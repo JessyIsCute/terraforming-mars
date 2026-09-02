@@ -10,8 +10,7 @@ export class MicroCredits extends Card implements IProjectCard {
     super({
       type: CardType.AUTOMATED,
       name: CardName.MICRO_CREDITS,
-      cost: 3,
-      tags: [Tag.EARTH, Tag.BUILDING],
+      cost: 2,
 
       behavior: {
         production: {megacredits: 1},
