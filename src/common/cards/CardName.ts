@@ -583,6 +583,9 @@ export enum CardName {
 
   // End of promo cards
 
+  // Community project cards
+  MICRO_CREDITS = 'Micro Credits',
+
   // Community corps
   AEROTECH = 'Aerotech',
   AGRICOLA_INC = 'Agricola Inc',

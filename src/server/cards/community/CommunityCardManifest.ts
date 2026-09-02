@@ -21,6 +21,7 @@ import {SpecialDesignProxy} from './SpecialDesignProxy';
 import {TradeAdvance} from './TradeAdvance';
 import {UnitedNationsMissionOne} from './UnitedNationsMissionOne';
 import {ValuableGases} from './ValuableGases';
+import {MicroCredits} from './MicroCredits';
 
 export const COMMUNITY_CARD_MANIFEST = new ModuleManifest({
   module: 'community',
@@ -46,8 +47,9 @@ export const COMMUNITY_CARD_MANIFEST = new ModuleManifest({
     [CardName.BY_ELECTION]: {Factory: ByElection, compatibility: 'turmoil'},
     [CardName.EXECUTIVE_ORDER]: {Factory: ExecutiveOrder, compatibility: 'turmoil'},
   },
-  projectCards: {
+    projectCards: {
     [CardName.SPECIAL_DESIGN_PROXY]: {Factory: SpecialDesignProxy, instantiate: false},
+    [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
   },
   globalEvents: {
     [GlobalEventName.LEADERSHIP_SUMMIT]: {Factory: LeadershipSummit},
