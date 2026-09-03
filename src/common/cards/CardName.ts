@@ -636,6 +636,7 @@ export enum CardName {
   CORRUPT_GOVERNORS = 'Corrupt Governors',
   OVERCROWDED_COLONY = 'Overcrowded Colony',
   NECROTIC_BLOOM = 'Necrotic Bloom',
+  GUERRILLA_GARDENING = 'Guerrilla Gardening',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
