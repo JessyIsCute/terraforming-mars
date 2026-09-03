@@ -18,17 +18,17 @@ describe('LivestockLobby', () => {
     player2.plants = 0;
   });
 
-  it('when any player adds an animal, that player gains plants and the owner gains M€', () => {
+  it('another player adding an animal gains that player plants only, no M€ for the owner', () => {
     const fish = new Fish();
     player2.playedCards.push(fish);
 
     player2.addResourceTo(fish, 2);
 
     expect(player2.plants).to.eq(2);
-    expect(player.megaCredits).to.eq(2);
+    expect(player.megaCredits).to.eq(0);
   });
 
-  it('the owner adding animals also triggers it', () => {
+  it('the owner adding an animal gains both plants and M€', () => {
     const fish = new Fish();
     player.playedCards.push(fish);
     player.megaCredits = 0;

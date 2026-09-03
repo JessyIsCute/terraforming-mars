@@ -14,17 +14,17 @@ export class SlashAndBurn extends Card implements IProjectCard {
       cost: 8,
 
       behavior: {
-        production: {plants: -2, heat: 4},
+        production: {plants: -2, heat: 6},
       },
 
       metadata: {
         cardNumber: 'X53',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => {
-            pb.minus().plants(2).nbsp.plus().heat(4);
+            pb.minus().plants(2).nbsp.plus().heat(6);
           });
         }),
-        description: 'Decrease your plant production 2 steps. Increase your heat production 4 steps.',
+        description: 'Decrease your plant production 2 steps. Increase your heat production 6 steps.',
       },
     });
   }

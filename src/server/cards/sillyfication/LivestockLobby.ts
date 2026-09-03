@@ -15,6 +15,7 @@ export class LivestockLobby extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.LIVESTOCK_LOBBY,
+      tags: [Tag.ANIMAL],
       cost: 10,
 
       requirements: {tag: Tag.ANIMAL, count: 2},
@@ -27,8 +28,11 @@ export class LivestockLobby extends Card implements IProjectCard {
         cardNumber: 'X42',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.minus().plants(1)).br;
-          b.effect('When any player adds an animal to a card, that player gains 1 plant and you gain 1 M€.', (eb) => {
-            eb.resource(CardResource.ANIMAL, {all}).startEffect.plants(1, {all}).megacredits(1);
+          b.effect('When any player adds an animal to a card, that player gains 1 plant.', (eb) => {
+            eb.resource(CardResource.ANIMAL, {all}).startEffect.plants(1, {all});
+          }).br;
+          b.effect('When you add an animal to a card, you gain 1 M€.', (eb) => {
+            eb.resource(CardResource.ANIMAL).startEffect.megacredits(1);
           });
         }),
         description: 'Requires 2 animal tags. Decrease your plant production 1 step.',
@@ -37,8 +41,11 @@ export class LivestockLobby extends Card implements IProjectCard {
   }
 
   public onResourceAddedByAnyPlayer(cardOwner: IPlayer, activePlayer: IPlayer, card: ICard, count: number) {
-    if (card.resourceType === CardResource.ANIMAL) {
-      activePlayer.stock.add(Resource.PLANTS, count, {log: true});
+    if (card.resourceType !== CardResource.ANIMAL) {
+      return;
+    }
+    activePlayer.stock.add(Resource.PLANTS, count, {log: true});
+    if (activePlayer.id === cardOwner.id) {
       cardOwner.stock.add(Resource.MEGACREDITS, count, {log: true});
     }
   }
