@@ -633,6 +633,7 @@ export enum CardName {
   STEEL_PHOBO = 'SteelPhobo',
   PHARMACY_ON_LUNA = 'Pharmacy on Luna',
   VITOR_VITALIS = 'Vitor Vitalis',
+  CORRUPT_GOVERNORS = 'Corrupt Governors',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

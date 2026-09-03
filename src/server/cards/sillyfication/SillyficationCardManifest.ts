@@ -48,6 +48,7 @@ import {ColdLikeSteel} from './ColdLikeSteel';
 import {SteelPhobo} from './SteelPhobo';
 import {PharmacyOnLuna} from './PharmacyOnLuna';
 import {VitorVitalis} from './VitorVitalis';
+import {CorruptGovernors} from './CorruptGovernors';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -108,5 +109,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.STEEL_PHOBO]: {Factory: SteelPhobo},
     [CardName.PHARMACY_ON_LUNA]: {Factory: PharmacyOnLuna, compatibility: 'moon'},
     [CardName.VITOR_VITALIS]: {Factory: VitorVitalis},
+    [CardName.CORRUPT_GOVERNORS]: {Factory: CorruptGovernors, compatibility: 'turmoil'},
   },
 });
