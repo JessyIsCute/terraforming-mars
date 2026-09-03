@@ -37,9 +37,12 @@ export abstract class Board {
 
   public constructor(
     public readonly spaces: ReadonlyArray<Space>,
-    public readonly noctisCitySpaceId?: SpaceId | undefined) {
-    this.maxX = Math.max(...spaces.map((s) => s.x));
-    this.maxY = Math.max(...spaces.map((s) => s.y));
+    public readonly noctisCitySpaceId?: SpaceId | undefined,
+    // Custom boards may carve away entire edge rows; an explicit extent keeps the
+    // `computeAdjacentSpaces` middle-row pivot anchored to the intended grid size.
+    extent?: {maxX: number, maxY: number}) {
+    this.maxX = extent?.maxX ?? Math.max(...spaces.map((s) => s.x));
+    this.maxY = extent?.maxY ?? Math.max(...spaces.map((s) => s.y));
     spaces.forEach((space) => {
       const adjacentSpaces = this.computeAdjacentSpaces(space);
       const filtered = adjacentSpaces.filter((space) => space !== undefined);
@@ -136,6 +139,14 @@ export abstract class Board {
   }
 
   /**
+   * True when a space is reserved and cannot take a general tile placement. On the standard
+   * boards that's just Noctis City; custom boards may flag additional reserved spaces.
+   */
+  protected isReservedSpace(space: Space): boolean {
+    return space.id === this.noctisCitySpaceId;
+  }
+
+  /**
    * Update `costs` with any costs for this `space`.
    *
    * @returns `true` when costs has changed, `false` when it has not.
@@ -229,7 +240,7 @@ export abstract class Board {
         return false;
       }
 
-      if (space.id === this.noctisCitySpaceId) {
+      if (this.isReservedSpace(space)) {
         return false;
       }
 
@@ -273,7 +284,7 @@ export abstract class Board {
   }
 
   public canPlaceTile(space: Space): boolean {
-    return space.tile === undefined && space.spaceType === SpaceType.LAND && space.id !== this.noctisCitySpaceId;
+    return space.tile === undefined && space.spaceType === SpaceType.LAND && !this.isReservedSpace(space);
   }
 
   public static isCitySpace(space: Space): boolean {
@@ -341,6 +352,9 @@ export abstract class Board {
         if (space.coOwner !== undefined) {
           serialized.coOwner = space.coOwner.id;
         }
+        if (space.reserved) {
+          serialized.reserved = true;
+        }
         if (space.volcanic) {
           serialized.volcanic = true;
         }
@@ -385,6 +399,9 @@ export abstract class Board {
     }
     if (serialized.volcanic !== undefined) {
       space.volcanic = serialized.volcanic;
+    }
+    if (serialized.reserved !== undefined) {
+      space.reserved = serialized.reserved;
     }
     return space;
   }

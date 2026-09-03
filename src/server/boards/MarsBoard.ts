@@ -17,8 +17,9 @@ export class MarsBoard extends Board {
 
   public constructor(
     spaces: ReadonlyArray<Space>,
-    noctisCitySpaceId?: SpaceId | undefined) {
-    super(spaces, noctisCitySpaceId);
+    noctisCitySpaceId?: SpaceId | undefined,
+    extent?: {maxX: number, maxY: number}) {
+    super(spaces, noctisCitySpaceId, extent);
     this.edges = this.computeEdges();
   }
 
@@ -222,21 +223,11 @@ export class MarsBoard extends Board {
   }
 
   private computeEdges(): ReadonlyArray<Space> {
-    return this.spaces.filter((space) => {
-      if (space.y === 0 || space.y === 8 || space.x === 8) {
-        return true;
-      }
-      // left side is tricky.
-      // top-left is easy with math. Look at the map.
-      if (space.y + space.x === 4) {
-        return true;
-      }
-      // bottom-left is also easy with math. Look at the map.
-      if (space.y - space.x === 4) {
-        return true;
-      }
-      return false;
-    });
+    // A Mars space is on the edge when it has fewer than the full six neighbours.
+    // On the standard diamond this is exactly {y===0, y===8, x===8, y+x===4, y-x===4};
+    // computing it from adjacency instead lets non-standard (custom) outlines work too.
+    return this.spaces.filter((space) =>
+      space.spaceType !== SpaceType.COLONY && this.getAdjacentSpaces(space).length < 6);
   }
 
   public getEdges(): ReadonlyArray<Space> {
@@ -261,7 +252,7 @@ export class MarsBoard extends Board {
    */
   public getNonReservedLandSpaces(): ReadonlyArray<Space> {
     return this.spaces.filter((space) => {
-      if (space.id === this.noctisCitySpaceId) {
+      if (this.isReservedSpace(space)) {
         return false;
       }
       return (space.spaceType === SpaceType.LAND || space.spaceType === SpaceType.COVE || space.spaceType === SpaceType.DEFLECTION_ZONE) &&

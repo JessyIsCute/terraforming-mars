@@ -4,6 +4,7 @@ import {Context} from './IHandler';
 import {Database} from '../database/Database';
 import {BoardName} from '../../common/boards/BoardName';
 import {RandomBoardOption} from '../../common/boards/RandomBoardOption';
+import {decodeCustomBoard} from '../../common/boards/customBoardCodec';
 import {Cloner} from '../database/Cloner';
 import {Game} from '../Game';
 import {GameOptions} from '../game/GameOptions';
@@ -70,7 +71,8 @@ export class ApiCreateGame extends Handler {
   }
 
   public static boardOptions(board: RandomBoardOption | BoardName): Array<BoardName> {
-    const allBoards = Object.values(BoardName);
+    // A custom board needs its own definition and can't be chosen by a random roll.
+    const allBoards = Object.values(BoardName).filter((name) => name !== BoardName.CUSTOM);
 
     if (board === RandomBoardOption.ALL) {
       return allBoards;
@@ -116,11 +118,20 @@ export class ApiCreateGame extends Handler {
         }
       }
 
-      const boards = ApiCreateGame.boardOptions(gameReq.board);
-      gameReq.board = boards[Math.floor(Math.random() * boards.length)];
+      let customBoard: GameOptions['customBoard'] = undefined;
+      if (gameReq.board === BoardName.CUSTOM) {
+        if (gameReq.customBoardCode === undefined) {
+          throw new Error('A custom board was selected but no map code was provided.');
+        }
+        customBoard = decodeCustomBoard(gameReq.customBoardCode);
+      } else {
+        const boards = ApiCreateGame.boardOptions(gameReq.board);
+        gameReq.board = boards[Math.floor(Math.random() * boards.length)];
+      }
 
       const gameOptions: GameOptions = {
         altVenusBoard: gameReq.altVenusBoard,
+        customBoard,
         aresExtension: gameReq.expansions.ares,
         aresHazards: true, // Not a runtime option.
         aresExtremeVariant: gameReq.aresExtremeVariant,
