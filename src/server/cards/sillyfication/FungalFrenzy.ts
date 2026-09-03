@@ -11,9 +11,8 @@ export class FungalFrenzy extends ActionCard {
       type: CardType.ACTIVE,
       name: CardName.FUNGAL_FRENZY,
       tags: [Tag.MICROBE],
-      cost: 8,
+      cost: 11,
       resourceType: CardResource.MICROBE,
-      victoryPoints: {resourcesHere: {}, per: 3},
 
       requirements: {temperature: 8},
 
@@ -47,8 +46,6 @@ export class FungalFrenzy extends ActionCard {
           b.plainText('Action: Add 1 microbe to this card, or remove 1 microbe to raise your plant production 1 step.', /* parens */ true);
           b.br;
           b.resource(CardResource.MICROBE).slash().tag(Tag.MICROBE);
-          b.br;
-          b.vpText('1 VP per 3 microbes on this card.');
         }),
         description: 'Requires +8°C or warmer. Add 1 microbe to this card for each microbe tag you have, including this.',
       },

@@ -8,24 +8,23 @@ import {IProjectCard} from '../IProjectCard';
 import {IPlayer} from '../../IPlayer';
 import {Resource} from '../../../common/Resource';
 
-// Venus is the goddess of love, so a joint Venus/Earth subsidiary is, obviously, a love child.
-export class LoveChildHoldings extends Card implements IProjectCard, IActionCard {
+export class VenusianSubsidiary extends Card implements IProjectCard, IActionCard {
   constructor() {
     super({
       type: CardType.ACTIVE,
-      name: CardName.LOVE_CHILD_HOLDINGS,
+      name: CardName.VENUSIAN_SUBSIDIARY,
       tags: [Tag.VENUS, Tag.EARTH],
       cost: 10,
       requirements: [{tag: Tag.VENUS, count: 2}, {tag: Tag.EARTH, count: 2}],
 
       metadata: {
         cardNumber: 'X07',
+        description: 'Requires 2 Venus tags and 2 Earth tags. Action: Gain 1 M€ for each pair of Venus and Earth tags you have.',
         renderData: CardRenderer.builder((b) => {
-          b.action('Gain 1 M€ for each pair of Venus and Earth tags you have (1 Venus + 1 Earth = 1 pair).', (eb) => {
+          b.action(undefined, (eb) => {
             eb.empty().startAction.megacredits(1).slash().tag(Tag.VENUS).tag(Tag.EARTH);
           });
         }),
-        description: 'Requires 2 Venus tags and 2 Earth tags.',
       },
     });
   }
@@ -35,8 +34,20 @@ export class LoveChildHoldings extends Card implements IProjectCard, IActionCard
   }
 
   public action(player: IPlayer) {
-    const pairs = Math.min(player.tags.count(Tag.VENUS), player.tags.count(Tag.EARTH));
-    player.stock.add(Resource.MEGACREDITS, pairs, {log: true});
+    // Count raw tags and hand each wild tag to whichever side is behind, so a
+    // wild tag completes exactly one pair rather than counting for both.
+    let venus = player.tags.count(Tag.VENUS, 'raw');
+    let earth = player.tags.count(Tag.EARTH, 'raw');
+    let wild = player.tags.count(Tag.WILD, 'raw');
+    while (wild > 0) {
+      if (venus <= earth) {
+        venus++;
+      } else {
+        earth++;
+      }
+      wild--;
+    }
+    player.stock.add(Resource.MEGACREDITS, Math.min(venus, earth), {log: true});
     return undefined;
   }
 }

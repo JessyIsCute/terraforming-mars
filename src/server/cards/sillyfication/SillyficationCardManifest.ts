@@ -6,7 +6,7 @@ import {ThermalForests} from './ThermalForests';
 import {VolcanicMinerals} from './VolcanicMinerals';
 import {MacroMills} from './MacroMills';
 import {FungalFrenzy} from './FungalFrenzy';
-import {LoveChildHoldings} from './LoveChildHoldings';
+import {VenusianSubsidiary} from './VenusianSubsidiary';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -17,6 +17,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.VOLCANIC_MINERALS]: {Factory: VolcanicMinerals},
     [CardName.MACRO_MILLS]: {Factory: MacroMills},
     [CardName.FUNGAL_FRENZY]: {Factory: FungalFrenzy},
-    [CardName.LOVE_CHILD_HOLDINGS]: {Factory: LoveChildHoldings},
+    [CardName.VENUSIAN_SUBSIDIARY]: {Factory: VenusianSubsidiary},
   },
 });

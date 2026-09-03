@@ -60,9 +60,4 @@ describe('FungalFrenzy', () => {
     expect(card.resourceCount).to.eq(0);
     expect(player.production.plants).to.eq(1);
   });
-
-  it('scores 1 VP per 3 microbes', () => {
-    player.addResourceTo(card, {qty: 7});
-    expect(card.getVictoryPoints(player)).to.eq(2);
-  });
 });

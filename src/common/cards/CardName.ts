@@ -590,7 +590,7 @@ export enum CardName {
   VOLCANIC_MINERALS = 'Volcanic Minerals',
   MACRO_MILLS = 'Macro Mills',
   FUNGAL_FRENZY = 'Fungal Frenzy',
-  LOVE_CHILD_HOLDINGS = 'Love Child Holdings',
+  VENUSIAN_SUBSIDIARY = 'Venusian Subsidiary',
 
   // Community corps
   AEROTECH = 'Aerotech',

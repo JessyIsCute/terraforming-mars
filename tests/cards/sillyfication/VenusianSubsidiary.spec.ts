@@ -1,14 +1,14 @@
 import {expect} from 'chai';
-import {LoveChildHoldings} from '../../../src/server/cards/sillyfication/LoveChildHoldings';
+import {VenusianSubsidiary} from '../../../src/server/cards/sillyfication/VenusianSubsidiary';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 
-describe('LoveChildHoldings', () => {
-  let card: LoveChildHoldings;
+describe('VenusianSubsidiary', () => {
+  let card: VenusianSubsidiary;
   let player: TestPlayer;
 
   beforeEach(() => {
-    card = new LoveChildHoldings();
+    card = new VenusianSubsidiary();
     [/* game */, player] = testGame(2);
     player.megaCredits = 20;
   });
@@ -45,5 +45,15 @@ describe('LoveChildHoldings', () => {
     card.action(player);
 
     expect(player.megaCredits).to.eq(0);
+  });
+
+  it('action assigns each wild tag to the side that is behind', () => {
+    player.megaCredits = 0;
+    player.tagsForTest = {venus: 3, earth: 1, wild: 2};
+
+    card.action(player);
+
+    // wild #1 -> earth (2), wild #2 -> earth (3); min(3, 3) = 3 pairs.
+    expect(player.megaCredits).to.eq(3);
   });
 });
