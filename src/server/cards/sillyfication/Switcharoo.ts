@@ -7,6 +7,7 @@ import {Resource} from '../../../common/Resource';
 import {SelectPlayer} from '../../inputs/SelectPlayer';
 import {SelectAmount} from '../../inputs/SelectAmount';
 import {CardRenderer} from '../render/CardRenderer';
+import {all} from '../Options';
 
 export class Switcharoo extends Card implements IProjectCard {
   constructor() {
@@ -18,7 +19,7 @@ export class Switcharoo extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X37',
         renderData: CardRenderer.builder((b) => {
-          b.minus().steel(1).nbsp.plus().plants(1);
+          b.minus().steel(1).nbsp.plus().plants(1, {all}).asterix();
         }),
         description: 'Give any number of your steel to any player and take an equal number of that player\'s plants.',
       },

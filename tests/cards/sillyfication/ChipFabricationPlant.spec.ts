@@ -23,24 +23,27 @@ describe('ChipFabricationPlant', () => {
   });
 
   it('cannot act without building tags or M€', () => {
+    player.tagsForTest = {building: 0};
     player.megaCredits = 10;
     expect(card.canAct(player)).is.false;
+
     player.tagsForTest = {building: 3};
     expect(card.canAct(player)).is.true;
+
     player.megaCredits = 0;
     expect(card.canAct(player)).is.false;
   });
 
-  it('converts M€ to titanium, capped by building tags', () => {
+  it('converts M€ to steel, capped by building tags', () => {
     player.tagsForTest = {building: 3};
     player.megaCredits = 10;
-    player.titanium = 0;
+    player.steel = 0;
 
     const selectAmount = cast(card.action(player), SelectAmount);
     expect(selectAmount.max).to.eq(3);
     selectAmount.cb(3);
 
     expect(player.megaCredits).to.eq(7);
-    expect(player.titanium).to.eq(3);
+    expect(player.steel).to.eq(3);
   });
 });

@@ -14,20 +14,20 @@ export class OrbitDumping extends Card implements IProjectCard {
       type: CardType.EVENT,
       name: CardName.ORBIT_DUMPING,
       tags: [Tag.SPACE],
-      cost: 1,
-      victoryPoints: -1,
+      cost: 4,
+      victoryPoints: -2,
 
       behavior: {
-        stock: {titanium: 2},
+        stock: {titanium: 3},
       },
 
       metadata: {
         cardNumber: 'X31',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.minus().megacredits(3, {all})).br;
-          b.titanium(2);
+          b.titanium(3);
         }),
-        description: 'All players lose 3 M€ production. Gain 2 titanium.',
+        description: 'All players lose 3 M€ production. Gain 3 titanium.',
       },
     });
   }

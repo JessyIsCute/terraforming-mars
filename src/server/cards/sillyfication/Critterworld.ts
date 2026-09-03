@@ -8,7 +8,7 @@ import {Resource} from '../../../common/Resource';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
-import {all} from '../Options';
+import {all, digit} from '../Options';
 
 export class Critterworld extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
@@ -28,7 +28,7 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
         cardNumber: 'XC3',
         description: 'You start with 38 M€ and add 7 animals to this card. As your first action, draw 2 cards with an animal tag.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(38).nbsp.resource(CardResource.ANIMAL, {amount: 7}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
+          b.megacredits(38).nbsp.resource(CardResource.ANIMAL, {amount: 7, digit}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you add an animal to another card, add an animal to this card.', (eb) => {

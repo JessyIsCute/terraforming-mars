@@ -26,7 +26,7 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
           b.megacredits(54);
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
-            cea.effect('When you play a card with a Venus tag, including this, add 2 floaters to any card.', (eb) => {
+            cea.effect('When you play a Venus tag, including this, add 2 floaters to any card.', (eb) => {
               eb.tag(Tag.VENUS).asterix().startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
             });
             cea.action('Remove any number of floaters from this card to gain 2 M€ each.', (ab) => {
@@ -38,14 +38,12 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
     });
   }
 
-  public override bespokePlay(player: IPlayer) {
-    player.game.defer(new AddResourcesToCard(player, CardResource.FLOATER, {count: 2}));
-    return undefined;
-  }
-
   public onCardPlayed(player: IPlayer, card: ICard) {
-    if (card.name !== this.name && card.tags.includes(Tag.VENUS)) {
-      player.game.defer(new AddResourcesToCard(player, CardResource.FLOATER, {count: 2}));
+    // Triggers once per Venus tag on the card, so this corp's own two Venus tags
+    // hand you 4 floaters when it comes into play.
+    const venusTags = player.tags.cardTagCount(card, Tag.VENUS);
+    if (venusTags > 0) {
+      player.game.defer(new AddResourcesToCard(player, CardResource.FLOATER, {count: venusTags * 2}));
     }
   }
 

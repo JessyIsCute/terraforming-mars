@@ -17,10 +17,10 @@ describe('NeptuneResearchVessel', () => {
     player.playedCards.push(card);
   });
 
-  it('requires 2 science tags', () => {
+  it('requires 2 science and 2 Jovian tags', () => {
     player.tagsForTest = {science: 1};
     expect(card.canPlay(player)).is.false;
-    player.tagsForTest = {science: 2};
+    player.tagsForTest = {science: 2, jovian: 2};
     expect(card.canPlay(player)).is.true;
   });
 

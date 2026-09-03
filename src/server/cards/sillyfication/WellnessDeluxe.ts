@@ -18,10 +18,9 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
     super({
       name: CardName.WELLNESS_DELUXE,
       tags: [Tag.EARTH],
-      startingMegaCredits: 40,
+      startingMegaCredits: 37,
 
       behavior: {
-        production: {megacredits: 2},
         stock: {heat: 4},
       },
 
@@ -32,10 +31,10 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
 
       metadata: {
         cardNumber: 'XC1',
-        description: 'You start with 40 M€, 2 M€ production and 4 heat. As your first action, place an ocean tile.',
+        description: 'You start with 37 M€ and 4 heat. As your first action, place an ocean tile.',
         renderData: CardRenderer.builder((b) => {
           b.br;
-          b.megacredits(40).nbsp.production((pb) => pb.megacredits(2)).nbsp.heat(4, {digit}).nbsp.oceans(1);
+          b.megacredits(37).nbsp.heat(4, {digit}).nbsp.oceans(1);
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
             ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 3 heat.', (eb) => {

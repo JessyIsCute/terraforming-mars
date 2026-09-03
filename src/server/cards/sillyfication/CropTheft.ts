@@ -20,7 +20,7 @@ export class CropTheft extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X35',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(1, {all}).slash().tag(Tag.PLANT);
+          b.minus().plants(1, {all}).asterix().slash().tag(Tag.PLANT);
         }),
         description: 'Steal 1 plant from any player for each plant tag that player has.',
       },

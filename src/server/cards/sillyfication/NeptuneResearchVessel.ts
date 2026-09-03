@@ -18,9 +18,9 @@ export class NeptuneResearchVessel extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.NEPTUNE_RESEARCH_VESSEL,
       tags: [Tag.JOVIAN, Tag.SCIENCE],
-      cost: 8,
+      cost: 9,
       victoryPoints: 1,
-      requirements: {tag: Tag.SCIENCE, count: 2},
+      requirements: [{tag: Tag.SCIENCE, count: 2}, {tag: Tag.JOVIAN, count: 2}],
 
       metadata: {
         cardNumber: 'X16',
@@ -29,7 +29,7 @@ export class NeptuneResearchVessel extends Card implements IProjectCard {
             eb.oceans(1, {all}).startEffect.megacredits(2);
           });
         }),
-        description: 'Requires 2 science tags.',
+        description: 'Requires 2 science tags and 2 Jovian tags.',
       },
     });
   }

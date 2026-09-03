@@ -17,10 +17,10 @@ describe('WellnessDeluxe', () => {
     player.playedCards.push(card);
   });
 
-  it('starting bonuses', () => {
+  it('starts with 4 heat and no production bonus', () => {
     card.play(player);
     runAllActions(game);
-    expect(player.production.megacredits).to.eq(2);
+    expect(player.production.megacredits).to.eq(0);
     expect(player.heat).to.eq(4);
   });
 

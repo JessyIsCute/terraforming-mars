@@ -22,14 +22,15 @@ describe('VenusVentures', () => {
     expect(card.tags.filter((t) => t === 'venus')).to.have.length(2);
   });
 
-  it('adds 2 floaters on play and when a Venus-tag card is played', () => {
-    card.play(player);
-    runAllActions(game);
-    expect(card.resourceCount).to.eq(2);
-
-    card.onCardPlayed(player, new VenusianSubsidiary());
+  it('adds 2 floaters per Venus tag played; 4 for its own two Venus tags', () => {
+    card.onCardPlayed(player, card);
     runAllActions(game);
     expect(card.resourceCount).to.eq(4);
+
+    // Venusian Subsidiary has a single Venus tag.
+    card.onCardPlayed(player, new VenusianSubsidiary());
+    runAllActions(game);
+    expect(card.resourceCount).to.eq(6);
   });
 
   it('does not add floaters for a non-Venus card', () => {
