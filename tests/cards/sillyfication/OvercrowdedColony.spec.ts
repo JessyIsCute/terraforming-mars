@@ -6,6 +6,7 @@ import {ColonyName} from '../../../src/common/colonies/ColonyName';
 import {IGame} from '../../../src/server/IGame';
 import {IColony} from '../../../src/server/colonies/IColony';
 import {cast} from '@/common/utils/utils';
+import {runAllActions} from '../../TestingUtils';
 import {TestPlayer} from '../../TestPlayer';
 
 describe('OvercrowdedColony', () => {
@@ -39,15 +40,26 @@ describe('OvercrowdedColony', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('adds a fourth colony with no placement bonus', () => {
+  it('is worth -1 VP', () => {
+    expect(card.getVictoryPoints(player)).eq(-1);
+  });
+
+  it('adds a fourth colony, grants the placement bonus, and trades for free', () => {
     ganymede.colonies = [player2.id, player2.id, player2.id];
-    const plantsBefore = player.production.plants;
+    ganymede.trackPosition = 3;
+    const plantsProdBefore = player.production.plants;
+    const plantsBefore = player.plants;
 
     const selectColony = cast(card.play(player), SelectColony);
     expect(selectColony.colonies).deep.eq([ganymede]);
     selectColony.cb(ganymede);
+    runAllActions(game);
 
+    // 4th colony on the tile, in build order.
     expect(ganymede.colonies).deep.eq([player2.id, player2.id, player2.id, player.id]);
-    expect(player.production.plants).eq(plantsBefore);
+    // Ganymede build bonus: +1 plant production.
+    expect(player.production.plants).eq(plantsProdBefore + 1);
+    // Free trade income (Ganymede pays plants by track position).
+    expect(player.plants).is.greaterThan(plantsBefore);
   });
 });

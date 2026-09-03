@@ -7,7 +7,6 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {SelectColony} from '../../inputs/SelectColony';
 import {IColony} from '../../colonies/IColony';
-import {ColonyName} from '../../../common/colonies/ColonyName';
 import {MAX_COLONIES_PER_TILE} from '../../../common/constants';
 
 export class OvercrowdedColony extends Card implements IProjectCard {
@@ -17,14 +16,14 @@ export class OvercrowdedColony extends Card implements IProjectCard {
       name: CardName.OVERCROWDED_COLONY,
       tags: [Tag.SPACE],
       cost: 8,
-      victoryPoints: 1,
+      victoryPoints: -1,
 
       metadata: {
         cardNumber: 'X50',
         renderData: CardRenderer.builder((b) => {
-          b.colonies(1).asterix();
+          b.colonies(1).asterix().trade();
         }),
-        description: 'Requires a colony tile that already has 3 colonies. Add a colony to that tile. You do not get a placement bonus.',
+        description: 'Requires a colony tile that already has 3 colonies. Add a colony to that tile, gaining the placement bonus, then trade with it for free.',
       },
     });
   }
@@ -34,6 +33,9 @@ export class OvercrowdedColony extends Card implements IProjectCard {
   }
 
   public override bespokeCanPlay(player: IPlayer): boolean {
+    if (player.game.tradeEmbargo === true) {
+      return false;
+    }
     return this.fullColonies(player).length > 0;
   }
 
@@ -43,18 +45,23 @@ export class OvercrowdedColony extends Card implements IProjectCard {
       .andThen((colony) => {
         const game = player.game;
         game.log('${0} crammed an extra colony onto ${1}', (b) => b.player(player).colony(colony));
-        colony.colonies.push(player.id);
+
+        // The tile is already full (3 colonies). Momentarily treat it as having 2 so the
+        // normal build path awards the placement bonus (build bonuses are identical for
+        // every slot), then restore the displaced colony so the tile ends up with 4.
+        const displaced = colony.colonies.pop();
+        colony.addColony(player);
+        if (displaced !== undefined) {
+          colony.colonies.splice(colony.colonies.length - 1, 0, displaced);
+        }
         if (colony.trackPosition < colony.colonies.length) {
           colony.trackPosition = colony.colonies.length;
         }
-        for (const cardOwner of game.players) {
-          for (const card of cardOwner.tableau) {
-            card.onColonyAddedByAnyPlayer?.(cardOwner, player);
-          }
-        }
-        if (colony.name === ColonyName.LEAVITT) {
-          player.triggerOnNonCardTagAdded(Tag.SCIENCE);
-        }
+
+        player.defer(() => {
+          colony.trade(player, {usesTradeFleet: false});
+          return undefined;
+        });
         return undefined;
       });
   }
