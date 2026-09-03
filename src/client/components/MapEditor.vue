@@ -97,9 +97,6 @@
             :style="hexStyle(cell)"
             @click="paint(cell)"
             @contextmenu.prevent="removeLastBonus(cell)"
-            @mousedown="dragging = true"
-            @mouseup="dragging = false"
-            @mouseenter="dragging && paint(cell)"
             :title="cell.x + ',' + cell.y"
           >
             <span class="map-editor-hex-bonuses" v-if="cell.space">
@@ -265,7 +262,6 @@ export default defineComponent({
       awards: [] as Array<AwardName>,
       customParams: false,
       params: toEditableParams(DEFAULT_GLOBAL_PARAMETERS),
-      dragging: false,
       loadInput: '',
       loadError: '',
       expansions: DEFAULT_EXPANSIONS,
@@ -394,15 +390,23 @@ export default defineComponent({
       this.grid = new Map(this.grid);
     },
     hexClass(cell: Cell): Record<string, boolean> {
+      const space = cell.space;
+      if (space === null) {
+        return {'map-editor-hex--void': true};
+      }
+      const isCove = space.spaceType === SpaceType.COVE;
+      const volcanicLand = space.volcanic === true && !isCove && space.spaceType !== SpaceType.OCEAN;
       return {
-        'map-editor-hex--void': cell.space === null,
-        'map-editor-hex--land': cell.space?.spaceType === SpaceType.LAND,
-        'map-editor-hex--ocean': cell.space?.spaceType === SpaceType.OCEAN,
-        'map-editor-hex--cove': cell.space?.spaceType === SpaceType.COVE,
-        'map-editor-hex--restricted': cell.space?.spaceType === SpaceType.RESTRICTED,
-        'map-editor-hex--deflection': cell.space?.spaceType === SpaceType.DEFLECTION_ZONE,
-        'map-editor-hex--volcanic': cell.space?.volcanic === true,
-        'map-editor-hex--reserved': cell.space?.reserved === true,
+        // Reuse the real board sprites (board.less) so terrain reads the same as in a game.
+        'board-space-type-ocean': space.spaceType === SpaceType.OCEAN && space.volcanic !== true,
+        'board-space-type-volcanic-cove': isCove && space.volcanic === true,
+        'board-space-type-cove': isCove && space.volcanic !== true,
+        'board-space-type-deflection-zone': space.spaceType === SpaceType.DEFLECTION_ZONE,
+        // The land-volcanic sprite is an overlay used together with land, as on the real board.
+        'board-space-type-land': (space.spaceType === SpaceType.LAND && space.volcanic !== true) || volcanicLand,
+        'board-space-type-land-volcanic': volcanicLand,
+        'map-editor-hex--restricted': space.spaceType === SpaceType.RESTRICTED,
+        'map-editor-hex--reserved': space.reserved === true,
       };
     },
     hexStyle(cell: Cell): Record<string, string> {
@@ -570,26 +574,33 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     max-height: 60vh;
   }
 
+  // The hex's fill comes from the real board-space-type-* sprites (global, from board.less);
+  // only layout, the void state and the reserved marker are styled here.
   .map-editor-hex {
     position: absolute;
     width: 46px;
     height: 51px;
     border: none;
     padding: 0;
-    font-size: 12px;
-    line-height: 51px;
-    color: #000;
     cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: 46px 51px;
     clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-    background: #b9b0a3;
 
-    &--void { background: #2a2733; cursor: crosshair; }
-    &--land { background: #c8bda9; }
-    &--ocean { background: #5aa9d6; }
-    &--cove { background: #8fc9c0; }
-    &--restricted { background: #55555f; }
-    &--deflection { background: #d8d94a; }
-    &--volcanic { box-shadow: inset 0 0 0 3px #c0392b; }
+    &:hover { filter: brightness(1.25); }
+
+    // A void is an absence: no hex shape, just a faint clickable slot.
+    &--void {
+      background: transparent;
+      clip-path: none;
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      cursor: cell;
+      &:hover { filter: none; background: rgba(255, 255, 255, 0.06); }
+    }
+
+    // RESTRICTED has no board sprite of its own.
+    &--restricted { background-color: rgba(70, 70, 78, 0.85); }
+
     &--reserved { box-shadow: inset 0 0 0 3px #f1c40f; }
   }
 

@@ -101,6 +101,33 @@ describe('MapEditor', () => {
     expect(decodeCustomBoard(vm.code).spaces[0].bonus).to.deep.eq([]);
   });
 
+  it('paints terrain with the real board sprite classes', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const hex = () => wrapper.findAll('.map-editor-hex')[0];
+
+    vm.tool = 'type:ocean';
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    expect(hex().classes()).to.include('board-space-type-ocean');
+
+    vm.tool = 'flag:volcanic';
+    await wrapper.vm.$nextTick();
+    vm.tool = 'type:land';
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click'); // land, not volcanic yet
+    vm.tool = 'flag:volcanic';
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    expect(hex().classes()).to.include.members(['board-space-type-land', 'board-space-type-land-volcanic']);
+
+    vm.tool = 'flag:void';
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    expect(hex().classes()).to.include('map-editor-hex--void');
+    expect(hex().classes()).to.not.include('board-space-type-land');
+  });
+
   it('caps milestone selection at 5', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;
