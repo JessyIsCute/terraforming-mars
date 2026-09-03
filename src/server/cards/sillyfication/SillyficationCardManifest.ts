@@ -33,6 +33,7 @@ import {DebrisField} from './DebrisField';
 import {OrbitDumping} from './OrbitDumping';
 import {GarbageDumps} from './GarbageDumps';
 import {LaunchWindow} from './LaunchWindow';
+import {GlobalEnergyInfrastructure} from './GlobalEnergyInfrastructure';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 
@@ -76,5 +77,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.ORBIT_DUMPING]: {Factory: OrbitDumping},
     [CardName.GARBAGE_DUMPS]: {Factory: GarbageDumps},
     [CardName.LAUNCH_WINDOW]: {Factory: LaunchWindow},
+    [CardName.GLOBAL_ENERGY_INFRASTRUCTURE]: {Factory: GlobalEnergyInfrastructure},
   },
 });

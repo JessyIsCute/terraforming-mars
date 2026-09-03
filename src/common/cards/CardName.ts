@@ -617,6 +617,7 @@ export enum CardName {
   ORBIT_DUMPING = 'Orbit Dumping',
   GARBAGE_DUMPS = 'Garbage Dumps',
   LAUNCH_WINDOW = 'Launch Window',
+  GLOBAL_ENERGY_INFRASTRUCTURE = 'Global Energy Infrastructure',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
