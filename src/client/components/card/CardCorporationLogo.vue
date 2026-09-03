@@ -286,6 +286,12 @@
           <div class="voltagon-title">VOLTAGON</div>
         </div>
       </template>
+      <template v-else-if="title === CardName.VENUS_VENTURES">
+        <div class="card-venus-ventures-logo"><span class="word-1">VENUS</span> <span class="word-2">VENTURES</span></div>
+      </template>
+      <template v-else-if="title === CardName.WELLNESS_DELUXE">
+        <div class="card-wellness-deluxe-logo"><span class="word-1">WELLNESS</span> <span class="word-2">DELUXE</span></div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -397,11 +403,11 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.UNITED_NATIONS_MISSION_ONE]: 'bespoke',
   [CardName.UTOPIA_INVEST]: 'bespoke',
   [CardName.VALLEY_TRUST]: 'bespoke',
-  [CardName.VENUS_VENTURES]: 'css',
+  [CardName.VENUS_VENTURES]: 'bespoke',
   [CardName.VIRON]: 'css',
   [CardName.VITOR]: 'bespoke',
   [CardName.VOLTAGON]: 'bespoke',
-  [CardName.WELLNESS_DELUXE]: 'css',
+  [CardName.WELLNESS_DELUXE]: 'bespoke',
 };
 
 export default defineComponent({
