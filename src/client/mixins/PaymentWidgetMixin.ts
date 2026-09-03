@@ -8,7 +8,7 @@ import {Units} from '@/common/Units';
 import {CardResource} from '@/common/CardResource';
 import {getCard} from '@/client/cards/ClientCardManifest';
 import {DEFAULT_PAYMENT_VALUES, Payment} from '@/common/inputs/Payment';
-import {SpendableResource} from '@/common/inputs/Spendable';
+import {SpendableResource, FLOATER_PAYMENT_CARDS} from '@/common/inputs/Spendable';
 import {Ledger, newDefaultLedger} from '../components/PaymentLedger';
 import {ALL_RESOURCES} from '@/common/Resource';
 
@@ -117,7 +117,7 @@ export const PaymentWidgetMixin = defineComponent({
         // Find a card other than Dirigibles with floaters.
         // If there is none, then Dirigibles can't use every one.
         if (!thisPlayer.tableau.some((card) => {
-          return card.name !== CardName.DIRIGIBLES && getCard(card.name)?.resourceType === CardResource.FLOATER && (card.resources ?? 0) > 0;
+          return !FLOATER_PAYMENT_CARDS.includes(card.name) && getCard(card.name)?.resourceType === CardResource.FLOATER && (card.resources ?? 0) > 0;
         })) {
           units.floaters = Math.max(units.floaters - 1, 0);
         }

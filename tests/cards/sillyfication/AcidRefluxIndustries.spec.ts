@@ -3,6 +3,7 @@ import {AcidRefluxIndustries} from '../../../src/server/cards/sillyfication/Acid
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {VenusianSubsidiary} from '../../../src/server/cards/sillyfication/VenusianSubsidiary';
 import {IGame} from '../../../src/server/IGame';
+import {Payment} from '../../../src/common/inputs/Payment';
 import {TestPlayer} from '../../TestPlayer';
 import {runAllActions} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
@@ -27,16 +28,14 @@ describe('AcidRefluxIndustries', () => {
     expect(card.getCardDiscount(player, new VenusianSubsidiary())).to.eq(-1);
   });
 
-  it('adds 2 floaters on play (its own Venus tags)', () => {
+  it('adds 2 floaters on play and when a Venus-tag card is played', () => {
     card.play(player);
     runAllActions(game);
     expect(card.resourceCount).to.eq(2);
-  });
 
-  it('adds 2 floaters when a Venus-tag card is played', () => {
     card.onCardPlayed(player, new VenusianSubsidiary());
     runAllActions(game);
-    expect(card.resourceCount).to.eq(2);
+    expect(card.resourceCount).to.eq(4);
   });
 
   it('does not add floaters for a non-Venus card', () => {
@@ -45,15 +44,15 @@ describe('AcidRefluxIndustries', () => {
     expect(card.resourceCount).to.eq(0);
   });
 
-  it('action removes 1 floater to gain 2 M€', () => {
-    player.addResourceTo(card, 3);
-    player.megaCredits = 0;
+  it('its floaters count as spendable floaters', () => {
+    player.addResourceTo(card, 4);
+    expect(player.getSpendable('floaters')).to.eq(4);
+  });
 
-    expect(card.canAct(player)).is.true;
-    card.action(player);
+  it('paying with floaters drains them from this card', () => {
+    player.addResourceTo(card, 4);
+    player.pay(Payment.of({floaters: 3}));
     runAllActions(game);
-
-    expect(card.resourceCount).to.eq(2);
-    expect(player.megaCredits).to.eq(2);
+    expect(card.resourceCount).to.eq(1);
   });
 });

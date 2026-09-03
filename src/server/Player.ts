@@ -9,7 +9,7 @@ import {ICorporationCard} from './cards/corporation/ICorporationCard';
 import {IGame} from './IGame';
 import {Game} from './Game';
 import {Payment, PaymentOptions, DEFAULT_PAYMENT_VALUES} from '../common/inputs/Payment';
-import {SpendableResource, SPENDABLE_RESOURCES, SpendableCardResource, CARD_FOR_SPENDABLE_RESOURCE} from '../common/inputs/Spendable';
+import {SpendableResource, SPENDABLE_RESOURCES, SpendableCardResource, CARD_FOR_SPENDABLE_RESOURCE, FLOATER_PAYMENT_CARDS} from '../common/inputs/Spendable';
 import {IAward} from './awards/IAward';
 import {ICard, isIActionCard, IActionCard} from './cards/ICard';
 import {IMilestone} from './milestones/IMilestone';
@@ -793,6 +793,9 @@ export class Player implements IPlayer {
   }
 
   public getSpendable(SpendableResource: SpendableCardResource): number {
+    if (SpendableResource === 'floaters') {
+      return FLOATER_PAYMENT_CARDS.reduce((sum, name) => sum + this.resourcesOnCard(name), 0);
+    }
     return this.resourcesOnCard(CARD_FOR_SPENDABLE_RESOURCE[SpendableResource]);
   }
 
@@ -823,7 +826,19 @@ export class Player implements IPlayer {
     };
 
     removeResourcesOnCard(CardName.PSYCHROPHILES, payment.microbes);
-    removeResourcesOnCard(CardName.DIRIGIBLES, payment.floaters);
+    // Floaters may sit on more than one card (Dirigibles, Acid Reflux Industries); drain them in order.
+    let floatersToRemove = payment.floaters;
+    for (const name of FLOATER_PAYMENT_CARDS) {
+      if (floatersToRemove <= 0) {
+        break;
+      }
+      const card = this.playedCards.get(name);
+      const take = Math.min(card?.resourceCount ?? 0, floatersToRemove);
+      if (take > 0 && card !== undefined) {
+        this.removeResourceFrom(card, take, {log: true});
+        floatersToRemove -= take;
+      }
+    }
     removeResourcesOnCard(CardName.LUNA_ARCHIVES, payment.lunaArchivesScience);
     removeResourcesOnCard(CardName.SPIRE, payment.spireScience);
     removeResourcesOnCard(CardName.CARBON_NANOSYSTEMS, payment.graphene);

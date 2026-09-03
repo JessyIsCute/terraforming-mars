@@ -58,3 +58,13 @@ export const CARD_FOR_SPENDABLE_RESOURCE = {
   graphene: CardName.CARBON_NANOSYSTEMS,
   kuiperAsteroids: CardName.KUIPER_COOPERATIVE,
 } satisfies Record<SpendableCardResource, CardName>;
+
+/**
+ * Cards whose floaters may be spent as M€ for cards with a Venus tag, in the order they are drained.
+ *
+ * Dirigibles is the canonical one; Sillyfication's Acid Reflux Industries behaves identically.
+ */
+export const FLOATER_PAYMENT_CARDS: ReadonlyArray<CardName> = [
+  CardName.DIRIGIBLES,
+  CardName.ACID_REFLUX_INDUSTRIES,
+];

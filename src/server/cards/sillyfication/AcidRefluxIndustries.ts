@@ -1,4 +1,4 @@
-import {ActiveCorporationCard} from '../corporation/CorporationCard';
+import {CorporationCard} from '../corporation/CorporationCard';
 import {ICorporationCard} from '../corporation/ICorporationCard';
 import {Tag} from '../../../common/cards/Tag';
 import {CardResource} from '../../../common/CardResource';
@@ -8,20 +8,14 @@ import {ICard} from '../ICard';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
-import {digit} from '../Options';
 
-export class AcidRefluxIndustries extends ActiveCorporationCard implements ICorporationCard {
+export class AcidRefluxIndustries extends CorporationCard implements ICorporationCard {
   constructor() {
     super({
       name: CardName.ACID_REFLUX_INDUSTRIES,
       tags: [Tag.VENUS, Tag.VENUS],
       startingMegaCredits: 54,
       resourceType: CardResource.FLOATER,
-
-      action: {
-        spend: {resourcesHere: 1},
-        stock: {megacredits: 2},
-      },
 
       metadata: {
         cardNumber: 'XC2',
@@ -34,8 +28,8 @@ export class AcidRefluxIndustries extends ActiveCorporationCard implements ICorp
           b.effect('Whenever you play a card with a Venus tag, including this, add 2 floaters to any card.', (eb) => {
             eb.tag(Tag.VENUS).asterix().startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
           }).br;
-          b.action('Remove 1 floater from this card to gain 2 M€.', (ab) => {
-            ab.resource(CardResource.FLOATER).startAction.megacredits(2, {digit});
+          b.effect('When playing a Venus tag, floaters here may be used as payment, and are worth 3 M€ each.', (eb) => {
+            eb.tag(Tag.VENUS).startEffect.resource(CardResource.FLOATER).equals().megacredits(3);
           });
         }),
       },

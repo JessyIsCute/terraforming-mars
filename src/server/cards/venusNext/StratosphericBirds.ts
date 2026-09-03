@@ -4,6 +4,7 @@ import {CardType} from '../../../common/cards/CardType';
 import {IPlayer} from '../../IPlayer';
 import {CardResource} from '../../../common/CardResource';
 import {CardName} from '../../../common/cards/CardName';
+import {FLOATER_PAYMENT_CARDS} from '../../../common/inputs/Spendable';
 import {RemoveResourcesFromCard} from '../../deferredActions/RemoveResourcesFromCard';
 import {CardRenderer} from '../render/CardRenderer';
 import {ActionCard} from '../ActionCard';
@@ -49,7 +50,7 @@ export class StratosphericBirds extends ActionCard implements IActionCard {
       return true;
     } else {
       const floaterCard = cardsWithFloater[0];
-      if (floaterCard.name !== CardName.DIRIGIBLES) {
+      if (!FLOATER_PAYMENT_CARDS.includes(floaterCard.name)) {
         return true;
       }
 
