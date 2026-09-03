@@ -637,6 +637,7 @@ export enum CardName {
   OVERCROWDED_COLONY = 'Overcrowded Colony',
   NECROTIC_BLOOM = 'Necrotic Bloom',
   GUERRILLA_GARDENING = 'Guerrilla Gardening',
+  SLASH_AND_BURN = 'Slash and Burn',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

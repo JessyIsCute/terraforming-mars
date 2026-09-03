@@ -52,6 +52,7 @@ import {CorruptGovernors} from './CorruptGovernors';
 import {OvercrowdedColony} from './OvercrowdedColony';
 import {NecroticBloom} from './NecroticBloom';
 import {GuerrillaGardening} from './GuerrillaGardening';
+import {SlashAndBurn} from './SlashAndBurn';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -116,5 +117,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.OVERCROWDED_COLONY]: {Factory: OvercrowdedColony, compatibility: 'colonies'},
     [CardName.NECROTIC_BLOOM]: {Factory: NecroticBloom},
     [CardName.GUERRILLA_GARDENING]: {Factory: GuerrillaGardening},
+    [CardName.SLASH_AND_BURN]: {Factory: SlashAndBurn},
   },
 });
