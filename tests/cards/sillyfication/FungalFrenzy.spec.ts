@@ -4,7 +4,7 @@ import {Ants} from '../../../src/server/cards/base/Ants';
 import {IGame} from '../../../src/server/IGame';
 import {OrOptions} from '../../../src/server/inputs/OrOptions';
 import {TestPlayer} from '../../TestPlayer';
-import {runAllActions} from '../../TestingUtils';
+import {runAllActions, setTemperature} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 import {cast} from '../../../src/common/utils/utils';
 
@@ -19,10 +19,10 @@ describe('FungalFrenzy', () => {
     player.playedCards.push(card);
   });
 
-  it('requires 2 microbe tags', () => {
-    player.tagsForTest = {microbe: 1};
+  it('requires -8°C or colder', () => {
+    setTemperature(game, -6);
     expect(card.canPlay(player)).is.false;
-    player.tagsForTest = {microbe: 2};
+    setTemperature(game, -8);
     expect(card.canPlay(player)).is.true;
   });
 

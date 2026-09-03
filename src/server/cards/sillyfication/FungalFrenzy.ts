@@ -14,7 +14,7 @@ export class FungalFrenzy extends ActionCard {
       cost: 11,
       resourceType: CardResource.MICROBE,
 
-      requirements: {tag: Tag.MICROBE, count: 2},
+      requirements: {temperature: -8, max: true},
 
       behavior: {
         addResources: {tag: Tag.MICROBE},
@@ -47,7 +47,7 @@ export class FungalFrenzy extends ActionCard {
           b.br;
           b.resource(CardResource.MICROBE).slash().tag(Tag.MICROBE);
         }),
-        description: 'Requires 2 microbe tags. Add 1 microbe to this card for each microbe tag you have, including this.',
+        description: 'Requires -8°C or colder. Add 1 microbe to this card for each microbe tag you have, including this.',
       },
     });
   }

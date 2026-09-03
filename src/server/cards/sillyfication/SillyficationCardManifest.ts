@@ -34,6 +34,9 @@ import {OrbitDumping} from './OrbitDumping';
 import {GarbageDumps} from './GarbageDumps';
 import {LaunchWindow} from './LaunchWindow';
 import {GlobalEnergyInfrastructure} from './GlobalEnergyInfrastructure';
+import {CropTheft} from './CropTheft';
+import {Swaperoo} from './Swaperoo';
+import {Switcharoo} from './Switcharoo';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 
@@ -78,5 +81,8 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.GARBAGE_DUMPS]: {Factory: GarbageDumps},
     [CardName.LAUNCH_WINDOW]: {Factory: LaunchWindow},
     [CardName.GLOBAL_ENERGY_INFRASTRUCTURE]: {Factory: GlobalEnergyInfrastructure},
+    [CardName.CROP_THEFT]: {Factory: CropTheft},
+    [CardName.SWAPEROO]: {Factory: Swaperoo},
+    [CardName.SWITCHAROO]: {Factory: Switcharoo},
   },
 });
