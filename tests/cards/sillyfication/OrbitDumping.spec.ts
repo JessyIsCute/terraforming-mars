@@ -16,14 +16,17 @@ describe('OrbitDumping', () => {
     [game, player, player2] = testGame(2);
   });
 
-  it('every opponent loses 2 M€ production', () => {
+  it('all players lose 3 M€ production; you gain 2 titanium; -1 VP', () => {
     player.production.override({megacredits: 5});
     player2.production.override({megacredits: 5});
+    player.titanium = 0;
 
     card.play(player);
     runAllActions(game);
 
-    expect(player.production.megacredits).to.eq(5);
-    expect(player2.production.megacredits).to.eq(3);
+    expect(player.production.megacredits).to.eq(2);
+    expect(player2.production.megacredits).to.eq(2);
+    expect(player.titanium).to.eq(2);
+    expect(card.getVictoryPoints(player)).to.eq(-1);
   });
 });

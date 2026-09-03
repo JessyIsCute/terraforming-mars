@@ -15,21 +15,29 @@ export class OrbitDumping extends Card implements IProjectCard {
       name: CardName.ORBIT_DUMPING,
       tags: [Tag.SPACE],
       cost: 1,
+      victoryPoints: -1,
+
+      behavior: {
+        stock: {titanium: 2},
+      },
 
       metadata: {
         cardNumber: 'X31',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.minus().megacredits(2, {all}));
+          b.production((pb) => pb.minus().megacredits(3, {all})).br;
+          b.titanium(2);
         }),
-        description: 'Every opponent loses 2 M€ production.',
+        description: 'All players lose 3 M€ production. Gain 2 titanium.',
       },
     });
   }
 
   public override bespokePlay(player: IPlayer) {
-    for (const opponent of player.opponents) {
-      if (opponent.canHaveProductionReduced(Resource.MEGACREDITS, 2, player)) {
-        opponent.production.add(Resource.MEGACREDITS, -2, {log: true, from: {player}});
+    for (const p of player.game.players) {
+      if (p.id === player.id) {
+        p.production.add(Resource.MEGACREDITS, -3, {log: true});
+      } else if (p.canHaveProductionReduced(Resource.MEGACREDITS, 3, player)) {
+        p.production.add(Resource.MEGACREDITS, -3, {log: true, from: {player}});
       }
     }
     return undefined;
