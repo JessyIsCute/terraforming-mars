@@ -23,13 +23,13 @@ describe('CorruptGovernors', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('raises every player influence by 2 and the owner by 2 more', () => {
+  it('raises every player influence by 3 and the owner by 3 more', () => {
     const turmoil = game.turmoil!;
 
     card.play(player);
 
-    expect(turmoil.playersInfluenceBonus.get(player.id)).to.eq(4);
-    expect(turmoil.playersInfluenceBonus.get(player2.id)).to.eq(2);
+    expect(turmoil.playersInfluenceBonus.get(player.id)).to.eq(6);
+    expect(turmoil.playersInfluenceBonus.get(player2.id)).to.eq(3);
   });
 
   it('accumulates on repeated plays', () => {
@@ -38,7 +38,7 @@ describe('CorruptGovernors', () => {
     card.play(player);
     card.play(player);
 
-    expect(turmoil.playersInfluenceBonus.get(player.id)).to.eq(8);
-    expect(turmoil.playersInfluenceBonus.get(player2.id)).to.eq(4);
+    expect(turmoil.playersInfluenceBonus.get(player.id)).to.eq(12);
+    expect(turmoil.playersInfluenceBonus.get(player2.id)).to.eq(6);
   });
 });
