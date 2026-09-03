@@ -186,6 +186,14 @@
                         <div class="create-game-page-column">
                             <h4 v-i18n>Board</h4>
 
+                            <div v-if="customBoardCode !== undefined" class="create-game-subsection-label">
+                              <input type="radio" :value="BoardNameEnum.CUSTOM" name="board" v-model="board" id="custom-board-checkbox">
+                              <label for="custom-board-checkbox" class="expansion-button">
+                                <span class="create-game-board-hexagon create-game-random">&#x2B22;</span>
+                                <span>Custom: {{ customBoardName }}</span>
+                              </label>
+                            </div>
+
                             <div v-for="boardName in boards" :key="boardName">
                               <div v-if="boardName==='utopia planitia'" class="create-game-subsection-label" v-i18n>Fan-made</div>
                               <input type="radio" :value="boardName" name="board" v-model="board" :id="boardName+'-checkbox'">
@@ -580,6 +588,7 @@ import {defineComponent, nextTick} from 'vue';
 import {Color, PLAYER_COLORS} from '@/common/Color';
 import {BoardName} from '@/common/boards/BoardName';
 import {RandomBoardOption} from '@/common/boards/RandomBoardOption';
+import {decodeCustomBoard} from '@/common/boards/customBoardCodec';
 import {CardName} from '@/common/cards/CardName';
 import CeosFilter from '@/client/components/create/CeosFilter.vue';
 import CorporationsFilter from '@/client/components/create/CorporationsFilter.vue';
@@ -620,6 +629,9 @@ type FormModel = {
   preludeToggled: boolean;
   uploading: boolean;
   previousViewport: string;
+  /** Opaque map-editor code carried over via "Play with this map". */
+  customBoardCode: string | undefined;
+  customBoardName: string;
 };
 
 export default defineComponent({
@@ -630,6 +642,8 @@ export default defineComponent({
       preludeToggled: false,
       uploading: false,
       previousViewport: '',
+      customBoardCode: undefined,
+      customBoardName: '',
     };
   },
   components: {
@@ -688,6 +702,7 @@ export default defineComponent({
   mounted() {
     setDocumentTitle('Create New Game');
     this.restoreLastSettings();
+    this.adoptCustomBoardFromEditor();
 
     // Set the viewport width to width=device-width on the create game form so mobile browsers use their actual CSS viewport width.
     // The current global viewport is width=1260, which prevents the create game form from using the device width on phones.
@@ -717,6 +732,9 @@ export default defineComponent({
     RandomBoardOption(): typeof RandomBoardOption {
       return RandomBoardOption;
     },
+    BoardNameEnum(): typeof BoardName {
+      return BoardName;
+    },
     RandomMAOptionType(): typeof RandomMAOptionType {
       return RandomMAOptionType;
     },
@@ -745,6 +763,27 @@ export default defineComponent({
     },
   },
   methods: {
+    adoptCustomBoardFromEditor() {
+      if (!window.location.search.includes('customBoard=1')) {
+        return;
+      }
+      let code: string | null = null;
+      try {
+        code = window.localStorage?.getItem('customBoardCode') ?? null;
+      } catch (e) {
+        code = null;
+      }
+      if (code === null) {
+        return;
+      }
+      this.customBoardCode = code;
+      this.board = BoardName.CUSTOM;
+      try {
+        this.customBoardName = decodeCustomBoard(code).name;
+      } catch (e) {
+        this.customBoardName = 'custom map';
+      }
+    },
     restoreLastSettings() {
       const settings = createGameSettingsStorage.loadSettings();
       if (settings === undefined) {
@@ -1244,6 +1283,7 @@ export default defineComponent({
         bannedCards,
         includedCards,
         board,
+        customBoardCode: this.board === BoardName.CUSTOM ? this.customBoardCode : undefined,
         seed,
         solarPhaseOption,
         aresExtremeVariant: this.aresExtremeVariant,

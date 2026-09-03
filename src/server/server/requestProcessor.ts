@@ -113,6 +113,7 @@ const handlers: Map<string, IHandler> = new Map(
     [paths.LOAD, Load.INSTANCE],
     [paths.LOAD_GAME, LoadGame.INSTANCE],
     [paths.LOGIN, Login.INSTANCE],
+    [paths.MAP_EDITOR, ServeApp.INSTANCE],
     [paths.API_LOGOUT, ApiLogout.INSTANCE],
     ['main.js', ServeAsset.INSTANCE],
     ['main.js.map', ServeAsset.INSTANCE],
