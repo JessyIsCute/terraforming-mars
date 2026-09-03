@@ -9,7 +9,7 @@ describe('VenusianSubsidiary', () => {
 
   beforeEach(() => {
     card = new VenusianSubsidiary();
-    [/* game */, player] = testGame(2);
+    [/* game */, player] = testGame(2, {venusNextExtension: true});
     player.megaCredits = 20;
   });
 

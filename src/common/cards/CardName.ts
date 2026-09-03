@@ -591,6 +591,7 @@ export enum CardName {
   MACRO_MILLS = 'Macro Mills',
   FUNGAL_FRENZY = 'Fungal Frenzy',
   VENUSIAN_SUBSIDIARY = 'Venusian Subsidiary',
+  VENUSIAN_BEES = 'Venusian Bees',
 
   // Community corps
   AEROTECH = 'Aerotech',
