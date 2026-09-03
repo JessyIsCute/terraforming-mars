@@ -1,7 +1,7 @@
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardType} from '../../../common/cards/CardType';
-import {Tag} from '../../../common/cards/Tag';
+import {ALL_TAGS, Tag} from '../../../common/cards/Tag';
 import {IPlayer} from '../../IPlayer';
 import {ICard} from '../ICard';
 import {Resource} from '../../../common/Resource';
@@ -9,7 +9,10 @@ import {SerializedCard} from '../../SerializedCard';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-// A knock-off Aridor: pays out M€ instead of production.
+// The real tags a player can accumulate (no wild / event / clone bookkeeping tags).
+const COUNTABLE_TAGS = ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.EVENT && tag !== Tag.CLONE);
+
+// A knock-off Aridor.
 export class AriAdore extends Card implements IProjectCard {
   public allTags = new Set<Tag>();
 
@@ -17,14 +20,14 @@ export class AriAdore extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.ARI_ADORE,
-      cost: 26,
-      victoryPoints: 1,
+      cost: 28,
+      victoryPoints: 2,
 
       metadata: {
         cardNumber: 'X39',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you get a new type of tag in play [event cards do not count], gain 4 M€.', (eb) => {
-            eb.diverseTag().startEffect.megacredits(4);
+          b.effect('When you get a new type of tag in play [event cards do not count], gain 1 M€ for each tag you have.', (eb) => {
+            eb.diverseTag().startEffect.megacredits(1).slash().wild(1);
           });
         }),
       },
@@ -52,7 +55,7 @@ export class AriAdore extends Card implements IProjectCard {
       const currentSize = this.allTags.size;
       this.allTags.add(tag);
       if (this.allTags.size > currentSize) {
-        player.stock.add(Resource.MEGACREDITS, 4, {log: true});
+        player.stock.add(Resource.MEGACREDITS, player.tags.multipleCount(COUNTABLE_TAGS), {log: true});
       }
     }
   }

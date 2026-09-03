@@ -8,11 +8,11 @@ import {CardRenderer} from '../render/CardRenderer';
 import {ActionCard} from '../ActionCard';
 import {all} from '../Options';
 
-export class Honse extends ActionCard implements IProjectCard {
+export class Horses extends ActionCard implements IProjectCard {
   constructor() {
     super({
       type: CardType.ACTIVE,
-      name: CardName.HONSE,
+      name: CardName.HORSES,
       tags: [Tag.ANIMAL],
       cost: 11,
       resourceType: CardResource.ANIMAL,

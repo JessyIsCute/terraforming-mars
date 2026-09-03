@@ -4,23 +4,23 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-export class MicroSteels extends Card implements IProjectCard {
+export class MicroPlant extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.AUTOMATED,
-      name: CardName.MICRO_STEELS,
-      cost: 3,
+      name: CardName.MICRO_PLANT,
+      cost: 5,
 
       behavior: {
-        production: {steel: 1},
+        production: {plants: 1},
       },
 
       metadata: {
-        cardNumber: 'X23',
+        cardNumber: 'X24',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.steel(1));
+          b.production((pb) => pb.plants(1));
         }),
-        description: 'Increase your steel production 1 step.',
+        description: 'Increase your plant production 1 step.',
       },
     });
   }

@@ -4,11 +4,11 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-export class MicroEnergies extends Card implements IProjectCard {
+export class MicroEnergy extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.AUTOMATED,
-      name: CardName.MICRO_ENERGIES,
+      name: CardName.MICRO_ENERGY,
       cost: 3,
 
       behavior: {

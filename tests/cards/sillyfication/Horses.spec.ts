@@ -1,18 +1,18 @@
 import {expect} from 'chai';
-import {Honse} from '../../../src/server/cards/sillyfication/Honse';
+import {Horses} from '../../../src/server/cards/sillyfication/Horses';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {runAllActions, setOxygenLevel} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 
-describe('Honse', () => {
-  let card: Honse;
+describe('Horses', () => {
+  let card: Horses;
   let player: TestPlayer;
   let player2: TestPlayer;
   let game: IGame;
 
   beforeEach(() => {
-    card = new Honse();
+    card = new Horses();
     [game, player, player2] = testGame(2);
     player.playedCards.push(card);
     player.production.override({plants: 1});

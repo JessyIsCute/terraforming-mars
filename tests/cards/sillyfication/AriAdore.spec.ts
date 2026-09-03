@@ -17,25 +17,28 @@ describe('AriAdore', () => {
     player.megaCredits = 0;
   });
 
-  it('scores 1 VP', () => {
-    expect(card.getVictoryPoints(player)).to.eq(1);
+  it('scores 2 VP', () => {
+    expect(card.getVictoryPoints(player)).to.eq(2);
   });
 
-  it('gains 4 M€ for each new tag type', () => {
-    // Fish: animal tag -> new.
+  it('gains 1 M€ per tag you have for each new tag type', () => {
+    player.tagsForTest = {animal: 2, plant: 1};
+
+    // Fish: animal tag -> new type. 3 tags total.
     card.onCardPlayed(player, new Fish());
-    expect(player.megaCredits).to.eq(4);
+    expect(player.megaCredits).to.eq(3);
 
     // Another animal tag -> not new.
     card.onCardPlayed(player, new Fish());
-    expect(player.megaCredits).to.eq(4);
+    expect(player.megaCredits).to.eq(3);
 
-    // LunarBeam: energy + earth tags -> two new types.
+    // LunarBeam: energy + earth -> two new types, still 3 tags each time.
     card.onCardPlayed(player, new LunarBeam());
-    expect(player.megaCredits).to.eq(12);
+    expect(player.megaCredits).to.eq(9);
   });
 
   it('ignores event cards', () => {
+    player.tagsForTest = {earth: 3};
     card.onCardPlayed(player, new ImportedHydrogen()); // event with earth/space tags
     expect(player.megaCredits).to.eq(0);
   });

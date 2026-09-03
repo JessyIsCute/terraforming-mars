@@ -4,11 +4,11 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-export class MicroTitaniums extends Card implements IProjectCard {
+export class MicroTitanium extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.AUTOMATED,
-      name: CardName.MICRO_TITANIUMS,
+      name: CardName.MICRO_TITANIUM,
       cost: 6,
 
       behavior: {

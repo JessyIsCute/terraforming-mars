@@ -14,15 +14,15 @@ export class PeerReview extends Card implements IProjectCard {
       type: CardType.EVENT,
       name: CardName.PEER_REVIEW,
       tags: [Tag.SCIENCE],
-      cost: 4,
+      cost: 8,
       victoryPoints: 1,
 
       metadata: {
         cardNumber: 'X11',
         renderData: CardRenderer.builder((b) => {
-          b.cards(3, {digit}).colon().megacredits(3);
+          b.cards(3, {digit}).colon().megacredits(5);
         }),
-        description: 'Look at the top 3 cards of the deck and put them back in any order. Gain 3 M€.',
+        description: 'Look at the top 3 cards of the deck and put them back in any order. Gain 5 M€.',
       },
     });
   }
@@ -37,7 +37,7 @@ export class PeerReview extends Card implements IProjectCard {
         b.cards(top);
       }, {reservedFor: player});
     }
-    player.stock.add(Resource.MEGACREDITS, 3, {log: true});
+    player.stock.add(Resource.MEGACREDITS, 5, {log: true});
     return undefined;
   }
 }

@@ -21,10 +21,10 @@ import {LoremIpsum} from './LoremIpsum';
 import {CommitteeToFormACommittee} from './CommitteeToFormACommittee';
 import {RoundingError} from './RoundingError';
 import {LongDistanceRelations} from './LongDistanceRelations';
-import {MicroEnergies} from './MicroEnergies';
-import {MicroSteels} from './MicroSteels';
-import {MicroPlants} from './MicroPlants';
-import {MicroTitaniums} from './MicroTitaniums';
+import {MicroEnergy} from './MicroEnergy';
+import {MicroSteel} from './MicroSteel';
+import {MicroPlant} from './MicroPlant';
+import {MicroTitanium} from './MicroTitanium';
 import {ScaffoldingForever} from './ScaffoldingForever';
 import {CoreMines} from './CoreMines';
 import {MineralFabricators} from './MineralFabricators';
@@ -37,7 +37,7 @@ import {GlobalEnergyInfrastructure} from './GlobalEnergyInfrastructure';
 import {CropTheft} from './CropTheft';
 import {Swaperoo} from './Swaperoo';
 import {Switcharoo} from './Switcharoo';
-import {Honse} from './Honse';
+import {Horses} from './Horses';
 import {AriAdore} from './AriAdore';
 import {ChipFabricationPlant} from './ChipFabricationPlant';
 import {UranusSeaCreatures} from './UranusSeaCreatures';
@@ -74,10 +74,10 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.COMMITTEE_TO_FORM_A_COMMITTEE]: {Factory: CommitteeToFormACommittee},
     [CardName.ROUNDING_ERROR]: {Factory: RoundingError},
     [CardName.LONG_DISTANCE_RELATIONS]: {Factory: LongDistanceRelations},
-    [CardName.MICRO_ENERGIES]: {Factory: MicroEnergies},
-    [CardName.MICRO_STEELS]: {Factory: MicroSteels},
-    [CardName.MICRO_PLANTS]: {Factory: MicroPlants},
-    [CardName.MICRO_TITANIUMS]: {Factory: MicroTitaniums},
+    [CardName.MICRO_ENERGY]: {Factory: MicroEnergy},
+    [CardName.MICRO_STEEL]: {Factory: MicroSteel},
+    [CardName.MICRO_PLANT]: {Factory: MicroPlant},
+    [CardName.MICRO_TITANIUM]: {Factory: MicroTitanium},
     [CardName.SCAFFOLDING_FOREVER]: {Factory: ScaffoldingForever},
     [CardName.CORE_MINES]: {Factory: CoreMines},
     [CardName.MINERAL_FABRICATORS]: {Factory: MineralFabricators},
@@ -90,7 +90,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.CROP_THEFT]: {Factory: CropTheft},
     [CardName.SWAPEROO]: {Factory: Swaperoo},
     [CardName.SWITCHAROO]: {Factory: Switcharoo},
-    [CardName.HONSE]: {Factory: Honse},
+    [CardName.HORSES]: {Factory: Horses},
     [CardName.ARI_ADORE]: {Factory: AriAdore},
     [CardName.CHIP_FABRICATION_PLANT]: {Factory: ChipFabricationPlant},
     [CardName.URANUS_SEA_CREATURES]: {Factory: UranusSeaCreatures},
