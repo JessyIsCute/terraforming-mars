@@ -26,7 +26,7 @@ describe('VolcanicMinerals', () => {
     expect(player.canPlay(card)).is.true;
   });
 
-  it('spends 4 heat and gains 4 titanium', () => {
+  it('offers the choice exactly once and gains 4 titanium', () => {
     player.heat = 5;
     card.play(player);
     runAllActions(game);
@@ -34,7 +34,10 @@ describe('VolcanicMinerals', () => {
     const options = cast(player.popWaitingFor(), OrOptions);
     expect(options.options).has.lengthOf(2);
     options.options[0].cb();
+    runAllActions(game);
 
+    // No second choice queued.
+    expect(player.popWaitingFor()).is.undefined;
     expect(player.heat).to.eq(1);
     expect(player.titanium).to.eq(4);
     expect(player.steel).to.eq(0);
@@ -47,6 +50,7 @@ describe('VolcanicMinerals', () => {
 
     const options = cast(player.popWaitingFor(), OrOptions);
     options.options[1].cb();
+    runAllActions(game);
 
     expect(player.heat).to.eq(0);
     expect(player.steel).to.eq(6);

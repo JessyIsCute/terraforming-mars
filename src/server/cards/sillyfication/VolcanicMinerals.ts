@@ -12,12 +12,13 @@ export class VolcanicMinerals extends Card implements IProjectCard {
       name: CardName.VOLCANIC_MINERALS,
       cost: 3,
 
+      // `spend` lives inside each `or` branch: a top-level `behavior.spend`
+      // alongside `behavior.or` makes the executor run the `or` twice.
       behavior: {
-        spend: {heat: 4},
         or: {
           behaviors: [
-            {stock: {titanium: 4}, title: 'Gain 4 titanium'},
-            {stock: {steel: 6}, title: 'Gain 6 steel'},
+            {spend: {heat: 4}, stock: {titanium: 4}, title: 'Spend 4 heat to gain 4 titanium'},
+            {spend: {heat: 4}, stock: {steel: 6}, title: 'Spend 4 heat to gain 6 steel'},
           ],
         },
       },
