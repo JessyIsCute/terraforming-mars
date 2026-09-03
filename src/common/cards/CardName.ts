@@ -634,6 +634,8 @@ export enum CardName {
   PHARMACY_ON_LUNA = 'Pharmacy on Luna',
   VITOR_VITALIS = 'Vitor Vitalis',
   CORRUPT_GOVERNORS = 'Corrupt Governors',
+  OVERCROWDED_COLONY = 'Overcrowded Colony',
+  NECROTIC_BLOOM = 'Necrotic Bloom',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

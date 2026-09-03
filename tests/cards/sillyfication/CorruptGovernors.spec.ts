@@ -15,6 +15,14 @@ describe('CorruptGovernors', () => {
     [game, player, player2] = testGame(2, {turmoilExtension: true});
   });
 
+  it('requires that you are Chairman', () => {
+    const turmoil = game.turmoil!;
+    turmoil.chairman = 'NEUTRAL';
+    expect(card.canPlay(player)).is.false;
+    turmoil.chairman = player;
+    expect(card.canPlay(player)).is.true;
+  });
+
   it('raises every player influence by 2 and the owner by 2 more', () => {
     const turmoil = game.turmoil!;
 

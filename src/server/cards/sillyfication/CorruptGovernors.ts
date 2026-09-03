@@ -14,13 +14,15 @@ export class CorruptGovernors extends Card implements IProjectCard {
       name: CardName.CORRUPT_GOVERNORS,
       cost: 16,
 
+      requirements: {chairman: true},
+
       metadata: {
         cardNumber: 'X49',
         renderData: CardRenderer.builder((b) => {
           b.influence({amount: 2, all}).br;
           b.plus().influence({amount: 2});
         }),
-        description: 'Increase all players\' influence 2 steps. Increase your influence 2 additional steps.',
+        description: 'Requires that you are Chairman. Increase all players\' influence 2 steps. Increase your influence 2 additional steps.',
       },
     });
   }
