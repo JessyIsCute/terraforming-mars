@@ -73,6 +73,34 @@ describe('MapEditor', () => {
     expect(hexBonus.classes()).to.include('board-space-bonus--heat');
   });
 
+  it('stacks placement bonuses in any combination', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const hex = () => wrapper.findAll('.map-editor-hex')[0];
+
+    vm.tool = 'bonus:' + 2; // PLANT
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    await hex().trigger('click'); // two plants
+    vm.tool = 'bonus:' + 4; // HEAT
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+
+    let space = decodeCustomBoard(vm.code).spaces[0];
+    expect(space.bonus).to.deep.eq([2, 2, 4]);
+
+    // Right-click removes the last one.
+    await hex().trigger('contextmenu');
+    space = decodeCustomBoard(vm.code).spaces[0];
+    expect(space.bonus).to.deep.eq([2, 2]);
+
+    // Clear tool empties the hex.
+    vm.tool = 'bonus:clear';
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    expect(decodeCustomBoard(vm.code).spaces[0].bonus).to.deep.eq([]);
+  });
+
   it('caps milestone selection at 5', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;

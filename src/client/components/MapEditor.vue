@@ -34,7 +34,12 @@
 
         <fieldset class="map-editor-tools">
           <legend v-i18n>Placement bonuses</legend>
-          <p class="map-editor-tools-note" v-i18n>Click a hex to add the bonus, click again to remove it.</p>
+          <p class="map-editor-tools-note" v-i18n>Click a hex to add this bonus — bonuses stack, so click twice for two plants. Right-click a hex to remove its last bonus.</p>
+          <label :title="'Remove every placement bonus from the hex you click.'">
+            <input type="radio" name="tool" value="bonus:clear" v-model="tool">
+            <i class="map-editor-bonus-icon map-editor-bonus-icon--clear">∅</i>
+            <span v-i18n>Clear bonuses</span>
+          </label>
           <label v-for="t in bonusTools" :key="t.key" :title="t.description">
             <input type="radio" name="tool" :value="t.key" v-model="tool">
             <i class="map-editor-bonus-icon" :class="'board-space-bonus--' + t.css"></i>
@@ -91,6 +96,7 @@
             :class="hexClass(cell)"
             :style="hexStyle(cell)"
             @click="paint(cell)"
+            @contextmenu.prevent="removeLastBonus(cell)"
             @mousedown="dragging = true"
             @mouseup="dragging = false"
             @mouseenter="dragging && paint(cell)"
@@ -243,6 +249,9 @@ const BONUS_TOOLS: Array<BonusTool> = ([
 
 const BONUS_CSS: Partial<Record<SpaceBonus, string>> = Object.fromEntries(BONUS_TOOLS.map((t) => [t.bonus, t.css]));
 
+/** Guard against a runaway click-fest; real boards never exceed a handful. */
+const MAX_HEX_BONUSES = 8;
+
 export default defineComponent({
   name: 'MapEditor',
   components: {Board},
@@ -280,6 +289,9 @@ export default defineComponent({
       return ['temperature', 'oxygen', 'venus'];
     },
     currentToolHint(): string {
+      if (this.tool === 'bonus:clear') {
+        return 'Remove every placement bonus from the hex you click.';
+      }
       const all: Array<Tool> = [...TERRAIN_TOOLS, ...MARKER_TOOLS, ...BONUS_TOOLS];
       return all.find((t) => t.key === this.tool)?.description ?? '';
     },
@@ -364,16 +376,22 @@ export default defineComponent({
         space.volcanic = !space.volcanic;
       } else if (this.tool === 'flag:reserved') {
         space.reserved = !space.reserved;
+      } else if (this.tool === 'bonus:clear') {
+        space.bonus = [];
       } else if (this.tool.startsWith('bonus:')) {
-        const bonus = Number(this.tool.slice(6)) as SpaceBonus;
-        const idx = space.bonus.indexOf(bonus);
-        if (idx === -1) {
-          space.bonus.push(bonus);
-        } else {
-          space.bonus.splice(idx, 1);
+        // Bonuses stack: each click appends. Any combination is allowed, up to a sane cap.
+        if (space.bonus.length < MAX_HEX_BONUSES) {
+          space.bonus.push(Number(this.tool.slice(6)) as SpaceBonus);
         }
       }
       // Force reactivity for the nested object mutation.
+      this.grid = new Map(this.grid);
+    },
+    removeLastBonus(cell: Cell): void {
+      if (cell.space === null || cell.space.bonus.length === 0) {
+        return;
+      }
+      cell.space.bonus.pop();
       this.grid = new Map(this.grid);
     },
     hexClass(cell: Cell): Record<string, boolean> {
@@ -520,6 +538,13 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: contain !important;
+  }
+  .map-editor-bonus-icon--clear {
+    font-style: normal;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    color: #e74c3c;
   }
 
   .map-editor-ma {
