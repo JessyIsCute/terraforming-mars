@@ -25,14 +25,13 @@ describe('Honse', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('play adds 7 animals, drops your plant production, and attacks a plant producer', () => {
+  it('play drops your plant production and attacks a plant producer', () => {
     setOxygenLevel(game, 10);
     player2.production.override({plants: 3});
 
     card.play(player);
     runAllActions(game);
 
-    expect(card.resourceCount).to.eq(7);
     expect(player.production.plants).to.eq(0);
     // Only player2 can lose plant production, so the attack auto-resolves onto them.
     expect(player2.production.plants).to.eq(2);

@@ -15,16 +15,20 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
     super({
       name: CardName.CRITTERWORLD,
       tags: [Tag.ANIMAL],
-      startingMegaCredits: 40,
+      startingMegaCredits: 38,
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}, per: 4},
       initialActionText: 'Draw 2 cards with an animal tag',
 
+      behavior: {
+        addResources: 7,
+      },
+
       metadata: {
         cardNumber: 'XC3',
-        description: 'You start with 40 M€. As your first action, draw 2 cards with an animal tag.',
+        description: 'You start with 38 M€ and add 7 animals to this card. As your first action, draw 2 cards with an animal tag.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(40).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
+          b.megacredits(38).nbsp.resource(CardResource.ANIMAL, {amount: 7}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you add an animal to another card, add an animal to this card.', (eb) => {

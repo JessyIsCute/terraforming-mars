@@ -289,6 +289,9 @@
       <template v-else-if="title === CardName.VENUS_VENTURES">
         <div class="card-venus-ventures-logo"><span class="word-1">VENUS</span> <span class="word-2">VENTURES</span></div>
       </template>
+      <template v-else-if="title === CardName.CRITTERWORLD">
+        <div class="card-critterworld-logo"><span class="word-1">Critter</span><span class="word-2">world</span></div>
+      </template>
       <template v-else-if="title === CardName.WELLNESS_DELUXE">
         <div class="card-wellness-deluxe-logo"><span class="word-1">WELLNESS</span> <span class="word-2">DELUXE</span></div>
       </template>
@@ -326,6 +329,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.CHIMERA]: 'image',
   [CardName.COLLEGIUM_COPERNICUS]: 'image',
   [CardName.CREDICOR]: 'css',
+  [CardName.CRITTERWORLD]: 'bespoke',
   [CardName.CRESCENT_RESEARCH_ASSOCIATION]: 'bespoke',
   [CardName.CURIOSITY_II]: 'bespoke',
   [CardName.DEMETRON_LABS]: 'bespoke',
