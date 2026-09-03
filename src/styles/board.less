@@ -24,13 +24,14 @@
   background: url(./assets/board/mars-without-venus.png) no-repeat;
 }
 
-// Custom boards have no painted background and can be larger than the viewport.
+// Custom boards can be larger than the viewport and don't line up with the painted
+// hexes, so the Mars artwork sits behind them only as a scaled backdrop for atmosphere.
 .board-cont--custom {
   width: auto;
   max-width: 95vw;
   max-height: 82vh;
   overflow: auto;
-  background: #15131f;
+  background: #15131f url("./assets/board/mars-without-venus.png") no-repeat center / cover;
   border-radius: 6px;
 
   .board--custom {

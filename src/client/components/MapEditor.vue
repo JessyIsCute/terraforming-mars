@@ -219,14 +219,13 @@ const TERRAIN_TOOLS: Array<Tool> = [
   {key: 'type:' + SpaceType.LAND, label: 'Land', description: 'Ordinary ground. Cities, greeneries and most special tiles go here.'},
   {key: 'type:' + SpaceType.OCEAN, label: 'Ocean', description: 'Only ocean tiles may be placed here, and they count toward the ocean track.'},
   {key: 'type:' + SpaceType.COVE, label: 'Cove', description: 'Counts as both a land space and an ocean space (Pathfinders).'},
-  {key: 'type:' + SpaceType.RESTRICTED, label: 'Restricted', description: 'Permanently blocked — no tile can ever be placed here (Amazonis Planitia style).'},
   {key: 'type:' + SpaceType.DEFLECTION_ZONE, label: 'Deflection zone', description: 'Behaves as land, and is tracked separately for the Hollandia deflection-zone rule.'},
 ];
 
 const MARKER_TOOLS: Array<Tool> = [
   {key: 'flag:volcanic', label: 'Volcanic', description: 'Toggles the volcanic flag: volcanic-only placements (Lava Flows, etc.) may go here.'},
-  {key: 'flag:reserved', label: 'Reserved', description: 'Toggles a reservation like Noctis City: excluded from general tile placement.'},
-  {key: 'flag:void', label: 'Void', description: 'Toggles whether this hex exists at all — use it to carve the board outline.'},
+  {key: 'flag:reserved', label: 'Reserve for Noctis City', description: 'Marks the space that the Noctis City card places its city on; excluded from all other tile placement.'},
+  {key: 'flag:void', label: 'Void (no hex)', description: 'Removes the hex from the board entirely — use it to carve the outline or punch a hole. (This replaces the old "restricted" type for practical purposes.)'},
 ];
 
 const BONUS_TOOLS: Array<BonusTool> = ([

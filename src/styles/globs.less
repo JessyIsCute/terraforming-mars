@@ -277,3 +277,56 @@
     each(@temperature-vals, .(@v) { .pin-and-rotate(@v); });
   }
 }
+
+// Custom boards can be any size and can stretch the parameter ranges past the values
+// the painted curve covers, so the tracks drop the curve and become a plain labelled
+// readout that sits outside the board rather than overlaid on it.
+.global-numbers.global-numbers--custom {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 12px;
+  font-size: 13px;
+
+  .global-numbers-temperature,
+  .global-numbers-oxygen,
+  .global-numbers-venus,
+  .global-numbers-oceans {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px;
+    margin: 0;
+  }
+
+  .global-numbers-temperature::before { content: "Temperature"; }
+  .global-numbers-oxygen::before { content: "Oxygen"; }
+  .global-numbers-venus::before { content: "Venus"; }
+  .global-numbers-oceans::before { content: "Oceans"; }
+
+  .global-numbers-temperature::before,
+  .global-numbers-oxygen::before,
+  .global-numbers-venus::before,
+  .global-numbers-oceans::before {
+    flex: 0 0 92px;
+    font-weight: bold;
+    color: #daab63;
+  }
+
+  .global-numbers-value {
+    position: static !important;
+    margin: 0 !important;
+    transform: none !important;
+    width: 24px;
+    height: 22px;
+    line-height: 22px;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .global-numbers-oceans {
+    font-size: 20px;
+    color: #3682b4;
+  }
+}
