@@ -91,7 +91,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.THERMAL_SMELTERY]: {Factory: ThermalSmeltery},
     [CardName.DEBRIS_FIELD]: {Factory: DebrisField},
     [CardName.ORBIT_DUMPING]: {Factory: OrbitDumping},
-    [CardName.GARBAGE_DUMPS]: {Factory: GarbageDumps},
+    [CardName.GARBAGE_DUMPS]: {Factory: GarbageDumps, compatibility: 'pathfinders'},
     [CardName.LAUNCH_WINDOW]: {Factory: LaunchWindow},
     [CardName.GLOBAL_ENERGY_INFRASTRUCTURE]: {Factory: GlobalEnergyInfrastructure},
     [CardName.CROP_THEFT]: {Factory: CropTheft},

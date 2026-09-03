@@ -14,24 +14,25 @@ describe('LivestockLobby', () => {
     card = new LivestockLobby();
     [/* game */, player, player2] = testGame(2);
     player.playedCards.push(card);
-    player.plants = 0;
-    player2.megaCredits = 0;
+    player.megaCredits = 0;
+    player2.plants = 0;
   });
 
-  it('when any player adds an animal, that player gains M€ and the owner gains plants', () => {
+  it('when any player adds an animal, that player gains plants and the owner gains M€', () => {
     const fish = new Fish();
     player2.playedCards.push(fish);
 
     player2.addResourceTo(fish, 2);
 
-    expect(player2.megaCredits).to.eq(2);
-    expect(player.plants).to.eq(2);
+    expect(player2.plants).to.eq(2);
+    expect(player.megaCredits).to.eq(2);
   });
 
   it('the owner adding animals also triggers it', () => {
     const fish = new Fish();
     player.playedCards.push(fish);
     player.megaCredits = 0;
+    player.plants = 0;
 
     player.addResourceTo(fish, 1);
 
@@ -45,8 +46,8 @@ describe('LivestockLobby', () => {
 
     player2.addResourceTo(microbeCard, 3);
 
-    expect(player2.megaCredits).to.eq(0);
-    expect(player.plants).to.eq(0);
+    expect(player.megaCredits).to.eq(0);
+    expect(player2.plants).to.eq(0);
   });
 
   it('requires 2 animal tags and plant production to reduce', () => {

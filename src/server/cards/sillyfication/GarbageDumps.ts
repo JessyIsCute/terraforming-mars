@@ -17,7 +17,7 @@ export class GarbageDumps extends Card implements IProjectCard {
     super({
       type: CardType.AUTOMATED,
       name: CardName.GARBAGE_DUMPS,
-      tags: [Tag.BUILDING],
+      tags: [Tag.BUILDING, Tag.MARS],
       cost: 9,
       victoryPoints: -1,
 

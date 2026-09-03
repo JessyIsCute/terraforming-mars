@@ -27,8 +27,8 @@ export class LivestockLobby extends Card implements IProjectCard {
         cardNumber: 'X42',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.minus().plants(1)).br;
-          b.effect('When any player adds an animal to a card, that player gains 1 M€ and you gain 1 plant.', (eb) => {
-            eb.resource(CardResource.ANIMAL, {all}).startEffect.megacredits(1, {all}).plants(1);
+          b.effect('When any player adds an animal to a card, that player gains 1 plant and you gain 1 M€.', (eb) => {
+            eb.resource(CardResource.ANIMAL, {all}).startEffect.plants(1, {all}).megacredits(1);
           });
         }),
         description: 'Requires 2 animal tags. Decrease your plant production 1 step.',
@@ -38,8 +38,8 @@ export class LivestockLobby extends Card implements IProjectCard {
 
   public onResourceAddedByAnyPlayer(cardOwner: IPlayer, activePlayer: IPlayer, card: ICard, count: number) {
     if (card.resourceType === CardResource.ANIMAL) {
-      activePlayer.stock.add(Resource.MEGACREDITS, count, {log: true});
-      cardOwner.stock.add(Resource.PLANTS, count, {log: true});
+      activePlayer.stock.add(Resource.PLANTS, count, {log: true});
+      cardOwner.stock.add(Resource.MEGACREDITS, count, {log: true});
     }
   }
 }

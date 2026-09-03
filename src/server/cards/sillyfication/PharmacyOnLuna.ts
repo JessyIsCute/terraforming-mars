@@ -22,7 +22,7 @@ export class PharmacyOnLuna extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X47',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When any player plays a microbe tag, you gain 2 M€.', (eb) => {
+          b.effect('When any player plays a microbe tag, including this, you gain 2 M€.', (eb) => {
             eb.tag(Tag.MICROBE, {all}).startEffect.megacredits(2);
           }).br;
           b.effect('When you play a microbe tag, including this, you may spend 2 M€ to draw a card.', (eb) => {
