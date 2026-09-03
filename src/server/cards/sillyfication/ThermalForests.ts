@@ -25,7 +25,6 @@ export class ThermalForests extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X03',
         renderData: CardRenderer.builder((b) => {
-          b.asterix().br;
           b.production((pb) => pb.heat(2).plants(1)).heat(3);
         }),
         description: 'Requires 2 greeneries on Mars adjacent to each other. ' +

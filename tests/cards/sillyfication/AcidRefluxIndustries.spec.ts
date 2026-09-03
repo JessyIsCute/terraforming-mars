@@ -55,4 +55,18 @@ describe('AcidRefluxIndustries', () => {
     runAllActions(game);
     expect(card.resourceCount).to.eq(1);
   });
+
+  it('action removes floaters for 2 M€ each', () => {
+    expect(card.canAct()).is.false;
+    player.addResourceTo(card, 5);
+    player.megaCredits = 0;
+
+    expect(card.canAct()).is.true;
+    const selectAmount = card.action(player);
+    selectAmount.cb(3);
+    runAllActions(game);
+
+    expect(card.resourceCount).to.eq(2);
+    expect(player.megaCredits).to.eq(6);
+  });
 });
