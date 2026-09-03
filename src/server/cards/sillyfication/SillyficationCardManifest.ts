@@ -37,14 +37,17 @@ import {GlobalEnergyInfrastructure} from './GlobalEnergyInfrastructure';
 import {CropTheft} from './CropTheft';
 import {Swaperoo} from './Swaperoo';
 import {Switcharoo} from './Switcharoo';
+import {Honse} from './Honse';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
+import {Critterworld} from './Critterworld';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
   corporationCards: {
     [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
     [CardName.VENUS_VENTURES]: {Factory: VenusVentures, compatibility: 'venus'},
+    [CardName.CRITTERWORLD]: {Factory: Critterworld},
   },
   projectCards: {
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
@@ -84,5 +87,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.CROP_THEFT]: {Factory: CropTheft},
     [CardName.SWAPEROO]: {Factory: Swaperoo},
     [CardName.SWITCHAROO]: {Factory: Switcharoo},
+    [CardName.HONSE]: {Factory: Honse},
   },
 });

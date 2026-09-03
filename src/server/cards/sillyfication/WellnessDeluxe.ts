@@ -37,6 +37,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
           b.br;
           b.megacredits(40).nbsp.production((pb) => pb.megacredits(2)).nbsp.heat(4, {digit}).nbsp.oceans(1);
           b.corpBox('effect', (ce) => {
+            ce.vSpace(Size.MEDIUM);
             ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 3 heat.', (eb) => {
               eb.oceans(1, {size: Size.SMALL}).colon().production((pb) => pb.heat(1)).nbsp;
               eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(3, {digit});

@@ -621,6 +621,8 @@ export enum CardName {
   CROP_THEFT = 'Crop Theft',
   SWAPEROO = 'Swaperoo',
   SWITCHAROO = 'Switcharoo',
+  HONSE = 'Honse',
+  CRITTERWORLD = 'Critterworld',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
