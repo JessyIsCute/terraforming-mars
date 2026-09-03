@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {AcidRefluxIndustries} from '../../../src/server/cards/sillyfication/AcidRefluxIndustries';
+import {VenusVentures} from '../../../src/server/cards/sillyfication/VenusVentures';
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {VenusianSubsidiary} from '../../../src/server/cards/sillyfication/VenusianSubsidiary';
 import {IGame} from '../../../src/server/IGame';
@@ -7,24 +7,19 @@ import {TestPlayer} from '../../TestPlayer';
 import {runAllActions} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 
-describe('AcidRefluxIndustries', () => {
-  let card: AcidRefluxIndustries;
+describe('VenusVentures', () => {
+  let card: VenusVentures;
   let player: TestPlayer;
   let game: IGame;
 
   beforeEach(() => {
-    card = new AcidRefluxIndustries();
+    card = new VenusVentures();
     [game, player] = testGame(2, {venusNextExtension: true});
     player.playedCards.push(card);
   });
 
   it('has two Venus tags', () => {
     expect(card.tags.filter((t) => t === 'venus')).to.have.length(2);
-  });
-
-  it('all cards cost 1 M€ more', () => {
-    expect(card.getCardDiscount(player, new MicroCredits())).to.eq(-1);
-    expect(card.getCardDiscount(player, new VenusianSubsidiary())).to.eq(-1);
   });
 
   it('adds 2 floaters on play and when a Venus-tag card is played', () => {

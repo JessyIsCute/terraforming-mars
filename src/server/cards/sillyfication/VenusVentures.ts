@@ -4,7 +4,6 @@ import {IActionCard, ICard} from '../ICard';
 import {Tag} from '../../../common/cards/Tag';
 import {CardResource} from '../../../common/CardResource';
 import {IPlayer} from '../../IPlayer';
-import {IProjectCard} from '../IProjectCard';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
@@ -12,10 +11,10 @@ import {Resource} from '../../../common/Resource';
 import {SelectAmount} from '../../inputs/SelectAmount';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
 
-export class AcidRefluxIndustries extends CorporationCard implements ICorporationCard, IActionCard {
+export class VenusVentures extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
     super({
-      name: CardName.ACID_REFLUX_INDUSTRIES,
+      name: CardName.VENUS_VENTURES,
       tags: [Tag.VENUS, Tag.VENUS],
       startingMegaCredits: 54,
       resourceType: CardResource.FLOATER,
@@ -26,9 +25,6 @@ export class AcidRefluxIndustries extends CorporationCard implements ICorporatio
         renderData: CardRenderer.builder((b) => {
           b.megacredits(54);
           b.corpBox('effect-action', (cea) => {
-            cea.effect('When you play a card, you pay 1 M€ more for it.', (eb) => {
-              eb.cards(1).startEffect.plus().megacredits(1);
-            });
             cea.effect('When you play a card with a Venus tag, including this, add 2 floaters to any card.', (eb) => {
               eb.tag(Tag.VENUS).asterix().startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
             });
@@ -39,10 +35,6 @@ export class AcidRefluxIndustries extends CorporationCard implements ICorporatio
         }),
       },
     });
-  }
-
-  public override getCardDiscount(_player: IPlayer, _card: IProjectCard): number {
-    return -1;
   }
 
   public override bespokePlay(player: IPlayer) {

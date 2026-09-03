@@ -397,9 +397,11 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.UNITED_NATIONS_MISSION_ONE]: 'bespoke',
   [CardName.UTOPIA_INVEST]: 'bespoke',
   [CardName.VALLEY_TRUST]: 'bespoke',
+  [CardName.VENUS_VENTURES]: 'css',
   [CardName.VIRON]: 'css',
   [CardName.VITOR]: 'bespoke',
   [CardName.VOLTAGON]: 'bespoke',
+  [CardName.WELLNESS_DELUXE]: 'css',
 };
 
 export default defineComponent({
