@@ -68,21 +68,28 @@ export function chooseMilestonesAndAwards(gameOptions: GameOptions): DrawnMilest
   switch (gameOptions.randomMA) {
   case RandomMAOptionType.NONE:
     const boardName = gameOptions.boardName;
-    switch (gameOptions.boardName) {
-    case BoardName.THARSIS:
-    case BoardName.HELLAS:
-    case BoardName.ELYSIUM:
-    case BoardName.UTOPIA_PLANITIA:
-    case BoardName.ARABIA_TERRA:
-    case BoardName.AMAZONIS:
-    case BoardName.TERRA_CIMMERIA:
-    case BoardName.TERRA_CIMMERIA_NOVA:
-    case BoardName.VASTITAS_BOREALIS:
-    case BoardName.VASTITAS_BOREALIS_NOVA:
-      push(milestoneManifest.boards[boardName], awardManifest.boards[gameOptions.boardName]);
-      break;
-    default:
-      return getRandomMilestonesAndAwards(gameOptions, requiredQty, LIMITED_SYNERGY);
+    const customBoard = gameOptions.customBoard;
+    if (boardName === BoardName.CUSTOM && customBoard !== undefined &&
+        customBoard.milestones.length === 5 && customBoard.awards.length === 5) {
+      // The editor bundled a fixed milestone/award set into the map.
+      push(customBoard.milestones, customBoard.awards);
+    } else {
+      switch (gameOptions.boardName) {
+      case BoardName.THARSIS:
+      case BoardName.HELLAS:
+      case BoardName.ELYSIUM:
+      case BoardName.UTOPIA_PLANITIA:
+      case BoardName.ARABIA_TERRA:
+      case BoardName.AMAZONIS:
+      case BoardName.TERRA_CIMMERIA:
+      case BoardName.TERRA_CIMMERIA_NOVA:
+      case BoardName.VASTITAS_BOREALIS:
+      case BoardName.VASTITAS_BOREALIS_NOVA:
+        push(milestoneManifest.boards[boardName], awardManifest.boards[gameOptions.boardName]);
+        break;
+      default:
+        return getRandomMilestonesAndAwards(gameOptions, requiredQty, LIMITED_SYNERGY);
+      }
     }
     if (gameOptions.venusNextExtension) {
       push(milestoneManifest.expansions['venus'], awardManifest.expansions['venus']);

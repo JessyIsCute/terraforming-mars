@@ -414,6 +414,7 @@ export class Server {
       altVenusBoard: options.altVenusBoard,
       aresExtremeVariant: options.aresExtremeVariant,
       boardName: options.boardName,
+      globalParameters: options.globalParameters,
       bannedCards: options.bannedCards,
       draftVariant: options.draftVariant,
       escapeVelocity: options.escapeVelocity,

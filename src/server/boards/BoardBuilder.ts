@@ -10,8 +10,28 @@ import {expansionSpaceColonies} from '../../common/boards/expansionSpaceColonies
 import {CardName} from '../../common/cards/CardName';
 import {numeric} from '../../common/utils/Ordering';
 
-function colonySpace(id: SpaceId): Space {
+export function colonySpace(id: SpaceId): Space {
   return {id, spaceType: SpaceType.COLONY, x: -1, y: -1, bonus: []};
+}
+
+/**
+ * Appends the off-Mars colony spaces (Stanford Torus, Dawn City, ...) that the current
+ * game options bring into play. Shared by the standard `BoardBuilder` and `CustomBoard`.
+ */
+export function addExpansionColonySpaces(spaces: Array<Space>, gameOptions: GameOptions): void {
+  for (const entry of expansionSpaceColonies) {
+    // Special case for Venera Base when Pathfinders is included, but Turmoil or Venus is not
+    if (entry.card === CardName.VENERA_BASE) {
+      const pathfindersTurmoilVenusInPlay = gameOptions.pathfindersExpansion && gameOptions.turmoilExtension && gameOptions.venusNextExtension;
+      if (gameOptions.includedCards.includes(entry.card) || pathfindersTurmoilVenusInPlay) {
+        spaces.push(colonySpace(entry.name));
+      }
+      continue;
+    }
+    if (gameOptions.expansions[entry.expansion] || gameOptions.includedCards.includes(entry.card)) {
+      spaces.push(colonySpace(entry.name));
+    }
+  }
 }
 
 export class BoardBuilder {
@@ -117,19 +137,7 @@ export class BoardBuilder {
     }
 
     // Include space colonies if the expansion is included, or if the card is included.
-    for (const entry of expansionSpaceColonies) {
-      // Special case for Venera Base when Pathfinders is included, but Turmoil or Venus is not
-      if (entry.card === CardName.VENERA_BASE) {
-        const pathfindersTurmoilVenusInPlay = this.gameOptions.pathfindersExpansion && this.gameOptions.turmoilExtension && this.gameOptions.venusNextExtension;
-        if (this.gameOptions.includedCards.includes(entry.card) || pathfindersTurmoilVenusInPlay) {
-          this.spaces.push(colonySpace(entry.name));
-        }
-        continue;
-      }
-      if (this.gameOptions.expansions[entry.expansion] || this.gameOptions.includedCards.includes(entry.card)) {
-        this.spaces.push(colonySpace(entry.name));
-      }
-    }
+    addExpansionColonySpaces(this.spaces, this.gameOptions);
 
     return this.spaces;
   }

@@ -36,6 +36,8 @@ export interface NewGameConfig {
   players: Array<NewPlayerModel>;
   expansions: Record<Expansion, boolean>,
   board: BoardNameType;
+  /** Opaque map-editor code, required when `board` is `BoardName.CUSTOM`. */
+  customBoardCode?: string;
   seed: number;
   randomFirstPlayer: boolean;
 

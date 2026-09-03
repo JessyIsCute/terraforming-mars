@@ -25,6 +25,7 @@ export const paths = {
   LOAD: 'load',
   LOAD_GAME: 'load_game',
   LOGIN: 'login',
+  MAP_EDITOR: 'map-editor',
   NEW_GAME: 'new-game',
   PLAYER: 'player',
   PLAYER_INPUT: 'player/input',

@@ -7,9 +7,15 @@ import {RandomMAOptionType} from '../../common/ma/RandomMAOptionType';
 import {AgendaStyle} from '../../common/turmoil/Types';
 import {Expansion} from '../../common/cards/GameModule';
 import {EscapeVelocityOptions} from '../../common/game/NewGameConfig';
+import {CustomBoardDefinition} from '../../common/boards/CustomBoardDefinition';
+import {GlobalParametersConfig} from '../../common/GlobalParameterConfig';
 
 export type GameOptions = {
   boardName: BoardName;
+  /** The board layout when `boardName` is `BoardName.CUSTOM`. Persisted for the life of the game. */
+  customBoard?: CustomBoardDefinition;
+  /** Global-parameter track overrides (from a custom board). Absent means the official tracks. */
+  globalParameters?: GlobalParametersConfig;
   clonedGamedId: GameId | undefined;
 
   // Configuration
@@ -83,6 +89,8 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   aresHazards: true,
   aresExtremeVariant: false,
   boardName: BoardName.THARSIS,
+  customBoard: undefined,
+  globalParameters: undefined,
   bannedCards: [],
   includedCards: [],
   ceoExtension: false,

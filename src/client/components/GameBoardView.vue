@@ -6,6 +6,7 @@
     :expansions="game.gameOptions.expansions"
     :venusScaleLevel="game.venusScaleLevel"
     :boardName ="game.gameOptions.boardName"
+    :globalParameters="game.gameOptions.globalParameters"
     :oceans_count="game.oceans"
     :oxygen_level="game.oxygenLevel"
     :temperature="game.temperature"

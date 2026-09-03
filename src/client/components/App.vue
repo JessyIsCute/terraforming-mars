@@ -40,6 +40,7 @@
         v-else-if="screen === 'games-overview'"
       />
       <CardList v-else-if="screen === 'cards'"/>
+      <MapEditor v-else-if="screen === 'map-editor'"/>
       <AdminHome v-else-if="screen === 'admin'"/>
       <LoginHome v-else-if="screen === 'login-home'"/>
       <Help v-else-if="screen === 'help'"/>
@@ -66,6 +67,7 @@ const LoadGameForm = defineAsyncComponent(() => import(/* webpackChunkName: "loa
 const PlayerHome = defineAsyncComponent(() => import(/* webpackChunkName: "player-home" */ '@/client/components/PlayerHome.vue'));
 const SpectatorHome = defineAsyncComponent(() => import(/* webpackChunkName: "spectator-home" */ '@/client/components/SpectatorHome.vue'));
 const StartScreen = defineAsyncComponent(() => import(/* webpackChunkName: "start-screen" */ '@/client/components/StartScreen.vue'));
+const MapEditor = defineAsyncComponent(() => import(/* webpackChunkName: "map-editor" */ '@/client/components/MapEditor.vue'));
 import {$t, setTranslationContext} from '@/client/directives/i18n';
 import {paths} from '@/common/app/paths';
 import {PlayerViewModel, ViewModel} from '@/common/models/PlayerModel';
@@ -86,6 +88,7 @@ type Screen = 'admin' |
             'help' |
             'load' |
             'login-home' |
+            'map-editor' |
             'player-home' |
             'spectator-home' |
             'start-screen' |
@@ -143,6 +146,7 @@ export default defineComponent({
   },
   components: {
     StartScreen,
+    MapEditor,
     CreateGameForm,
     LoadGameForm,
     GameHome,
@@ -293,6 +297,8 @@ export default defineComponent({
       app.screen = 'load';
     } else if (currentPathname === paths.CARDS) {
       app.screen = 'cards';
+    } else if (currentPathname === paths.MAP_EDITOR) {
+      app.screen = 'map-editor';
     } else if (currentPathname === paths.HELP) {
       app.screen = 'help';
     } else if (currentPathname === paths.SPECTATOR) {

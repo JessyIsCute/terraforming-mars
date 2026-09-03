@@ -9,6 +9,58 @@ import {RandomBoardOption} from '../../src/common/boards/RandomBoardOption';
 import {RandomMAOptionType} from '../../src/common/ma/RandomMAOptionType';
 import {SimpleGameModel} from '../../src/common/models/SimpleGameModel';
 import {FakeClock} from '../common/FakeClock';
+import {blankCustomBoard} from '../../src/common/boards/CustomBoardDefinition';
+import {encodeCustomBoard} from '../../src/common/boards/customBoardCodec';
+import {SpaceType} from '../../src/common/boards/SpaceType';
+
+function customBoardGameConfig(customBoardCode: string): NewGameConfig {
+  return {
+    players: [{name: 'Robot', color: 'blue', beginner: false, handicap: 0, first: true}],
+    expansions: {
+      corpera: true, promo: false, venus: false, colonies: false, prelude: false, prelude2: false,
+      turmoil: false, community: false, ares: false, moon: false, pathfinders: false, ceo: false,
+      starwars: false, underworld: false, deltaProject: false, sillyfication: false,
+    },
+    board: BoardName.CUSTOM,
+    customBoardCode,
+    seed: 0,
+    randomFirstPlayer: false,
+    clonedGamedId: undefined,
+    undoOption: false,
+    showTimers: false,
+    fastModeOption: false,
+    showOtherPlayersVP: false,
+    aresExtremeVariant: false,
+    politicalAgendasExtension: 'Standard',
+    solarPhaseOption: false,
+    removeNegativeGlobalEventsOption: false,
+    modularMA: false,
+    draftVariant: false,
+    initialDraft: false,
+    preludeDraftVariant: false,
+    ceosDraftVariant: false,
+    startingCorporations: 0,
+    shuffleMapOption: false,
+    randomMA: RandomMAOptionType.NONE,
+    includeFanMA: false,
+    soloTR: false,
+    customCorporationsList: [],
+    bannedCards: [],
+    includedCards: [],
+    customColoniesList: [],
+    customPreludes: [],
+    requiresMoonTrackCompletion: false,
+    requiresVenusTrackCompletion: false,
+    moonStandardProjectVariant: false,
+    moonStandardProjectVariant1: false,
+    altVenusBoard: false,
+    escapeVelocity: undefined,
+    twoCorpsVariant: false,
+    customCeos: [],
+    startingCeos: 0,
+    startingPreludes: 0,
+  };
+}
 
 describe('ApiCreateGame', () => {
   let scaffolding: RouteTestScaffolding;
@@ -127,6 +179,33 @@ describe('ApiCreateGame', () => {
     const game = await scaffolding.ctx.gameLoader.getGame(model.id);
     expect(game).is.not.undefined;
     expect(game!.players[0].name).eq('Robot');
+  });
+
+  it('creates a game from a custom board code', async () => {
+    const def = blankCustomBoard(9, 'Route Test');
+    def.spaces[0].spaceType = SpaceType.OCEAN;
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(customBoardGameConfig(encodeCustomBoard(def))));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).eq(statusCode.ok);
+    const model = JSON.parse(res.content) as SimpleGameModel;
+    const game = await scaffolding.ctx.gameLoader.getGame(model.id);
+    expect(game!.gameOptions.boardName).eq(BoardName.CUSTOM);
+    expect(game!.gameOptions.customBoard?.name).eq('Route Test');
+    expect(game!.board.getSpaceOrThrow('100').spaceType).eq(SpaceType.OCEAN);
+  });
+
+  it('rejects a custom board with a broken code', async () => {
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(customBoardGameConfig('TMB2-not-valid')));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).not.eq(statusCode.ok);
   });
 
   it('red rover solo game', async () => {
