@@ -48,7 +48,7 @@ describe('FungalFrenzy', () => {
   });
 
   it('action can spend 1 microbe for 1 plant production', () => {
-    player.addResourceTo(card, {qty: 1});
+    player.addResourceTo(card, 1);
 
     expect(card.action(player)).is.undefined;
     runAllActions(game);
