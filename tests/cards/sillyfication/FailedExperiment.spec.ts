@@ -21,6 +21,10 @@ describe('FailedExperiment', () => {
     expect(card.canPlay(player)).is.false;
   });
 
+  it('scores -1 VP', () => {
+    expect(card.getVictoryPoints(player)).to.eq(-1);
+  });
+
   it('discards a card, then draws 2 and gains 2 M€', () => {
     player.megaCredits = 0;
     const toDiscard = new MicroCredits();

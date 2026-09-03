@@ -12,6 +12,7 @@ export class FailedExperiment extends Card implements IProjectCard {
       name: CardName.FAILED_EXPERIMENT,
       tags: [Tag.SCIENCE],
       cost: 2,
+      victoryPoints: -1,
 
       behavior: {
         spend: {cards: 1},

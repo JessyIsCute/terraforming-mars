@@ -25,9 +25,13 @@ import {MicroEnergies} from './MicroEnergies';
 import {MicroSteels} from './MicroSteels';
 import {MicroPlants} from './MicroPlants';
 import {MicroTitaniums} from './MicroTitaniums';
+import {WellnessDeluxe} from './WellnessDeluxe';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
+  corporationCards: {
+    [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
+  },
   projectCards: {
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
     [CardName.ORBITAL_SEED_DISPERSAL]: {Factory: OrbitalSeedDispersal},

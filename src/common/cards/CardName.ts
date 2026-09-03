@@ -609,6 +609,7 @@ export enum CardName {
   MICRO_STEELS = 'Micro Steels',
   MICRO_PLANTS = 'Micro Plants',
   MICRO_TITANIUMS = 'Micro Titaniums',
+  WELLNESS_DELUXE = 'Wellness Deluxe',
 
   // Community corps
   AEROTECH = 'Aerotech',
