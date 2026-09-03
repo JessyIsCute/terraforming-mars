@@ -23,7 +23,7 @@ export class SomeAssemblyRequired extends Card implements IProjectCard {
           b.city().br;
           b.minus().cards(1, {all}).asterix();
         }),
-        description: 'Place a city tile. Then every player, including you, discards a card. Instructions not included.',
+        description: 'Place a city tile. Then every player, including you, discards a card.',
       },
     });
   }

@@ -34,7 +34,6 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
             eb.empty().startAction.temperature(1).asterix();
           });
         }),
-        description: 'Some problems can be solved with a large enough wrench.',
       },
     });
   }

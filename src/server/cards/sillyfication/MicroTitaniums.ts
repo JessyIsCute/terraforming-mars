@@ -4,23 +4,23 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-export class MicroCredits extends Card implements IProjectCard {
+export class MicroTitaniums extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.AUTOMATED,
-      name: CardName.MICRO_CREDITS,
-      cost: 2,
+      name: CardName.MICRO_TITANIUMS,
+      cost: 6,
 
       behavior: {
-        production: {megacredits: 1},
+        production: {titanium: 1},
       },
 
       metadata: {
-        cardNumber: 'X01',
+        cardNumber: 'X25',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.megacredits(1));
+          b.production((pb) => pb.titanium(1));
         }),
-        description: 'Increase your M€ production 1 step.',
+        description: 'Increase your titanium production 1 step.',
       },
     });
   }

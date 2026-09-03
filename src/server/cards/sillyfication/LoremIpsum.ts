@@ -20,7 +20,7 @@ export class LoremIpsum extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.cards(1);
         }),
-        description: 'Draw a card. Effect text goes here.',
+        description: 'Draw a card.',
       },
     });
   }

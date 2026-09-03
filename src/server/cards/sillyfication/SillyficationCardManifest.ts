@@ -21,6 +21,10 @@ import {LoremIpsum} from './LoremIpsum';
 import {CommitteeToFormACommittee} from './CommitteeToFormACommittee';
 import {RoundingError} from './RoundingError';
 import {LongDistanceRelations} from './LongDistanceRelations';
+import {MicroEnergies} from './MicroEnergies';
+import {MicroSteels} from './MicroSteels';
+import {MicroPlants} from './MicroPlants';
+import {MicroTitaniums} from './MicroTitaniums';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -46,5 +50,9 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.COMMITTEE_TO_FORM_A_COMMITTEE]: {Factory: CommitteeToFormACommittee},
     [CardName.ROUNDING_ERROR]: {Factory: RoundingError},
     [CardName.LONG_DISTANCE_RELATIONS]: {Factory: LongDistanceRelations},
+    [CardName.MICRO_ENERGIES]: {Factory: MicroEnergies},
+    [CardName.MICRO_STEELS]: {Factory: MicroSteels},
+    [CardName.MICRO_PLANTS]: {Factory: MicroPlants},
+    [CardName.MICRO_TITANIUMS]: {Factory: MicroTitaniums},
   },
 });

@@ -25,7 +25,6 @@ export class GasGiantTourismBoard extends ActionCard implements IProjectCard {
             eb.empty().startAction.megacredits(1).slash().tag(Tag.JOVIAN);
           });
         }),
-        description: 'There is no surface. There is nothing to see. Visit today.',
       },
     });
   }

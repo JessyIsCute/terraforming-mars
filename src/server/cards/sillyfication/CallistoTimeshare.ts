@@ -23,7 +23,7 @@ export class CallistoTimeshare extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.megacredits(2));
         }),
-        description: 'Increase your M€ production 2 steps. You now own 1/52 of a habitat you will never visit.',
+        description: 'Increase your M€ production 2 steps.',
       },
     });
   }

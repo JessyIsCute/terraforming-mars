@@ -15,15 +15,15 @@ export class LongDistanceRelations extends Card implements IProjectCard {
       victoryPoints: 1,
 
       behavior: {
-        stock: {megacredits: {tag: Tag.JOVIAN}},
+        production: {megacredits: {tag: Tag.JOVIAN}},
       },
 
       metadata: {
         cardNumber: 'X21',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(1).slash().tag(Tag.JOVIAN);
+          b.production((pb) => pb.megacredits(1).slash().tag(Tag.JOVIAN));
         }),
-        description: 'Gain 1 M€ for each Jovian tag you have, including this.',
+        description: 'Increase your M€ production 1 step for each Jovian tag you have, including this.',
       },
     });
   }

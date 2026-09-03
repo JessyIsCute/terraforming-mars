@@ -1,3 +1,4 @@
+import {Tag} from '../../../common/cards/Tag';
 import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
@@ -9,6 +10,7 @@ export class CommitteeToFormACommittee extends ActionCard implements IProjectCar
     super({
       type: CardType.ACTIVE,
       name: CardName.COMMITTEE_TO_FORM_A_COMMITTEE,
+      tags: [Tag.EARTH],
       cost: 3,
 
       action: {
@@ -22,7 +24,6 @@ export class CommitteeToFormACommittee extends ActionCard implements IProjectCar
             eb.empty().startAction.megacredits(1);
           });
         }),
-        description: 'The committee has resolved to continue meeting.',
       },
     });
   }

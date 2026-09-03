@@ -20,7 +20,7 @@ export class Pothole extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.minus().megacredits(1, {all})).asterix();
         }),
-        description: 'Requires a player with a city tile. That player decreases their M€ production 1 step. Infrastructure.',
+        description: 'Choose a player with a city tile. That player loses 1 M€ production.',
       },
     });
   }

@@ -23,7 +23,7 @@ export class RoundingError extends Card implements IProjectCard {
             eb.cards(1).asterix().startEffect.megacredits(-1);
           });
         }),
-        description: 'Requires that you have no more than 2 science tags. Off by one.',
+        description: 'Requires that you have no more than 2 science tags.',
       },
     });
   }

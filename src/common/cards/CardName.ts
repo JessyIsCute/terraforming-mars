@@ -605,6 +605,10 @@ export enum CardName {
   COMMITTEE_TO_FORM_A_COMMITTEE = 'Committee to Form a Committee',
   ROUNDING_ERROR = 'Rounding Error',
   LONG_DISTANCE_RELATIONS = 'Long Distance Relations',
+  MICRO_ENERGIES = 'Micro Energies',
+  MICRO_STEELS = 'Micro Steels',
+  MICRO_PLANTS = 'Micro Plants',
+  MICRO_TITANIUMS = 'Micro Titaniums',
 
   // Community corps
   AEROTECH = 'Aerotech',

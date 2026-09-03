@@ -22,9 +22,9 @@ export class UnpaidElectricityBill extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X14',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(9, {digit}).production((pb) => pb.minus().energy(1));
+          b.production((pb) => pb.minus().energy(1)).megacredits(9, {digit});
         }),
-        description: 'Gain 9 M€. Decrease your energy production 1 step. Future you can deal with it.',
+        description: 'Decrease your energy production 1 step. Gain 9 M€.',
       },
     });
   }

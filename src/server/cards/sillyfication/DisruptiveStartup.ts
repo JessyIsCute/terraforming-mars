@@ -26,7 +26,6 @@ export class DisruptiveStartup extends ActionCard implements IProjectCard {
             eb.cards(1).startAction.megacredits(4);
           });
         }),
-        description: 'Move fast, break things.',
       },
     });
   }
