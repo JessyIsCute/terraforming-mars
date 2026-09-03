@@ -638,6 +638,10 @@ export enum CardName {
   NECROTIC_BLOOM = 'Necrotic Bloom',
   GUERRILLA_GARDENING = 'Guerrilla Gardening',
   SLASH_AND_BURN = 'Slash and Burn',
+  NEPOTISM = 'Nepotism',
+  ROTATING_HANDS = 'Rotating Hands',
+  SHOW_AND_TELL = 'Show and Tell',
+  MUSICAL_CHAIRS = 'Musical Chairs',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

@@ -5,10 +5,7 @@ import {CardType} from '../../../common/cards/CardType';
 import {TileType} from '../../../common/TileType';
 import {IPlayer} from '../../IPlayer';
 import {CardName} from '../../../common/cards/CardName';
-import {SelectPlayer} from '../../inputs/SelectPlayer';
 import {PlaceTile} from '../../deferredActions/PlaceTile';
-import {SimpleDeferredAction} from '../../deferredActions/DeferredAction';
-import {Priority} from '../../deferredActions/Priority';
 import {CardRenderer} from '../render/CardRenderer';
 import {all} from '../Options';
 
@@ -27,7 +24,7 @@ export class GarbageDumps extends Card implements IProjectCard {
           b.tile(TileType.GARBAGE_DUMP, true).br;
           b.minus().tr(1, {all}).asterix();
         }),
-        description: 'Place this tile. A player with a tile adjacent to it loses 1 TR.',
+        description: 'Place this tile. Every opponent with a tile adjacent to it loses 1 TR.',
       },
     });
   }
@@ -45,14 +42,9 @@ export class GarbageDumps extends Card implements IProjectCard {
           adjacentPlayers.add(adjacent.player);
         }
       });
-      if (adjacentPlayers.size === 0) {
-        return undefined;
+      for (const target of adjacentPlayers) {
+        target.decreaseTerraformRating(1, {log: true});
       }
-      game.defer(new SimpleDeferredAction(player, () =>
-        new SelectPlayer(Array.from(adjacentPlayers), 'Choose an adjacent player to lose 1 TR', 'Select').andThen((target) => {
-          target.decreaseTerraformRating(1, {log: true});
-          return undefined;
-        }), Priority.ATTACK_OPPONENT));
       return undefined;
     });
     return undefined;

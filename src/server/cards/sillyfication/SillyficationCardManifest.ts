@@ -53,6 +53,10 @@ import {OvercrowdedColony} from './OvercrowdedColony';
 import {NecroticBloom} from './NecroticBloom';
 import {GuerrillaGardening} from './GuerrillaGardening';
 import {SlashAndBurn} from './SlashAndBurn';
+import {Nepotism} from './Nepotism';
+import {RotatingHands} from './RotatingHands';
+import {ShowAndTell} from './ShowAndTell';
+import {MusicalChairs} from './MusicalChairs';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -139,6 +143,10 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.NECROTIC_BLOOM]: {Factory: NecroticBloom},
     [CardName.GUERRILLA_GARDENING]: {Factory: GuerrillaGardening},
     [CardName.SLASH_AND_BURN]: {Factory: SlashAndBurn},
+    [CardName.NEPOTISM]: {Factory: Nepotism, compatibility: 'turmoil'},
+    [CardName.ROTATING_HANDS]: {Factory: RotatingHands},
+    [CardName.SHOW_AND_TELL]: {Factory: ShowAndTell},
+    [CardName.MUSICAL_CHAIRS]: {Factory: MusicalChairs},
 
     // Replacement cards (swap into the base pool; see cardsToRemove below)
     [CardName.LUNAR_BEAM_SILLY]: {Factory: LunarBeamSilly},
