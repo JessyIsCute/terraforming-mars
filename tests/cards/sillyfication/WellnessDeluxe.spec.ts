@@ -17,6 +17,13 @@ describe('WellnessDeluxe', () => {
     player.playedCards.push(card);
   });
 
+  it('starting bonuses', () => {
+    card.play(player);
+    runAllActions(game);
+    expect(player.production.megacredits).to.eq(2);
+    expect(player.heat).to.eq(4);
+  });
+
   it('placing your own ocean gains 1 heat production and 3 heat', () => {
     addOcean(player, '06');
     runAllActions(game);

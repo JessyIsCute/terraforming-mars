@@ -15,11 +15,9 @@ export class VenusianSubsidiary extends Card implements IProjectCard, IActionCar
       name: CardName.VENUSIAN_SUBSIDIARY,
       tags: [Tag.VENUS, Tag.EARTH],
       cost: 10,
-      requirements: [{tag: Tag.VENUS, count: 2}, {tag: Tag.EARTH, count: 2}],
 
       metadata: {
         cardNumber: 'X07',
-        description: 'Requires 2 Venus tags and 2 Earth tags.',
         renderData: CardRenderer.builder((b) => {
           b.action('Gain 1 M€ for each pair of Venus and Earth tags you have.', (eb) => {
             eb.empty().startAction.megacredits(1).slash().tag(Tag.VENUS).tag(Tag.EARTH);

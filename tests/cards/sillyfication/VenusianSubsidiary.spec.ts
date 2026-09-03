@@ -13,14 +13,7 @@ describe('VenusianSubsidiary', () => {
     player.megaCredits = 20;
   });
 
-  it('requires 2 Venus tags and 2 Earth tags', () => {
-    player.tagsForTest = {venus: 2, earth: 1};
-    expect(card.canPlay(player)).is.false;
-
-    player.tagsForTest = {venus: 1, earth: 2};
-    expect(card.canPlay(player)).is.false;
-
-    player.tagsForTest = {venus: 2, earth: 2};
+  it('has no play requirement', () => {
     expect(card.canPlay(player)).is.true;
   });
 
