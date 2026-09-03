@@ -3,7 +3,6 @@ import {AcidRefluxIndustries} from '../../../src/server/cards/sillyfication/Acid
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {VenusianSubsidiary} from '../../../src/server/cards/sillyfication/VenusianSubsidiary';
 import {IGame} from '../../../src/server/IGame';
-import {Payment} from '../../../src/common/inputs/Payment';
 import {TestPlayer} from '../../TestPlayer';
 import {runAllActions} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
@@ -42,18 +41,6 @@ describe('AcidRefluxIndustries', () => {
     card.onCardPlayed(player, new MicroCredits());
     runAllActions(game);
     expect(card.resourceCount).to.eq(0);
-  });
-
-  it('its floaters count as spendable floaters', () => {
-    player.addResourceTo(card, 4);
-    expect(player.getSpendable('floaters')).to.eq(4);
-  });
-
-  it('paying with floaters drains them from this card', () => {
-    player.addResourceTo(card, 4);
-    player.pay(Payment.of({floaters: 3}));
-    runAllActions(game);
-    expect(card.resourceCount).to.eq(1);
   });
 
   it('action removes floaters for 2 M€ each', () => {

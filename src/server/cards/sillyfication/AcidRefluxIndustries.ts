@@ -32,11 +32,8 @@ export class AcidRefluxIndustries extends CorporationCard implements ICorporatio
             cea.effect('When you play a card with a Venus tag, including this, add 2 floaters to any card.', (eb) => {
               eb.tag(Tag.VENUS).asterix().startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
             });
-            cea.effect('When playing a Venus tag, floaters here may be used as payment, and are worth 3 M€ each.', (eb) => {
-              eb.tag(Tag.VENUS).startEffect.resource(CardResource.FLOATER).equals().megacredits(3);
-            });
             cea.action('Remove any number of floaters from this card to gain 2 M€ each.', (ab) => {
-              ab.text('x').resource(CardResource.FLOATER).startAction.megacredits(2, {size: Size.SMALL, text: '2x'});
+              ab.text('x').resource(CardResource.FLOATER).startAction.megacredits(2, {size: Size.SMALL, text: '2X'});
             });
           });
         }),
