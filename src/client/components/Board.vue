@@ -73,17 +73,18 @@
             </div>
         </div>
 
-        <div class="board" id="main_board">
+        <div :class="['board', {'board--custom': isCustomBoard}]" :style="boardStyle" id="main_board">
             <BoardSpace
               v-for="curSpace in getAllSpacesOnMars()"
               :key="curSpace.id"
               :space="curSpace"
               :aresExtension="expansions.ares"
               :tileView="tileView"
+              :pixel="isCustomBoard ? pixelFor(curSpace) : undefined"
               data-test="board-space"
             />
 
-            <svg id="board_legend" height="550" width="630" class="board-legend">
+            <svg v-if="!isCustomBoard" id="board_legend" height="550" width="630" class="board-legend">
               <g v-for="(key, idx) of LEGENDS[boardName]" :key="idx" :transform="`translate(${key.position[0]}, ${key.position[1]})`">
                 <text class="board-caption">
                   <tspan y="0">{{key.text[0]}}</tspan>
@@ -360,6 +361,7 @@ import {SpaceType} from '@/common/boards/SpaceType';
 import {SpaceId} from '@/common/Types';
 import {TileView} from '@/client/components/board/TileView';
 import {BoardName} from '@/common/boards/BoardName';
+import {customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
 import {LEGENDS} from '@/client/components/Legends';
 import {Expansion} from '@/common/cards/GameModule';
 import {SpaceName} from '@/common/boards/SpaceName';
@@ -495,12 +497,40 @@ export default defineComponent({
       }
     },
     getGameBoardClassName(): string {
+      if (this.isCustomBoard) {
+        return 'board-cont board-cont--custom';
+      }
       return this.expansions.venus ? 'board-cont board-with-venus' : 'board-cont board-without-venus';
+    },
+    pixelFor(space: SpaceModel): {left: number, top: number} {
+      return customSpacePixel(space.x, space.y, this.customExtent.maxY);
     },
   },
   computed: {
     BoardName(): typeof BoardName {
       return BoardName;
+    },
+    isCustomBoard(): boolean {
+      return this.boardName === BoardName.CUSTOM;
+    },
+    customExtent(): {maxX: number, maxY: number} {
+      let maxX = 0;
+      let maxY = 0;
+      for (const space of this.spaces) {
+        if (space.spaceType === SpaceType.COLONY) {
+          continue;
+        }
+        maxX = Math.max(maxX, space.x);
+        maxY = Math.max(maxY, space.y);
+      }
+      return {maxX, maxY};
+    },
+    boardStyle(): Record<string, string> | undefined {
+      if (!this.isCustomBoard) {
+        return undefined;
+      }
+      const {width, height} = customBoardPixelSize(this.customExtent.maxX, this.customExtent.maxY);
+      return {width: `${width}px`, height: `${height}px`};
     },
     LEGENDS(): typeof LEGENDS {
       return LEGENDS;

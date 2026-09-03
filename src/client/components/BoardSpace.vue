@@ -1,5 +1,5 @@
 <template>
-  <div v-if="space !== undefined" :class="mainClass" :data_space_id="space.id">
+  <div v-if="space !== undefined" :class="mainClass" :style="positionStyle" :data_space_id="space.id">
     <BoardSpaceTile
       :space="space"
       :aresExtension="aresExtension"
@@ -60,6 +60,12 @@ export default defineComponent({
       type: String as () => TileView,
       required: true,
     },
+    // Explicit pixel offset for boards without a hand-placed `.board-space-NN` CSS rule
+    // (i.e. custom boards). Absent for the official boards.
+    pixel: {
+      type: Object as () => {left: number, top: number} | undefined,
+      default: undefined,
+    },
   },
   data() {
     return {};
@@ -73,7 +79,16 @@ export default defineComponent({
     mainClass(): string {
       let css = 'board-space board-space-' + this.space?.id.toString();
       css += ' board-space-selectable';
+      if (this.space.spaceType === SpaceType.RESTRICTED) {
+        css += ' board-space-type-restricted';
+      }
       return css;
+    },
+    positionStyle(): Record<string, string> | undefined {
+      if (this.pixel === undefined) {
+        return undefined;
+      }
+      return {margin: `${this.pixel.top}px 0 0 ${this.pixel.left}px`};
     },
     showBonus(): boolean {
       return this.space.tileType === undefined || this.tileView === 'hide';

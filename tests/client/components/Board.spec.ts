@@ -110,4 +110,33 @@ describe('Board', () => {
 
     expect(wrapper.find('[data-test=hide-tiles-button]').text()).to.be.eq('hide tiles');
   });
+
+  it('positions custom-board spaces by pixel and drops the painted background', () => {
+    const customSpaces: SpaceModel[] = [
+      {id: '100', x: 4, y: 0, bonus: [], spaceType: SpaceType.LAND, color: undefined, highlight: undefined, tileType: undefined},
+      {id: '101', x: 2, y: 2, bonus: [], spaceType: SpaceType.OCEAN, color: undefined, highlight: undefined, tileType: undefined},
+      {id: '102', x: 5, y: 4, bonus: [], spaceType: SpaceType.RESTRICTED, color: undefined, highlight: undefined, tileType: undefined},
+    ];
+    const wrapper = shallowMount(Board, {
+      ...globalConfig,
+      props: {spaces: customSpaces, expansions: DEFAULT_EXPANSIONS, tileView: 'show', venusScaleLevel: 0, boardName: BoardName.CUSTOM},
+    });
+
+    expect(wrapper.find('.board-cont--custom').exists()).to.be.true;
+    expect(wrapper.find('.board-with-venus').exists()).to.be.false;
+    expect(wrapper.find('.board-without-venus').exists()).to.be.false;
+    expect(wrapper.find('#board_legend').exists()).to.be.false;
+
+    const spaceWrappers = wrapper.findAllComponents(BoardSpace)
+      .filter((w) => w.attributes('data-test') === 'board-space');
+    expect(spaceWrappers).to.have.length(3);
+    // Every custom space carries an explicit pixel offset.
+    expect(spaceWrappers.every((w) => w.props('pixel') !== undefined)).to.be.true;
+    // maxY is 4, so the middle row is y=2 (zero row-shift): left === 49*x + 6.
+    const middle = spaceWrappers.find((w) => w.props('space').id === '101')!;
+    expect(middle.props('pixel')).to.deep.eq({left: 49 * 2 + 6, top: 34 + 41 * 2});
+    // Bottom row y=4 is shifted left by one hex-width relative to the middle.
+    const bottom = spaceWrappers.find((w) => w.props('space').id === '102')!;
+    expect(bottom.props('pixel')).to.deep.eq({left: 49 * 5 + 6 - 49, top: 34 + 41 * 4});
+  });
 });

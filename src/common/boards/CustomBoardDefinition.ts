@@ -64,6 +64,33 @@ export function hexCellCount(rows: number): number {
   return hexRowLayout(rows).reduce((sum, row) => sum + row.width, 0);
 }
 
+// --- client pixel layout ---------------------------------------------------------------------
+// The official boards position each hex with a hand-tuned `.board-space-NN` CSS rule over a
+// painted background image. Custom boards have neither, so their hexes are placed by formula.
+// These constants are reverse-engineered from board_items_positions.less and reproduce the
+// standard Tharsis positions exactly when maxY === 8.
+export const HEX_WIDTH = 49;
+export const HEX_HEIGHT = 41;
+const HEX_LEFT_PAD = 6;
+const HEX_TOP_PAD = 34;
+
+/** Top/left pixel offset (a `.board-space` margin) for the hex at grid coordinate (x, y). */
+export function customSpacePixel(x: number, y: number, maxY: number): {left: number, top: number} {
+  const midDistance = Math.min(y, maxY - y);
+  const rowShift = (HEX_WIDTH / 2) * (midDistance - maxY / 2);
+  return {
+    left: HEX_WIDTH * x + HEX_LEFT_PAD + rowShift,
+    top: HEX_TOP_PAD + HEX_HEIGHT * y,
+  };
+}
+
+/** Pixel size of the scrollable board area needed to hold a custom board. */
+export function customBoardPixelSize(maxX: number, maxY: number): {width: number, height: number} {
+  const right = customSpacePixel(maxX, maxY / 2, maxY).left;
+  const bottom = customSpacePixel(0, maxY, maxY).top;
+  return {width: right + 46 + 40, height: bottom + 51 + 20};
+}
+
 /** The space id for the Nth custom hex (row-major), e.g. index 0 -> '100'. */
 export function customSpaceId(index: number): SpaceId {
   return safeCast(String(CUSTOM_BOARD_ID_BASE + index), isSpaceId);

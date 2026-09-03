@@ -976,6 +976,7 @@ export default defineComponent({
         [BoardName.TERRA_CIMMERIA]: 'terra-cimmeria',
         [BoardName.TERRA_CIMMERIA_NOVA]: 'terra-cimmeria-nova',
         [BoardName.HOLLANDIA]: 'hollandia',
+        [BoardName.CUSTOM]: '',
         [RandomBoardOption.OFFICIAL]: '',
         [RandomBoardOption.ALL]: '',
       };
