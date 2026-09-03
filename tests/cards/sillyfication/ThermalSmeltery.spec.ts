@@ -14,18 +14,18 @@ describe('ThermalSmeltery', () => {
     player.playedCards.push(card);
   });
 
-  it('cannot act without 7 heat', () => {
-    player.heat = 6;
+  it('cannot act without 6 heat', () => {
+    player.heat = 5;
     expect(card.canAct(player)).is.false;
-    player.heat = 7;
+    player.heat = 6;
     expect(card.canAct(player)).is.true;
   });
 
-  it('spends 7 heat for 4 titanium', () => {
-    player.heat = 7;
+  it('spends 6 heat for 3 titanium', () => {
+    player.heat = 6;
     card.action(player);
     runAllActions(player.game);
     expect(player.heat).to.eq(0);
-    expect(player.titanium).to.eq(4);
+    expect(player.titanium).to.eq(3);
   });
 });

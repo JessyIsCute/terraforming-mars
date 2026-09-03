@@ -12,18 +12,18 @@ export class ThermalSmeltery extends ActionCard implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.THERMAL_SMELTERY,
       tags: [Tag.BUILDING],
-      cost: 8,
+      cost: 6,
 
       action: {
-        spend: {heat: 7},
-        stock: {titanium: 4},
+        spend: {heat: 6},
+        stock: {titanium: 3},
       },
 
       metadata: {
         cardNumber: 'X29',
         renderData: CardRenderer.builder((b) => {
-          b.action('Spend 7 heat to gain 4 titanium.', (eb) => {
-            eb.heat(7, {digit}).startAction.titanium(4, {digit});
+          b.action('Spend 6 heat to gain 3 titanium.', (eb) => {
+            eb.heat(6, {digit}).startAction.titanium(3, {digit});
           });
         }),
       },
