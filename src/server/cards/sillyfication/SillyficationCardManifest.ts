@@ -25,6 +25,14 @@ import {MicroEnergies} from './MicroEnergies';
 import {MicroSteels} from './MicroSteels';
 import {MicroPlants} from './MicroPlants';
 import {MicroTitaniums} from './MicroTitaniums';
+import {ScaffoldingForever} from './ScaffoldingForever';
+import {CoreMines} from './CoreMines';
+import {MineralFabricators} from './MineralFabricators';
+import {ThermalSmeltery} from './ThermalSmeltery';
+import {DebrisField} from './DebrisField';
+import {OrbitDumping} from './OrbitDumping';
+import {GarbageDumps} from './GarbageDumps';
+import {LaunchWindow} from './LaunchWindow';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 
@@ -60,5 +68,13 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.MICRO_STEELS]: {Factory: MicroSteels},
     [CardName.MICRO_PLANTS]: {Factory: MicroPlants},
     [CardName.MICRO_TITANIUMS]: {Factory: MicroTitaniums},
+    [CardName.SCAFFOLDING_FOREVER]: {Factory: ScaffoldingForever},
+    [CardName.CORE_MINES]: {Factory: CoreMines},
+    [CardName.MINERAL_FABRICATORS]: {Factory: MineralFabricators},
+    [CardName.THERMAL_SMELTERY]: {Factory: ThermalSmeltery},
+    [CardName.DEBRIS_FIELD]: {Factory: DebrisField},
+    [CardName.ORBIT_DUMPING]: {Factory: OrbitDumping},
+    [CardName.GARBAGE_DUMPS]: {Factory: GarbageDumps},
+    [CardName.LAUNCH_WINDOW]: {Factory: LaunchWindow},
   },
 });

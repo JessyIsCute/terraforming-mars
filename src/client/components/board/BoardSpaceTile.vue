@@ -59,6 +59,7 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.MAN_MADE_VOLCANO]: 'man-made-volcano',
   [TileType.NEW_HOLLAND]: 'new-holland',
   [TileType.NEURAL_INSTANCE]: 'neural-instance',
+  [TileType.GARBAGE_DUMP]: 'garbage_dump',
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([

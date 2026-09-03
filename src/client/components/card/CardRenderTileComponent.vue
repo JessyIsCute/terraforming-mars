@@ -150,6 +150,7 @@ const TILE_CLASSES: Record<TileType, Classes> = {
   [TileType.NEURAL_INSTANCE]: {
     tile: 'card-tile-neural-instance',
   },
+  [TileType.GARBAGE_DUMP]: {},
 };
 
 export default defineComponent({
