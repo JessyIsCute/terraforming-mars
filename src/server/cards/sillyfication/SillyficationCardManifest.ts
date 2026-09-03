@@ -26,11 +26,13 @@ import {MicroSteels} from './MicroSteels';
 import {MicroPlants} from './MicroPlants';
 import {MicroTitaniums} from './MicroTitaniums';
 import {WellnessDeluxe} from './WellnessDeluxe';
+import {AcidRefluxIndustries} from './AcidRefluxIndustries';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
   corporationCards: {
     [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
+    [CardName.ACID_REFLUX_INDUSTRIES]: {Factory: AcidRefluxIndustries, compatibility: 'venus'},
   },
   projectCards: {
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
