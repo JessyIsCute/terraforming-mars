@@ -15,7 +15,7 @@ import {FailedExperiment} from './FailedExperiment';
 import {DisruptiveStartup} from './DisruptiveStartup';
 import {UnpaidElectricityBill} from './UnpaidElectricityBill';
 import {GasGiantTourismBoard} from './GasGiantTourismBoard';
-import {CallistoTimeshare} from './CallistoTimeshare';
+import {NeptuneResearchVessel} from './NeptuneResearchVessel';
 import {Pothole} from './Pothole';
 import {LoremIpsum} from './LoremIpsum';
 import {CommitteeToFormACommittee} from './CommitteeToFormACommittee';
@@ -50,7 +50,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.DISRUPTIVE_STARTUP]: {Factory: DisruptiveStartup},
     [CardName.UNPAID_ELECTRICITY_BILL]: {Factory: UnpaidElectricityBill},
     [CardName.GAS_GIANT_TOURISM_BOARD]: {Factory: GasGiantTourismBoard},
-    [CardName.CALLISTO_TIMESHARE]: {Factory: CallistoTimeshare},
+    [CardName.NEPTUNE_RESEARCH_VESSEL]: {Factory: NeptuneResearchVessel},
     [CardName.POTHOLE]: {Factory: Pothole},
     [CardName.LOREM_IPSUM]: {Factory: LoremIpsum},
     [CardName.COMMITTEE_TO_FORM_A_COMMITTEE]: {Factory: CommitteeToFormACommittee},

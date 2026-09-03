@@ -599,7 +599,7 @@ export enum CardName {
   DISRUPTIVE_STARTUP = 'Disruptive Startup',
   UNPAID_ELECTRICITY_BILL = 'Unpaid Electricity Bill',
   GAS_GIANT_TOURISM_BOARD = 'Gas Giant Tourism Board',
-  CALLISTO_TIMESHARE = 'Callisto Timeshare',
+  NEPTUNE_RESEARCH_VESSEL = 'Neptune Research Vessel',
   POTHOLE = 'Pothole',
   LOREM_IPSUM = 'Lorem Ipsum',
   COMMITTEE_TO_FORM_A_COMMITTEE = 'Committee to Form a Committee',
