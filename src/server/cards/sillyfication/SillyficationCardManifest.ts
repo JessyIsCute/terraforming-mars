@@ -38,6 +38,9 @@ import {CropTheft} from './CropTheft';
 import {Swaperoo} from './Swaperoo';
 import {Switcharoo} from './Switcharoo';
 import {Honse} from './Honse';
+import {AriAdore} from './AriAdore';
+import {ChipFabricationPlant} from './ChipFabricationPlant';
+import {UranusSeaCreatures} from './UranusSeaCreatures';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -88,5 +91,8 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.SWAPEROO]: {Factory: Swaperoo},
     [CardName.SWITCHAROO]: {Factory: Switcharoo},
     [CardName.HONSE]: {Factory: Honse},
+    [CardName.ARI_ADORE]: {Factory: AriAdore},
+    [CardName.CHIP_FABRICATION_PLANT]: {Factory: ChipFabricationPlant},
+    [CardName.URANUS_SEA_CREATURES]: {Factory: UranusSeaCreatures},
   },
 });

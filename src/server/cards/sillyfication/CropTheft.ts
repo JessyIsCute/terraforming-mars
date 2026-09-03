@@ -20,15 +20,19 @@ export class CropTheft extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X35',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(-1, {all}).slash().plants(1, {all});
+          b.minus().plants(1, {all}).slash().tag(Tag.PLANT);
         }),
-        description: 'Steal all plants from any player.',
+        description: 'Steal 1 plant from any player for each plant tag that player has.',
       },
     });
   }
 
+  private stealAmount(target: IPlayer): number {
+    return Math.min(target.plants, target.tags.count(Tag.PLANT));
+  }
+
   private stealTargets(player: IPlayer) {
-    return player.opponents.filter((p) => p.plants > 0 && !p.plantsAreProtected());
+    return player.opponents.filter((p) => this.stealAmount(p) > 0 && !p.plantsAreProtected());
   }
 
   public override bespokeCanPlay(player: IPlayer): boolean {
@@ -40,9 +44,9 @@ export class CropTheft extends Card implements IProjectCard {
     if (targets.length === 0) {
       return undefined;
     }
-    return new SelectPlayer(targets, 'Select a player to steal all their plants from', 'Steal')
+    return new SelectPlayer(targets, 'Select a player to steal plants from', 'Steal')
       .andThen((target) => {
-        target.attack(player, Resource.PLANTS, target.plants, {stealing: true, log: true});
+        target.attack(player, Resource.PLANTS, this.stealAmount(target), {stealing: true, log: true});
         return undefined;
       });
   }

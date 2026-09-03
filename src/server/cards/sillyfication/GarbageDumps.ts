@@ -15,7 +15,7 @@ import {all} from '../Options';
 export class GarbageDumps extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.EVENT,
+      type: CardType.AUTOMATED,
       name: CardName.GARBAGE_DUMPS,
       tags: [Tag.BUILDING],
       cost: 9,
