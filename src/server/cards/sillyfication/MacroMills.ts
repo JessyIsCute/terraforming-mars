@@ -9,7 +9,7 @@ export class MacroMills extends Card implements IProjectCard {
     super({
       type: CardType.AUTOMATED,
       name: CardName.MACRO_MILLS,
-      cost: 6,
+      cost: 7,
 
       behavior: {
         production: {heat: 2},

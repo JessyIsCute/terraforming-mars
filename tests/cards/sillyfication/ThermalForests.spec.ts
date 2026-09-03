@@ -37,6 +37,21 @@ describe('ThermalForests', () => {
     expect(card.canPlay(player)).is.false;
   });
 
+  it('cannot play with two greeneries that are not adjacent', () => {
+    const spaces = game.board.getAvailableSpacesOnLand(player);
+    const first = spaces[0];
+    const nonNeighbour = spaces.find((s) =>
+      s !== first && !game.board.getAdjacentSpaces(first).includes(s));
+    if (nonNeighbour === undefined) {
+      throw new Error('no non-adjacent land space for test setup');
+    }
+    game.addGreenery(player, first);
+    game.addGreenery(player, nonNeighbour);
+
+    // The greeneries:2 requirement is met, but the adjacency check is not.
+    expect(card.canPlay(player)).is.false;
+  });
+
   it('can play with two adjacent greeneries', () => {
     addAdjacentGreeneries();
 

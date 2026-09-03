@@ -15,6 +15,8 @@ export class ThermalForests extends Card implements IProjectCard {
       tags: [Tag.PLANT],
       cost: 10,
 
+      requirements: {greeneries: 2},
+
       behavior: {
         production: {heat: 2, plants: 1},
         stock: {heat: 3},
@@ -23,9 +25,9 @@ export class ThermalForests extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X03',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.heat(2).plants(1)).heat(3);
+          b.production((pb) => pb.heat(2).plants(1)).heat(3).asterix();
         }),
-        description: 'Requires two greeneries on Mars adjacent to each other. ' +
+        description: 'Requires two greeneries on Mars that are adjacent to each other. ' +
           'Increase your heat production 2 steps and your plant production 1 step. Gain 3 heat.',
       },
     });
