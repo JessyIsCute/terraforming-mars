@@ -1,0 +1,49 @@
+import {expect} from 'chai';
+import {LoveChildHoldings} from '../../../src/server/cards/sillyfication/LoveChildHoldings';
+import {TestPlayer} from '../../TestPlayer';
+import {testGame} from '../../TestGame';
+
+describe('LoveChildHoldings', () => {
+  let card: LoveChildHoldings;
+  let player: TestPlayer;
+
+  beforeEach(() => {
+    card = new LoveChildHoldings();
+    [/* game */, player] = testGame(2);
+    player.megaCredits = 20;
+  });
+
+  it('requires 2 Venus tags and 2 Earth tags', () => {
+    player.tagsForTest = {venus: 2, earth: 1};
+    expect(card.canPlay(player)).is.false;
+
+    player.tagsForTest = {venus: 1, earth: 2};
+    expect(card.canPlay(player)).is.false;
+
+    player.tagsForTest = {venus: 2, earth: 2};
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('can always act', () => {
+    expect(card.canAct()).is.true;
+  });
+
+  it('action gains 1 M€ per Venus/Earth pair', () => {
+    player.megaCredits = 0;
+    player.tagsForTest = {venus: 3, earth: 2};
+
+    card.action(player);
+
+    // min(3, 2) = 2 pairs.
+    expect(player.megaCredits).to.eq(2);
+  });
+
+  it('action gains nothing without a matching pair', () => {
+    player.megaCredits = 0;
+    player.tagsForTest = {venus: 4, earth: 0};
+
+    card.action(player);
+
+    expect(player.megaCredits).to.eq(0);
+  });
+});

@@ -585,6 +585,12 @@ export enum CardName {
 
   // Sillyfication (silly fan expansion)
   MICRO_CREDITS = 'Micro Credits',
+  ORBITAL_SEED_DISPERSAL = 'Orbital Seed Dispersal',
+  THERMAL_FORESTS = 'Thermal Forests',
+  VOLCANIC_MINERALS = 'Volcanic Minerals',
+  MACRO_MILLS = 'Macro Mills',
+  FUNGAL_FRENZY = 'Fungal Frenzy',
+  LOVE_CHILD_HOLDINGS = 'Love Child Holdings',
 
   // Community corps
   AEROTECH = 'Aerotech',
