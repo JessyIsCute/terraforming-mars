@@ -3,7 +3,6 @@ import {testGame} from '../TestGame';
 import {IGame} from '../../src/server/IGame';
 import {TestPlayer} from '../TestPlayer';
 import {Phase} from '../../src/common/Phase';
-import {Resource} from '../../src/common/Resource';
 import {runAllActions} from '../TestingUtils';
 import {cast} from '../../src/common/utils/utils';
 import {SelectSpace} from '../../src/server/inputs/SelectSpace';
