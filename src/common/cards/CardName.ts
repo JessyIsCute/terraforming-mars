@@ -627,6 +627,12 @@ export enum CardName {
   CHIP_FABRICATION_PLANT = 'Chip Fabrication Plant',
   URANUS_SEA_CREATURES = 'Uranus Sea Creatures',
   LIVESTOCK_LOBBY = 'Livestock Lobby',
+  ROBINITTA = 'Robinitta',
+  CHILLING_RICHES = 'Chilling Riches',
+  COLD_LIKE_STEEL = 'Cold like Steel',
+  STEEL_PHOBO = 'SteelPhobo',
+  PHARMACY_ON_LUNA = 'Pharmacy on Luna',
+  VITOR_VITALIS = 'Vitor Vitalis',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

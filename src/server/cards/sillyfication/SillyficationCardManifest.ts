@@ -42,6 +42,12 @@ import {AriAdore} from './AriAdore';
 import {ChipFabricationPlant} from './ChipFabricationPlant';
 import {UranusSeaCreatures} from './UranusSeaCreatures';
 import {LivestockLobby} from './LivestockLobby';
+import {Robinitta} from './Robinitta';
+import {ChillingRiches} from './ChillingRiches';
+import {ColdLikeSteel} from './ColdLikeSteel';
+import {SteelPhobo} from './SteelPhobo';
+import {PharmacyOnLuna} from './PharmacyOnLuna';
+import {VitorVitalis} from './VitorVitalis';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -96,5 +102,11 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.CHIP_FABRICATION_PLANT]: {Factory: ChipFabricationPlant},
     [CardName.URANUS_SEA_CREATURES]: {Factory: UranusSeaCreatures},
     [CardName.LIVESTOCK_LOBBY]: {Factory: LivestockLobby},
+    [CardName.ROBINITTA]: {Factory: Robinitta},
+    [CardName.CHILLING_RICHES]: {Factory: ChillingRiches},
+    [CardName.COLD_LIKE_STEEL]: {Factory: ColdLikeSteel},
+    [CardName.STEEL_PHOBO]: {Factory: SteelPhobo},
+    [CardName.PHARMACY_ON_LUNA]: {Factory: PharmacyOnLuna, compatibility: 'moon'},
+    [CardName.VITOR_VITALIS]: {Factory: VitorVitalis},
   },
 });

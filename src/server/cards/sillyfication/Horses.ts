@@ -35,7 +35,7 @@ export class Horses extends ActionCard implements IProjectCard {
           b.action('Add 3 animals to this card.', (eb) => {
             eb.empty().startAction.resource(CardResource.ANIMAL, {amount: 3});
           }).br;
-          b.production((pb) => pb.minus().plants(1).nbsp.minus().plants(1, {all}).asterix());
+          b.production((pb) => pb.minus().plants(1).nbsp.minus().plants(1, {all}));
         }),
         description: 'Requires 10% oxygen. Decrease your plant production 1 step and any plant production 1 step. ' +
           '1 VP per 2 animals on this card.',

@@ -1,4 +1,5 @@
 import {IProjectCard} from '../IProjectCard';
+import {Tag} from '../../../common/cards/Tag';
 import {Card} from '../Card';
 import {CardType} from '../../../common/cards/CardType';
 import {CardResource} from '../../../common/CardResource';
@@ -14,15 +15,23 @@ export class LivestockLobby extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.LIVESTOCK_LOBBY,
-      cost: 9,
+      cost: 10,
+
+      requirements: {tag: Tag.ANIMAL, count: 2},
+
+      behavior: {
+        production: {plants: -1},
+      },
 
       metadata: {
         cardNumber: 'X42',
         renderData: CardRenderer.builder((b) => {
+          b.production((pb) => pb.minus().plants(1)).br;
           b.effect('When any player adds an animal to a card, that player gains 1 M€ and you gain 1 plant.', (eb) => {
-            eb.resource(CardResource.ANIMAL, {all}).asterix().startEffect.megacredits(1, {all}).plants(1);
+            eb.resource(CardResource.ANIMAL, {all}).startEffect.megacredits(1, {all}).plants(1);
           });
         }),
+        description: 'Requires 2 animal tags. Decrease your plant production 1 step.',
       },
     });
   }

@@ -27,7 +27,7 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you play a Venus tag, including this, add 2 floaters to any card.', (eb) => {
-              eb.tag(Tag.VENUS).asterix().startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
+              eb.tag(Tag.VENUS).startEffect.resource(CardResource.FLOATER, {amount: 2}).asterix();
             });
             cea.action('Remove any number of floaters from this card to gain 2 M€ each.', (ab) => {
               ab.text('x').resource(CardResource.FLOATER).startAction.megacredits(2, {size: Size.SMALL, text: '2X'});

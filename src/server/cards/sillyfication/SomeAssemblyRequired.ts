@@ -21,7 +21,7 @@ export class SomeAssemblyRequired extends Card implements IProjectCard {
         cardNumber: 'X09',
         renderData: CardRenderer.builder((b) => {
           b.city().br;
-          b.minus().cards(1, {all}).asterix();
+          b.minus().cards(1, {all});
         }),
         description: 'Place a city tile. Then every player, including you, discards a card.',
       },

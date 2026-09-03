@@ -48,4 +48,19 @@ describe('LivestockLobby', () => {
     expect(player2.megaCredits).to.eq(0);
     expect(player.plants).to.eq(0);
   });
+
+  it('requires 2 animal tags and plant production to reduce', () => {
+    player.megaCredits = 20;
+    player.production.override({plants: 1});
+    player.tagsForTest = {animal: 1};
+    expect(card.canPlay(player)).is.false;
+    player.tagsForTest = {animal: 2};
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('play decreases your plant production 1 step', () => {
+    player.production.override({plants: 2});
+    card.play(player);
+    expect(player.production.plants).to.eq(1);
+  });
 });
