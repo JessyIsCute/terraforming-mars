@@ -34,11 +34,11 @@
             </div>
 
             <div class="global-numbers-oceans">
-              <span v-if="oceans_count === constants.MAX_OCEAN_TILES">
+              <span v-if="oceans_count === oceanMax">
                 <img width="26" src="assets/misc/circle-checkmark.png" class="board-ocean-checkmark" :alt="$t('Completed!')">
               </span>
               <span v-else>
-                {{oceans_count}}/{{constants.MAX_OCEAN_TILES}}
+                {{oceans_count}}/{{oceanMax}}
               </span>
             </div>
 
@@ -362,6 +362,7 @@ import {SpaceId} from '@/common/Types';
 import {TileView} from '@/client/components/board/TileView';
 import {BoardName} from '@/common/boards/BoardName';
 import {customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
+import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig} from '@/common/GlobalParameterConfig';
 import {LEGENDS} from '@/client/components/Legends';
 import {Expansion} from '@/common/cards/GameModule';
 import {SpaceName} from '@/common/boards/SpaceName';
@@ -388,6 +389,10 @@ export default defineComponent({
     boardName: {
       type: String as () => BoardName,
       required: true,
+    },
+    globalParameters: {
+      type: Object as () => GlobalParametersConfig | undefined,
+      default: undefined,
     },
     oceans_count: {
       type: Number,
@@ -449,23 +454,24 @@ export default defineComponent({
       let curValue: number;
       let strValue: string;
 
+      const parameters = this.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS;
       switch (targetParameter) {
       case 'oxygen':
-        startValue = constants.MIN_OXYGEN_LEVEL;
-        endValue = constants.MAX_OXYGEN_LEVEL;
-        step = 1;
+        startValue = parameters.oxygen.min;
+        endValue = parameters.oxygen.max;
+        step = parameters.oxygen.step;
         curValue = this.oxygen_level;
         break;
       case 'temperature':
-        startValue = constants.MIN_TEMPERATURE;
-        endValue = constants.MAX_TEMPERATURE;
-        step = 2;
+        startValue = parameters.temperature.min;
+        endValue = parameters.temperature.max;
+        step = parameters.temperature.step;
         curValue = this.temperature;
         break;
       case 'venus':
-        startValue = constants.MIN_VENUS_SCALE;
-        endValue = constants.MAX_VENUS_SCALE;
-        step = 2;
+        startValue = parameters.venus.min;
+        endValue = parameters.venus.max;
+        step = parameters.venus.step;
         curValue = this.venusScaleLevel;
         break;
       default:
@@ -512,6 +518,9 @@ export default defineComponent({
     },
     isCustomBoard(): boolean {
       return this.boardName === BoardName.CUSTOM;
+    },
+    oceanMax(): number {
+      return this.globalParameters?.oceans.max ?? constants.MAX_OCEAN_TILES;
     },
     customExtent(): {maxX: number, maxY: number} {
       let maxX = 0;

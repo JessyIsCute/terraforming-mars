@@ -132,6 +132,7 @@ export class ApiCreateGame extends Handler {
       const gameOptions: GameOptions = {
         altVenusBoard: gameReq.altVenusBoard,
         customBoard,
+        globalParameters: customBoard?.globalParameters,
         aresExtension: gameReq.expansions.ares,
         aresHazards: true, // Not a runtime option.
         aresExtremeVariant: gameReq.aresExtremeVariant,

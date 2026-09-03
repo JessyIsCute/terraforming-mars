@@ -787,6 +787,7 @@ describe('Game', () => {
       'inTurmoil',
       'playersInGenerationOrder',
       'monsInsuranceOwner',
+      'parameters',
       'resettable',
       'rng',
       'underworldDraftEnabled',

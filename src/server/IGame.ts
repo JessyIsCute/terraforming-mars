@@ -1,4 +1,5 @@
 import {MarsBoard} from './boards/MarsBoard';
+import {GlobalParametersConfig} from '../common/GlobalParameterConfig';
 import {CardName} from '../common/cards/CardName';
 import {ClaimedMilestone} from './milestones/ClaimedMilestone';
 import {IColony} from './colonies/IColony';
@@ -70,6 +71,8 @@ export interface IGame extends Logger {
   ceoDeck: CeoDeck;
   corporationDeck: CorporationDeck;
   board: MarsBoard;
+  /** Global-parameter track limits and bonus thresholds (custom boards may override these). */
+  readonly parameters: GlobalParametersConfig;
   activePlayer: IPlayer;
   claimedMilestones: Array<ClaimedMilestone>;
   milestones: Array<IMilestone>;
