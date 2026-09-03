@@ -47,6 +47,32 @@ describe('MapEditor', () => {
     expect(decodeCustomBoard((wrapper.vm as any).code)).to.deep.eq(source);
   });
 
+  it('separates terrain, markers and placement bonuses, with descriptions', () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const legends = wrapper.findAll('.map-editor-tools legend').map((l) => l.text());
+    expect(legends).to.include.members(['Terrain', 'Markers', 'Placement bonuses']);
+    // Every tool label carries a description tooltip.
+    const toolLabels = wrapper.findAll('.map-editor-tools label');
+    expect(toolLabels.length).to.be.greaterThan(10);
+    expect(toolLabels.every((l) => (l.attributes('title') ?? '').length > 10)).to.be.true;
+  });
+
+  it('renders bonus tools with the real board sprite classes, not emoji', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const icons = wrapper.findAll('.map-editor-bonus-icon');
+    expect(icons.length).to.be.greaterThan(5);
+    expect(icons.some((i) => i.classes().includes('board-space-bonus--heat'))).to.be.true;
+    expect(icons.some((i) => i.classes().includes('board-space-bonus--card'))).to.be.true;
+
+    // A painted hex shows a sprite element, not a text glyph.
+    (wrapper.vm as any).tool = 'bonus:' + 4; // HEAT
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.map-editor-hex')[0].trigger('click');
+    const hexBonus = wrapper.findAll('.map-editor-hex')[0].find('.map-editor-hex-bonus');
+    expect(hexBonus.exists()).to.be.true;
+    expect(hexBonus.classes()).to.include('board-space-bonus--heat');
+  });
+
   it('caps milestone selection at 5', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;

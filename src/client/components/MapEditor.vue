@@ -17,17 +17,32 @@
         </label>
 
         <fieldset class="map-editor-tools">
-          <legend v-i18n>Paint</legend>
-          <label v-for="t in spaceTypeTools" :key="t.value">
-            <input type="radio" name="tool" :value="'type:' + t.value" v-model="tool"> {{ t.label }}
-          </label>
-          <label><input type="radio" name="tool" value="flag:volcanic" v-model="tool"> <span v-i18n>Volcanic</span></label>
-          <label><input type="radio" name="tool" value="flag:reserved" v-model="tool"> <span v-i18n>Reserved</span></label>
-          <label><input type="radio" name="tool" value="flag:void" v-model="tool"> <span v-i18n>Void</span></label>
-          <label v-for="b in bonusTools" :key="b.value">
-            <input type="radio" name="tool" :value="'bonus:' + b.value" v-model="tool"> {{ b.label }}
+          <legend v-i18n>Terrain</legend>
+          <label v-for="t in terrainTools" :key="t.key" :title="t.description">
+            <input type="radio" name="tool" :value="t.key" v-model="tool">
+            <span>{{ t.label }}</span>
           </label>
         </fieldset>
+
+        <fieldset class="map-editor-tools">
+          <legend v-i18n>Markers</legend>
+          <label v-for="t in markerTools" :key="t.key" :title="t.description">
+            <input type="radio" name="tool" :value="t.key" v-model="tool">
+            <span>{{ t.label }}</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="map-editor-tools">
+          <legend v-i18n>Placement bonuses</legend>
+          <p class="map-editor-tools-note" v-i18n>Click a hex to add the bonus, click again to remove it.</p>
+          <label v-for="t in bonusTools" :key="t.key" :title="t.description">
+            <input type="radio" name="tool" :value="t.key" v-model="tool">
+            <i class="map-editor-bonus-icon" :class="'board-space-bonus--' + t.css"></i>
+            <span>{{ t.label }}</span>
+          </label>
+        </fieldset>
+
+        <p class="map-editor-tool-hint">{{ currentToolHint }}</p>
 
         <fieldset class="map-editor-ma">
           <legend v-i18n>Milestones (0 or 5)</legend>
@@ -80,7 +95,16 @@
             @mouseup="dragging = false"
             @mouseenter="dragging && paint(cell)"
             :title="cell.x + ',' + cell.y"
-          >{{ bonusGlyphs(cell) }}</button>
+          >
+            <span class="map-editor-hex-bonuses" v-if="cell.space">
+              <i
+                v-for="(b, i) in cell.space.bonus"
+                :key="i"
+                class="map-editor-hex-bonus"
+                :class="'board-space-bonus--' + bonusCss(b)"
+              ></i>
+            </span>
+          </button>
         </div>
 
         <div v-if="warnings.length" class="map-editor-warnings">
@@ -182,13 +206,42 @@ function toParametersConfig(p: EditableParams): GlobalParametersConfig {
   };
 }
 
-const BONUS_GLYPH: Partial<Record<SpaceBonus, string>> = {
-  [SpaceBonus.PLANT]: '🌿',
-  [SpaceBonus.STEEL]: '🔩',
-  [SpaceBonus.TITANIUM]: '🔷',
-  [SpaceBonus.DRAW_CARD]: '🃏',
-  [SpaceBonus.HEAT]: '🔥',
-};
+type Tool = {key: string, label: string, description: string};
+type BonusTool = Tool & {bonus: SpaceBonus, css: string};
+
+const TERRAIN_TOOLS: Array<Tool> = [
+  {key: 'type:' + SpaceType.LAND, label: 'Land', description: 'Ordinary ground. Cities, greeneries and most special tiles go here.'},
+  {key: 'type:' + SpaceType.OCEAN, label: 'Ocean', description: 'Only ocean tiles may be placed here, and they count toward the ocean track.'},
+  {key: 'type:' + SpaceType.COVE, label: 'Cove', description: 'Counts as both a land space and an ocean space (Pathfinders).'},
+  {key: 'type:' + SpaceType.RESTRICTED, label: 'Restricted', description: 'Permanently blocked — no tile can ever be placed here (Amazonis Planitia style).'},
+  {key: 'type:' + SpaceType.DEFLECTION_ZONE, label: 'Deflection zone', description: 'Behaves as land, and is tracked separately for the Hollandia deflection-zone rule.'},
+];
+
+const MARKER_TOOLS: Array<Tool> = [
+  {key: 'flag:volcanic', label: 'Volcanic', description: 'Toggles the volcanic flag: volcanic-only placements (Lava Flows, etc.) may go here.'},
+  {key: 'flag:reserved', label: 'Reserved', description: 'Toggles a reservation like Noctis City: excluded from general tile placement.'},
+  {key: 'flag:void', label: 'Void', description: 'Toggles whether this hex exists at all — use it to carve the board outline.'},
+];
+
+const BONUS_TOOLS: Array<BonusTool> = ([
+  {bonus: SpaceBonus.PLANT, css: 'plant', label: 'Plant', description: 'Gain 1 plant when you place a tile on this space.'},
+  {bonus: SpaceBonus.STEEL, css: 'steel', label: 'Steel', description: 'Gain 1 steel when you place a tile on this space.'},
+  {bonus: SpaceBonus.TITANIUM, css: 'titanium', label: 'Titanium', description: 'Gain 1 titanium when you place a tile on this space.'},
+  {bonus: SpaceBonus.DRAW_CARD, css: 'card', label: 'Card', description: 'Draw 1 card when you place a tile on this space.'},
+  {bonus: SpaceBonus.HEAT, css: 'heat', label: 'Heat', description: 'Gain 1 heat when you place a tile on this space.'},
+  {bonus: SpaceBonus.ENERGY, css: 'energy', label: 'Energy', description: 'Gain 1 energy when you place a tile on this space.'},
+  {bonus: SpaceBonus.MICROBE, css: 'microbe', label: 'Microbe', description: 'Add 1 microbe to a card when you place a tile on this space (Arabia Terra).'},
+  {bonus: SpaceBonus.ANIMAL, css: 'animal', label: 'Animal', description: 'Add 1 animal to a card when you place a tile on this space (Amazonis).'},
+  {bonus: SpaceBonus.DATA, css: 'data', label: 'Data', description: 'Add 1 data to a card when you place a tile on this space (Arabia Terra).'},
+  {bonus: SpaceBonus.SCIENCE, css: 'science', label: 'Science', description: 'Add 1 science resource to a card when you place a tile on this space (Arabia Terra).'},
+  {bonus: SpaceBonus.ENERGY_PRODUCTION, css: 'energy-production', label: 'Energy prod.', description: 'Increase your energy production 1 step when you place a tile on this space.'},
+  {bonus: SpaceBonus.DELEGATE, css: 'delegate', label: 'Delegate', description: 'Add 1 delegate from the reserve when you place a tile on this space (Vastitas Borealis Nova).'},
+  {bonus: SpaceBonus.OCEAN, css: 'bonusocean', label: 'Ocean', description: 'Place an ocean tile (paying its M€ cost) when you place a tile on this space — the Hellas south-pole bonus.'},
+  {bonus: SpaceBonus.TEMPERATURE, css: 'bonustemperature', label: 'Temperature', description: 'Raise the temperature 1 step (paying an M€ cost) when you place a tile on this space (Vastitas Borealis).'},
+  {bonus: SpaceBonus.COLONY, css: 'colony', label: 'Colony', description: 'Build a colony (paying an M€ cost) when you place a tile on this space (Terra Cimmeria Nova).'},
+] as Array<Omit<BonusTool, 'key'>>).map((t) => ({...t, key: 'bonus:' + t.bonus}));
+
+const BONUS_CSS: Partial<Record<SpaceBonus, string>> = Object.fromEntries(BONUS_TOOLS.map((t) => [t.bonus, t.css]));
 
 export default defineComponent({
   name: 'MapEditor',
@@ -211,20 +264,9 @@ export default defineComponent({
       MAX_CUSTOM_NAME_LENGTH,
       MAX_CUSTOM_ROWS,
       MIN_CUSTOM_ROWS,
-      spaceTypeTools: [
-        {value: SpaceType.LAND, label: 'Land'},
-        {value: SpaceType.OCEAN, label: 'Ocean'},
-        {value: SpaceType.COVE, label: 'Cove'},
-        {value: SpaceType.RESTRICTED, label: 'Restricted'},
-        {value: SpaceType.DEFLECTION_ZONE, label: 'Deflection'},
-      ],
-      bonusTools: [
-        {value: SpaceBonus.PLANT, label: '+Plant'},
-        {value: SpaceBonus.STEEL, label: '+Steel'},
-        {value: SpaceBonus.TITANIUM, label: '+Titanium'},
-        {value: SpaceBonus.DRAW_CARD, label: '+Card'},
-        {value: SpaceBonus.HEAT, label: '+Heat'},
-      ],
+      terrainTools: TERRAIN_TOOLS,
+      markerTools: MARKER_TOOLS,
+      bonusTools: BONUS_TOOLS,
       bonusKinds: ['ocean', 'temperature', 'heatProduction', 'card', 'tr'] as Array<ParameterBonus['kind']>,
       milestoneNames,
       awardNames,
@@ -236,6 +278,10 @@ export default defineComponent({
     },
     trackKeys(): Array<'temperature' | 'oxygen' | 'venus'> {
       return ['temperature', 'oxygen', 'venus'];
+    },
+    currentToolHint(): string {
+      const all: Array<Tool> = [...TERRAIN_TOOLS, ...MARKER_TOOLS, ...BONUS_TOOLS];
+      return all.find((t) => t.key === this.tool)?.description ?? '';
     },
     cells(): Array<Cell> {
       const out: Array<Cell> = [];
@@ -347,11 +393,8 @@ export default defineComponent({
       const p = customSpacePixel(cell.x, cell.y, maxY);
       return {left: `${p.left}px`, top: `${p.top}px`};
     },
-    bonusGlyphs(cell: Cell): string {
-      if (cell.space === null) {
-        return '';
-      }
-      return cell.space.bonus.map((b) => BONUS_GLYPH[b] ?? '•').join('');
+    bonusCss(bonus: SpaceBonus): string {
+      return BONUS_CSS[bonus] ?? '';
     },
     bonusHasAmount(kind: ParameterBonus['kind']): boolean {
       return kind === 'heatProduction' || kind === 'card' || kind === 'tr';
@@ -446,6 +489,39 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     label { display: block; font-size: 13px; }
   }
 
+  .map-editor-tools label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 1px 0;
+    cursor: help;
+  }
+  .map-editor-tools-note {
+    margin: 2px 0 6px;
+    font-size: 11px;
+    color: #999;
+  }
+  .map-editor-tool-hint {
+    min-height: 30px;
+    margin: 0;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: #cfc9e6;
+    background: #2a2733;
+    border-radius: 4px;
+  }
+
+  // Reuse the real board bonus sprites (board.less) at palette / hex sizes.
+  .map-editor-bonus-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+  }
+
   .map-editor-ma {
     max-height: 160px;
     overflow-y: auto;
@@ -491,6 +567,23 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     &--deflection { background: #d8d94a; }
     &--volcanic { box-shadow: inset 0 0 0 3px #c0392b; }
     &--reserved { box-shadow: inset 0 0 0 3px #f1c40f; }
+  }
+
+  .map-editor-hex-bonuses {
+    display: flex;
+    flex-wrap: wrap;
+    place-content: center;
+    gap: 1px;
+    width: 100%;
+    height: 100%;
+  }
+  .map-editor-hex-bonus {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
   }
 
   .map-editor-warnings {
