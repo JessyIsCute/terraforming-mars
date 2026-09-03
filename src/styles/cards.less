@@ -404,6 +404,18 @@ input[type="radio"]:checked+.filterDiv::after {
   content: "";
 }
 
+// Placeholder art: reuses the Community look with a silly badge.
+// Swap for a real sprite by pointing this at an expansion_icon_sillyfication.png.
+.sillyfication-icon:after {
+  .expansion-icon-base();
+  color: @grey_900;
+  background: moccasin;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 16px;
+  content: "🤪";
+}
+
 /*********** Style the tags ************/
 
 .tag-wild {
@@ -1078,6 +1090,19 @@ input[type="radio"]:checked+.filterDiv::after {
 
 .expansion-icon-deltaProject {
   background-image: url(./assets/expansion_icons/expansion_icon_deltaProject.png);
+}
+
+// Placeholder "art": the tongue-out emoji, matching the card-title badge.
+// Works in both the .expansion-icon (25px) and .create-game-expansion-icon (30px) boxes.
+.expansion-icon-sillyfication {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🤪";
+    font-size: 20px;
+    line-height: 1.35;
+  }
 }
 
 .card-standard-project {

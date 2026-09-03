@@ -275,6 +275,7 @@ export class Game implements IGame, Logger {
         starwars: partialOptions.starWarsExpansion ?? false,
         underworld: partialOptions.underworldExpansion ?? false,
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
+        sillyfication: partialOptions.sillyficationExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};

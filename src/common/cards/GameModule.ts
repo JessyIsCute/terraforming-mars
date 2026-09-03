@@ -14,6 +14,7 @@ export const EXPANSIONS = [
   'starwars',
   'underworld',
   'deltaProject',
+  'sillyfication',
 ] as const;
 
 export const GAME_MODULES = [
@@ -41,6 +42,7 @@ export const MODULE_NAMES = {
   starwars: 'Star Wars',
   underworld: 'Underworld',
   deltaProject: 'Delta Project',
+  sillyfication: 'Sillyfication',
 } satisfies Record<GameModule, string>;
 
 export const DEFAULT_EXPANSIONS = {
@@ -59,4 +61,5 @@ export const DEFAULT_EXPANSIONS = {
   starwars: false,
   underworld: false,
   deltaProject: false,
+  sillyfication: false,
 } satisfies Record<Expansion, boolean>;

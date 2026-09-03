@@ -583,7 +583,7 @@ export enum CardName {
 
   // End of promo cards
 
-  // Community project cards
+  // Sillyfication (silly fan expansion)
   MICRO_CREDITS = 'Micro Credits',
 
   // Community corps
