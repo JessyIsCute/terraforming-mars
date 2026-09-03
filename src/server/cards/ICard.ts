@@ -108,6 +108,16 @@ export interface ICard {
    */
   onResourceAdded?(player: IPlayer, playedCard: ICard, count: number): void;
 
+  /**
+   * Optional callback when any player adds resources to any card.
+   *
+   * @param cardOwner the player who owns THIS CARD.
+   * @param activePlayer the player who added the resources.
+   * @param playedCard the card that received resources.
+   * @param count the number of resources added to `playedCard`.
+   */
+  onResourceAddedByAnyPlayer?(cardOwner: IPlayer, activePlayer: IPlayer, playedCard: ICard, count: number): void;
+
 
   /**
    * Optional callback when any player identifies a space.

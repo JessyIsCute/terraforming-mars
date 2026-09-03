@@ -626,6 +626,7 @@ export enum CardName {
   ARI_ADORE = 'Ari-Adore',
   CHIP_FABRICATION_PLANT = 'Chip Fabrication Plant',
   URANUS_SEA_CREATURES = 'Uranus Sea Creatures',
+  LIVESTOCK_LOBBY = 'Livestock Lobby',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

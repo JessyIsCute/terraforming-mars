@@ -41,6 +41,7 @@ import {Horses} from './Horses';
 import {AriAdore} from './AriAdore';
 import {ChipFabricationPlant} from './ChipFabricationPlant';
 import {UranusSeaCreatures} from './UranusSeaCreatures';
+import {LivestockLobby} from './LivestockLobby';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -94,5 +95,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.ARI_ADORE]: {Factory: AriAdore},
     [CardName.CHIP_FABRICATION_PLANT]: {Factory: ChipFabricationPlant},
     [CardName.URANUS_SEA_CREATURES]: {Factory: UranusSeaCreatures},
+    [CardName.LIVESTOCK_LOBBY]: {Factory: LivestockLobby},
   },
 });

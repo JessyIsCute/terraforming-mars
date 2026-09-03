@@ -558,6 +558,11 @@ export class Player implements IPlayer {
       for (const playedCard of this.tableau) {
         playedCard.onResourceAdded?.(this, card, count);
       }
+      for (const cardOwner of this.game.playersInGenerationOrder) {
+        for (const playedCard of cardOwner.tableau) {
+          playedCard.onResourceAddedByAnyPlayer?.(cardOwner, this, card, count);
+        }
+      }
     }
 
     // Vermin hook (2 of 2)
