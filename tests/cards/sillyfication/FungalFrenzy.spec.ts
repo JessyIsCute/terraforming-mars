@@ -47,8 +47,8 @@ describe('FungalFrenzy', () => {
     expect(card.resourceCount).to.eq(1);
   });
 
-  it('action can spend 1 microbe for 1 plant production', () => {
-    player.addResourceTo(card, 1);
+  it('action can spend 2 microbes for 2 plant production', () => {
+    player.addResourceTo(card, 3);
 
     expect(card.action(player)).is.undefined;
     runAllActions(game);
@@ -57,7 +57,7 @@ describe('FungalFrenzy', () => {
     orOptions.options[0].cb();
     runAllActions(game);
 
-    expect(card.resourceCount).to.eq(0);
-    expect(player.production.plants).to.eq(1);
+    expect(card.resourceCount).to.eq(1);
+    expect(player.production.plants).to.eq(2);
   });
 });

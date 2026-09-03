@@ -11,7 +11,7 @@ export class FungalFrenzy extends ActionCard {
       type: CardType.ACTIVE,
       name: CardName.FUNGAL_FRENZY,
       tags: [Tag.MICROBE],
-      cost: 11,
+      cost: 13,
       resourceType: CardResource.MICROBE,
 
       requirements: {temperature: -8, max: true},
@@ -25,9 +25,9 @@ export class FungalFrenzy extends ActionCard {
           autoSelect: true,
           behaviors: [
             {
-              spend: {resourcesHere: 1},
-              production: {plants: 1},
-              title: 'Remove 1 microbe to increase your plant production 1 step',
+              spend: {resourcesHere: 2},
+              production: {plants: 2},
+              title: 'Remove 2 microbes to increase your plant production 2 steps',
             },
             {
               addResources: 1,
@@ -41,9 +41,9 @@ export class FungalFrenzy extends ActionCard {
         cardNumber: 'X06',
         renderData: CardRenderer.builder((b) => {
           b.arrow().resource(CardResource.MICROBE).nbsp.or().br;
-          b.resource(CardResource.MICROBE).arrow().production((pb) => pb.plants(1)).br;
+          b.resource(CardResource.MICROBE, 2).arrow().production((pb) => pb.plants(2)).br;
 
-          b.plainText('Action: Add 1 microbe to this card, or remove 1 microbe to raise your plant production 1 step.', /* parens */ true);
+          b.plainText('Action: Add 1 microbe to this card, or remove 2 microbes to raise your plant production 2 steps.', /* parens */ true);
           b.br;
           b.resource(CardResource.MICROBE).slash().tag(Tag.MICROBE);
         }),
