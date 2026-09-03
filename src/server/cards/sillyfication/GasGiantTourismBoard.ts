@@ -11,7 +11,7 @@ export class GasGiantTourismBoard extends ActionCard implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.GAS_GIANT_TOURISM_BOARD,
       tags: [Tag.JOVIAN, Tag.SPACE],
-      cost: 11,
+      cost: 20,
       victoryPoints: 1,
 
       action: {

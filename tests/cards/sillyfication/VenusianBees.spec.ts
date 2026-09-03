@@ -25,22 +25,29 @@ describe('VenusianBees', () => {
   });
 
   it('raises plant production per microbe/plant pair', () => {
-    player.tagsForTest = {microbe: 3, plant: 2};
+    player.tagsForTest = {microbe: 2, plant: 3};
     card.play(player);
-    // min(3, 2) = 2.
-    expect(player.production.plants).to.eq(2);
+    // 2 microbe + 1 (this) = 3; min(3, 3) = 3.
+    expect(player.production.plants).to.eq(3);
   });
 
-  it('gains nothing without a matching pair', () => {
+  it('counts its own microbe tag', () => {
+    player.tagsForTest = {microbe: 0, plant: 2};
+    card.play(player);
+    // 0 + 1 (this) microbe pairs with 1 plant.
+    expect(player.production.plants).to.eq(1);
+  });
+
+  it('gains nothing without a matching plant tag', () => {
     player.tagsForTest = {microbe: 4, plant: 0};
     card.play(player);
     expect(player.production.plants).to.eq(0);
   });
 
   it('assigns each wild tag to the side that is behind', () => {
-    player.tagsForTest = {microbe: 3, plant: 1, wild: 2};
+    player.tagsForTest = {microbe: 2, plant: 1, wild: 2};
     card.play(player);
-    // wild #1 -> plant (2), wild #2 -> plant (3); min(3, 3) = 3.
+    // microbe = 2 + 1 (this) = 3, plant = 1; both wilds go to plant -> 3; min(3, 3) = 3.
     expect(player.production.plants).to.eq(3);
   });
 });

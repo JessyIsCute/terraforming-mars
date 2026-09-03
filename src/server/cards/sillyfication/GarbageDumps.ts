@@ -25,9 +25,9 @@ export class GarbageDumps extends Card implements IProjectCard {
         cardNumber: 'X32',
         renderData: CardRenderer.builder((b) => {
           b.tile(TileType.GARBAGE_DUMP, true).br;
-          b.minus().tr(1, {all});
+          b.minus().tr(1, {all}).asterix();
         }),
-        description: 'Place this tile. Choose a player. That player loses 1 TR.',
+        description: 'Place this tile. A player with a tile adjacent to it loses 1 TR.',
       },
     });
   }
@@ -38,14 +38,23 @@ export class GarbageDumps extends Card implements IProjectCard {
       tile: {tileType: TileType.GARBAGE_DUMP, card: this.name},
       on: 'land',
       title: 'Select space for Garbage Dumps',
-    }));
-    if (game.players.length > 1) {
+    })).andThen((space) => {
+      const adjacentPlayers = new Set<IPlayer>();
+      game.board.getAdjacentSpaces(space).forEach((adjacent) => {
+        if (adjacent.tile !== undefined && adjacent.player !== undefined && adjacent.player.id !== player.id) {
+          adjacentPlayers.add(adjacent.player);
+        }
+      });
+      if (adjacentPlayers.size === 0) {
+        return undefined;
+      }
       game.defer(new SimpleDeferredAction(player, () =>
-        new SelectPlayer(game.players, 'Choose a player to lose 1 TR', 'Select').andThen((target) => {
+        new SelectPlayer(Array.from(adjacentPlayers), 'Choose an adjacent player to lose 1 TR', 'Select').andThen((target) => {
           target.decreaseTerraformRating(1, {log: true});
           return undefined;
         }), Priority.ATTACK_OPPONENT));
-    }
+      return undefined;
+    });
     return undefined;
   }
 }

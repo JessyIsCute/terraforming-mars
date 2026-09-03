@@ -24,20 +24,39 @@ describe('GarbageDumps', () => {
     expect(card.getVictoryPoints(player)).to.eq(-1);
   });
 
-  it('places a garbage dump tile and a chosen player loses 1 TR', () => {
+  it('an adjacent tile owner loses 1 TR', () => {
+    const p2Space = game.board.getAvailableSpacesOnLand(player2)[0];
+    game.addGreenery(player2, p2Space);
     const tr2 = player2.terraformRating;
 
     card.play(player);
     runAllActions(game);
 
     const selectSpace = cast(player.popWaitingFor(), SelectSpace);
-    const space = selectSpace.spaces[0];
-    selectSpace.cb(space);
+    const adjacent = game.board.getAdjacentSpaces(p2Space).find((s) => selectSpace.spaces.includes(s));
+    if (adjacent === undefined) {
+      throw new Error('no adjacent placement space for test setup');
+    }
+    selectSpace.cb(adjacent);
     runAllActions(game);
-    expect(space.tile?.tileType).to.eq(TileType.GARBAGE_DUMP);
+    expect(adjacent.tile?.tileType).to.eq(TileType.GARBAGE_DUMP);
 
     const selectPlayer = cast(player.popWaitingFor(), SelectPlayer);
+    expect(selectPlayer.players).to.deep.eq([player2]);
     selectPlayer.cb(player2);
     expect(player2.terraformRating).to.eq(tr2 - 1);
+  });
+
+  it('no TR loss when no other player has an adjacent tile', () => {
+    const tr2 = player2.terraformRating;
+
+    card.play(player);
+    runAllActions(game);
+    const selectSpace = cast(player.popWaitingFor(), SelectSpace);
+    selectSpace.cb(selectSpace.spaces[0]);
+    runAllActions(game);
+
+    expect(player.popWaitingFor()).is.undefined;
+    expect(player2.terraformRating).to.eq(tr2);
   });
 });
