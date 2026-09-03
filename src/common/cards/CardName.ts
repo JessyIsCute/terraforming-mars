@@ -641,6 +641,24 @@ export enum CardName {
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
+  // Sillyfication replacement cards (swap into the base pool when Sillyfication is on)
+  LUNAR_BEAM_SILLY = 'Lunar Beam:s',
+  LUNA_METROPOLIS_SILLY = 'Luna Metropolis:s',
+  LUNAR_EXPORTS_SILLY = 'Lunar Exports:s',
+  PRISTAR_SILLY = 'Pristar:s',
+  EARLY_SETTLEMENT_SILLY = 'Early Settlement:s',
+  SELF_SUFFICIENT_SETTLEMENT_SILLY = 'Self-Sufficient Settlement:s',
+  EOS_CHASMA_NATIONAL_PARK_SILLY = 'Eos Chasma National Park:s',
+  IMMIGRATION_SHUTTLES_SILLY = 'Immigration Shuttles:s',
+  MARTIAN_RAILS_SILLY = 'Martian Rails:s',
+  NOCTIS_CITY_SILLY = 'Noctis City:s',
+  NOCTIS_FARMING_SILLY = 'Noctis Farming:s',
+  PROTECTED_VALLEY_SILLY = 'Protected Valley:s',
+  MARS_UNIVERSITY_SILLY = 'Mars University:s',
+  PROTECTED_HABITATS_SILLY = 'Protected Habitats:s',
+  TROPICAL_RESORT_SILLY = 'Tropical Resort:s',
+  MARTIAN_MEDIA_CENTER_SILLY = 'Martian Media Center:s',
+
   // Community corps
   AEROTECH = 'Aerotech',
   AGRICOLA_INC = 'Agricola Inc',
