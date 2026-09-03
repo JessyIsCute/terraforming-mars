@@ -12,8 +12,9 @@ describe('MacroMills', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('raises heat production 2 steps', () => {
+  it('raises heat production 2 steps and gains 3 heat', () => {
     card.play(player);
     expect(player.production.heat).to.eq(2);
+    expect(player.heat).to.eq(3);
   });
 });
