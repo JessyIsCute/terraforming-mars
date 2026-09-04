@@ -436,7 +436,13 @@ export default defineComponent({
     applyDefinition(def: CustomBoardDefinition): void {
       this.name = def.name;
       this.rows = def.rows;
-      const grid = buildGrid(def.rows, null);
+      // Start every bounding-hexagon cell as a void; only the cells the code lists are filled.
+      const grid = new Map<string, CustomSpaceDef | null>();
+      for (const row of hexRowLayout(def.rows)) {
+        for (let i = 0; i < row.width; i++) {
+          grid.set(`${row.xOffset + i},${row.y}`, null);
+        }
+      }
       for (const s of def.spaces) {
         grid.set(`${s.x},${s.y}`, {...s, bonus: [...s.bonus]});
       }

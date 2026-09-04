@@ -47,6 +47,23 @@ describe('MapEditor', () => {
     expect(decodeCustomBoard((wrapper.vm as any).code)).to.deep.eq(source);
   });
 
+  it('Load preserves void cells (does not re-fill carved holes with land)', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const source = blankCustomBoard(9, 'Carved');
+    // Drop two cells and renumber to what the codec produces.
+    source.spaces.splice(5, 1);
+    source.spaces.splice(20, 1);
+    source.spaces.forEach((s, i) => (s.id = blankCustomBoard(9, '').spaces[i].id));
+
+    (wrapper.vm as any).loadInput = encodeCustomBoard(source);
+    (wrapper.vm as any).loadCode();
+    await wrapper.vm.$nextTick();
+
+    const reencoded = decodeCustomBoard((wrapper.vm as any).code);
+    expect(reencoded.spaces).to.have.length(59);
+    expect(reencoded).to.deep.eq(source);
+  });
+
   it('separates terrain, markers and placement bonuses, with descriptions', () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const legends = wrapper.findAll('.map-editor-tools legend').map((l) => l.text());
