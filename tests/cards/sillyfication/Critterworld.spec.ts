@@ -17,10 +17,10 @@ describe('Critterworld', () => {
     player.playedCards.push(card);
   });
 
-  it('starts with 7 animals', () => {
+  it('starts with 8 animals', () => {
     card.play(player);
     runAllActions(game);
-    expect(card.resourceCount).to.eq(7);
+    expect(card.resourceCount).to.eq(8);
   });
 
   it('mirrors animals added to another card', () => {
