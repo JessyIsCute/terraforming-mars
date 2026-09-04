@@ -13,8 +13,8 @@ import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig, ParameterBonus, Param
 import {milestoneNames, MilestoneName} from '../ma/MilestoneName';
 import {awardNames, AwardName} from '../ma/AwardName';
 
-const PREFIX = 'TMB2';
-const FORMAT_VERSION = 2;
+const PREFIX = 'TMB3';
+const FORMAT_VERSION = 3;
 
 export class CustomBoardCodecError extends Error {
   constructor(message: string) {
@@ -242,6 +242,16 @@ export function encodeCustomBoard(def: CustomBoardDefinition): string {
     w.u8(def.globalParameters.heatForTemperature);
   }
 
+  // Placement bonus costs (SpaceBonus.OCEAN / TEMPERATURE / COLONY).
+  if (def.placementBonusCosts === undefined) {
+    w.u8(0);
+  } else {
+    w.u8(1);
+    w.u8(def.placementBonusCosts.ocean);
+    w.u8(def.placementBonusCosts.temperature);
+    w.u8(def.placementBonusCosts.colony);
+  }
+
   return PREFIX + bytesToBase64url(w.toBytes());
 }
 
@@ -323,6 +333,14 @@ export function decodeCustomBoard(code: string): CustomBoardDefinition {
     const oceans = {max: r.u8()};
     const heatForTemperature = r.u8();
     def.globalParameters = {temperature, oxygen, venus, oceans, heatForTemperature};
+  }
+
+  const hasPlacementBonusCosts = r.u8();
+  if (hasPlacementBonusCosts === 1) {
+    const ocean = r.u8();
+    const temperature = r.u8();
+    const colony = r.u8();
+    def.placementBonusCosts = {ocean, temperature, colony};
   }
 
   return def;

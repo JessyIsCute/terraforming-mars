@@ -12,7 +12,7 @@ describe('MapEditor', () => {
     const hexes = wrapper.findAll('.map-editor-hex');
     expect(hexes.length).to.eq(61);
     const code = (wrapper.vm as any).code as string;
-    expect(code.startsWith('TMB2')).to.be.true;
+    expect(code.startsWith('TMB3')).to.be.true;
     expect(decodeCustomBoard(code).spaces).to.have.length(61);
   });
 

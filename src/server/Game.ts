@@ -114,6 +114,8 @@ export class Game implements IGame, Logger {
   public undoCount: number = 0; // Each undo increases it
   public inputsThisRound = 0;
   public resettable: boolean = false;
+  /** Set by a prelude (e.g. Teco's Slow Start) to route generation 1 straight to production, skipping every player's actions. Consumed immediately, never persisted. */
+  public skipGeneration1Actions: boolean = false;
   public globalsPerGeneration: Array<Partial<Record<GlobalParameter, number>>> = [];
 
   public generation: number = 1;
@@ -283,6 +285,7 @@ export class Game implements IGame, Logger {
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
+        teco: partialOptions.tecoExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -1063,6 +1066,12 @@ export class Game implements IGame, Logger {
         this.passedPlayers.clear();
         this.potentiallyChangeFirstPlayer();
 
+        if (this.skipGeneration1Actions) {
+          this.skipGeneration1Actions = false;
+          this.gotoProductionPhase();
+          return;
+        }
+
         this.startActionsForPlayer(this.first);
       }
     });
@@ -1514,7 +1523,8 @@ export class Game implements IGame, Logger {
     case SpaceBonus.OCEAN:
       // Hellas special requirements ocean tile
       if (this.canAddOcean()) {
-        this.defer(new SelectPaymentDeferred(player, constants.HELLAS_BONUS_OCEAN_COST, {title: 'Select how to pay for placement bonus ocean'}))
+        const oceanCost = this.gameOptions.customBoard?.placementBonusCosts?.ocean ?? constants.HELLAS_BONUS_OCEAN_COST;
+        this.defer(new SelectPaymentDeferred(player, oceanCost, {title: 'Select how to pay for placement bonus ocean'}))
           .andThen(() => {
             this.defer(new PlaceOceanTile(player, {title: 'Select space for ocean from placement bonus'}));
             return undefined;
@@ -1539,7 +1549,10 @@ export class Game implements IGame, Logger {
     case SpaceBonus.TEMPERATURE:
     case SpaceBonus.TEMPERATURE_4MC:
       if (this.getTemperature() < this.parameters.temperature.max) {
-        const cost = spaceBonus === SpaceBonus.TEMPERATURE ? constants.VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST : constants.VASTITAS_BOREALIS_NOVA_BONUS_TEMPERATURE_COST;
+        const customCost = this.gameOptions.customBoard?.placementBonusCosts?.temperature;
+        const cost = spaceBonus === SpaceBonus.TEMPERATURE ?
+          (customCost ?? constants.VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST) :
+          constants.VASTITAS_BOREALIS_NOVA_BONUS_TEMPERATURE_COST;
         this.defer(new SelectPaymentDeferred(
           player,
           cost,
@@ -1559,7 +1572,7 @@ export class Game implements IGame, Logger {
     case SpaceBonus.COLONY:
       this.defer(new SelectPaymentDeferred(
         player,
-        constants.TERRA_CIMMERIA_COLONY_COST,
+        this.gameOptions.customBoard?.placementBonusCosts?.colony ?? constants.TERRA_CIMMERIA_COLONY_COST,
         {title: 'Select how to pay for building a colony'}))
         .andThen(() => this.defer(new BuildColony(player)));
       break;

@@ -63,7 +63,13 @@
         </fieldset>
 
         <fieldset class="map-editor-params">
-          <legend><label><input type="checkbox" v-model="customParams"> <span v-i18n>Custom global parameters</span></label></legend>
+          <legend>
+            <label>
+              <input type="checkbox" v-model="customParams">
+              <span v-i18n>Custom global parameters</span>
+            </label>
+            <span class="map-editor-early-testing" v-i18n>(Early testing &mdash; not finished)</span>
+          </legend>
           <template v-if="customParams">
             <div v-for="key in trackKeys" :key="key" class="map-editor-track">
               <strong>{{ key }}</strong>
@@ -83,6 +89,23 @@
             <label>ocean tiles max <input type="number" v-model.number="params.oceans.max"></label>
             <label>heat per temperature step <input type="number" v-model.number="params.heatForTemperature" min="1"></label>
           </template>
+        </fieldset>
+
+        <fieldset class="map-editor-params">
+          <legend v-i18n>Placement bonus costs</legend>
+          <p class="map-editor-tools-note" v-i18n>What placing a tile on an ocean/temperature/colony bonus space costs, in M€. Only matters if you've painted that bonus onto a hex.</p>
+          <label :title="'Cost of the ocean placement bonus (Hellas is 6).'">
+            <span v-i18n>Ocean bonus</span>
+            <input type="number" v-model.number="bonusCostOcean" min="0">
+          </label>
+          <label :title="'Cost of the temperature placement bonus (Vastitas Borealis is 3).'">
+            <span v-i18n>Temperature bonus</span>
+            <input type="number" v-model.number="bonusCostTemperature" min="0">
+          </label>
+          <label :title="'Cost of the colony placement bonus (Terra Cimmeria Nova is 5).'">
+            <span v-i18n>Colony bonus</span>
+            <input type="number" v-model.number="bonusCostColony" min="0">
+          </label>
         </fieldset>
       </div>
 
@@ -120,7 +143,7 @@
         </label>
         <div class="map-editor-actions">
           <button type="button" @click="copyCode" v-i18n>Copy code</button>
-          <input type="text" v-model="loadInput" placeholder="Paste a TMB2… code" class="map-editor-load-input">
+          <input type="text" v-model="loadInput" placeholder="Paste a TMB3… code" class="map-editor-load-input">
           <button type="button" @click="loadCode" v-i18n>Load</button>
           <button type="button" class="map-editor-play" @click="play" v-i18n>Play with this map</button>
         </div>
@@ -166,6 +189,7 @@ import {
 } from '@/common/boards/CustomBoardDefinition';
 import {decodeCustomBoard, encodeCustomBoard, validateCustomBoard} from '@/common/boards/customBoardCodec';
 import {paths} from '@/common/app/paths';
+import {HELLAS_BONUS_OCEAN_COST, VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST, TERRA_CIMMERIA_COLONY_COST} from '@/common/constants';
 
 type Cell = {x: number, y: number, space: CustomSpaceDef | null};
 
@@ -263,6 +287,9 @@ export default defineComponent({
       awards: [] as Array<AwardName>,
       customParams: false,
       params: toEditableParams(DEFAULT_GLOBAL_PARAMETERS),
+      bonusCostOcean: HELLAS_BONUS_OCEAN_COST,
+      bonusCostTemperature: VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST,
+      bonusCostColony: TERRA_CIMMERIA_COLONY_COST,
       loadInput: '',
       loadError: '',
       expansions: DEFAULT_EXPANSIONS,
@@ -319,6 +346,17 @@ export default defineComponent({
       };
       if (this.customParams) {
         def.globalParameters = toParametersConfig(this.params);
+      }
+      // Only carry costs that differ from the official defaults, so an unmodified map's code
+      // matches blankCustomBoard() exactly.
+      if (this.bonusCostOcean !== HELLAS_BONUS_OCEAN_COST ||
+          this.bonusCostTemperature !== VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST ||
+          this.bonusCostColony !== TERRA_CIMMERIA_COLONY_COST) {
+        def.placementBonusCosts = {
+          ocean: this.bonusCostOcean,
+          temperature: this.bonusCostTemperature,
+          colony: this.bonusCostColony,
+        };
       }
       return def;
     },
@@ -478,6 +516,9 @@ export default defineComponent({
       this.awards = [...def.awards];
       this.customParams = def.globalParameters !== undefined;
       this.params = toEditableParams(def.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS);
+      this.bonusCostOcean = def.placementBonusCosts?.ocean ?? HELLAS_BONUS_OCEAN_COST;
+      this.bonusCostTemperature = def.placementBonusCosts?.temperature ?? VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST;
+      this.bonusCostColony = def.placementBonusCosts?.colony ?? TERRA_CIMMERIA_COLONY_COST;
     },
     play(): void {
       try {
@@ -550,6 +591,17 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     gap: 6px;
     padding: 1px 0;
     cursor: help;
+  }
+  .map-editor-params {
+    legend { display: flex; align-items: baseline; gap: 6px; }
+    label { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    input[type=number] { width: 60px; }
+  }
+  .map-editor-early-testing {
+    font-size: 11px;
+    font-weight: normal;
+    font-style: italic;
+    color: #d9822b;
   }
   .map-editor-tools-note {
     margin: 2px 0 6px;

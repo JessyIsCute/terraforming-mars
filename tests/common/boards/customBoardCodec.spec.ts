@@ -82,12 +82,25 @@ describe('customBoardCodec', () => {
     expect(decoded.globalParameters).to.deep.eq(DEFAULT_GLOBAL_PARAMETERS);
   });
 
+  it('round-trips custom placement bonus costs', () => {
+    const def = blankCustomBoard(9, 'Costs');
+    def.placementBonusCosts = {ocean: 8, temperature: 1, colony: 12};
+    const decoded = decodeCustomBoard(encodeCustomBoard(def));
+    expect(decoded).to.deep.eq(def);
+  });
+
+  it('omits placement bonus costs when unset', () => {
+    const def = blankCustomBoard(9, 'No costs');
+    const decoded = decodeCustomBoard(encodeCustomBoard(def));
+    expect(decoded.placementBonusCosts).is.undefined;
+  });
+
   it('rejects a bad prefix', () => {
-    expect(() => decodeCustomBoard('NOPE12345')).to.throw(CustomBoardCodecError, /must start with TMB2/);
+    expect(() => decodeCustomBoard('NOPE12345')).to.throw(CustomBoardCodecError, /must start with TMB3/);
   });
 
   it('rejects invalid base64url characters', () => {
-    expect(() => decodeCustomBoard('TMB2!!!!')).to.throw(CustomBoardCodecError);
+    expect(() => decodeCustomBoard('TMB3!!!!')).to.throw(CustomBoardCodecError);
   });
 
   it('rejects truncated data', () => {

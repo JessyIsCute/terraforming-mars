@@ -199,23 +199,24 @@ export class MarsBoard extends Board {
    */
   public static canAffordPlacementBonuses(player: IPlayer, space: Space): boolean {
     const game = player.game;
+    const customCosts = game.gameOptions.customBoard?.placementBonusCosts;
     if (space.bonus.includes(SpaceBonus.OCEAN) && game.canAddOcean()) {
-      if (!player.canAfford({cost: constants.HELLAS_BONUS_OCEAN_COST, tr: {oceans: 1}})) {
+      if (!player.canAfford({cost: customCosts?.ocean ?? constants.HELLAS_BONUS_OCEAN_COST, tr: {oceans: 1}})) {
         return false;
       }
     }
-    if (space.bonus.includes(SpaceBonus.TEMPERATURE) && game.getTemperature() < constants.MAX_TEMPERATURE) {
-      if (!player.canAfford({cost: constants.VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST, tr: {temperature: 1}})) {
+    if (space.bonus.includes(SpaceBonus.TEMPERATURE) && game.getTemperature() < game.parameters.temperature.max) {
+      if (!player.canAfford({cost: customCosts?.temperature ?? constants.VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST, tr: {temperature: 1}})) {
         return false;
       }
     }
-    if (space.bonus.includes(SpaceBonus.TEMPERATURE_4MC) && game.getTemperature() < constants.MAX_TEMPERATURE) {
+    if (space.bonus.includes(SpaceBonus.TEMPERATURE_4MC) && game.getTemperature() < game.parameters.temperature.max) {
       if (!player.canAfford({cost: constants.VASTITAS_BOREALIS_NOVA_BONUS_TEMPERATURE_COST, tr: {temperature: 1}})) {
         return false;
       }
     }
     if (space.bonus.includes(SpaceBonus.COLONY)) {
-      if (!player.canAfford({cost: constants.TERRA_CIMMERIA_COLONY_COST})) {
+      if (!player.canAfford({cost: customCosts?.colony ?? constants.TERRA_CIMMERIA_COLONY_COST})) {
         return false;
       }
     }

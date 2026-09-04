@@ -23,6 +23,20 @@ export interface CustomBoardDefinition {
   awards: Array<AwardName>;
   /** Optional global-parameter track overrides. Absent means the official tracks. */
   globalParameters?: GlobalParametersConfig;
+  /** Optional M€ costs for the ocean/temperature/colony placement bonuses. Absent means the official costs. */
+  placementBonusCosts?: PlacementBonusCosts;
+}
+
+/**
+ * M€ cost of the "also do X" placement bonuses (SpaceBonus.OCEAN / TEMPERATURE / COLONY),
+ * charged via SelectPaymentDeferred when a player places a tile on a space carrying one.
+ * Defaults match the official boards that use each bonus (Hellas, Vastitas Borealis, Terra
+ * Cimmeria Nova).
+ */
+export interface PlacementBonusCosts {
+  ocean: number;
+  temperature: number;
+  colony: number;
 }
 
 export interface CustomSpaceDef {
