@@ -46,6 +46,25 @@ describe('CreateGameForm', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
+  it('has a custom map code field that loads a board from a pasted code', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const field = wrapper.find('#custom-map-code');
+    expect(field.exists()).to.be.true;
+
+    const {encodeCustomBoard} = await import('@/common/boards/customBoardCodec');
+    const {blankCustomBoard} = await import('@/common/boards/CustomBoardDefinition');
+    const code = encodeCustomBoard(blankCustomBoard(9, 'Pasted Map'));
+
+    await field.setValue(code);
+    expect((wrapper.vm as any).board).to.eq(BoardName.CUSTOM);
+    expect((wrapper.vm as any).customBoardCode).to.eq(code);
+    expect((wrapper.vm as any).customBoardName).to.eq('Pasted Map');
+
+    await field.setValue('garbage');
+    expect((wrapper.vm as any).customBoardCode).to.be.undefined;
+    expect((wrapper.vm as any).customBoardCodeError).to.not.eq('');
+  });
+
   it('restores the last saved game settings on load', async () => {
     new CreateGameSettingsStorage(localStorage).saveSettings(createNewGameConfig({
       expansions: {...DEFAULT_EXPANSIONS, venus: true},
