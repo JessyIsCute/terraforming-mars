@@ -642,6 +642,9 @@ export enum CardName {
   ROTATING_HANDS = 'Rotating Hands',
   SHOW_AND_TELL = 'Show and Tell',
   MUSICAL_CHAIRS = 'Musical Chairs',
+  PRELUDE_CLONING = 'Prelude Cloning',
+  PROJECT_IMITATORS = 'Project Imitators',
+  DEIMOS_DOUBLE_DOWN = 'Deimos Double Down',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 

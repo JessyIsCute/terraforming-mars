@@ -23,8 +23,8 @@ export class ChipFabricationPlant extends Card implements IProjectCard, IActionC
       metadata: {
         cardNumber: 'X40',
         renderData: CardRenderer.builder((b) => {
-          b.action('Spend any number of M€ to gain the same amount of steel (max is the number of building tags you have).', (ab) => {
-            ab.text('X').megacredits(1, {secondaryTag: Tag.BUILDING}).startAction.text('X').steel(1);
+          b.action('Spend any number of energy to gain the same amount of steel.', (ab) => {
+            ab.text('X').energy(1).startAction.text('X').steel(1);
           });
         }),
         description: 'Requires that you have no more than 1 plant tag.',
@@ -33,18 +33,17 @@ export class ChipFabricationPlant extends Card implements IProjectCard, IActionC
   }
 
   public canAct(player: IPlayer): boolean {
-    return player.tags.count(Tag.BUILDING) > 0 && player.megaCredits > 0;
+    return player.energy > 0;
   }
 
   public action(player: IPlayer) {
-    const max = Math.min(player.tags.count(Tag.BUILDING), player.megaCredits);
     return new SelectAmount(
-      message('Select up to ${0} M€ to convert to steel', (b) => b.number(max)),
-      'Convert M€', 1, max, false)
+      message('Select up to ${0} energy to convert to steel', (b) => b.number(player.energy)),
+      'Convert energy', 1, player.energy, false)
       .andThen((amount) => {
-        player.stock.deduct(Resource.MEGACREDITS, amount);
+        player.stock.deduct(Resource.ENERGY, amount);
         player.stock.add(Resource.STEEL, amount);
-        player.game.log('${0} converted ${1} M€ to steel', (b) => b.player(player).number(amount));
+        player.game.log('${0} converted ${1} energy to steel', (b) => b.player(player).number(amount));
         return undefined;
       });
   }

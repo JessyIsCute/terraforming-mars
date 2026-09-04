@@ -12,7 +12,7 @@ export class ChillingRiches extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       name: CardName.CHILLING_RICHES,
       tags: [Tag.BUILDING],
-      cost: 24,
+      cost: 20,
 
       behavior: {
         production: {heat: -3, megacredits: 11},

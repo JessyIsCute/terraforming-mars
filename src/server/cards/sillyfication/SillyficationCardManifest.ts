@@ -57,6 +57,9 @@ import {Nepotism} from './Nepotism';
 import {RotatingHands} from './RotatingHands';
 import {ShowAndTell} from './ShowAndTell';
 import {MusicalChairs} from './MusicalChairs';
+import {PreludeCloning} from './PreludeCloning';
+import {ProjectImitators} from './ProjectImitators';
+import {DeimosDoubleDown} from './DeimosDoubleDown';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -67,6 +70,9 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
     [CardName.VENUS_VENTURES]: {Factory: VenusVentures, compatibility: 'venus'},
     [CardName.CRITTERWORLD]: {Factory: Critterworld},
+  },
+  preludeCards: {
+    [CardName.DEIMOS_DOUBLE_DOWN]: {Factory: DeimosDoubleDown, compatibility: 'prelude'},
   },
   projectCards: {
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
@@ -126,5 +132,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.ROTATING_HANDS]: {Factory: RotatingHands},
     [CardName.SHOW_AND_TELL]: {Factory: ShowAndTell},
     [CardName.MUSICAL_CHAIRS]: {Factory: MusicalChairs},
+    [CardName.PRELUDE_CLONING]: {Factory: PreludeCloning, compatibility: 'prelude'},
+    [CardName.PROJECT_IMITATORS]: {Factory: ProjectImitators},
   },
 });
