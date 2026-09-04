@@ -60,22 +60,6 @@ import {MusicalChairs} from './MusicalChairs';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
-import {LunarBeamSilly} from './replacements/LunarBeamSilly';
-import {LunaMetropolisSilly} from './replacements/LunaMetropolisSilly';
-import {LunarExportsSilly} from './replacements/LunarExportsSilly';
-import {PristarSilly} from './replacements/PristarSilly';
-import {EarlySettlementSilly} from './replacements/EarlySettlementSilly';
-import {SelfSufficientSettlementSilly} from './replacements/SelfSufficientSettlementSilly';
-import {EosChasmaNationalParkSilly} from './replacements/EosChasmaNationalParkSilly';
-import {ImmigrationShuttlesSilly} from './replacements/ImmigrationShuttlesSilly';
-import {MartianRailsSilly} from './replacements/MartianRailsSilly';
-import {NoctisCitySilly} from './replacements/NoctisCitySilly';
-import {NoctisFarmingSilly} from './replacements/NoctisFarmingSilly';
-import {ProtectedValleySilly} from './replacements/ProtectedValleySilly';
-import {MarsUniversitySilly} from './replacements/MarsUniversitySilly';
-import {ProtectedHabitatsSilly} from './replacements/ProtectedHabitatsSilly';
-import {TropicalResortSilly} from './replacements/TropicalResortSilly';
-import {MartianMediaCenterSilly} from './replacements/MartianMediaCenterSilly';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -83,11 +67,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
     [CardName.VENUS_VENTURES]: {Factory: VenusVentures, compatibility: 'venus'},
     [CardName.CRITTERWORLD]: {Factory: Critterworld},
-    [CardName.PRISTAR_SILLY]: {Factory: PristarSilly, compatibility: 'turmoil'},
-  },
-  preludeCards: {
-    [CardName.EARLY_SETTLEMENT_SILLY]: {Factory: EarlySettlementSilly, compatibility: 'prelude'},
-    [CardName.SELF_SUFFICIENT_SETTLEMENT_SILLY]: {Factory: SelfSufficientSettlementSilly, compatibility: 'prelude'},
   },
   projectCards: {
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
@@ -147,38 +126,5 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.ROTATING_HANDS]: {Factory: RotatingHands},
     [CardName.SHOW_AND_TELL]: {Factory: ShowAndTell},
     [CardName.MUSICAL_CHAIRS]: {Factory: MusicalChairs},
-
-    // Replacement cards (swap into the base pool; see cardsToRemove below)
-    [CardName.LUNAR_BEAM_SILLY]: {Factory: LunarBeamSilly},
-    [CardName.LUNA_METROPOLIS_SILLY]: {Factory: LunaMetropolisSilly, compatibility: 'venus'},
-    [CardName.LUNAR_EXPORTS_SILLY]: {Factory: LunarExportsSilly, compatibility: 'colonies'},
-    [CardName.EOS_CHASMA_NATIONAL_PARK_SILLY]: {Factory: EosChasmaNationalParkSilly},
-    [CardName.IMMIGRATION_SHUTTLES_SILLY]: {Factory: ImmigrationShuttlesSilly},
-    [CardName.MARTIAN_RAILS_SILLY]: {Factory: MartianRailsSilly},
-    [CardName.NOCTIS_CITY_SILLY]: {Factory: NoctisCitySilly},
-    [CardName.NOCTIS_FARMING_SILLY]: {Factory: NoctisFarmingSilly},
-    [CardName.PROTECTED_VALLEY_SILLY]: {Factory: ProtectedValleySilly},
-    [CardName.MARS_UNIVERSITY_SILLY]: {Factory: MarsUniversitySilly},
-    [CardName.PROTECTED_HABITATS_SILLY]: {Factory: ProtectedHabitatsSilly},
-    [CardName.TROPICAL_RESORT_SILLY]: {Factory: TropicalResortSilly},
-    [CardName.MARTIAN_MEDIA_CENTER_SILLY]: {Factory: MartianMediaCenterSilly, compatibility: 'turmoil'},
   },
-  cardsToRemove: [
-    CardName.LUNAR_BEAM,
-    CardName.LUNA_METROPOLIS,
-    CardName.LUNAR_EXPORTS,
-    CardName.PRISTAR,
-    CardName.EARLY_SETTLEMENT,
-    CardName.SELF_SUFFICIENT_SETTLEMENT,
-    CardName.EOS_CHASMA_NATIONAL_PARK,
-    CardName.IMMIGRATION_SHUTTLES,
-    CardName.MARTIAN_RAILS,
-    CardName.NOCTIS_CITY,
-    CardName.NOCTIS_FARMING,
-    CardName.PROTECTED_VALLEY,
-    CardName.MARS_UNIVERSITY,
-    CardName.PROTECTED_HABITATS,
-    CardName.TROPICAL_RESORT,
-    CardName.MARTIAN_MEDIA_CENTER,
-  ],
 });

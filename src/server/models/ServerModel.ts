@@ -435,6 +435,7 @@ export class Server {
         underworld: options.underworldExpansion,
         deltaProject: options.deltaProjectExpansion,
         sillyfication: options.sillyficationExpansion,
+        betterMars: options.betterMarsExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

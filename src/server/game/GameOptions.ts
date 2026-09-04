@@ -46,6 +46,7 @@ export type GameOptions = {
   underworldExpansion: boolean;
   deltaProjectExpansion: boolean;
   sillyficationExpansion: boolean;
+  betterMarsExpansion: boolean;
 
   expansions: Record<Expansion, boolean>,
 
@@ -121,6 +122,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     underworld: false,
     deltaProject: false,
     sillyfication: false,
+    betterMars: false,
   },
   fastModeOption: false,
   includeFanMA: false,
@@ -153,6 +155,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   underworldExpansion: false,
   deltaProjectExpansion: false,
   sillyficationExpansion: false,
+  betterMarsExpansion: false,
   undoOption: false,
   venusNextExtension: false,
   twoCorpsVariant: false,

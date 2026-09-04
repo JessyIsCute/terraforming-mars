@@ -1,11 +1,11 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {CardName} from '../../../../common/cards/CardName';
-import {LunarBeam} from '../../base/LunarBeam';
+import {Tag} from '../../../common/cards/Tag';
+import {CardName} from '../../../common/cards/CardName';
+import {LunarBeam} from '../base/LunarBeam';
 
 /** Lunar Beam, but the Earth tag is a Moon tag. */
-export class LunarBeamSilly extends LunarBeam {
+export class LunarBeamBetterMars extends LunarBeam {
   public override get name() {
-    return CardName.LUNAR_BEAM_SILLY;
+    return CardName.LUNAR_BEAM_BETTER_MARS;
   }
 
   public override get tags() {

@@ -1,11 +1,11 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {CardName} from '../../../../common/cards/CardName';
-import {LunarExports} from '../../colonies/LunarExports';
+import {Tag} from '../../../common/cards/Tag';
+import {CardName} from '../../../common/cards/CardName';
+import {LunarExports} from '../colonies/LunarExports';
 
 /** Lunar Exports, with an added Moon tag and 1 M€ more expensive. */
-export class LunarExportsSilly extends LunarExports {
+export class LunarExportsBetterMars extends LunarExports {
   public override get name() {
-    return CardName.LUNAR_EXPORTS_SILLY;
+    return CardName.LUNAR_EXPORTS_BETTER_MARS;
   }
 
   public override get tags() {

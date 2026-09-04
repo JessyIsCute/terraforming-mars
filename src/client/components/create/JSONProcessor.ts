@@ -89,6 +89,7 @@ export class JSONProcessor {
       underworld: json_constants.UNDERWORLDEXPANSION,
       deltaProject: json_constants.DELTA_PROJECT_EXPANSION,
       sillyfication: json_constants.SILLYFICATION_EXPANSION,
+      betterMars: json_constants.BETTER_MARS_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

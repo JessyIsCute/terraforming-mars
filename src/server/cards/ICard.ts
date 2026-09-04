@@ -163,6 +163,9 @@ export interface ICard {
   onNonCardTagAdded?(player: IPlayer, tag: Tag): void;
   onNonCardTagAddedByAnyPlayer?(cardOwner: IPlayer, tag: Tag): void;
 
+  /** Called after `delegateOwner` sends one of their own (non-neutral) delegates to a party. */
+  onDelegateSent?(cardOwner: IPlayer, delegateOwner: IPlayer): void;
+
   readonly cost?: number; /** Used with IProjectCard and PreludeCard. */
   readonly type: CardType;
   readonly requirements: ReadonlyArray<CardRequirementDescriptor>;

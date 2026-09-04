@@ -183,6 +183,7 @@ export class ApiCreateGame extends Handler {
         underworldExpansion: gameReq.expansions.underworld,
         deltaProjectExpansion: gameReq.expansions.deltaProject,
         sillyficationExpansion: gameReq.expansions.sillyfication,
+        betterMarsExpansion: gameReq.expansions.betterMars,
         undoOption: gameReq.undoOption,
         venusNextExtension: gameReq.expansions.venus,
       };

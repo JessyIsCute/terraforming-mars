@@ -1,13 +1,13 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {SpaceName} from '../../../../common/boards/SpaceName';
-import {CardName} from '../../../../common/cards/CardName';
-import {CardRenderer} from '../../render/CardRenderer';
-import {LunaMetropolis} from '../../venusNext/LunaMetropolis';
+import {Tag} from '../../../common/cards/Tag';
+import {SpaceName} from '../../../common/boards/SpaceName';
+import {CardName} from '../../../common/cards/CardName';
+import {CardRenderer} from '../render/CardRenderer';
+import {LunaMetropolis} from '../venusNext/LunaMetropolis';
 
 /** Luna Metropolis, but the Earth tag (and the tag it counts) is the Moon tag. */
-export class LunaMetropolisSilly extends LunaMetropolis {
+export class LunaMetropolisBetterMars extends LunaMetropolis {
   public override get name() {
-    return CardName.LUNA_METROPOLIS_SILLY;
+    return CardName.LUNA_METROPOLIS_BETTER_MARS;
   }
 
   public override get tags() {

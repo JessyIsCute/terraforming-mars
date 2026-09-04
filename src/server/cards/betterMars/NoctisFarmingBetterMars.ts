@@ -1,11 +1,11 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {CardName} from '../../../../common/cards/CardName';
-import {NoctisFarming} from '../../base/NoctisFarming';
+import {Tag} from '../../../common/cards/Tag';
+import {CardName} from '../../../common/cards/CardName';
+import {NoctisFarming} from '../base/NoctisFarming';
 
 /** Noctis Farming, with an additional Mars tag. */
-export class NoctisFarmingSilly extends NoctisFarming {
+export class NoctisFarmingBetterMars extends NoctisFarming {
   public override get name() {
-    return CardName.NOCTIS_FARMING_SILLY;
+    return CardName.NOCTIS_FARMING_BETTER_MARS;
   }
 
   public override get tags() {

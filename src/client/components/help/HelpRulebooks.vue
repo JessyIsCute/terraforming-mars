@@ -52,6 +52,7 @@ const fanExpansions: ReadonlyArray<RulebookEntry> = [
   {module: 'underworld', name: 'Underworld', iconClass: 'underworld', url: RULEBOOK_URLS.underworld},
   {module: 'deltaProject', name: 'Delta Project', iconClass: 'deltaProject', url: RULEBOOK_URLS.deltaProject},
   {module: 'sillyfication', name: 'Sillyfication', iconClass: 'sillyfication', url: RULEBOOK_URLS.sillyfication},
+  {module: 'betterMars', name: 'BetterMars', iconClass: 'betterMars', url: RULEBOOK_URLS.betterMars},
 ];
 
 export default defineComponent({

@@ -164,6 +164,13 @@ export class Turmoil {
     }
     party.sendDelegate(delegate, game);
     this.checkDominantParty();
+    if (delegate !== 'NEUTRAL') {
+      for (const somePlayer of game.playersInGenerationOrder) {
+        for (const card of somePlayer.tableau) {
+          card.onDelegateSent?.(somePlayer, delegate);
+        }
+      }
+    }
   }
 
   /**

@@ -12,18 +12,30 @@ describe('MusicalChairs', () => {
   beforeEach(() => {
     card = new MusicalChairs();
     [game, player] = testGame(3);
+    player.playedCards.push(card);
   });
 
-  it('needs at least 2 players', () => {
+  it('cannot act without energy', () => {
+    player.energy = 0;
+    expect(card.canAct(player)).is.false;
+    player.energy = 1;
+    expect(card.canAct(player)).is.true;
+  });
+
+  it('cannot act in a solo game', () => {
     const [/* g */, solo] = testGame(1);
-    expect(card.canPlay(solo)).is.false;
+    solo.energy = 5;
+    expect(card.canAct(solo)).is.false;
   });
 
-  it('hands the first-player marker to a different player', () => {
+  it('spends 1 energy and hands the first-player marker to a different player', () => {
+    player.energy = 2;
     const before = game.first;
-    card.play(player);
+
+    card.action(player);
+
+    expect(player.energy).to.eq(1);
     expect(game.first).to.not.eq(before);
-    expect(game.players).to.contain(game.first);
     expect(game.playersInGenerationOrder[0]).to.eq(game.first);
   });
 });

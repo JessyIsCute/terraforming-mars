@@ -416,6 +416,17 @@ input[type="radio"]:checked+.filterDiv::after {
   content: "🤪";
 }
 
+// BetterMars: just uses the Mars tag sprite as its badge.
+.betterMars-icon:after {
+  .expansion-icon-base();
+  background-image: url("./assets/tags/mars.png");
+  background-size: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: white;
+  content: "";
+}
+
 /*********** Style the tags ************/
 
 .tag-wild {
@@ -1103,6 +1114,11 @@ input[type="radio"]:checked+.filterDiv::after {
     font-size: 20px;
     line-height: 1.35;
   }
+}
+
+// BetterMars uses the Mars tag sprite as its expansion icon.
+.expansion-icon-betterMars {
+  background-image: url(./assets/tags/mars.png);
 }
 
 .card-standard-project {

@@ -74,6 +74,7 @@ export class GlobalEventDealer {
       underworld: gameOptions.underworldExpansion,
       deltaProject: gameOptions.deltaProjectExpansion,
       sillyfication: gameOptions.sillyficationExpansion,
+      betterMars: gameOptions.betterMarsExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

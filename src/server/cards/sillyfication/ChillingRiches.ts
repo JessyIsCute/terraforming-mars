@@ -15,15 +15,15 @@ export class ChillingRiches extends Card implements IProjectCard {
       cost: 24,
 
       behavior: {
-        production: {heat: -2, megacredits: 7},
+        production: {heat: -3, megacredits: 11},
       },
 
       metadata: {
         cardNumber: 'X44',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.minus().heat(2).nbsp.plus().megacredits(7, {digit}));
+          b.production((pb) => pb.minus().heat(3).nbsp.plus().megacredits(11, {digit}));
         }),
-        description: 'Decrease your heat production 2 steps. Increase your M€ production 7 steps.',
+        description: 'Decrease your heat production 3 steps. Increase your M€ production 11 steps.',
       },
     });
   }

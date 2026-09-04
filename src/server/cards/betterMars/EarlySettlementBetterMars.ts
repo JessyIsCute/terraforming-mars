@@ -1,11 +1,11 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {CardName} from '../../../../common/cards/CardName';
-import {EarlySettlement} from '../../prelude/EarlySettlement';
+import {Tag} from '../../../common/cards/Tag';
+import {CardName} from '../../../common/cards/CardName';
+import {EarlySettlement} from '../prelude/EarlySettlement';
 
 /** Early Settlement, with an additional Mars tag. */
-export class EarlySettlementSilly extends EarlySettlement {
+export class EarlySettlementBetterMars extends EarlySettlement {
   public override get name() {
-    return CardName.EARLY_SETTLEMENT_SILLY;
+    return CardName.EARLY_SETTLEMENT_BETTER_MARS;
   }
 
   public override get tags() {

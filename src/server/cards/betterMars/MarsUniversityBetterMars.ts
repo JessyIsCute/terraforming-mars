@@ -1,11 +1,11 @@
-import {Tag} from '../../../../common/cards/Tag';
-import {CardName} from '../../../../common/cards/CardName';
-import {MarsUniversity} from '../../base/MarsUniversity';
+import {Tag} from '../../../common/cards/Tag';
+import {CardName} from '../../../common/cards/CardName';
+import {MarsUniversity} from '../base/MarsUniversity';
 
 /** Mars University, with an additional Mars tag and 2 M€ more expensive. */
-export class MarsUniversitySilly extends MarsUniversity {
+export class MarsUniversityBetterMars extends MarsUniversity {
   public override get name() {
-    return CardName.MARS_UNIVERSITY_SILLY;
+    return CardName.MARS_UNIVERSITY_BETTER_MARS;
   }
 
   public override get tags() {

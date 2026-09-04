@@ -282,6 +282,7 @@ export class Game implements IGame, Logger {
         underworld: partialOptions.underworldExpansion ?? false,
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
         sillyfication: partialOptions.sillyficationExpansion ?? false,
+        betterMars: partialOptions.betterMarsExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};

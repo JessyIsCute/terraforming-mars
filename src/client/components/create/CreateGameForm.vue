@@ -181,6 +181,12 @@
                                 <div class="create-game-expansion-icon expansion-icon-sillyfication"></div>
                                 <span v-i18n>Sillyfication</span>&nbsp;<span title="A silly fan expansion">(&#945;)</span>
                             </label>
+
+                            <input type="checkbox" name="betterMars" id="betterMars-checkbox" v-model="expansions.betterMars">
+                            <label for="betterMars-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-betterMars"></div>
+                                <span v-i18n>BetterMars</span>&nbsp;<span title="A fan expansion: Mars-flavoured card variants">(&#945;)</span>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">

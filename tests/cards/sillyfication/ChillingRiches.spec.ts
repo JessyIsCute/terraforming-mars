@@ -12,15 +12,17 @@ describe('ChillingRiches', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('cannot play without 2 heat production', () => {
-    player.production.override({heat: 1});
+  it('cannot play without 3 heat production', () => {
+    player.production.override({heat: 2});
     expect(card.canPlay(player)).is.false;
+    player.production.override({heat: 3});
+    expect(card.canPlay(player)).is.true;
   });
 
-  it('trades 2 heat production for 7 M€ production', () => {
-    player.production.override({heat: 3});
+  it('trades 3 heat production for 11 M€ production', () => {
+    player.production.override({heat: 4});
     card.play(player);
     expect(player.production.heat).to.eq(1);
-    expect(player.production.megacredits).to.eq(7);
+    expect(player.production.megacredits).to.eq(11);
   });
 });
