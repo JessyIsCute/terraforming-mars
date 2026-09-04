@@ -154,8 +154,7 @@ describe('Board', () => {
     expect(wrapper.find('#main_board').attributes('style') ?? '').to.match(/scale\(/);
   });
 
-  it('plugs carved-out (void) cells of a custom board', () => {
-    // A 5-row board (19 cells) with only 2 spaces present -> 17 void plugs.
+  it('renders only the present cells of a carved custom board (voids are just gaps)', () => {
     const twoSpaces: SpaceModel[] = [
       {id: '100', x: 2, y: 0, bonus: [], spaceType: SpaceType.LAND, color: undefined, highlight: undefined, tileType: undefined},
       {id: '101', x: 2, y: 4, bonus: [], spaceType: SpaceType.LAND, color: undefined, highlight: undefined, tileType: undefined},
@@ -164,7 +163,9 @@ describe('Board', () => {
       ...globalConfig,
       props: {spaces: twoSpaces, expansions: DEFAULT_EXPANSIONS, tileView: 'show', venusScaleLevel: 0, boardName: BoardName.CUSTOM, customBoardRows: 5},
     });
-    expect(wrapper.findAll('.board-space--void-plug')).to.have.length(17);
+    const spaceWrappers = wrapper.findAllComponents(BoardSpace)
+      .filter((w) => w.attributes('data-test') === 'board-space');
+    expect(spaceWrappers).to.have.length(2);
   });
 
   it('drops the painting for a plain readout when parameters are stretched', () => {

@@ -575,7 +575,11 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
 
   .map-editor-grid {
     position: relative;
-    background: #15131f;
+    // Mars planet as a dimmed backdrop; a carved (void) hex just shows this through.
+    background:
+      linear-gradient(rgba(21, 19, 31, 0.55), rgba(21, 19, 31, 0.55)),
+      url("/assets/board/mars-without-venus.png") no-repeat center / cover,
+      #15131f;
     border-radius: 6px;
     overflow: auto;
     max-height: 60vh;
