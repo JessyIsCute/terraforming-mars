@@ -22,7 +22,7 @@ export class PeerReview extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.cards(3, {digit}).colon().megacredits(5);
         }),
-        description: 'Look at the top 3 cards of the deck and put them back in any order. Gain 5 M€.',
+        description: 'Look at the top 3 cards of the deck. Gain 5 M€.',
       },
     });
   }
@@ -32,7 +32,7 @@ export class PeerReview extends Card implements IProjectCard {
     // The deck's top is the end of the array. Peek without disturbing the order.
     const top = drawPile.slice(-3).reverse();
     if (top.length > 0) {
-      player.game.log('${0} peer-reviewed ${1} and put it all back', (b) => {
+      player.game.log('${0} peer-reviewed the top ${1} of the deck', (b) => {
         b.string('You');
         b.cards(top);
       }, {reservedFor: player});
