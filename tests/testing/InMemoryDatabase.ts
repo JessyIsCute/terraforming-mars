@@ -96,6 +96,14 @@ export class InMemoryDatabase implements IDatabase {
     this.completedGames.set(gameId, new Date(this.clock.now()));
     return Promise.resolve();
   }
+  deleteGame(gameId: GameId): Promise<void> {
+    this.games.delete(gameId);
+    this.completedGames.delete(gameId);
+    return Promise.resolve();
+  }
+  getFinishedGameIds(): Promise<Array<GameId>> {
+    return Promise.resolve(Array.from(this.completedGames.keys()));
+  }
   purgeUnfinishedGames(): Promise<Array<GameId>> {
     const keys = [...this.games.keys()];
     for (const key of keys) {

@@ -461,6 +461,19 @@ export class PostgreSQL implements IDatabase {
     await this.client.query('DELETE FROM games WHERE ctid IN (SELECT ctid FROM games WHERE game_id = $1 ORDER BY save_id DESC LIMIT $2)', [gameId, rollbackCount]);
   }
 
+  async deleteGame(gameId: GameId): Promise<void> {
+    await this.client.query('DELETE FROM games WHERE game_id = $1', [gameId]);
+    await this.client.query('DELETE FROM game WHERE game_id = $1', [gameId]);
+    await this.client.query('DELETE FROM participants WHERE game_id = $1', [gameId]);
+    await this.client.query('DELETE FROM game_results WHERE game_id = $1', [gameId]);
+    await this.client.query('DELETE FROM completed_game WHERE game_id = $1', [gameId]);
+  }
+
+  async getFinishedGameIds(): Promise<Array<GameId>> {
+    const res = await this.client.query("SELECT DISTINCT game_id FROM game WHERE status = 'finished'");
+    return res.rows.map((row) => safeCast(row.game_id, isGameId));
+  }
+
   public async storeParticipants(entry: GameIdLedger): Promise<void> {
     await this.client.query('INSERT INTO participants (game_id, participants) VALUES($1, $2) ON CONFLICT (game_id) DO NOTHING', [entry.gameId, entry.participantIds]);
   }

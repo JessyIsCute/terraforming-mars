@@ -8,6 +8,8 @@ import {globalInitialize} from '../../src/server/globalInitialize';
 const FAKE_DATABASE: IDatabase = {
   markFinished: () => Promise.resolve(),
   deleteGameNbrSaves: () => Promise.resolve(),
+  deleteGame: () => Promise.resolve(),
+  getFinishedGameIds: () => Promise.resolve([]),
   getPlayerCount: () => Promise.resolve(0),
   getGame: () => Promise.resolve({} as SerializedGame),
   getGameId: () => Promise.resolve('g'),

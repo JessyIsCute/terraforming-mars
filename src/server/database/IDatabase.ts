@@ -129,6 +129,19 @@ export interface IDatabase {
      */
     stats(): Promise<{[key: string]: string | number}>;
 
+    /**
+     * Permanently and completely deletes a single game: every save, its
+     * participants, its results and its completion record.
+     *
+     * Used by the admin games-overview purge buttons. Not part of normal play.
+     */
+    deleteGame(gameId: GameId): Promise<void>;
+
+    /**
+     * Returns the ids of every game that has been marked finished.
+     */
+    getFinishedGameIds(): Promise<Array<GameId>>;
+
     storeParticipants(entry: GameIdLedger): Promise<void>;
     getParticipants(): Promise<Array<GameIdLedger>>;
 

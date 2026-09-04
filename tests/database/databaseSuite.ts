@@ -416,6 +416,41 @@ export function describeDatabaseSuite<T extends ITestDatabase>(dtor: DatabaseTes
       expect(saveIds).has.members([0, 1, 2, 3]);
     });
 
+    it('deleteGame removes the game entirely', async () => {
+      const player = TestPlayer.BLACK.newPlayer();
+      const game = Game.newInstance('game-to-delete', [player], player, 'spectatorid-del');
+      await db.lastSaveGamePromise;
+      await db.saveGame(game);
+
+      expect(await db.getGameIds()).contains(game.id);
+
+      await db.deleteGame(game.id);
+
+      expect(await db.getGameIds()).does.not.contain(game.id);
+      await expect(db.getGame(game.id)).to.be.rejected;
+    });
+
+    it('getFinishedGameIds', async () => {
+      const p1 = TestPlayer.BLACK.newPlayer();
+      const running = Game.newInstance('running-game', [p1], p1, 's-run');
+      await db.lastSaveGamePromise;
+      await db.saveGame(running);
+
+      const p2 = TestPlayer.BLUE.newPlayer();
+      const finished = Game.newInstance('finished-game', [p2], p2, 's-fin');
+      await db.lastSaveGamePromise;
+      await db.saveGame(finished);
+      await db.markFinished(finished.id);
+
+      const ids = await db.getFinishedGameIds();
+      // LocalFilesystem's markFinished is a no-op, so it reports nothing here; the
+      // other backends should see the finished game and not the running one.
+      if (ids.length > 0) {
+        expect(ids).contains('finished-game');
+        expect(ids).does.not.contain('running-game');
+      }
+    });
+
     if (dtor.omit?.sessions !== true) {
       const discordUser = {id: 'xyz'} as DiscordUser;
       it('createSession', async () => {

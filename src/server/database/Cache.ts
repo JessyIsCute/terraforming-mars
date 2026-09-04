@@ -143,6 +143,22 @@ export class Cache extends EventEmitter {
     this.lastAccess.delete(gameId);
   }
 
+  /**
+   * Completely forget a game: unload it from memory and drop every trace of it
+   * from the cache. For use when a game is permanently deleted from the database.
+   */
+  public delete(gameId: GameId) {
+    this.evict(gameId);
+    this.games.delete(gameId);
+    this.lastAccess.delete(gameId);
+    this.evictionSchedule.delete(gameId);
+    for (const [participantId, gid] of this.participantIds) {
+      if (gid === gameId) {
+        this.participantIds.delete(participantId);
+      }
+    }
+  }
+
   private shouldTrim(gameId: GameId, game: IGame): boolean {
     if (this.config.idleMillis > 0) {
       const now = this.clock.now();

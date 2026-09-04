@@ -39,10 +39,12 @@ describe('ApiGame', () => {
     // This test is probably brittle.
     const json = JSON.parse(res.content);
     json.expectedPurgeTimeMs = -1;
+    json.createdTimeMs = -1;
     json.name = 'game-name';
     expect(json).deep.eq(
       {
         'activePlayer': 'black',
+        'createdTimeMs': -1,
         'expectedPurgeTimeMs': -1,
         'id': 'game-valid-id',
         'lastSoloGeneration': 14,
@@ -64,6 +66,7 @@ describe('ApiGame', () => {
           'draftVariant': false,
           'expansions': {
             'ares': false,
+            'betterMars': false,
             'ceo': false,
             'colonies': false,
             'community': false,
@@ -74,6 +77,7 @@ describe('ApiGame', () => {
             'prelude': false,
             'prelude2': false,
             'promo': false,
+            'sillyfication': false,
             'starwars': false,
             'turmoil': false,
             'underworld': false,

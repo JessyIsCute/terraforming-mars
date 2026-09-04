@@ -2,8 +2,17 @@
   <div id="games-overview" class="games-overview-container">
     <h1 v-i18n>{{ constants.APP_NAME }} — Games Overview</h1>
       <p v-i18n>The following games are available on this server:</p>
+      <div class="games-overview-actions">
+        <button type="button" class="btn btn-error" :disabled="bulkPurging" @click="purgeFinishedAndAbandoned" v-i18n>
+          Purge finished &amp; abandoned games
+        </button>
+        <button type="button" class="btn btn-error" :disabled="bulkPurging" @click="purgeAll" v-i18n>
+          Purge ALL games
+        </button>
+        <span v-if="bulkPurging" v-i18n>Working…</span>
+      </div>
       <table>
-        <GameOverview v-for="entry in entries" :key="entry.id" :id="entry.id" :game="entry.game" :status="entry.status"/>
+        <GameOverview v-for="entry in entries" :key="entry.id" :id="entry.id" :game="entry.game" :status="entry.status" @purged="removeEntry"/>
       </table>
   </div>
 </template>
@@ -15,6 +24,7 @@ import * as constants from '@/common/constants';
 import GameOverview from '@/client/components/admin/GameOverview.vue';
 import {SimpleGameModel} from '@/common/models/SimpleGameModel';
 import {GameId, ParticipantId} from '@/common/Types';
+import {paths} from '@/common/app/paths';
 
 type FetchStatus = {
   id: GameId;
@@ -23,6 +33,7 @@ type FetchStatus = {
 }
 type DataModel = {
   entries: Array<FetchStatus>,
+  bulkPurging: boolean,
 };
 
 // Copied from routes/Game.ts and probably IDatabase. Should be centralized I suppose
@@ -33,6 +44,7 @@ export default defineComponent({
   data(): DataModel {
     return {
       entries: [],
+      bulkPurging: false,
     };
   },
   mounted() {
@@ -82,6 +94,39 @@ export default defineComponent({
       } catch (error) {
         entry.status = 'error';
       }
+    },
+    removeEntry(gameId: GameId) {
+      this.entries = this.entries.filter((entry) => entry.id !== gameId);
+    },
+    async bulkPurge(mode: 'finishedAndAbandoned' | 'all', prompt: string) {
+      if (!window.confirm(prompt)) {
+        return;
+      }
+      this.bulkPurging = true;
+      try {
+        const response = await fetch(`${paths.API_GAMES}?serverId=${this.serverId}`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({mode}),
+        });
+        if (response.ok) {
+          const result = await response.json() as {deleted: number};
+          alert(`Purged ${result.deleted} game(s).`);
+          await this.getGames();
+        } else {
+          alert('Purge failed.');
+        }
+      } catch (e) {
+        alert('Error during purge.');
+      } finally {
+        this.bulkPurging = false;
+      }
+    },
+    purgeFinishedAndAbandoned() {
+      this.bulkPurge('finishedAndAbandoned', 'Delete every finished game and every abandoned (old, still-running) game? This cannot be undone.');
+    },
+    purgeAll() {
+      this.bulkPurge('all', 'Delete EVERY game on this server, including games in progress? This cannot be undone.');
     },
   },
   computed: {

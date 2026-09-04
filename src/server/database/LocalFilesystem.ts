@@ -176,6 +176,35 @@ export class LocalFilesystem implements IDatabase {
     });
   }
 
+  async deleteGame(gameId: GameId): Promise<void> {
+    const saveIds = await this.getSaveIds(gameId);
+    for (const saveId of saveIds) {
+      try {
+        this.deleteVersion(gameId, saveId);
+      } catch (e) {
+        console.error(`While deleting ${gameId}-${saveId}`, e);
+      }
+    }
+    for (const file of [this.filename(gameId), this.completedFilename(gameId)]) {
+      if (existsSync(file)) {
+        unlinkSync(file);
+      }
+    }
+  }
+
+  getFinishedGameIds(): Promise<Array<GameId>> {
+    const gameIds: Array<GameId> = [];
+    if (existsSync(this.completedFolder)) {
+      for (const dirent of readdirSync(this.completedFolder, {withFileTypes: true})) {
+        const gameId = this.asGameId(dirent);
+        if (gameId !== undefined) {
+          gameIds.push(gameId);
+        }
+      }
+    }
+    return Promise.resolve(gameIds);
+  }
+
   public stats(): Promise<{[key: string]: string | number}> {
     return Promise.resolve({
       type: 'Local Filesystem',

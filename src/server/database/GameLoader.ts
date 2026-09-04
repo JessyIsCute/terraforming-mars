@@ -248,6 +248,38 @@ export class GameLoader implements IGameLoader {
     this.cache.mark(gameId);
   }
 
+  public async deleteGame(gameId: GameId): Promise<void> {
+    await Database.getInstance().deleteGame(gameId);
+    this.cache.delete(gameId);
+    this.purgedGames.push(gameId);
+    metrics.gamesPurged.inc();
+  }
+
+  public async purgeFinishedAndAbandonedGames(): Promise<number> {
+    const database = Database.getInstance();
+    // Abandoned: old games still marked running. purgeUnfinishedGames deletes them from the DB.
+    const abandoned = await database.purgeUnfinishedGames();
+    for (const id of abandoned) {
+      this.cache.delete(id);
+      this.purgedGames.push(id);
+    }
+    metrics.gamesPurged.inc(abandoned.length);
+    // Finished games: delete outright.
+    const finished = await database.getFinishedGameIds();
+    for (const id of finished) {
+      await this.deleteGame(id);
+    }
+    return new Set([...abandoned, ...finished]).size;
+  }
+
+  public async purgeAllGames(): Promise<number> {
+    const ids = await Database.getInstance().getGameIds();
+    for (const id of ids) {
+      await this.deleteGame(id);
+    }
+    return ids.length;
+  }
+
   public sweep(): void {
     this.cache.sweep();
   }

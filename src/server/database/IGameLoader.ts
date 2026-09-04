@@ -36,6 +36,23 @@ export interface IGameLoader {
   mark(gameId: GameId): void;
 
   /**
+   * Permanently deletes a single game from both the database and the cache.
+   * Admin-only (games-overview purge button).
+   */
+  deleteGame(gameId: GameId): Promise<void>;
+
+  /**
+   * Purges every finished game, plus abandoned games (old and still running).
+   * Returns the number of games removed.
+   */
+  purgeFinishedAndAbandonedGames(): Promise<number>;
+
+  /**
+   * Permanently deletes every game on the server. Returns the number removed.
+   */
+  purgeAllGames(): Promise<number>;
+
+  /**
    * Saves a game (but takes into account that the game might have already been purged.)
    *
    * Do not call IDatabase.saveGame directly in a running system.
