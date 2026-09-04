@@ -14,7 +14,7 @@ export class SomeAssemblyRequired extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.SOME_ASSEMBLY_REQUIRED,
-      tags: [Tag.BUILDING],
+      tags: [Tag.BUILDING, Tag.CITY],
       cost: 20,
 
       metadata: {

@@ -9,5 +9,6 @@ export class MoonCards {
     CardName.NANOTECH_INDUSTRIES,
     CardName.APPLIED_SCIENCE,
     CardName.SPIRE,
+    CardName.SPIRE_TECH,
   ]);
 }

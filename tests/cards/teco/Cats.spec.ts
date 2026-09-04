@@ -3,7 +3,6 @@ import {Cats} from '../../../src/server/cards/teco/Cats';
 import {Birds} from '../../../src/server/cards/base/Birds';
 import {TileType} from '../../../src/common/TileType';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
-import {OrOptions} from '../../../src/server/inputs/OrOptions';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {cast} from '../../../src/common/utils/utils';
@@ -25,7 +24,7 @@ describe('Cats', () => {
     expect(card.resourceCount).to.eq(1);
   });
 
-  it('gains an animal on any city placement, with an optional steal from prey cards', () => {
+  it('steals an animal from the only eligible card when a city tile is placed', () => {
     const birds = new Birds();
     player2.playedCards.push(birds);
     player2.addResourceTo(birds, 3);
@@ -35,18 +34,37 @@ describe('Cats', () => {
     game.addCity(player2, space);
     runAllActions(game);
 
-    expect(card.resourceCount).to.eq(1);
     expect(space.tile?.tileType).to.eq(TileType.CITY);
-    const orOptions = cast(player.popWaitingFor(), OrOptions);
-    const selectCard = cast(orOptions.options[0], SelectCard);
-    selectCard.cb([birds]);
     expect(birds.resourceCount).to.eq(2);
+    expect(card.resourceCount).to.eq(1);
   });
 
-  it('still gains an animal when no prey card is in play', () => {
+  it('offers a choice when more than one card could be stolen from', () => {
+    const birds = new Birds();
+    player2.playedCards.push(birds);
+    player2.addResourceTo(birds, 3);
+    // Cats itself already holds an animal, so it's a second eligible target.
+    player.addResourceTo(card, 1);
+
     const game = player.game;
     const space = game.board.getAvailableSpacesForCity(player)[0];
     game.addCity(player, space);
+    runAllActions(game);
+
+    const selectCard = cast(player.popWaitingFor(), SelectCard);
+    expect(selectCard.cards).to.have.length(2);
+    selectCard.cb([birds]);
+    runAllActions(game);
+
+    expect(birds.resourceCount).to.eq(2);
+    expect(card.resourceCount).to.eq(2);
+  });
+
+  it('gains an animal directly when no player has any animal resource to steal', () => {
+    const game = player.game;
+    const space = game.board.getAvailableSpacesForCity(player)[0];
+    game.addCity(player, space);
+    runAllActions(game);
     expect(card.resourceCount).to.eq(1);
   });
 });

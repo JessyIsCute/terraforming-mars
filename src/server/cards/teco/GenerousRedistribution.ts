@@ -13,10 +13,10 @@ export class GenerousRedistribution extends PreludeCard {
       metadata: {
         cardNumber: 'T13',
         renderData: CardRenderer.builder((b) => {
-          b.tr(3, {all}).production((pb) => pb.megacredits(1, {all})).plants(2, {all}).cards(1, {all}).br;
-          b.text('you get twice that').colon().tr(6).production((pb) => pb.megacredits(2)).plants(4, {digit}).cards(2);
+          b.tr(3, {all}).plants(2, {all}).cards(1, {all}).br;
+          b.text('you get twice that').colon().tr(6).plants(4, {digit}).cards(2);
         }),
-        description: 'Every player gains 3 TR, 1 M€ production, 2 plants, and 1 card. You gain twice as much of each.',
+        description: 'Every player gains 3 TR, 2 plants, and 1 card. You gain twice as much of each.',
       },
     });
   }
@@ -25,7 +25,6 @@ export class GenerousRedistribution extends PreludeCard {
     for (const p of player.game.players) {
       const mult = p.id === player.id ? 2 : 1;
       p.increaseTerraformRating(3 * mult, {log: true});
-      p.production.add(Resource.MEGACREDITS, 1 * mult, {log: true});
       p.stock.add(Resource.PLANTS, 2 * mult, {log: true});
       p.drawCard(1 * mult);
     }

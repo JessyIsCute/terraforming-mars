@@ -647,6 +647,7 @@ export enum CardName {
   DEIMOS_DOUBLE_DOWN = 'Deimos Double Down?',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
+  NEREID_BIOTECH = 'Nereid Biotech',
 
   // Teco (new fan expansion)
   MOON_COW = 'Moon Cow',
@@ -669,6 +670,7 @@ export enum CardName {
   INSIDER_TRADING = 'Insider Trading',
   MARKET_CRASH = 'Market Crash',
   SHARED_KNOWLEDGE = 'Shared Knowledge',
+  SPIRE_TECH = 'SpireTech',
 
   // BetterMars replacement cards (swap into the base pool when BetterMars is on)
   LUNAR_BEAM_BETTER_MARS = 'Lunar Beam:bm',

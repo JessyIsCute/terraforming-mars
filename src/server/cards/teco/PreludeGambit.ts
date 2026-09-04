@@ -16,10 +16,10 @@ export class PreludeGambit extends PreludeCard {
       metadata: {
         cardNumber: 'T15',
         renderData: CardRenderer.builder((b) => {
-          b.minus().cards(10, {digit}).br;
+          b.minus().cards(7, {digit}).br;
           b.prelude().asterix();
         }),
-        description: 'Discard 10 cards. Draw 6 Prelude cards. You may play up to 2 of them; discard the rest.',
+        description: 'Discard 7 cards. Draw 6 Prelude cards. You may play up to 2 of them; discard the rest.',
       },
     });
   }
@@ -58,7 +58,7 @@ export class PreludeGambit extends PreludeCard {
 
   public override bespokePlay(player: IPlayer) {
     const game = player.game;
-    game.defer(new DiscardCards(player, 10, 10, 'Discard 10 cards')).andThen(() => {
+    game.defer(new DiscardCards(player, 7, 7, 'Discard 7 cards')).andThen(() => {
       const drawn = game.preludeDeck.drawN(game, 6);
       player.defer(() => this.offerPicks(player, drawn, 2));
       return undefined;

@@ -18,7 +18,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
     super({
       name: CardName.WELLNESS_DELUXE,
       tags: [Tag.EARTH],
-      startingMegaCredits: 33,
+      startingMegaCredits: 38,
 
       behavior: {
         stock: {heat: 4},
@@ -31,19 +31,19 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
 
       metadata: {
         cardNumber: 'XC1',
-        description: 'You start with 33 M€ and 4 heat. As your first action, place an ocean tile.',
+        description: 'You start with 38 M€ and 4 heat. As your first action, place an ocean tile.',
         renderData: CardRenderer.builder((b) => {
           b.br;
-          b.megacredits(33).nbsp.heat(4, {digit}).nbsp.oceans(1);
+          b.megacredits(38).nbsp.heat(4, {digit}).nbsp.oceans(1);
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
-            ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 3 heat.', (eb) => {
+            ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 4 heat.', (eb) => {
               eb.oceans(1, {size: Size.SMALL}).colon().production((pb) => pb.heat(1)).nbsp;
-              eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(3, {digit});
+              eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(4, {digit});
             });
-            ce.effect('When you raise the temperature, gain 2 M€.', (eb) => {
+            ce.effect('When you raise the temperature, gain 1 M€.', (eb) => {
               eb.temperature(1).startEffect;
-              eb.megacredits(2);
+              eb.megacredits(1);
             });
           });
         }),
@@ -56,7 +56,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
       return;
     }
     cardOwner.game.defer(
-      new GainResourcesDeferred(cardOwner, Resource.HEAT, {count: 3, log: true, from: {card: this}}),
+      new GainResourcesDeferred(cardOwner, Resource.HEAT, {count: 4, log: true, from: {card: this}}),
       cardOwner.id !== activePlayer.id ? Priority.OPPONENT_TRIGGER : undefined,
     );
     if (activePlayer.id === cardOwner.id) {
@@ -66,7 +66,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
 
   public onGlobalParameterIncrease(player: IPlayer, parameter: GlobalParameter, steps: number) {
     if (parameter === GlobalParameter.TEMPERATURE) {
-      player.stock.add(Resource.MEGACREDITS, 2 * steps, {log: true});
+      player.stock.add(Resource.MEGACREDITS, 1 * steps, {log: true});
     }
   }
 }

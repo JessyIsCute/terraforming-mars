@@ -19,6 +19,8 @@ export class PlantEater extends Card implements IProjectCard, IActionCard {
       cost: 10,
       victoryPoints: 1,
 
+      requirements: {production: Resource.PLANTS, count: 2},
+
       metadata: {
         cardNumber: 'T08',
         renderData: CardRenderer.builder((b) => {
@@ -29,10 +31,6 @@ export class PlantEater extends Card implements IProjectCard, IActionCard {
         description: 'Requires 2 plant production.',
       },
     });
-  }
-
-  public override bespokeCanPlay(player: IPlayer): boolean {
-    return player.production.plants >= 2;
   }
 
   public canAct(player: IPlayer): boolean {

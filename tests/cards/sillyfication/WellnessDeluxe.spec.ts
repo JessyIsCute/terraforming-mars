@@ -24,30 +24,30 @@ describe('WellnessDeluxe', () => {
     expect(player.heat).to.eq(4);
   });
 
-  it('placing your own ocean gains 1 heat production and 3 heat', () => {
+  it('placing your own ocean gains 1 heat production and 4 heat', () => {
     addOcean(player, '06');
     runAllActions(game);
 
     expect(player.production.heat).to.eq(1);
-    expect(player.heat).to.eq(3);
+    expect(player.heat).to.eq(4);
   });
 
-  it('another player placing an ocean gains you 3 heat but no production', () => {
+  it('another player placing an ocean gains you 4 heat but no production', () => {
     addOcean(player2, '06');
     runAllActions(game);
 
     expect(player.production.heat).to.eq(0);
-    expect(player.heat).to.eq(3);
+    expect(player.heat).to.eq(4);
     expect(player2.heat).to.eq(0);
   });
 
-  it('raising the temperature yourself gains 2 M€ per step', () => {
+  it('raising the temperature yourself gains 1 M€ per step', () => {
     setTemperature(game, -8);
     player.megaCredits = 0;
 
     game.increaseTemperature(player, 2);
 
-    expect(player.megaCredits).to.eq(4);
+    expect(player.megaCredits).to.eq(2);
   });
 
   it('does not gain M€ when another player raises the temperature', () => {

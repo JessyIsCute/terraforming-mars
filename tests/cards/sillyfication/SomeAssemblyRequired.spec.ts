@@ -8,6 +8,7 @@ import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {runAllActions} from '../../TestingUtils';
 import {cast} from '../../../src/common/utils/utils';
+import {Tag} from '../../../src/common/cards/Tag';
 
 describe('SomeAssemblyRequired', () => {
   let card: SomeAssemblyRequired;
@@ -18,6 +19,10 @@ describe('SomeAssemblyRequired', () => {
   beforeEach(() => {
     card = new SomeAssemblyRequired();
     [game, player, player2] = testGame(2);
+  });
+
+  it('has a building tag and a city tag', () => {
+    expect(card.tags).to.deep.eq([Tag.BUILDING, Tag.CITY]);
   });
 
   it('places a city and makes every player discard a card', () => {

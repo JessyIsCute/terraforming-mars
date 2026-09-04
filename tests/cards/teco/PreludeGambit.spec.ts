@@ -16,7 +16,7 @@ describe('PreludeGambit', () => {
     [/* game */, player] = testGame(2, {preludeExtension: true});
   });
 
-  it('discards down to 0 and draws 6 preludes, letting you play up to 2', () => {
+  it('discards 7 cards and draws 6 preludes, letting you play up to 2', () => {
     const game = player.game;
     player.cardsInHand = [];
     for (let i = 0; i < 12; i++) {
@@ -27,7 +27,7 @@ describe('PreludeGambit', () => {
     runAllActions(game);
 
     const discard = cast(player.popWaitingFor(), SelectCard);
-    discard.cb(discard.cards.slice(0, 10));
+    discard.cb(discard.cards.slice(0, 7));
     runAllActions(game);
 
     const firstPick = cast(player.popWaitingFor(), SelectCard<IPreludeCard>);

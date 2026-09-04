@@ -63,6 +63,7 @@ import {DeimosDoubleDown} from './DeimosDoubleDown';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
+import {NereidBiotech} from './NereidBiotech';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -70,6 +71,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.WELLNESS_DELUXE]: {Factory: WellnessDeluxe},
     [CardName.VENUS_VENTURES]: {Factory: VenusVentures, compatibility: 'venus'},
     [CardName.CRITTERWORLD]: {Factory: Critterworld},
+    [CardName.NEREID_BIOTECH]: {Factory: NereidBiotech},
   },
   preludeCards: {
     [CardName.DEIMOS_DOUBLE_DOWN]: {Factory: DeimosDoubleDown, compatibility: 'prelude'},

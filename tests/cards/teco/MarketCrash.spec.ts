@@ -14,20 +14,23 @@ describe('MarketCrash', () => {
     [/* game */, player, player2] = testGame(2, {preludeExtension: true});
   });
 
-  it('has a crime tag', () => {
-    expect(card.tags).to.deep.eq([Tag.CRIME]);
+  it('has two crime tags', () => {
+    expect(card.tags).to.deep.eq([Tag.CRIME, Tag.CRIME]);
   });
 
-  it('drops every player\'s TR by 2, and gives you 3 M€ production and 8 M€', () => {
+  it('drops every player\'s TR by 2 and M€ production by 3, and gives you 8 M€', () => {
     const trBefore = player.terraformRating;
     const tr2Before = player2.terraformRating;
     player.megaCredits = 0;
+    player.production.override({megacredits: 0});
+    player2.production.override({megacredits: 0});
 
     card.play(player);
 
     expect(player.terraformRating).to.eq(trBefore - 2);
     expect(player2.terraformRating).to.eq(tr2Before - 2);
-    expect(player.production.megacredits).to.eq(3);
+    expect(player.production.megacredits).to.eq(-3);
+    expect(player2.production.megacredits).to.eq(-3);
     expect(player.megaCredits).to.eq(8);
   });
 });
