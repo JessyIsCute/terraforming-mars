@@ -23,8 +23,8 @@ export class DeimosDoubleDown extends PreludeCard {
       metadata: {
         cardNumber: 'X76',
         renderData: CardRenderer.builder((b) => {
-          b.titanium(2, {digit}).cards(2, {secondaryTag: Tag.SPACE}).br;
-          b.text('copy to all').colon().cards(1, {secondaryTag: Tag.SPACE, all});
+          b.titanium(2, {digit}).cards(2, {secondaryTag: Tag.EVENT}).super((sb) => sb.tag(Tag.SPACE)).br;
+          b.text('copy to all').colon().cards(1, {secondaryTag: Tag.EVENT, all}).super((sb) => sb.tag(Tag.SPACE));
         }),
         description: 'Gain 2 titanium. Draw 2 Space event cards. Then choose a Space event in your hand; every player, including you, gets a copy of it.',
       },

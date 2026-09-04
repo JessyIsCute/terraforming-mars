@@ -40,8 +40,8 @@ describe('OvercrowdedColony', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('is worth -1 VP', () => {
-    expect(card.getVictoryPoints(player)).eq(-1);
+  it('is worth -2 VP', () => {
+    expect(card.getVictoryPoints(player)).eq(-2);
   });
 
   it('adds a fourth colony, grants the placement bonus, and trades for free', () => {

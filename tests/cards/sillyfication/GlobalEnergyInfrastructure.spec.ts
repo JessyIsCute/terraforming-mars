@@ -44,4 +44,13 @@ describe('GlobalEnergyInfrastructure', () => {
 
     expect(player.energy).to.eq(0);
   });
+
+  it('caps the gain at 5 energy', () => {
+    player.tagsForTest = {power: 8};
+    player.energy = 0;
+
+    card.onCardPlayed(player, new EnergySaving());
+
+    expect(player.energy).to.eq(5);
+  });
 });

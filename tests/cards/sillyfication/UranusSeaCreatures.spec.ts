@@ -10,9 +10,11 @@ describe('UranusSeaCreatures', () => {
   let card: UranusSeaCreatures;
   let player: TestPlayer;
 
+  let player2: TestPlayer;
+
   beforeEach(() => {
     card = new UranusSeaCreatures();
-    [/* game */, player] = testGame(2);
+    [/* game */, player, player2] = testGame(2);
     player.playedCards.push(card);
   });
 
@@ -23,15 +25,20 @@ describe('UranusSeaCreatures', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('adds an animal per Jovian tag played', () => {
-    card.onCardPlayed(player, new GanymedeColony()); // 1 jovian tag
+  it('adds an animal per Jovian tag played, including by this player', () => {
+    card.onCardPlayedByAnyPlayer(player, new GanymedeColony(), player); // 1 jovian tag
     expect(card.resourceCount).to.eq(1);
 
-    card.onCardPlayed(player, new WaterImportFromEuropa()); // 1 jovian tag
+    card.onCardPlayedByAnyPlayer(player, new WaterImportFromEuropa(), player); // 1 jovian tag
     expect(card.resourceCount).to.eq(2);
 
-    card.onCardPlayed(player, new MicroCredits()); // no jovian tag
+    card.onCardPlayedByAnyPlayer(player, new MicroCredits(), player); // no jovian tag
     expect(card.resourceCount).to.eq(2);
+  });
+
+  it('adds an animal when any other player plays a Jovian tag', () => {
+    card.onCardPlayedByAnyPlayer(player, new GanymedeColony(), player2); // 1 jovian tag
+    expect(card.resourceCount).to.eq(1);
   });
 
   it('scores 1 VP per animal', () => {

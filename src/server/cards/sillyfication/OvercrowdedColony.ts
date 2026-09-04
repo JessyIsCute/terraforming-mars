@@ -16,7 +16,7 @@ export class OvercrowdedColony extends Card implements IProjectCard {
       name: CardName.OVERCROWDED_COLONY,
       tags: [Tag.SPACE],
       cost: 8,
-      victoryPoints: -1,
+      victoryPoints: -2,
 
       metadata: {
         cardNumber: 'X50',

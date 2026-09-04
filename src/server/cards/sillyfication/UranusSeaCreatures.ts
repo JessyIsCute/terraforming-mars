@@ -7,6 +7,7 @@ import {IPlayer} from '../../IPlayer';
 import {ICard} from '../ICard';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
+import {all} from '../Options';
 
 export class UranusSeaCreatures extends Card implements IProjectCard {
   constructor() {
@@ -23,8 +24,8 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X41',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a Jovian tag, including this, add 1 animal to this card.', (eb) => {
-            eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.ANIMAL);
+          b.effect('When any player plays a Jovian tag, including this, add 1 animal to this card.', (eb) => {
+            eb.tag(Tag.JOVIAN, {all}).startEffect.resource(CardResource.ANIMAL);
           }).br;
           b.vpText('1 VP per animal on this card.');
         }),
@@ -33,16 +34,10 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
     });
   }
 
-  public onCardPlayed(player: IPlayer, card: ICard): void {
-    const qty = player.tags.cardTagCount(card, Tag.JOVIAN);
+  public onCardPlayedByAnyPlayer(cardOwner: IPlayer, card: ICard, activePlayer: IPlayer): void {
+    const qty = activePlayer.tags.cardTagCount(card, Tag.JOVIAN);
     if (qty > 0) {
-      player.addResourceTo(this, {qty, log: true});
-    }
-  }
-
-  public onNonCardTagAdded(player: IPlayer, tag: Tag): void {
-    if (tag === Tag.JOVIAN) {
-      player.addResourceTo(this, {qty: 1, log: true});
+      cardOwner.addResourceTo(this, {qty, log: true});
     }
   }
 }

@@ -25,8 +25,7 @@ describe('FailedExperiment', () => {
     expect(card.getVictoryPoints(player)).to.eq(-1);
   });
 
-  it('discards a card, then draws 2 and gains 2 M€', () => {
-    player.megaCredits = 0;
+  it('discards a card, then draws 2', () => {
     const toDiscard = new MicroCredits();
     player.cardsInHand = [toDiscard];
 
@@ -35,7 +34,6 @@ describe('FailedExperiment', () => {
     cast(player.popWaitingFor(), SelectCard).cb([toDiscard]);
     runAllActions(player.game);
 
-    expect(player.megaCredits).to.eq(2);
     // Discarded the 1 held card, drew 2.
     expect(player.cardsInHand).to.have.length(2);
   });

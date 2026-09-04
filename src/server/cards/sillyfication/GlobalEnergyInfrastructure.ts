@@ -25,9 +25,9 @@ export class GlobalEnergyInfrastructure extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X34',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a power tag, including this, gain 1 energy for each power tag you have.', (eb) => {
+          b.effect('When you play a power tag, including this, gain 1 energy for each power tag you have, up to 5.', (eb) => {
             eb.tag(Tag.POWER).startEffect.energy(1).slash().tag(Tag.POWER);
-          }).br;
+          }).asterix().br;
           b.production((pb) => pb.energy(3));
         }),
         description: 'Requires 2 power tags. Increase your energy production 3 steps.',
@@ -37,7 +37,7 @@ export class GlobalEnergyInfrastructure extends Card implements IProjectCard {
 
   public onCardPlayed(player: IPlayer, card: ICard) {
     if (card.tags.includes(Tag.POWER)) {
-      player.stock.add(Resource.ENERGY, player.tags.count(Tag.POWER), {log: true});
+      player.stock.add(Resource.ENERGY, Math.min(player.tags.count(Tag.POWER), 5), {log: true});
     }
   }
 }

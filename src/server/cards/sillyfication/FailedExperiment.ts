@@ -17,15 +17,14 @@ export class FailedExperiment extends Card implements IProjectCard {
       behavior: {
         spend: {cards: 1},
         drawCard: 2,
-        stock: {megacredits: 2},
       },
 
       metadata: {
         cardNumber: 'X12',
         renderData: CardRenderer.builder((b) => {
-          b.minus().cards(1).colon().cards(2).megacredits(2);
+          b.minus().cards(1).colon().cards(2);
         }),
-        description: 'Discard 1 card from your hand. Draw 2 cards and gain 2 M€.',
+        description: 'Discard 1 card from your hand. Draw 2 cards.',
       },
     });
   }

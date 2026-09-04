@@ -11,19 +11,19 @@ export class DisruptiveStartup extends ActionCard implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.DISRUPTIVE_STARTUP,
       tags: [Tag.SCIENCE, Tag.EARTH],
-      cost: 11,
+      cost: 14,
       victoryPoints: -1,
 
       action: {
         spend: {cards: 1},
-        stock: {megacredits: 4},
+        stock: {megacredits: 5},
       },
 
       metadata: {
         cardNumber: 'X13',
         renderData: CardRenderer.builder((b) => {
-          b.action('Discard a card to gain 4 M€.', (eb) => {
-            eb.cards(1).startAction.megacredits(4);
+          b.action('Sell a card from hand to gain 5 M€.', (eb) => {
+            eb.cards(1).startAction.megacredits(5);
           });
         }),
       },
