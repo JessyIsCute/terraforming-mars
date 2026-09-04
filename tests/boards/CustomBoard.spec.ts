@@ -58,6 +58,19 @@ describe('CustomBoard', () => {
     expect(board.getSpaces(SpaceType.LAND).some((s) => s.id === def.spaces[10].id)).is.true;
   });
 
+  it('treats coves as both land and ocean', () => {
+    const def = blankCustomBoard(9, 'Coves');
+    def.spaces[12].spaceType = SpaceType.COVE;
+    const board = build(def);
+    const coveId = def.spaces[12].id;
+    expect(board.getSpaces(SpaceType.LAND).some((s) => s.id === coveId)).is.true;
+    expect(board.getSpaces(SpaceType.OCEAN).some((s) => s.id === coveId)).is.true;
+
+    const player = TestPlayer.BLUE.newPlayer();
+    (player as any).game = {gameOptions: DEFAULT_GAME_OPTIONS, nomadSpace: undefined};
+    expect(board.getAvailableSpacesForOcean(player).some((s) => s.id === coveId)).is.true;
+  });
+
   it('excludes reserved spaces from placement', () => {
     const def = blankCustomBoard(9, 'Reserved');
     def.spaces[20].reserved = true;

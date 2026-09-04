@@ -39,11 +39,19 @@ export class CustomBoard extends MarsBoard {
   }
 
   public override getSpaces(spaceType: SpaceType): Array<Space> {
-    // Deflection zones count as land, like Hollandia.
-    if (spaceType === SpaceType.LAND) {
-      return this.spaces.filter((s) => s.spaceType === SpaceType.LAND || s.spaceType === SpaceType.DEFLECTION_ZONE);
+    switch (spaceType) {
+    case SpaceType.LAND:
+      // Deflection zones count as land (Hollandia); coves count as both land and ocean
+      // (Arabia Terra).
+      return this.spaces.filter((s) =>
+        s.spaceType === SpaceType.LAND ||
+        s.spaceType === SpaceType.DEFLECTION_ZONE ||
+        s.spaceType === SpaceType.COVE);
+    case SpaceType.OCEAN:
+      return this.spaces.filter((s) => s.spaceType === SpaceType.OCEAN || s.spaceType === SpaceType.COVE);
+    default:
+      return this.spaces.filter((s) => s.spaceType === spaceType);
     }
-    return this.spaces.filter((s) => s.spaceType === spaceType);
   }
 }
 
