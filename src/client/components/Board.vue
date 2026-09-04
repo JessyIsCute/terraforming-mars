@@ -20,7 +20,7 @@
           <BoardSpace v-if="hasSpace(SpaceName.VENERA_BASE)" :space="getSpace(SpaceName.VENERA_BASE)" text="Venera Base" :tileView="tileView"/>
         </div>
 
-        <div class="global-numbers" :class="{'global-numbers--custom': isCustomBoard}">
+        <div class="global-numbers" :class="{'global-numbers--custom': isCustomBoard && !useStandardTrackLayout}">
             <div class="global-numbers-temperature">
                 <div :class="getScaleCSS(lvl)" v-for="(lvl, idx) in getValuesForParameter('temperature')" :key="idx">{{ lvl.strValue }}</div>
             </div>
@@ -73,7 +73,7 @@
             </div>
         </div>
 
-        <div :class="['board', {'board--custom': isCustomBoard}]" :style="boardStyle" id="main_board">
+        <div :class="['board', {'board--custom': isCustomBoard && !useStandardTrackLayout, 'board--custom-fit': useStandardTrackLayout}]" :style="boardStyle" id="main_board">
             <BoardSpace
               v-for="curSpace in getAllSpacesOnMars()"
               :key="curSpace.id"
@@ -503,7 +503,7 @@ export default defineComponent({
       }
     },
     getGameBoardClassName(): string {
-      if (this.isCustomBoard) {
+      if (this.isCustomBoard && !this.useStandardTrackLayout) {
         return 'board-cont board-cont--custom';
       }
       return this.expansions.venus ? 'board-cont board-with-venus' : 'board-cont board-without-venus';
@@ -518,6 +518,13 @@ export default defineComponent({
     },
     isCustomBoard(): boolean {
       return this.boardName === BoardName.CUSTOM;
+    },
+    // A custom board that uses the official parameter tracks keeps the painted Mars image and
+    // its curved temperature/oxygen/Venus scales, and the hex grid is scaled to fit inside
+    // that curve. Only a board with stretched/custom parameters falls back to the plain
+    // flow-layout readout.
+    useStandardTrackLayout(): boolean {
+      return this.isCustomBoard && this.globalParameters === undefined;
     },
     oceanMax(): number {
       return this.globalParameters?.oceans.max ?? constants.MAX_OCEAN_TILES;
@@ -538,8 +545,38 @@ export default defineComponent({
       if (!this.isCustomBoard) {
         return undefined;
       }
+      if (this.useStandardTrackLayout) {
+        // Scale + shift the hex cloud so it fills the standard painted diamond, leaving the
+        // curved parameter scales (siblings, not children) exactly where the artwork puts them.
+        return {transform: this.fitTransform, transformOrigin: '0 0'};
+      }
       const {width, height} = customBoardPixelSize(this.customExtent.maxX, this.customExtent.maxY);
       return {width: `${width}px`, height: `${height}px`};
+    },
+    fitTransform(): string {
+      const maxY = this.customExtent.maxY;
+      let minL = Infinity;
+      let minT = Infinity;
+      let maxL = -Infinity;
+      let maxT = -Infinity;
+      for (const space of this.spaces) {
+        if (space.spaceType === SpaceType.COLONY) {
+          continue;
+        }
+        const p = customSpacePixel(space.x, space.y, maxY);
+        minL = Math.min(minL, p.left);
+        minT = Math.min(minT, p.top);
+        maxL = Math.max(maxL, p.left);
+        maxT = Math.max(maxT, p.top);
+      }
+      const custW = (maxL - minL) + 46;
+      const custH = (maxT - minT) + 51;
+      // The standard 9-row diamond, in #main_board local pixels (from customSpacePixel).
+      const std = {left: 6, top: 34, width: 438, height: 379};
+      const scale = Math.min(std.width / custW, std.height / custH);
+      const tx = (std.left - minL * scale) + (std.width - custW * scale) / 2;
+      const ty = (std.top - minT * scale) + (std.height - custH * scale) / 2;
+      return `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${scale.toFixed(4)})`;
     },
     LEGENDS(): typeof LEGENDS {
       return LEGENDS;
