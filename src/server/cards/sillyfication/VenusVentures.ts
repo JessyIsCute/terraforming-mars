@@ -16,14 +16,14 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
     super({
       name: CardName.VENUS_VENTURES,
       tags: [Tag.VENUS, Tag.VENUS],
-      startingMegaCredits: 54,
+      startingMegaCredits: 48,
       resourceType: CardResource.FLOATER,
 
       metadata: {
         cardNumber: 'XC2',
-        description: 'You start with 54 M€.',
+        description: 'You start with 48 M€.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(54);
+          b.megacredits(48);
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you play a Venus tag, including this, add 2 floaters to any card.', (eb) => {
