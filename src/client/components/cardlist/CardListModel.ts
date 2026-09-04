@@ -42,6 +42,7 @@ const MODULE_ABBREVIATIONS = {
   deltaProject: 'd',
   sillyfication: 'y',
   betterMars: 'B',
+  teco: 'T',
 } satisfies Record<GameModule, string>;
 
 const TYPE_ABBREVIATIONS = {
@@ -104,6 +105,7 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       deltaProject: true,
       sillyfication: true,
       betterMars: true,
+      teco: true,
     },
     types: {
       event: true,

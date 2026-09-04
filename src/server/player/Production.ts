@@ -34,5 +34,14 @@ export class Production extends BaseStock {
     for (const card of this.player.tableau) {
       card.onProductionGain?.(this.player, resource, amount);
     }
+
+    // `this.player.game` may not be wired up yet in a few test-only construction paths.
+    if (this.player.game !== undefined) {
+      for (const cardOwner of this.player.game.playersInGenerationOrder) {
+        for (const card of cardOwner.tableau) {
+          card.onProductionGainByAnyPlayer?.(cardOwner, this.player, resource, amount);
+        }
+      }
+    }
   }
 }

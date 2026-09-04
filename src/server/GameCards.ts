@@ -26,6 +26,7 @@ import {STAR_WARS_CARD_MANIFEST} from './cards/starwars/StarwarsCardManifest';
 import {UNDERWORLD_CARD_MANIFEST} from './cards/underworld/UnderworldCardManifest';
 import {SILLYFICATION_CARD_MANIFEST} from './cards/sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManifest';
+import {TECO_CARD_MANIFEST} from './cards/teco/TecoCardManifest';
 
 /**
  * Returns the cards available to a game based on its `GameOptions`.
@@ -65,6 +66,7 @@ export class GameCards {
       [gameOptions.underworldExpansion, UNDERWORLD_CARD_MANIFEST],
       [gameOptions.sillyficationExpansion, SILLYFICATION_CARD_MANIFEST],
       [gameOptions.betterMarsExpansion, BETTER_MARS_CARD_MANIFEST],
+      [gameOptions.tecoExpansion, TECO_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests

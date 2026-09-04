@@ -558,9 +558,12 @@ export class Player implements IPlayer {
       for (const playedCard of this.tableau) {
         playedCard.onResourceAdded?.(this, card, count);
       }
-      for (const cardOwner of this.game.playersInGenerationOrder) {
-        for (const playedCard of cardOwner.tableau) {
-          playedCard.onResourceAddedByAnyPlayer?.(cardOwner, this, card, count);
+      // `this.game` may not be wired up yet in a few test-only construction paths.
+      if (this.game !== undefined) {
+        for (const cardOwner of this.game.playersInGenerationOrder) {
+          for (const playedCard of cardOwner.tableau) {
+            playedCard.onResourceAddedByAnyPlayer?.(cardOwner, this, card, count);
+          }
         }
       }
     }

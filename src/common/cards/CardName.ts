@@ -648,6 +648,27 @@ export enum CardName {
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
+  // Teco (new fan expansion)
+  MOON_COW = 'Moon Cow',
+  UNDERGROUND_WORMS = 'Underground Worms',
+  VENUPHILE = 'Venuphile',
+  TAG_TAXER = 'Tag Taxer',
+  AMPHIBIANS = 'Amphibians',
+  COLD_BLOODED = 'Cold Blooded',
+  SPACE_OFFICE = 'Space Office',
+  PLANT_EATER = 'Plant Eater',
+  SMELTING_PODS = 'Smelting Pods',
+  MANUWHACK = 'Manuwhack',
+  BURN_THE_FOREST = 'Burn the Forest',
+  CATS = 'Cats',
+  GENEROUS_REDISTRIBUTION = 'Generous Redistribution',
+  SLOW_START = 'Slow Start',
+  PRELUDE_GAMBIT = 'Prelude Gambit',
+  BALANCE = 'Balance',
+  MARS_HOMESTEAD_ACT = 'Mars Homestead Act',
+  INSIDER_TRADING = 'Insider Trading',
+  MARKET_CRASH = 'Market Crash',
+
   // BetterMars replacement cards (swap into the base pool when BetterMars is on)
   LUNAR_BEAM_BETTER_MARS = 'Lunar Beam:bm',
   LUNA_METROPOLIS_BETTER_MARS = 'Luna Metropolis:bm',

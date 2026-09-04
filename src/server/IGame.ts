@@ -55,6 +55,7 @@ export interface IGame extends Logger {
   undoCount: number; // Each undo increases it
   inputsThisRound: number;
   resettable: boolean;
+  skipGeneration1Actions: boolean;
   generation: number;
   readonly players: ReadonlyArray<IPlayer>;
   readonly playersInGenerationOrder: ReadonlyArray<IPlayer>;

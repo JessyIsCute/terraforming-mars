@@ -145,6 +145,13 @@ export interface ICard {
    */
   onProductionGain?(player: IPlayer, resource: Resource, amount: number): void;
   /**
+   * Callback when ANY player gains (or loses) production.
+   *
+   * @param cardOwner the player who owns THIS CARD.
+   * @param activePlayer the player whose production changed.
+   */
+  onProductionGainByAnyPlayer?(cardOwner: IPlayer, activePlayer: IPlayer, resource: Resource, amount: number): void;
+  /**
    * Callback during the production phase. Used to reset between generations.
    *
    * @param player the card owner.

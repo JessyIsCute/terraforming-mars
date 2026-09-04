@@ -23,3 +23,4 @@ export const UNDERWORLDEXPANSION = 'underworldExpansion';
 export const DELTA_PROJECT_EXPANSION = 'deltaProjectExpansion';
 export const SILLYFICATION_EXPANSION = 'sillyficationExpansion';
 export const BETTER_MARS_EXPANSION = 'betterMarsExpansion';
+export const TECO_EXPANSION = 'tecoExpansion';
