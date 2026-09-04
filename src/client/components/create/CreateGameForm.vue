@@ -211,6 +211,19 @@
                                   </template>
                               </label>
                             </div>
+
+                            <div class="create-game-subsection-label" style="margin-top: 8px;">
+                              <label for="custom-map-code" v-i18n>Custom map code</label>
+                              <textarea
+                                id="custom-map-code"
+                                rows="2"
+                                style="width: 100%; font-family: monospace; font-size: 11px;"
+                                placeholder="Paste a TMB2… code from the map editor"
+                                v-model="customBoardCodeInput"
+                                @input="applyCustomBoardCode"></textarea>
+                              <div v-if="customBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customBoardCodeError }}</div>
+                              <div v-else-if="customBoardCode !== undefined" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom map: {{ customBoardName }}</div>
+                            </div>
                         </div>
 
                         <div class="create-game-page-column">
@@ -635,9 +648,11 @@ type FormModel = {
   preludeToggled: boolean;
   uploading: boolean;
   previousViewport: string;
-  /** Opaque map-editor code carried over via "Play with this map". */
+  /** Opaque map-editor code, from "Play with this map" or pasted into the form. */
   customBoardCode: string | undefined;
   customBoardName: string;
+  customBoardCodeInput: string;
+  customBoardCodeError: string;
 };
 
 export default defineComponent({
@@ -650,6 +665,8 @@ export default defineComponent({
       previousViewport: '',
       customBoardCode: undefined,
       customBoardName: '',
+      customBoardCodeInput: '',
+      customBoardCodeError: '',
     };
   },
   components: {
@@ -782,12 +799,29 @@ export default defineComponent({
       if (code === null) {
         return;
       }
-      this.customBoardCode = code;
-      this.board = BoardName.CUSTOM;
+      this.customBoardCodeInput = code;
+      this.applyCustomBoardCode();
+    },
+    applyCustomBoardCode() {
+      const code = this.customBoardCodeInput.trim();
+      if (code === '') {
+        this.customBoardCode = undefined;
+        this.customBoardName = '';
+        this.customBoardCodeError = '';
+        if (this.board === BoardName.CUSTOM) {
+          this.board = BoardName.THARSIS;
+        }
+        return;
+      }
       try {
         this.customBoardName = decodeCustomBoard(code).name;
+        this.customBoardCode = code;
+        this.customBoardCodeError = '';
+        this.board = BoardName.CUSTOM;
       } catch (e) {
-        this.customBoardName = 'custom map';
+        this.customBoardCode = undefined;
+        this.customBoardName = '';
+        this.customBoardCodeError = e instanceof Error ? e.message : String(e);
       }
     },
     restoreLastSettings() {

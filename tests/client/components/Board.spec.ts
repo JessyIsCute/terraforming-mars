@@ -154,6 +154,19 @@ describe('Board', () => {
     expect(wrapper.find('#main_board').attributes('style') ?? '').to.match(/scale\(/);
   });
 
+  it('plugs carved-out (void) cells of a custom board', () => {
+    // A 5-row board (19 cells) with only 2 spaces present -> 17 void plugs.
+    const twoSpaces: SpaceModel[] = [
+      {id: '100', x: 2, y: 0, bonus: [], spaceType: SpaceType.LAND, color: undefined, highlight: undefined, tileType: undefined},
+      {id: '101', x: 2, y: 4, bonus: [], spaceType: SpaceType.LAND, color: undefined, highlight: undefined, tileType: undefined},
+    ];
+    const wrapper = shallowMount(Board, {
+      ...globalConfig,
+      props: {spaces: twoSpaces, expansions: DEFAULT_EXPANSIONS, tileView: 'show', venusScaleLevel: 0, boardName: BoardName.CUSTOM, customBoardRows: 5},
+    });
+    expect(wrapper.findAll('.board-space--void-plug')).to.have.length(17);
+  });
+
   it('drops the painting for a plain readout when parameters are stretched', () => {
     const wrapper = shallowMount(Board, {
       ...globalConfig,

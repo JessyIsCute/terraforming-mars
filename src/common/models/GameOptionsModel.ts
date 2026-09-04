@@ -12,6 +12,8 @@ export type GameOptionsModel = {
   boardName: BoardName,
   /** Global-parameter track overrides (custom boards only); absent means the official tracks. */
   globalParameters?: GlobalParametersConfig,
+  /** Row count of a custom board, so the client can render its voided (carved-out) cells. */
+  customBoardRows?: number,
   bannedCards: ReadonlyArray<CardName>;
   expansions: Record<Expansion, boolean>,
   draftVariant: boolean,

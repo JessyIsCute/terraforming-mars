@@ -84,6 +84,13 @@
               data-test="board-space"
             />
 
+            <div
+              v-for="(plug, idx) in voidPlugs"
+              :key="'void-' + idx"
+              class="board-space board-space--void-plug"
+              :style="{margin: plug.top + 'px 0 0 ' + plug.left + 'px'}"
+            ></div>
+
             <svg v-if="!isCustomBoard" id="board_legend" height="550" width="630" class="board-legend">
               <g v-for="(key, idx) of LEGENDS[boardName]" :key="idx" :transform="`translate(${key.position[0]}, ${key.position[1]})`">
                 <text class="board-caption">
@@ -361,7 +368,7 @@ import {SpaceType} from '@/common/boards/SpaceType';
 import {SpaceId} from '@/common/Types';
 import {TileView} from '@/client/components/board/TileView';
 import {BoardName} from '@/common/boards/BoardName';
-import {customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
+import {customBoardPixelSize, customSpacePixel, hexRowLayout} from '@/common/boards/CustomBoardDefinition';
 import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig} from '@/common/GlobalParameterConfig';
 import {LEGENDS} from '@/client/components/Legends';
 import {Expansion} from '@/common/cards/GameModule';
@@ -392,6 +399,10 @@ export default defineComponent({
     },
     globalParameters: {
       type: Object as () => GlobalParametersConfig | undefined,
+      default: undefined,
+    },
+    customBoardRows: {
+      type: Number,
       default: undefined,
     },
     oceans_count: {
@@ -552,6 +563,31 @@ export default defineComponent({
       }
       const {width, height} = customBoardPixelSize(this.customExtent.maxX, this.customExtent.maxY);
       return {width: `${width}px`, height: `${height}px`};
+    },
+    // Pixel positions of the carved-out (void) cells of a custom board, so they can be
+    // plugged with an opaque hex instead of showing the painted board through the hole.
+    voidPlugs(): Array<{left: number, top: number}> {
+      if (!this.isCustomBoard) {
+        return [];
+      }
+      const maxY = this.customExtent.maxY;
+      const rows = this.customBoardRows ?? (maxY + 1);
+      const present = new Set<string>();
+      for (const space of this.spaces) {
+        if (space.spaceType !== SpaceType.COLONY) {
+          present.add(`${space.x},${space.y}`);
+        }
+      }
+      const plugs: Array<{left: number, top: number}> = [];
+      for (const row of hexRowLayout(rows)) {
+        for (let i = 0; i < row.width; i++) {
+          const x = row.xOffset + i;
+          if (!present.has(`${x},${row.y}`)) {
+            plugs.push(customSpacePixel(x, row.y, maxY));
+          }
+        }
+      }
+      return plugs;
     },
     fitTransform(): string {
       const maxY = this.customExtent.maxY;

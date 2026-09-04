@@ -416,6 +416,7 @@ export class Server {
       aresExtremeVariant: options.aresExtremeVariant,
       boardName: options.boardName,
       globalParameters: options.globalParameters,
+      customBoardRows: options.customBoard?.rows,
       bannedCards: options.bannedCards,
       draftVariant: options.draftVariant,
       escapeVelocity: options.escapeVelocity,

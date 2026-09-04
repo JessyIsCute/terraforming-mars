@@ -7,6 +7,7 @@
     :venusScaleLevel="game.venusScaleLevel"
     :boardName ="game.gameOptions.boardName"
     :globalParameters="game.gameOptions.globalParameters"
+    :customBoardRows="game.gameOptions.customBoardRows"
     :oceans_count="game.oceans"
     :oxygen_level="game.oxygenLevel"
     :temperature="game.temperature"

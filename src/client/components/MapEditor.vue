@@ -136,6 +136,7 @@
         :venusScaleLevel="0"
         :boardName="BoardName.CUSTOM"
         :globalParameters="definition.globalParameters"
+        :customBoardRows="rows"
         tileView="show"
       />
     </div>
@@ -589,13 +590,12 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
 
     &:hover { filter: brightness(1.25); }
 
-    // A void is an absence: no hex shape, just a faint clickable slot.
+    // A void is an absence: a faint recessed hex you can click to bring back.
     &--void {
-      background: transparent;
-      clip-path: none;
-      border: 1px dashed rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
       cursor: cell;
-      &:hover { filter: none; background: rgba(255, 255, 255, 0.06); }
+      &:hover { filter: none; background: rgba(255, 255, 255, 0.07); }
     }
 
     // RESTRICTED has no board sprite of its own.
