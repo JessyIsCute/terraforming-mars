@@ -342,8 +342,35 @@ export default defineComponent({
     },
     gridStyle(): Record<string, string> {
       const maxY = this.rows - 1;
-      const p = customSpacePixel(maxY, maxY / 2, maxY);
-      return {width: `${p.left + 90}px`, height: `${customSpacePixel(0, maxY, maxY).top + 90}px`};
+      let minL = Infinity;
+      let minT = Infinity;
+      let maxL = -Infinity;
+      let maxT = -Infinity;
+      for (const row of hexRowLayout(this.rows)) {
+        for (let i = 0; i < row.width; i++) {
+          const p = customSpacePixel(row.xOffset + i, row.y, maxY);
+          minL = Math.min(minL, p.left);
+          minT = Math.min(minT, p.top);
+          maxL = Math.max(maxL, p.left);
+          maxT = Math.max(maxT, p.top);
+        }
+      }
+      // Scale/position mars-without-venus.png (620x600) so its painted diamond -- hex box
+      // [6,444]x[34,413] within #main_board, offset (93,85) in the image -- lands under the
+      // editor's hex bounding box, so the backdrop lines up with the hexes as in the preview.
+      const img = {left: 99, top: 119, width: 438, height: 379};
+      const sx = ((maxL - minL) + 46) / img.width;
+      const sy = ((maxT - minT) + 51) / img.height;
+      const bgX = (minL - img.left * sx).toFixed(1);
+      const bgY = (minT - img.top * sy).toFixed(1);
+      return {
+        width: `${maxL + 90}px`,
+        height: `${maxT + 90}px`,
+        background:
+          'linear-gradient(rgba(21, 19, 31, 0.55), rgba(21, 19, 31, 0.55)) local, ' +
+          `url("/assets/board/mars-without-venus.png") local no-repeat ${bgX}px ${bgY}px / ${(620 * sx).toFixed(1)}px ${(600 * sy).toFixed(1)}px, ` +
+          '#15131f',
+      };
     },
   },
   methods: {
@@ -575,11 +602,8 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
 
   .map-editor-grid {
     position: relative;
-    // Mars planet as a dimmed backdrop; a carved (void) hex just shows this through.
-    background:
-      linear-gradient(rgba(21, 19, 31, 0.55), rgba(21, 19, 31, 0.55)),
-      url("/assets/board/mars-without-venus.png") no-repeat center / cover,
-      #15131f;
+    // The Mars backdrop is set inline (gridStyle) so it aligns with the hexes; this is a fallback.
+    background: #15131f;
     border-radius: 6px;
     overflow: auto;
     max-height: 60vh;
