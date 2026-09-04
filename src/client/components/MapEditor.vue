@@ -596,18 +596,20 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
 
     &:hover { filter: brightness(1.25); }
 
-    // A void is an absence: a faint recessed hex you can click to bring back.
+    // A void is an absence: nothing painted, so the dark grid shows straight through.
+    // (No box-shadow here -- box-shadow is not clipped by clip-path and would draw a
+    // square outline around the hex.)
     &--void {
-      background: rgba(0, 0, 0, 0.25);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      background: transparent;
       cursor: cell;
-      &:hover { filter: none; background: rgba(255, 255, 255, 0.07); }
+      &:hover { filter: none; background: rgba(255, 255, 255, 0.06); }
     }
 
     // RESTRICTED has no board sprite of its own.
     &--restricted { background-color: rgba(70, 70, 78, 0.85); }
 
-    &--reserved { box-shadow: inset 0 0 0 3px #f1c40f; }
+    // Tint (not box-shadow, which isn't clipped) to mark a reserved space over its terrain.
+    &--reserved { background-color: rgba(241, 196, 15, 0.55); }
   }
 
   .map-editor-hex-bonuses {
