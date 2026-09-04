@@ -22,7 +22,7 @@ describe('ShowAndTell', () => {
     [game, player, player2, player3] = testGame(3);
     player.cardsInHand = [];
     player2.cardsInHand = [new Ants()];
-    player3.cardsInHand = [new Birds(), new Comet()];
+    player3.cardsInHand = [new Birds(), new Comet(), new Comet()];
   });
 
   it('cannot be played when no opponent holds a card', () => {
@@ -31,24 +31,36 @@ describe('ShowAndTell', () => {
     expect(card.canPlay(player)).is.false;
   });
 
-  it('each opponent reveals one card and the active player takes one of them', () => {
+  it('each opponent reveals up to 2 cards and the active player takes 2 of them', () => {
     card.play(player);
     runAllActions(game);
 
-    cast(player2.popWaitingFor(), SelectCard).cb([player2.cardsInHand[0]]);
+    // player2 only holds 1 card, so they reveal just that one.
+    const p2reveal = cast(player2.popWaitingFor(), SelectCard);
+    expect(p2reveal.config.min).to.eq(1);
+    expect(p2reveal.config.max).to.eq(1);
+    p2reveal.cb([player2.cardsInHand[0]]);
     runAllActions(game);
+
+    // player3 holds 3 cards, so they reveal 2 of them.
     const p3reveal = cast(player3.popWaitingFor(), SelectCard);
-    p3reveal.cb([player3.cardsInHand.find((c) => c.name === 'Birds')!]);
+    expect(p3reveal.config.min).to.eq(2);
+    expect(p3reveal.config.max).to.eq(2);
+    const birds = player3.cardsInHand.find((c) => c.name === 'Birds')!;
+    const comet = player3.cardsInHand.find((c) => c.name === 'Comet')!;
+    p3reveal.cb([birds, comet]);
     runAllActions(game);
 
     const take = cast(player.popWaitingFor(), SelectCard);
-    expect(take.cards.map((c) => c.name).sort()).to.deep.eq(['Ants', 'Birds']);
-    take.cb([take.cards.find((c) => c.name === 'Birds')!]);
+    expect(take.cards.map((c) => c.name).sort()).to.deep.eq(['Ants', 'Birds', 'Comet']);
+    expect(take.config.min).to.eq(2);
+    expect(take.config.max).to.eq(2);
+    take.cb([birds, player2.cardsInHand[0]]);
     runAllActions(game);
 
-    expect(player.cardsInHand.map((c) => c.name)).to.deep.eq(['Birds']);
-    expect(player3.cardsInHand.map((c) => c.name)).to.deep.eq(['Comet']);
-    // The card that was revealed but not taken stays in its owner's hand.
-    expect(player2.cardsInHand.map((c) => c.name)).to.deep.eq(['Ants']);
+    expect(player.cardsInHand.map((c) => c.name).sort()).to.deep.eq(['Ants', 'Birds']);
+    // The revealed card that wasn't taken is returned to its owner.
+    expect(player3.cardsInHand.map((c) => c.name).sort()).to.deep.eq(['Comet', 'Comet']);
+    expect(player2.cardsInHand).to.have.length(0);
   });
 });
