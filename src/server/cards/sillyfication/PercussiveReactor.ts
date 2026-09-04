@@ -27,11 +27,11 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
       metadata: {
         cardNumber: 'X10',
         renderData: CardRenderer.builder((b) => {
-          b.action('Spend 1 energy to gain 4 heat.', (eb) => {
-            eb.energy(1).startAction.heat(4, {digit});
+          b.action('Spend 2 energy to gain 7 heat.', (eb) => {
+            eb.energy(2).startAction.heat(7, {digit});
           }).br;
-          b.action('Blow up the reactor: raise temperature 1 step. This card then becomes unusable.', (eb) => {
-            eb.empty().startAction.temperature(1).asterix();
+          b.action('Blow up the reactor: raise temperature 2 steps. This card then becomes unusable.', (eb) => {
+            eb.empty().startAction.temperature(2).asterix();
           });
         }),
       },
@@ -45,16 +45,16 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
   public action(player: IPlayer) {
     const options = new OrOptions();
 
-    if (player.energy >= 1) {
-      options.options.push(new SelectOption('Spend 1 energy to gain 4 heat', 'Whack it').andThen(() => {
-        player.stock.deduct(Resource.ENERGY, 1);
-        player.stock.add(Resource.HEAT, 4, {log: true});
+    if (player.energy >= 2) {
+      options.options.push(new SelectOption('Spend 2 energy to gain 7 heat', 'Whack it').andThen(() => {
+        player.stock.deduct(Resource.ENERGY, 2);
+        player.stock.add(Resource.HEAT, 7, {log: true});
         return undefined;
       }));
     }
 
-    options.options.push(new SelectOption('Blow up the reactor: raise temperature 1 step (this card becomes unusable)', 'Blow it up').andThen(() => {
-      player.game.increaseTemperature(player, 1);
+    options.options.push(new SelectOption('Blow up the reactor: raise temperature 2 steps (this card becomes unusable)', 'Blow it up').andThen(() => {
+      player.game.increaseTemperature(player, 2);
       this.isDisabled = true;
       player.game.log('${0} blew up ${1}', (b) => b.player(player).card(this));
       return undefined;

@@ -2,8 +2,12 @@ import {expect} from 'chai';
 import {SpaceOffice} from '../../../src/server/cards/teco/SpaceOffice';
 import {Comet} from '../../../src/server/cards/base/Comet';
 import {Sponsors} from '../../../src/server/cards/base/Sponsors';
+import {OrOptions} from '../../../src/server/inputs/OrOptions';
+import {SelectOption} from '../../../src/server/inputs/SelectOption';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
+import {runAllActions} from '../../TestingUtils';
+import {cast} from '../../../src/common/utils/utils';
 
 describe('SpaceOffice', () => {
   let card: SpaceOffice;
@@ -13,16 +17,39 @@ describe('SpaceOffice', () => {
     card = new SpaceOffice();
     [/* game */, player] = testGame(2);
     player.playedCards.push(card);
+  });
+
+  it('scores 3 VP', () => {
+    expect(card.getVictoryPoints(player)).to.eq(3);
+  });
+
+  it('adds a fighter resource for the first two space tags played', () => {
+    player.onCardPlayed(new Comet());
+    runAllActions(player.game);
+    expect(card.resourceCount).to.eq(1);
+
+    player.onCardPlayed(new Comet());
+    runAllActions(player.game);
+    expect(card.resourceCount).to.eq(2);
+  });
+
+  it('does not react to a card without a space tag', () => {
+    player.onCardPlayed(new Sponsors());
+    runAllActions(player.game);
+    expect(card.resourceCount).to.eq(0);
+  });
+
+  it('offers remove-2-to-draw-2 once you have 2 fighter resources', () => {
+    player.addResourceTo(card, 2);
     player.cardsInHand = [];
-  });
 
-  it('draws a card when a space tag is played', () => {
     card.onCardPlayed(player, new Comet());
-    expect(player.cardsInHand).has.lengthOf(1);
-  });
+    runAllActions(player.game);
 
-  it('does not draw for a card without a space tag', () => {
-    card.onCardPlayed(player, new Sponsors());
-    expect(player.cardsInHand).has.lengthOf(0);
+    const orOptions = cast(player.popWaitingFor(), OrOptions);
+    cast(orOptions.options[0], SelectOption).cb(undefined);
+
+    expect(card.resourceCount).to.eq(0);
+    expect(player.cardsInHand).has.lengthOf(2);
   });
 });

@@ -18,15 +18,15 @@ describe('SmeltingPods', () => {
     player.playedCards.push(card);
   });
 
-  it('offers the pay-steel-for-heat choice for a building tag, including itself', () => {
+  it('offers the pay-steel-for-heat-production choice for a building tag, including itself', () => {
     player.steel = 4;
-    player.heat = 0;
+    player.production.override({heat: 0});
 
     const orOptions = cast(card.onCardPlayed(player, card), OrOptions);
     cast(orOptions.options[0], SelectOption).cb(undefined);
 
     expect(player.steel).to.eq(0);
-    expect(player.heat).to.eq(1);
+    expect(player.production.heat).to.eq(2);
   });
 
   it('does nothing for a non-building card', () => {

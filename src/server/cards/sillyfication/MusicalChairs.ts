@@ -14,6 +14,7 @@ export class MusicalChairs extends Card implements IActionCard, IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.MUSICAL_CHAIRS,
       cost: 4,
+      victoryPoints: 1,
 
       metadata: {
         cardNumber: 'X73',

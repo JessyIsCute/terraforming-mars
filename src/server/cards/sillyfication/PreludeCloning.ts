@@ -13,10 +13,11 @@ import {CardRenderer} from '../render/CardRenderer';
 export class PreludeCloning extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.EVENT,
+      type: CardType.AUTOMATED,
       name: CardName.PRELUDE_CLONING,
       tags: [Tag.SCIENCE],
-      cost: 7,
+      cost: 14,
+      victoryPoints: 1,
 
       requirements: {tag: Tag.SCIENCE, count: 4},
 

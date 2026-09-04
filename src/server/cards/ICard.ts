@@ -84,6 +84,14 @@ export interface ICard {
   onCardPlayed?(player: IPlayer, card: ICard): PlayerInput | undefined | void;
   onCardPlayedByAnyPlayer?(thisCardOwner: IPlayer, card: ICard, activePlayer: IPlayer): PlayerInput | undefined | void;
   onCardPlayedFromAnyPlayer?: never;
+  /**
+   * Callback when ANY player draws one or more cards (via the normal "draw N cards" path).
+   *
+   * @param cardOwner the player who owns THIS CARD.
+   * @param drawingPlayer the player who drew the card(s).
+   * @param count how many cards were drawn in this batch.
+   */
+  onCardsDrawn?(cardOwner: IPlayer, drawingPlayer: IPlayer, count: number): void;
   onStandardProject?(player: IPlayer, project: IStandardProjectCard): void;
   onTilePlaced?(cardOwner: IPlayer, activePlayer: IPlayer, space: Space, boardType: BoardType): void;
   onDiscard?(player: IPlayer): void;

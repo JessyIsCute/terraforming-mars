@@ -644,7 +644,7 @@ export enum CardName {
   MUSICAL_CHAIRS = 'Musical Chairs',
   PRELUDE_CLONING = 'Prelude Cloning',
   PROJECT_IMITATORS = 'Project Imitators',
-  DEIMOS_DOUBLE_DOWN = 'Deimos Double Down',
+  DEIMOS_DOUBLE_DOWN = 'Deimos Double Down?',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
 
@@ -668,6 +668,7 @@ export enum CardName {
   MARS_HOMESTEAD_ACT = 'Mars Homestead Act',
   INSIDER_TRADING = 'Insider Trading',
   MARKET_CRASH = 'Market Crash',
+  SHARED_KNOWLEDGE = 'Shared Knowledge',
 
   // BetterMars replacement cards (swap into the base pool when BetterMars is on)
   LUNAR_BEAM_BETTER_MARS = 'Lunar Beam:bm',

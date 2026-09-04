@@ -15,6 +15,10 @@ describe('MusicalChairs', () => {
     player.playedCards.push(card);
   });
 
+  it('scores 1 VP', () => {
+    expect(card.getVictoryPoints(player)).to.eq(1);
+  });
+
   it('cannot act without energy', () => {
     player.energy = 0;
     expect(card.canAct(player)).is.false;

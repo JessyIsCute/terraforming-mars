@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {PreludeCloning} from '../../../src/server/cards/sillyfication/PreludeCloning';
 import {AlliedBanks} from '../../../src/server/cards/prelude/AlliedBanks';
+import {CardType} from '../../../src/common/cards/CardType';
 import {IGame} from '../../../src/server/IGame';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
 import {TestPlayer} from '../../TestPlayer';
@@ -17,6 +18,12 @@ describe('PreludeCloning', () => {
   beforeEach(() => {
     card = new PreludeCloning();
     [game, player, player2] = testGame(2, {preludeExtension: true});
+  });
+
+  it('is a green (automated) card, cost 14, 1 VP', () => {
+    expect(card.type).to.eq(CardType.AUTOMATED);
+    expect(card.cost).to.eq(14);
+    expect(card.getVictoryPoints(player)).to.eq(1);
   });
 
   it('requires 4 science tags and an opponent prelude', () => {

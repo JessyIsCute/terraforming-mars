@@ -18,8 +18,8 @@ export class Venuphile extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T03',
         renderData: CardRenderer.builder((b) => {
-          b.effect('Venus cards cost 1 M€ less for each Venus tag you have.', (eb) => {
-            eb.tag(Tag.VENUS).startEffect.megacredits(-1);
+          b.effect('When you play a Venus tag, you pay 1 M€ less for each Venus tag you have.', (eb) => {
+            eb.tag(Tag.VENUS).startEffect.megacredits(1).slash().tag(Tag.VENUS);
           });
         }),
       },

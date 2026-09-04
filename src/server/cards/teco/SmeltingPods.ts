@@ -9,6 +9,7 @@ import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
+import {digit} from '../Options';
 
 export class SmeltingPods extends Card implements IProjectCard {
   constructor() {
@@ -22,8 +23,8 @@ export class SmeltingPods extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T09',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a building tag, including this, you may pay 4 steel to gain 1 heat.', (eb) => {
-            eb.tag(Tag.BUILDING).startEffect.minus().steel(4).nbsp.plus().heat(1);
+          b.effect('When you play a building tag, including this, you may pay 4 steel to increase your heat production 2 steps.', (eb) => {
+            eb.tag(Tag.BUILDING).startEffect.minus().steel(4, {digit}).nbsp.production((pb) => pb.heat(2));
           });
         }),
       },
@@ -35,9 +36,9 @@ export class SmeltingPods extends Card implements IProjectCard {
       return undefined;
     }
     return new OrOptions(
-      new SelectOption('Pay 4 steel to gain 1 heat').andThen(() => {
+      new SelectOption('Pay 4 steel to increase your heat production 2 steps').andThen(() => {
         player.stock.deduct(Resource.STEEL, 4);
-        player.stock.add(Resource.HEAT, 1, {log: true});
+        player.production.add(Resource.HEAT, 2, {log: true});
         return undefined;
       }),
       new SelectOption('Do not pay'),

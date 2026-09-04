@@ -115,4 +115,12 @@ export function keep(player: IPlayer, cards: ReadonlyArray<IProjectCard>, discar
     break;
   }
   Aerotech.onDrawCards(player, cards, discards);
+
+  if (cards.length > 0) {
+    for (const cardOwner of player.game.playersInGenerationOrder) {
+      for (const ownedCard of cardOwner.tableau) {
+        ownedCard.onCardsDrawn?.(cardOwner, player, cards.length);
+      }
+    }
+  }
 }

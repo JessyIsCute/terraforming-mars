@@ -14,9 +14,9 @@ export class ColdBlooded extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.COLD_BLOODED,
       tags: [Tag.ANIMAL],
-      cost: 12,
+      cost: 11,
 
-      requirements: {oxygen: 4},
+      requirements: {oxygen: 5},
 
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}},
@@ -29,7 +29,7 @@ export class ColdBlooded extends Card implements IProjectCard {
           }).br;
           b.vpText('1 VP per animal on this card.');
         }),
-        description: 'Requires 4% oxygen.',
+        description: 'Requires 5% oxygen.',
       },
     });
   }

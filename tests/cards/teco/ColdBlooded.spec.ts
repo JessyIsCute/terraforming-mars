@@ -14,7 +14,7 @@ describe('ColdBlooded', () => {
     player.playedCards.push(card);
   });
 
-  it('requires 4% oxygen', () => {
+  it('requires 5% oxygen', () => {
     expect(card.canPlay(player)).is.false;
   });
 

@@ -19,6 +19,7 @@ import {Balance} from './Balance';
 import {MarsHomesteadAct} from './MarsHomesteadAct';
 import {InsiderTrading} from './InsiderTrading';
 import {MarketCrash} from './MarketCrash';
+import {SharedKnowledge} from './SharedKnowledge';
 
 /** Teco: an original fan expansion of project cards and preludes. Icon: a "T" in a circle. */
 export const TECO_CARD_MANIFEST = new ModuleManifest({
@@ -36,6 +37,7 @@ export const TECO_CARD_MANIFEST = new ModuleManifest({
     [CardName.MANUWHACK]: {Factory: Manuwhack},
     [CardName.BURN_THE_FOREST]: {Factory: BurnTheForest},
     [CardName.CATS]: {Factory: Cats},
+    [CardName.SHARED_KNOWLEDGE]: {Factory: SharedKnowledge},
   },
   preludeCards: {
     [CardName.GENEROUS_REDISTRIBUTION]: {Factory: GenerousRedistribution, compatibility: 'prelude'},

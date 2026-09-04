@@ -20,8 +20,9 @@ describe('DeimosDoubleDown', () => {
     [game, player, player2] = testGame(2, {preludeExtension: true});
   });
 
-  it('has a space tag', () => {
+  it('has a space tag and a "?" in its name', () => {
     expect(card.tags).to.deep.eq([Tag.SPACE]);
+    expect(card.name).to.eq('Deimos Double Down?');
   });
 
   it('gains titanium, draws space events, and copies one to every player', () => {
