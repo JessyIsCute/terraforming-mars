@@ -31,19 +31,27 @@
   max-width: 95vw;
   max-height: 82vh;
   overflow: auto;
+  // A large scrollable region whose content can change size (bigger board, more bonuses
+  // painted) is exactly what confuses the browser's scroll-anchoring heuristic on a long page
+  // (Turmoil/Pathfinders panels below it) -- opt it and its content out as an anchor candidate.
+  overflow-anchor: none;
   background: #15131f url("./assets/board/mars-without-venus.png") no-repeat center / cover;
   border-radius: 6px;
 
   .board--custom {
     position: relative;
     margin: 20px;
+    overflow-anchor: none;
   }
 }
 
 // A custom board that uses the standard parameter tracks keeps the normal painted-Mars
 // container; only the hex grid is transformed (see Board.vue fitTransform) to fit the curve.
+// Same scroll-anchoring opt-out as .board-cont--custom: a big board that scales/re-layouts
+// on every render (fitTransform) shouldn't be used by the browser as a scroll anchor.
 .board--custom-fit {
   position: relative;
+  overflow-anchor: none;
 }
 
 .board-legend {
