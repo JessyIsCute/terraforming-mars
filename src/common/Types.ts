@@ -1,4 +1,8 @@
 export type PlayerId = `p${string}`;
+/** Occupies a colony tile's slot once a player has sold their colony there (see the Colony
+ * Sale card): the slot stays filled - it can't be built on again - but doesn't belong to any
+ * real player, so it's excluded from every player-identity check against `Colony.colonies`. */
+export const NEUTRAL_COLONY_OWNER: PlayerId = 'pNEUTRAL';
 export type GameId = `g${string}`;
 export type SpectatorId = `s${string}`;
 export type ParticipantId = PlayerId | SpectatorId;

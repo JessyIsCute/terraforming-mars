@@ -12,6 +12,7 @@ import {CardName} from '../../common/cards/CardName';
 import {Tag} from '../../common/cards/Tag';
 import {asArray} from '../../common/utils/utils';
 import {isIStandardProjectCard} from '../cards/IStandardProjectCard';
+import {NEUTRAL_COLONY_OWNER} from '../../common/Types';
 
 export function cardsToModel(
   player: IPlayer,
@@ -88,7 +89,7 @@ export function coloniesToModel(game: IGame, colonies: Array<IColony>, showTileO
   return colonies.map(
     (colony): ColonyModel => ({
       colonies: colony.colonies.map(
-        (playerId): Color => game.getPlayerById(playerId).color,
+        (playerId): Color => playerId === NEUTRAL_COLONY_OWNER ? 'neutral' : game.getPlayerById(playerId).color,
       ),
       isActive: isActive && colony.isActive && showTileOnly === false,
       name: colony.name,
