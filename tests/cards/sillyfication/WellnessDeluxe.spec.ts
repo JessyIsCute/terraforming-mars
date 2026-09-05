@@ -17,27 +17,28 @@ describe('WellnessDeluxe', () => {
     player.playedCards.push(card);
   });
 
-  it('starts with 4 heat and no production bonus', () => {
+  it('starts with 32 M€, 4 heat, and no production bonus', () => {
+    expect(card.startingMegaCredits).to.eq(32);
     card.play(player);
     runAllActions(game);
     expect(player.production.megacredits).to.eq(0);
     expect(player.heat).to.eq(4);
   });
 
-  it('placing your own ocean gains 1 heat production and 4 heat', () => {
+  it('placing your own ocean gains 1 heat production and 2 heat', () => {
     addOcean(player, '06');
     runAllActions(game);
 
     expect(player.production.heat).to.eq(1);
-    expect(player.heat).to.eq(4);
+    expect(player.heat).to.eq(2);
   });
 
-  it('another player placing an ocean gains you 4 heat but no production', () => {
+  it('another player placing an ocean gains you 2 heat but no production', () => {
     addOcean(player2, '06');
     runAllActions(game);
 
     expect(player.production.heat).to.eq(0);
-    expect(player.heat).to.eq(4);
+    expect(player.heat).to.eq(2);
     expect(player2.heat).to.eq(0);
   });
 

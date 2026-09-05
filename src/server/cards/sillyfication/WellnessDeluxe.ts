@@ -18,7 +18,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
     super({
       name: CardName.WELLNESS_DELUXE,
       tags: [Tag.EARTH],
-      startingMegaCredits: 38,
+      startingMegaCredits: 32,
 
       behavior: {
         stock: {heat: 4},
@@ -31,15 +31,15 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
 
       metadata: {
         cardNumber: 'XC1',
-        description: 'You start with 38 M€ and 4 heat. As your first action, place an ocean tile.',
+        description: 'You start with 32 M€ and 4 heat. As your first action, place an ocean tile.',
         renderData: CardRenderer.builder((b) => {
           b.br;
-          b.megacredits(38).nbsp.heat(4, {digit}).nbsp.oceans(1);
+          b.megacredits(32).nbsp.heat(4, {digit}).nbsp.oceans(1);
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
-            ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 4 heat.', (eb) => {
+            ce.effect('When you place an ocean tile, increase your heat production 1 step. When any ocean tile is placed, gain 2 heat.', (eb) => {
               eb.oceans(1, {size: Size.SMALL}).colon().production((pb) => pb.heat(1)).nbsp;
-              eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(4, {digit});
+              eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(2, {digit});
             });
             ce.effect('When you raise the temperature, gain 1 M€.', (eb) => {
               eb.temperature(1).startEffect;
@@ -56,7 +56,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
       return;
     }
     cardOwner.game.defer(
-      new GainResourcesDeferred(cardOwner, Resource.HEAT, {count: 4, log: true, from: {card: this}}),
+      new GainResourcesDeferred(cardOwner, Resource.HEAT, {count: 2, log: true, from: {card: this}}),
       cardOwner.id !== activePlayer.id ? Priority.OPPONENT_TRIGGER : undefined,
     );
     if (activePlayer.id === cardOwner.id) {
