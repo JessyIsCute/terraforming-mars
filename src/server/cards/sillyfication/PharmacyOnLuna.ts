@@ -41,7 +41,7 @@ export class PharmacyOnLuna extends Card implements IProjectCard {
   }
 
   public onCardPlayed(player: IPlayer, card: ICard) {
-    if (!card.tags.includes(Tag.MICROBE) || player.megaCredits < 2) {
+    if (!player.tags.cardHasTag(card, Tag.MICROBE) || player.megaCredits < 2) {
       return undefined;
     }
     return new OrOptions(

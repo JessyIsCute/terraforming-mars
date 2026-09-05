@@ -81,7 +81,9 @@ export class PharmacyUnion extends CorporationCard implements ICorporationCard {
     const game = player.game;
 
     const hasScienceTag = player.tags.cardHasTag(card, Tag.SCIENCE);
-    const hasMicrobesTag = card.tags.includes(Tag.MICROBE);
+    // Whether the card that was played has (or counts as having, e.g. Nereid Biosystems)
+    // a microbe tag is a property of whoever played it, not of Pharmacy Union's owner.
+    const hasMicrobesTag = activePlayer.tags.cardHasTag(card, Tag.MICROBE);
 
     if (player === activePlayer && hasScienceTag) {
       // Edge case, let player pick order of resolution (see https://github.com/bafolts/terraforming-mars/issues/1286)
@@ -117,7 +119,7 @@ export class PharmacyUnion extends CorporationCard implements ICorporationCard {
 
     if (hasMicrobesTag) {
       player.defer(() => {
-        const microbeTagCount = card.tags.filter((cardTag) => cardTag === Tag.MICROBE).length;
+        const microbeTagCount = activePlayer.tags.cardTagCount(card, Tag.MICROBE);
         this.addDisease(player, microbeTagCount);
         return undefined;
       }, Priority.PHARMACY_UNION);

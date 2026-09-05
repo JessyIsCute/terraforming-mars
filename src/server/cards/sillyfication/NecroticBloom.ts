@@ -44,7 +44,7 @@ export class NecroticBloom extends ActionCard implements IProjectCard {
     if (activePlayer.id === cardOwner.id) {
       return;
     }
-    if (card.tags.includes(Tag.PLANT) || card.tags.includes(Tag.MICROBE)) {
+    if (activePlayer.tags.cardHasTag(card, Tag.PLANT) || activePlayer.tags.cardHasTag(card, Tag.MICROBE)) {
       cardOwner.addResourceTo(this, {qty: 1, log: true});
     }
   }

@@ -130,8 +130,8 @@ export class Tags {
   }
 
   /**
-   * Returns true if `card` has `tag`. This includes Habitat Marte, but not wild tags and
-   * not Earth Embassy.
+   * Returns true if `card` has `tag`. This includes Habitat Marte and Nereid Biosystems,
+   * but not wild tags and not Earth Embassy.
    */
   public cardHasTag(card: ICard, target: Tag): boolean {
     for (const tag of card.tags) {
@@ -157,17 +157,21 @@ export class Tags {
   }
 
   /**
-   * Returns the number of tags on `card`. Takes Habitat Marte into account.
+   * Returns the number of tags on `card`. Takes Habitat Marte and Nereid Biosystems
+   * into account - including when `target` is an array that merely includes Science
+   * or Microbe alongside other tags, not just when it's the sole target.
    */
   public cardTagCount(card: ICard, target: OneOrArray<Tag>): number {
+    const targets = Array.isArray(target) ? target : [target];
     let count = 0;
     for (const tag of card.tags) {
-      if (tag === target) {
+      if (targets.includes(tag)) {
         count++;
-      } else if (Array.isArray(target) && target.includes(tag)) {
-        count++;
-      } else if (tag === Tag.MARS && target === Tag.SCIENCE &&
+      } else if (tag === Tag.MARS && targets.includes(Tag.SCIENCE) &&
         this.player.tableau.has(CardName.HABITAT_MARTE)) {
+        count++;
+      } else if (tag === Tag.JOVIAN && targets.includes(Tag.MICROBE) &&
+        this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
         count++;
       }
     }

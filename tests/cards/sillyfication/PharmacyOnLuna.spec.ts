@@ -2,12 +2,14 @@ import {expect} from 'chai';
 import {PharmacyOnLuna} from '../../../src/server/cards/sillyfication/PharmacyOnLuna';
 import {Tardigrades} from '../../../src/server/cards/base/Tardigrades'; // microbe tag
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits'; // no tags
+import {NereidBiosystems} from '../../../src/server/cards/sillyfication/NereidBiosystems';
 import {IGame} from '../../../src/server/IGame';
 import {OrOptions} from '../../../src/server/inputs/OrOptions';
 import {TestPlayer} from '../../TestPlayer';
-import {runAllActions} from '../../TestingUtils';
+import {runAllActions, fakeCard} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 import {cast} from '../../../src/common/utils/utils';
+import {Tag} from '../../../src/common/cards/Tag';
 
 describe('PharmacyOnLuna', () => {
   let card: PharmacyOnLuna;
@@ -44,5 +46,18 @@ describe('PharmacyOnLuna', () => {
     expect(card.onCardPlayed(player, new MicroCredits())).is.undefined;
     player.megaCredits = 1;
     expect(card.onCardPlayed(player, new Tardigrades())).is.undefined;
+  });
+
+  it('Nereid Biosystems: offers the draw option for a Jovian-tagged card too', () => {
+    player.playedCards.push(new NereidBiosystems());
+    player.megaCredits = 5;
+    player.cardsInHand = [];
+
+    const options = cast(card.onCardPlayed(player, fakeCard({tags: [Tag.JOVIAN]})), OrOptions);
+    options.options[0].cb();
+    runAllActions(game);
+
+    expect(player.megaCredits).to.eq(3);
+    expect(player.cardsInHand).to.have.length(1);
   });
 });

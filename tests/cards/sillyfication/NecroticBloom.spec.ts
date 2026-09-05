@@ -4,9 +4,11 @@ import {NecroticBloom} from '../../../src/server/cards/sillyfication/NecroticBlo
 import {Tardigrades} from '../../../src/server/cards/base/Tardigrades';
 import {Ants} from '../../../src/server/cards/base/Ants';
 import {AICentral} from '../../../src/server/cards/base/AICentral';
+import {NereidBiosystems} from '../../../src/server/cards/sillyfication/NereidBiosystems';
 import {TestPlayer} from '../../TestPlayer';
 import {IGame} from '../../../src/server/IGame';
-import {runAllActions} from '../../TestingUtils';
+import {runAllActions, fakeCard} from '../../TestingUtils';
+import {Tag} from '../../../src/common/cards/Tag';
 
 describe('NecroticBloom', () => {
   let card: NecroticBloom;
@@ -59,5 +61,13 @@ describe('NecroticBloom', () => {
   it('scores 1 VP per 3 microbes', () => {
     player.addResourceTo(card, 7);
     expect(card.getVictoryPoints(player)).to.eq(2);
+  });
+
+  it('Nereid Biosystems: a Jovian-tagged card played by an opponent also counts', () => {
+    player2.playedCards.push(new NereidBiosystems());
+
+    card.onCardPlayedByAnyPlayer(player, fakeCard({tags: [Tag.JOVIAN]}), player2);
+
+    expect(card.resourceCount).to.eq(1);
   });
 });
