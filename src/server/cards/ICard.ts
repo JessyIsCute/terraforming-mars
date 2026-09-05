@@ -55,6 +55,12 @@ export interface ICard {
    */
   getCardDiscount?(player: IPlayer, card: IProjectCard): number;
   /**
+   * Describes the M€ discount `player` could apply to playing THIS card itself, unlike
+   * `getCardDiscount` (which only ever applies to OTHER cards, since a card isn't in the
+   * player's tableau yet while its own purchase cost is being computed).
+   */
+  getOwnCostReduction?(player: IPlayer): number;
+  /**
    * Describes type of discount this card applies to other cards.
    *
    * Achieves the same thing as `getCardDiscount` but for the simplest, most common use cases.

@@ -739,6 +739,10 @@ export class Player implements IPlayer {
       }
     });
 
+    // A card discounting its own purchase cost (unlike getCardDiscount, which only ever
+    // applies to other cards, since this card isn't in the tableau yet).
+    cost -= card.getOwnCostReduction?.(this) ?? 0;
+
     // TODO(kberg): put this in a callback.
     if (card.tags.includes(Tag.SPACE) && PartyHooks.shouldApplyPolicy(this, PartyName.UNITY, 'up04')) {
       cost -= 2;

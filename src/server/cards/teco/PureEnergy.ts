@@ -22,19 +22,14 @@ export class PureEnergy extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T27',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a Power tag, you pay 1 M€ less for each energy resource, Power tag, and energy production you have.', (eb) => {
-            eb.tag(Tag.POWER).startEffect.megacredits(1).slash().text('energy you have');
-          }).br;
           b.production((pb) => pb.energy(7));
         }),
+        description: 'This card costs 1 M€ less for each energy resource, Power tag, and energy production you have.',
       },
     });
   }
 
-  public override getCardDiscount(player: IPlayer, card: IProjectCard): number {
-    if (!card.tags.includes(Tag.POWER)) {
-      return 0;
-    }
+  public override getOwnCostReduction(player: IPlayer): number {
     return player.energy + player.tags.count(Tag.POWER) + player.production.energy;
   }
 }

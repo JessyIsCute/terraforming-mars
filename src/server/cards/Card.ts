@@ -437,6 +437,10 @@ export abstract class Card implements ICard {
     return sum;
   }
 
+  public getOwnCostReduction(_player: IPlayer): number {
+    return 0;
+  }
+
   public getGlobalParameterRequirementBonus(player: IPlayer, parameter: GlobalParameter): number {
     if (this.properties.globalParameterRequirementBonus !== undefined) {
       const globalParameterRequirementBonus = this.properties.globalParameterRequirementBonus;
