@@ -8,7 +8,6 @@ import {Space} from '../../boards/Space';
 import {BoardType} from '../../boards/BoardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class MoonCow extends Card implements IProjectCard {
   constructor() {
@@ -26,9 +25,9 @@ export class MoonCow extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T01',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.ANIMAL, {amount: 1, digit}).br;
+          b.resource(CardResource.ANIMAL).br;
           b.effect('When any tile is placed on the Moon, add an animal to this card.', (eb) => {
-            eb.text('moon tile').startEffect.resource(CardResource.ANIMAL);
+            eb.emptyTile().startEffect.resource(CardResource.ANIMAL);
           });
         }),
         description: 'Requires 2 habitat tiles on the Moon. Starts with 1 animal.',

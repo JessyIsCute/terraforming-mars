@@ -9,7 +9,7 @@ import {CITY_TILES} from '../../../common/TileType';
 import {CardName} from '../../../common/cards/CardName';
 import {RemoveResourcesFromCard} from '../../deferredActions/RemoveResourcesFromCard';
 import {CardRenderer} from '../render/CardRenderer';
-import {all, digit} from '../Options';
+import {all} from '../Options';
 
 export class Cats extends Card implements IProjectCard {
   constructor() {
@@ -25,7 +25,7 @@ export class Cats extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T12',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.ANIMAL, {amount: 1, digit}).br;
+          b.resource(CardResource.ANIMAL).br;
           b.effect('When any city tile is placed, steal an animal from any player\'s card and add it to this card. If no player has an animal, add one here anyway.', (eb) => {
             eb.city({all}).startEffect.resource(CardResource.ANIMAL);
           });

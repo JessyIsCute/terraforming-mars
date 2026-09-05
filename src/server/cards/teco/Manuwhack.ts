@@ -6,6 +6,7 @@ import {IPlayer} from '../../IPlayer';
 import {Resource} from '../../../common/Resource';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
+import {all} from '../Options';
 
 export class Manuwhack extends Card implements IProjectCard {
   constructor() {
@@ -22,7 +23,7 @@ export class Manuwhack extends Card implements IProjectCard {
         cardNumber: 'T10',
         renderData: CardRenderer.builder((b) => {
           b.effect('When any player gains production, every player gains 1 of that resource type (no matter the amount).', (eb) => {
-            eb.text('prod').startEffect.text('+1 each');
+            eb.production((pb) => pb.wild(1, {all})).startEffect.wild(1, {all});
           });
         }),
         description: 'Requires 5 building tags.',
