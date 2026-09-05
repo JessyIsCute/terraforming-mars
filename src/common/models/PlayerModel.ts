@@ -46,6 +46,7 @@ export type PublicPlayerModel = {
   coloniesCount: number;
   color: Color;
   deltaProject?: DeltaProjectPlayerModel;
+  epsilonDample?: DeltaProjectPlayerModel;
   energy: number;
   energyProduction: number;
   fleetSize: number;

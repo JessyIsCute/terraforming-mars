@@ -169,6 +169,7 @@ export class Player implements IPlayer {
   public trThisGeneration = 0;
   public underworldData: UnderworldPlayerData = UnderworldExpansion.initializePlayer();
   public deltaProjectData?: DeltaProjectPlayerModel;
+  public epsilonDampleData?: DeltaProjectPlayerModel;
   public standardProjectsThisGeneration: Set<CardName> = new Set();
   public temporaryGlobalParameterRequirementBonus = 0;
 
@@ -1890,6 +1891,7 @@ export class Player implements IPlayer {
       result.lastGreeneryActionNumber = this.lastGreeneryActionNumber;
     }
     result.deltaProject = this.deltaProjectData;
+    result.epsilonDample = this.epsilonDampleData;
     return result;
   }
 
@@ -1960,6 +1962,7 @@ export class Player implements IPlayer {
     player.dealtCeoCards = ceosFromJSON(d.dealtCeoCards);
     player.dealtProjectCards = cardsFromJSON(d.dealtProjectCards);
     player.deltaProjectData = d.deltaProject;
+    player.epsilonDampleData = d.epsilonDample;
     player.cardsInHand = cardsFromJSON(d.cardsInHand);
     // I don't like "as IPreludeCard" but this is pretty safe.
     player.preludeCardsInHand = cardsFromJSON(d.preludeCardsInHand) as Array<IPreludeCard>;

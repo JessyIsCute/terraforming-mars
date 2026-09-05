@@ -1194,6 +1194,7 @@ export enum CardName {
 
   // Delta Project
   DELTA_PROJECT = 'Delta Project',
+  EPSILON_DAMPLE = 'Epsilon Dample',
 
   // Underworld Standard Projects
   EXCAVATE_STANDARD_PROJECT = 'Excavate:SP',

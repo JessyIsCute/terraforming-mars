@@ -37,6 +37,7 @@ export interface SerializedPlayer extends DeprecatedFields{
   dealtPreludeCards: Array<CardName>;
   dealtProjectCards: Array<CardName>;
   deltaProject?: DeltaProjectPlayerModel;
+  epsilonDample?: DeltaProjectPlayerModel;
   draftedCards: Array<CardName>;
   draftHand: Array<CardName>,
   energy: number;

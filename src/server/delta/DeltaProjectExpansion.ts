@@ -38,23 +38,36 @@ export const VP5_POSITION = 11;
 
 export const MAX_TRACK_POSITION = DELTA_TRACK_TAGS.length - 1; // 11 (positions 0–11)
 
+/** Which marker on the Delta Project track is being referred to. Every player has a
+ * `primary` marker (from the always-dealt Delta Project prelude); `epsilon` is the
+ * second marker granted by the Epsilon Dample corporation. */
+export type MarkerKind = 'primary' | 'epsilon';
+
 export class DeltaProjectExpansion {
   private constructor() {}
 
   private static getProgress(player: IPlayer): DeltaProjectPlayerModel {
-    if (player.deltaProjectData === undefined) {
-      throw new Error('No Delta Project progress for player ' + player.color);
-    }
-    return player.deltaProjectData;
+    return DeltaProjectExpansion.getMarkerData(player, 'primary');
   }
 
-  // True if another player (not `excludePlayer`) occupies this track position.
-  private static hasOtherPlayerAtPosition(game: IGame, position: number, excludePlayer: IPlayer): boolean {
+  private static getMarkerData(player: IPlayer, marker: MarkerKind): DeltaProjectPlayerModel {
+    const data = marker === 'primary' ? player.deltaProjectData : player.epsilonDampleData;
+    if (data === undefined) {
+      throw new Error(`No ${marker} Delta Project progress for player ` + player.color);
+    }
+    return data;
+  }
+
+  // True if some marker other than (`excludePlayer`, `excludeMarker`) occupies this track
+  // position - including the *other* marker belonging to `excludePlayer` themselves, so a
+  // player can't stack both of their own markers on the same VP spot.
+  private static isOccupiedByOther(game: IGame, position: number, excludePlayer: IPlayer, excludeMarker: MarkerKind): boolean {
     for (const p of game.players) {
-      if (p === excludePlayer) {
-        continue;
+      const isExcludedPlayer = p === excludePlayer;
+      if (p.deltaProjectData?.position === position && !(isExcludedPlayer && excludeMarker === 'primary')) {
+        return true;
       }
-      if (p.deltaProjectData?.position === position) {
+      if (p.epsilonDampleData?.position === position && !(isExcludedPlayer && excludeMarker === 'epsilon')) {
         return true;
       }
     }
@@ -80,8 +93,17 @@ export class DeltaProjectExpansion {
    * Returns an empty array when no advance is possible.
    */
   public static getValidAdvanceSteps(player: IPlayer): ReadonlyArray<number> {
+    return DeltaProjectExpansion.computeValidAdvanceSteps(player, 'primary');
+  }
+
+  /** Same as {@link getValidAdvanceSteps}, but for Epsilon Dample's second marker. */
+  public static getValidEpsilonAdvanceSteps(player: IPlayer): ReadonlyArray<number> {
+    return DeltaProjectExpansion.computeValidAdvanceSteps(player, 'epsilon');
+  }
+
+  private static computeValidAdvanceSteps(player: IPlayer, marker: MarkerKind): ReadonlyArray<number> {
     const game = player.game;
-    const progress = DeltaProjectExpansion.getProgress(player);
+    const progress = DeltaProjectExpansion.getMarkerData(player, marker);
     const currentPos = progress.position;
 
     if (currentPos >= MAX_TRACK_POSITION) {
@@ -101,10 +123,31 @@ export class DeltaProjectExpansion {
         continue;
       }
 
-      if (newPos === VP2_POSITION && DeltaProjectExpansion.hasOtherPlayerAtPosition(game, VP2_POSITION, player)) {
+      if ((newPos === VP2_POSITION || newPos === VP5_POSITION) &&
+        DeltaProjectExpansion.isOccupiedByOther(game, newPos, player, marker)) {
         continue;
       }
-      if (newPos === VP5_POSITION && DeltaProjectExpansion.hasOtherPlayerAtPosition(game, VP5_POSITION, player)) {
+      result.push(steps);
+    }
+    return result;
+  }
+
+  /**
+   * Returns the allowed values for `retreatEpsilon(player, steps)`: how far Epsilon
+   * Dample's second marker can move backward. Unlike advancing, retreating has no tag
+   * requirement, and never re-triggers a position's reward - it's a repositioning tool,
+   * not a way to farm rewards by shuttling back and forth.
+   */
+  public static getValidEpsilonRetreatSteps(player: IPlayer): ReadonlyArray<number> {
+    const game = player.game;
+    const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
+    const maxSteps = Math.min(player.energy, progress.position);
+
+    const result: number[] = [];
+    for (let steps = 1; steps <= maxSteps; steps++) {
+      const newPos = progress.position - steps;
+      if ((newPos === VP2_POSITION || newPos === VP5_POSITION) &&
+        DeltaProjectExpansion.isOccupiedByOther(game, newPos, player, 'epsilon')) {
         continue;
       }
       result.push(steps);
@@ -129,6 +172,12 @@ export class DeltaProjectExpansion {
     return steps.length === 0 ? 0 : Math.max(...steps);
   }
 
+  /** Same as {@link maxSteps}, but for Epsilon Dample's second marker. */
+  public static maxEpsilonSteps(player: IPlayer): number {
+    const steps = DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player);
+    return steps.length === 0 ? 0 : Math.max(...steps);
+  }
+
   public static advance(player: IPlayer, steps: number): void {
     const valid = DeltaProjectExpansion.getValidAdvanceSteps(player);
     if (!valid.includes(steps)) {
@@ -142,12 +191,51 @@ export class DeltaProjectExpansion {
     player.stock.deduct(Resource.ENERGY, steps);
     progress.position = newPos;
 
-    DeltaProjectExpansion.resolveReward(player, newPos);
+    DeltaProjectExpansion.resolveReward(player, newPos, 'primary');
 
     player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
-  private static resolveReward(player: IPlayer, position: number): void {
+  /** Advance Epsilon Dample's second marker. Like {@link advance}, but rewards only fire
+   * the first time this marker reaches a position - see {@link getValidEpsilonRetreatSteps}. */
+  public static advanceEpsilon(player: IPlayer, steps: number): void {
+    const valid = DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player);
+    if (!valid.includes(steps)) {
+      throw new Error(`Invalid Epsilon Dample advance: ${String(steps)} step(s) (valid: ${valid.join(', ')})`);
+    }
+
+    const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
+    const currentPos = progress.position;
+    const newPos = currentPos + steps;
+
+    player.stock.deduct(Resource.ENERGY, steps);
+    progress.position = newPos;
+
+    const highWaterMark = progress.highestPosition ?? 0;
+    if (newPos > highWaterMark) {
+      progress.highestPosition = newPos;
+      DeltaProjectExpansion.resolveReward(player, newPos, 'epsilon');
+    }
+
+    player.game.log('${0} spent ${1} energy to advance their second marker on the Delta Project track', (b) => b.player(player).number(steps));
+  }
+
+  /** Move Epsilon Dample's second marker backward. Costs 1 energy per step, same as
+   * advancing, but never triggers a position's reward. */
+  public static retreatEpsilon(player: IPlayer, steps: number): void {
+    const valid = DeltaProjectExpansion.getValidEpsilonRetreatSteps(player);
+    if (!valid.includes(steps)) {
+      throw new Error(`Invalid Epsilon Dample retreat: ${String(steps)} step(s) (valid: ${valid.join(', ')})`);
+    }
+
+    const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
+    player.stock.deduct(Resource.ENERGY, steps);
+    progress.position -= steps;
+
+    player.game.log('${0} spent ${1} energy to move their second marker backward on the Delta Project track', (b) => b.player(player).number(steps));
+  }
+
+  private static resolveReward(player: IPlayer, position: number, marker: MarkerKind): void {
     // Positions 10/11 (VP spots) have no additional reward beyond VP claiming.
     switch (DELTA_TRACK_TAGS[position]) {
     case Tag.BUILDING: // Choose 2 steel or 2 plants
@@ -210,7 +298,7 @@ export class DeltaProjectExpansion {
     }
 
     case Tag.JOVIAN: { // Gain one Jovian tag
-      const progress = DeltaProjectExpansion.getProgress(player);
+      const progress = DeltaProjectExpansion.getMarkerData(player, marker);
       if (!progress.jovianBonus) {
         progress.jovianBonus = true;
         player.tags.extraJovianTags++;
@@ -247,16 +335,28 @@ export class DeltaProjectExpansion {
     return result;
   }
 
-  public static calculateVictoryPoints(player: IPlayer, builder: VictoryPointsBreakdownBuilder): void {
-    const progress = player.deltaProjectData;
+  private static vpForMarker(progress: DeltaProjectPlayerModel | undefined): number {
     if (progress === undefined) {
-      return;
+      return 0;
     }
-
     if (progress.position === VP5_POSITION) {
-      builder.setVictoryPoints('victoryPoints', 5, 'Delta Project (5VP)');
-    } else if (progress.position === VP2_POSITION) {
-      builder.setVictoryPoints('victoryPoints', 2, 'Delta Project (2VP)');
+      return 5;
+    }
+    if (progress.position === VP2_POSITION) {
+      return 2;
+    }
+    return 0;
+  }
+
+  public static calculateVictoryPoints(player: IPlayer, builder: VictoryPointsBreakdownBuilder): void {
+    // A player's two markers don't stack their VP spot bonuses - take whichever is higher.
+    const points = Math.max(
+      DeltaProjectExpansion.vpForMarker(player.deltaProjectData),
+      DeltaProjectExpansion.vpForMarker(player.epsilonDampleData),
+    );
+
+    if (points > 0) {
+      builder.setVictoryPoints('victoryPoints', points, `Delta Project (${points}VP)`);
     }
   }
 }

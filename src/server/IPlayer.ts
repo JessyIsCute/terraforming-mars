@@ -189,6 +189,8 @@ export interface IPlayer {
 
   underworldData: UnderworldPlayerData;
   deltaProjectData?: DeltaProjectPlayerModel;
+  /** Epsilon Dample's second Delta Project marker. */
+  epsilonDampleData?: DeltaProjectPlayerModel;
   readonly alliedParty?: AlliedParty;
 
   tearDown(): void;

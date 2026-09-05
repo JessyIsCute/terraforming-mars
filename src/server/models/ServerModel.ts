@@ -288,6 +288,7 @@ export class Server {
     }
 
     model.deltaProject = player.deltaProjectData;
+    model.epsilonDample = player.epsilonDampleData;
 
     return model;
   }
