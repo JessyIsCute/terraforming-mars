@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {NereidGenetics} from '../../../src/server/cards/sillyfication/NereidGenetics';
+import {NereidBiosystems} from '../../../src/server/cards/sillyfication/NereidBiosystems';
 import {GanymedeColony} from '../../../src/server/cards/base/GanymedeColony';
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {Tag} from '../../../src/common/cards/Tag';
@@ -7,12 +7,12 @@ import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {runAllActions} from '../../TestingUtils';
 
-describe('NereidGenetics', () => {
-  let card: NereidGenetics;
+describe('NereidBiosystems', () => {
+  let card: NereidBiosystems;
   let player: TestPlayer;
 
   beforeEach(() => {
-    card = new NereidGenetics();
+    card = new NereidBiosystems();
     [/* game */, player] = testGame(2);
     player.playedCards.push(card);
   });

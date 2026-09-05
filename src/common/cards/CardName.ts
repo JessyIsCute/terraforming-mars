@@ -647,7 +647,7 @@ export enum CardName {
   DEIMOS_DOUBLE_DOWN = 'Deimos Double Down?',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
-  NEREID_GENETICS = 'Nereid Genetics',
+  NEREID_BIOSYSTEMS = 'Nereid Biosystems',
 
   // Teco (new fan expansion)
   MOON_COW = 'Moon Cow',

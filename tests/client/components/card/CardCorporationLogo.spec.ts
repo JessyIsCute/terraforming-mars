@@ -15,15 +15,15 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders the Nereid Genetics bespoke logo', () => {
+  it('renders the Nereid Biosystems bespoke logo', () => {
     const wrapper = shallowMount(CardCorporationLogo, {
       ...globalConfig,
       props: {
-        title: CardName.NEREID_GENETICS,
+        title: CardName.NEREID_BIOSYSTEMS,
       },
     });
-    expect(wrapper.find('.card-nereid-genetics-logo').exists()).to.be.true;
+    expect(wrapper.find('.card-nereid-biosystems-logo').exists()).to.be.true;
     expect(wrapper.find('.word-1').text()).to.eq('NEREID');
-    expect(wrapper.find('.word-2').text()).to.eq('GENETICS');
+    expect(wrapper.find('.word-2').text()).to.eq('BIOSYSTEMS');
   });
 });

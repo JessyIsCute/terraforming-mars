@@ -37,7 +37,7 @@ export const SPENDABLE_CARD_RESOURCES = [
   'graphene',
   // Asteroids is a Kuiper Cooperative resource that pays for aquifer and asteroid standard projects.
   'kuiperAsteroids',
-  // Nereid Genetics corporation can spend its microbes for cards with a Jovian tag.
+  // Nereid Biosystems corporation can spend its microbes for cards with a Jovian tag.
   'nereidMicrobes',
 ] as const;
 
@@ -59,5 +59,5 @@ export const CARD_FOR_SPENDABLE_RESOURCE = {
   auroraiData: CardName.AURORAI,
   graphene: CardName.CARBON_NANOSYSTEMS,
   kuiperAsteroids: CardName.KUIPER_COOPERATIVE,
-  nereidMicrobes: CardName.NEREID_GENETICS,
+  nereidMicrobes: CardName.NEREID_BIOSYSTEMS,
 } satisfies Record<SpendableCardResource, CardName>;

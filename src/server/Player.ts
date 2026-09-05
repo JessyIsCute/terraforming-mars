@@ -842,7 +842,7 @@ export class Player implements IPlayer {
     removeResourcesOnCard(CardName.SOYLENT_SEEDLING_SYSTEMS, payment.seeds);
     removeResourcesOnCard(CardName.AURORAI, payment.auroraiData);
     removeResourcesOnCard(CardName.KUIPER_COOPERATIVE, payment.kuiperAsteroids);
-    removeResourcesOnCard(CardName.NEREID_GENETICS, payment.nereidMicrobes);
+    removeResourcesOnCard(CardName.NEREID_BIOSYSTEMS, payment.nereidMicrobes);
 
     if (payment.megacredits > 0 || payment.steel > 0 || payment.titanium > 0) {
       PathfindersExpansion.addToSolBank(this);

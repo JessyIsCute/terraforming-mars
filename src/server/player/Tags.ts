@@ -36,7 +36,7 @@ export type MultipleCountMode =
  * 2. Earth Embassy (Moon) counts Moon tags count as Earth tags.
  * 3. Habitat Marte (PF) Mars tags count as science tags.
  * 4. Chimera (PF) has two wild tags, but only count as one tag for milestones and (funding) awards.
- * 5. Nereid Genetics (fan) Jovian tags count as microbe tags.
+ * 5. Nereid Biosystems (fan) Jovian tags count as microbe tags.
  *
  */
 export class Tags {
@@ -109,8 +109,8 @@ export class Tags {
       if (tag === Tag.SCIENCE && this.player.tableau.has(CardName.HABITAT_MARTE)) {
         tagCount += this.rawCount(Tag.MARS, includeEvents);
       }
-      // Nereid Genetics hook
-      if (tag === Tag.MICROBE && this.player.tableau.has(CardName.NEREID_GENETICS)) {
+      // Nereid Biosystems hook
+      if (tag === Tag.MICROBE && this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
         tagCount += this.rawCount(Tag.JOVIAN, includeEvents);
       }
     }
@@ -145,7 +145,7 @@ export class Tags {
       }
       if (tag === Tag.JOVIAN &&
         target === Tag.MICROBE &&
-        this.player.tableau.has(CardName.NEREID_GENETICS)) {
+        this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
         return true;
       }
     }

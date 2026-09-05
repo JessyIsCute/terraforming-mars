@@ -9,11 +9,11 @@ import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
 
-/** A Neptune-moon genetics outfit: engineers Jovian organisms that are classified as microbes. */
-export class NereidGenetics extends CorporationCard implements ICorporationCard {
+/** A Neptune-moon biosystems outfit: engineers Jovian organisms that are classified as microbes. */
+export class NereidBiosystems extends CorporationCard implements ICorporationCard {
   constructor() {
     super({
-      name: CardName.NEREID_GENETICS,
+      name: CardName.NEREID_BIOSYSTEMS,
       tags: [Tag.JOVIAN, Tag.MICROBE],
       startingMegaCredits: 45,
       resourceType: CardResource.MICROBE,
