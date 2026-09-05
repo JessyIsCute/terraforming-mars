@@ -11,6 +11,7 @@ import {safeCast} from '../../common/Types';
 import {QuotaConfig, QuotaHandler, getQuotaConfigsFromEnv} from '../server/QuotaHandler';
 import {decodeCustomCard, encodeCustomCard, validateCustomCard, CustomCardCodecError} from '../../common/cards/customCardCodec';
 import {isCuratedBehavior} from '../../common/cards/curatedBehaviorTemplates';
+import {isCuratedRenderData} from '../../common/cards/curatedCardRenderData';
 import {
   CustomCardDefinition,
   MAX_CUSTOM_CARD_COST,
@@ -79,6 +80,12 @@ function validateSubmission(def: CustomCardDefinition): void {
   // curated picker's whitelist -- anything else needs an admin's set-behavior override instead.
   if (def.behavior !== undefined && !isCuratedBehavior(def.behavior)) {
     throw RouteError.badRequest('behavior is not a recognized curated effect');
+  }
+  // Same boundary for the icon tree: some ICardRenderItem fields (text/innerText) are rendered
+  // via v-html client-side, so a public submission's renderData must be provably drawn from the
+  // icon composer's whitelist too, or it's a stored-XSS vector once the card is shown to players.
+  if (!isCuratedRenderData(def.renderData)) {
+    throw RouteError.badRequest('renderData is not a recognized curated icon tree');
   }
 }
 

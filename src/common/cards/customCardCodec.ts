@@ -76,7 +76,11 @@ export function validateCustomCard(def: CustomCardDefinition): Array<string> {
     warnings.push('The card has no effect and no effect description -- it cannot be approved as-is.');
   }
   if (def.compatibility.length === 0) {
-    warnings.push('The card has no expansion compatibility set -- it will never appear in any game\'s pool.');
+    // GameCards.ts includes a registry entry when every compatibility entry is enabled --
+    // vacuously true for an empty list, so this card would show up in every game with Custom
+    // Cards enabled, not none. Still worth flagging: most cards should scope themselves to the
+    // expansion(s) whose mechanics/tags they actually use.
+    warnings.push('The card has no expansion compatibility set -- it will be available in every game with Custom Cards enabled, not scoped to a specific expansion.');
   }
   return warnings;
 }

@@ -102,6 +102,13 @@ describe('ApiCustomCardLibrary', () => {
     expect(res.statusCode).eq(statusCode.badRequest);
   });
 
+  it('POST rejects renderData outside the curated whitelist (the icon-tree security boundary)', async () => {
+    const def = validDefinition();
+    def.renderData = {is: 'root', rows: [[{is: 'item', type: 'steel', amount: 1, text: '<img src=x onerror=alert(1)>'}]]} as any;
+    await post(scaffolding, handler, res, {definition: def});
+    expect(res.statusCode).eq(statusCode.badRequest);
+  });
+
   it('POST rejects an over-length description', async () => {
     const def = validDefinition();
     def.description = 'x'.repeat(MAX_CUSTOM_CARD_DESCRIPTION_LENGTH + 1);
