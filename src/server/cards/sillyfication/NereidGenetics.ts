@@ -9,12 +9,13 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
+import {all} from '../Options';
 
-/** A Neptune-moon biotech outfit: turns Jovian-tag research into microbes, and microbes into cash. */
-export class NereidBiotech extends CorporationCard implements ICorporationCard {
+/** A Neptune-moon genetics outfit: engineers Jovian organisms that are classified as microbes. */
+export class NereidGenetics extends CorporationCard implements ICorporationCard {
   constructor() {
     super({
-      name: CardName.NEREID_BIOTECH,
+      name: CardName.NEREID_GENETICS,
       tags: [Tag.JOVIAN, Tag.MICROBE],
       startingMegaCredits: 38,
       resourceType: CardResource.MICROBE,
@@ -27,11 +28,14 @@ export class NereidBiotech extends CorporationCard implements ICorporationCard {
           b.megacredits(38);
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
-            ce.effect('When you play a card with a Jovian tag, including this, add 1 microbe to any card.', (eb) => {
-              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE).asterix();
+            ce.effect('Your Jovian tags also count as microbe tags.', (eb) => {
+              eb.tag(Tag.JOVIAN).startEffect.tag(Tag.MICROBE);
             });
-            ce.effect('When you add a microbe to a card, gain 1 M€.', (eb) => {
-              eb.resource(CardResource.MICROBE).startEffect.megacredits(1);
+            ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
+              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
+            });
+            ce.effect('When any player plays a card with a microbe tag, gain 1 M€ per tag.', (eb) => {
+              eb.tag(Tag.MICROBE, {all}).startEffect.megacredits(1);
             });
           });
           b.vpText('1 VP per 3 microbes on this card.');
@@ -43,13 +47,14 @@ export class NereidBiotech extends CorporationCard implements ICorporationCard {
   public onCardPlayed(player: IPlayer, card: ICard) {
     const jovianTags = player.tags.cardTagCount(card, Tag.JOVIAN);
     if (jovianTags > 0) {
-      player.game.defer(new AddResourcesToCard(player, CardResource.MICROBE, {count: jovianTags}));
+      player.game.defer(new AddResourcesToCard(player, CardResource.MICROBE, {count: jovianTags * 2}));
     }
   }
 
-  public onResourceAdded(player: IPlayer, card: ICard, count: number) {
-    if (card.resourceType === CardResource.MICROBE) {
-      player.stock.add(Resource.MEGACREDITS, count, {log: true});
+  public onCardPlayedByAnyPlayer(thisCardOwner: IPlayer, card: ICard) {
+    const microbeTags = thisCardOwner.tags.cardTagCount(card, Tag.MICROBE);
+    if (microbeTags > 0) {
+      thisCardOwner.stock.add(Resource.MEGACREDITS, microbeTags, {log: true});
     }
   }
 }
