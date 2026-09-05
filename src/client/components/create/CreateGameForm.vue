@@ -193,6 +193,12 @@
                                 <div class="create-game-expansion-icon expansion-icon-teco"></div>
                                 <span v-i18n>Teco</span>&nbsp;<span title="A fan expansion">(&#945;)</span>
                             </label>
+
+                            <input type="checkbox" name="customCards" id="customCards-checkbox" v-model="expansions.customCards">
+                            <label for="customCards-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-customCards"></div>
+                                <span v-i18n>Custom Cards</span>&nbsp;<span title="Community-submitted cards, approved on /cards">(&#945;)</span>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">

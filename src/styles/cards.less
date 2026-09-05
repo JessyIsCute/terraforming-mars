@@ -1149,6 +1149,21 @@ input[type="radio"]:checked+.filterDiv::after {
   }
 }
 
+// Custom Cards: a pencil glyph, same trick as Sillyfication/Teco above.
+.expansion-icon-customCards {
+  background-image: none;
+  background-color: #2c3e50;
+  border-radius: 50%;
+  text-align: center;
+
+  &::before {
+    content: "✎";
+    color: white;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
 .card-standard-project {
   height: 155px;
   width: 235px;

@@ -286,6 +286,7 @@ export class Game implements IGame, Logger {
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
         teco: partialOptions.tecoExpansion ?? false,
+        customCards: partialOptions.customCardsExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};

@@ -150,6 +150,7 @@ export class ApiCreateGame extends Handler {
         sillyficationExpansion: gameReq.expansions.sillyfication,
         betterMarsExpansion: gameReq.expansions.betterMars,
         tecoExpansion: gameReq.expansions.teco,
+        customCardsExpansion: gameReq.expansions.customCards,
         undoOption: gameReq.undoOption,
         venusNextExtension: gameReq.expansions.venus,
       };

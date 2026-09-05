@@ -48,6 +48,7 @@ export type GameOptions = {
   sillyficationExpansion: boolean;
   betterMarsExpansion: boolean;
   tecoExpansion: boolean;
+  customCardsExpansion: boolean;
 
   expansions: Record<Expansion, boolean>,
 
@@ -125,6 +126,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     sillyfication: false,
     betterMars: false,
     teco: false,
+    customCards: false,
   },
   fastModeOption: false,
   includeFanMA: false,
@@ -159,6 +161,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   sillyficationExpansion: false,
   betterMarsExpansion: false,
   tecoExpansion: false,
+  customCardsExpansion: false,
   undoOption: false,
   venusNextExtension: false,
   twoCorpsVariant: false,

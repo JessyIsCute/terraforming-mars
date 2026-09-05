@@ -439,6 +439,7 @@ export class Server {
         sillyfication: options.sillyficationExpansion,
         betterMars: options.betterMarsExpansion,
         teco: options.tecoExpansion,
+        customCards: options.customCardsExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

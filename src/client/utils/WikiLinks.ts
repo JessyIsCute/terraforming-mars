@@ -22,6 +22,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   sillyfication: `${WIKI}/Community`,
   betterMars: `${WIKI}/Community`,
   teco: `${WIKI}/Community`,
+  customCards: `${WIKI}/Community`,
 };
 
 export const WIKI_URLS = {

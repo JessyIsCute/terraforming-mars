@@ -91,6 +91,7 @@ export class JSONProcessor {
       sillyfication: json_constants.SILLYFICATION_EXPANSION,
       betterMars: json_constants.BETTER_MARS_EXPANSION,
       teco: json_constants.TECO_EXPANSION,
+      customCards: json_constants.CUSTOM_CARDS_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

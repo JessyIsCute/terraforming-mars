@@ -76,6 +76,8 @@ export class GlobalEventDealer {
       sillyfication: gameOptions.sillyficationExpansion,
       betterMars: gameOptions.betterMarsExpansion,
       teco: gameOptions.tecoExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      customCards: gameOptions.customCardsExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

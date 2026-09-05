@@ -24,6 +24,7 @@ import {timeAsync} from '@/server/utils/timer';
 import {GameLoader} from '@/server/database/GameLoader';
 import {globalInitialize} from '@/server/globalInitialize';
 import {seedOfficialMapLibrary} from '@/server/database/seedOfficialMapLibrary';
+import {refreshCustomCardRegistry} from '@/server/cards/CustomCardRegistry';
 import {SessionManager} from '@/server/server/auth/SessionManager';
 
 process.on('uncaughtException', (err: any) => {
@@ -109,6 +110,7 @@ async function start() {
     });
 
   await seedOfficialMapLibrary();
+  await refreshCustomCardRegistry();
 
   // Initialize the session manager after initializing the database.
   await SessionManager.getInstance().initialize();

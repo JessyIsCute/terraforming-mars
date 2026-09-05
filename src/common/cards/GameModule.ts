@@ -17,6 +17,7 @@ export const EXPANSIONS = [
   'sillyfication',
   'betterMars',
   'teco',
+  'customCards',
 ] as const;
 
 export const GAME_MODULES = [
@@ -47,6 +48,7 @@ export const MODULE_NAMES = {
   sillyfication: 'Sillyfication',
   betterMars: 'BetterMars',
   teco: 'Teco',
+  customCards: 'Custom Cards',
 } satisfies Record<GameModule, string>;
 
 export const DEFAULT_EXPANSIONS = {
@@ -68,4 +70,5 @@ export const DEFAULT_EXPANSIONS = {
   sillyfication: false,
   betterMars: false,
   teco: false,
+  customCards: false,
 } satisfies Record<Expansion, boolean>;

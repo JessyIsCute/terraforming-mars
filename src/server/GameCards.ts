@@ -27,6 +27,8 @@ import {UNDERWORLD_CARD_MANIFEST} from './cards/underworld/UnderworldCardManifes
 import {SILLYFICATION_CARD_MANIFEST} from './cards/sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManifest';
 import {TECO_CARD_MANIFEST} from './cards/teco/TecoCardManifest';
+import {DataDrivenCard} from './cards/DataDrivenCard';
+import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
 /**
  * Returns the cards available to a game based on its `GameOptions`.
@@ -84,6 +86,7 @@ export class GameCards {
   public getProjectCards() {
     const cards = this.getCards<IProjectCard>('projectCards');
     this.addCustomCards(cards, this.gameOptions.includedCards);
+    this.addCustomCardLibrary(cards);
     return cards.filter(isIProjectCard);
   }
   public getStandardProjects() {
@@ -131,6 +134,30 @@ export class GameCards {
       const card = newCard(cardName);
       cards.push(<T> card);
     }
+  }
+
+  /**
+   * Adds every approved Card Maker submission whose expansion-compatibility is fully satisfied
+   * by this game's enabled expansions -- gated by the "Custom Cards" toggle. Unlike
+   * `addCustomCards`, these aren't looked up by name from a `customList`: they're the entire
+   * approved registry, so it's an all-or-nothing toggle rather than a per-card opt-in.
+   */
+  private addCustomCardLibrary(cards: Array<IProjectCard>): void {
+    if (!this.gameOptions.customCardsExpansion) {
+      return;
+    }
+    const customCards: Array<IProjectCard> = [];
+    for (const def of getAllCustomCardDefinitions()) {
+      const name = def.cardName as unknown as CardName;
+      if (cards.findIndex((c) => c.name === name) > -1) {
+        continue;
+      }
+      if (!def.compatibility.every((expansion) => this.gameOptions.expansions[expansion])) {
+        continue;
+      }
+      customCards.push(new DataDrivenCard(def));
+    }
+    cards.push(...this.filterBannedCards(customCards));
   }
 
   private getCards<T extends ICard>(cardManifestName: keyof ModuleManifest) : Array<T> {
