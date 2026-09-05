@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import {NereidGenetics} from '../../../src/server/cards/sillyfication/NereidGenetics';
 import {GanymedeColony} from '../../../src/server/cards/base/GanymedeColony';
-import {Ants} from '../../../src/server/cards/base/Ants';
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {Tag} from '../../../src/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
@@ -11,11 +10,10 @@ import {runAllActions} from '../../TestingUtils';
 describe('NereidGenetics', () => {
   let card: NereidGenetics;
   let player: TestPlayer;
-  let player2: TestPlayer;
 
   beforeEach(() => {
     card = new NereidGenetics();
-    [/* game */, player, player2] = testGame(2);
+    [/* game */, player] = testGame(2);
     player.playedCards.push(card);
   });
 
@@ -52,30 +50,6 @@ describe('NereidGenetics', () => {
     runAllActions(player.game);
 
     expect(card.resourceCount).to.eq(0);
-  });
-
-  it('gains 1 M€ per microbe tag when you play a card with a microbe tag', () => {
-    player.megaCredits = 0;
-
-    player.playCard(new Ants());
-
-    expect(player.megaCredits).to.eq(1);
-  });
-
-  it('gains M€ when ANY OTHER player plays a card with a microbe tag', () => {
-    player.megaCredits = 0;
-
-    player2.playCard(new Ants());
-
-    expect(player.megaCredits).to.eq(1);
-  });
-
-  it('does not gain M€ for a card without a microbe tag', () => {
-    player.megaCredits = 0;
-
-    card.onCardPlayedByAnyPlayer(player, new GanymedeColony());
-
-    expect(player.megaCredits).to.eq(0);
   });
 
   it('scores 1 VP per 3 microbes on this card', () => {

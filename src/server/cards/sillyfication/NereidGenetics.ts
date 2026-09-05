@@ -4,12 +4,10 @@ import {Tag} from '../../../common/cards/Tag';
 import {CardResource} from '../../../common/CardResource';
 import {IPlayer} from '../../IPlayer';
 import {ICard} from '../ICard';
-import {Resource} from '../../../common/Resource';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
-import {all} from '../Options';
 
 /** A Neptune-moon genetics outfit: engineers Jovian organisms that are classified as microbes. */
 export class NereidGenetics extends CorporationCard implements ICorporationCard {
@@ -34,9 +32,6 @@ export class NereidGenetics extends CorporationCard implements ICorporationCard 
             ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
             });
-            ce.effect('When any player plays a card with a microbe tag, gain 1 M€ per tag.', (eb) => {
-              eb.tag(Tag.MICROBE, {all}).startEffect.megacredits(1);
-            });
           });
           b.vpText('1 VP per 3 microbes on this card.');
         }),
@@ -48,13 +43,6 @@ export class NereidGenetics extends CorporationCard implements ICorporationCard 
     const jovianTags = player.tags.cardTagCount(card, Tag.JOVIAN);
     if (jovianTags > 0) {
       player.game.defer(new AddResourcesToCard(player, CardResource.MICROBE, {count: jovianTags * 2}));
-    }
-  }
-
-  public onCardPlayedByAnyPlayer(thisCardOwner: IPlayer, card: ICard) {
-    const microbeTags = thisCardOwner.tags.cardTagCount(card, Tag.MICROBE);
-    if (microbeTags > 0) {
-      thisCardOwner.stock.add(Resource.MEGACREDITS, microbeTags, {log: true});
     }
   }
 }
