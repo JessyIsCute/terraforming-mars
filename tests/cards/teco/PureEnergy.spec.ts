@@ -20,12 +20,14 @@ describe('PureEnergy', () => {
     expect(player.production.energy).to.eq(7);
   });
 
-  it('discounts Power-tagged cards by your Power tag count', () => {
+  it('discounts Power-tagged cards by your energy resource + Power tag count + energy production', () => {
     player.tagsForTest = {power: 3};
+    player.energy = 4;
+    player.production.override({energy: 2});
     const powerCard = {tags: [Tag.POWER]} as any;
     const otherCard = {tags: [Tag.EARTH]} as any;
 
-    expect(card.getCardDiscount(player, powerCard)).to.eq(3);
+    expect(card.getCardDiscount(player, powerCard)).to.eq(9); // 4 + 3 + 2
     expect(card.getCardDiscount(player, otherCard)).to.eq(0);
   });
 });

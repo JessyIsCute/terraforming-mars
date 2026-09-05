@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import {Microbetronics} from '../../../src/server/cards/teco/Microbetronics';
-import {CardResource} from '../../../src/common/CardResource';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 
@@ -15,28 +14,27 @@ describe('Microbetronics', () => {
     player.production.override({energy: 0});
   });
 
-  it('gains 1 energy production for every 2 microbes added to it', () => {
-    player.addResourceTo(card, {qty: 1, log: false});
-    card.onResourceAdded(player, card);
+  it('gains 1 energy production for every 2 microbe tags, including its own', () => {
+    // tagsForTest overrides raw tag counting entirely, so include Microbetronics' own microbe tag here.
+    player.tagsForTest = {microbe: 1};
+    card.onCardPlayed(player, card);
     expect(player.production.energy).to.eq(0);
 
-    player.addResourceTo(card, {qty: 1, log: false});
-    card.onResourceAdded(player, card);
+    player.tagsForTest = {microbe: 2};
+    card.onCardPlayed(player, card);
     expect(player.production.energy).to.eq(1);
-  });
 
-  it('ignores non-microbe resources added to other cards', () => {
-    const other = {resourceType: CardResource.ANIMAL} as any;
-    card.onResourceAdded(player, other);
-    expect(player.production.energy).to.eq(0);
+    player.tagsForTest = {microbe: 4};
+    card.onCardPlayed(player, card);
+    expect(player.production.energy).to.eq(2);
   });
 
   it('does not re-grant production for the same total', () => {
-    player.addResourceTo(card, {qty: 2, log: false});
-    card.onResourceAdded(player, card);
+    player.tagsForTest = {microbe: 2};
+    card.onCardPlayed(player, card);
     expect(player.production.energy).to.eq(1);
 
-    card.onResourceAdded(player, card);
+    card.onCardPlayed(player, card);
     expect(player.production.energy).to.eq(1);
   });
 });

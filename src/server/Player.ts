@@ -180,6 +180,8 @@ export class Player implements IPlayer {
 
   // Stats
   public actionsTakenThisGame: number = 0;
+  /** Snapshot of `actionsTakenThisGame` at the start of the current generation (see Game.startGeneration). Equal to `actionsTakenThisGame` exactly when the player hasn't taken an action yet this generation. */
+  public actionsTakenAtGenerationStart: number = 0;
   public victoryPointsByGeneration: Array<number> = [];
   public totalDelegatesPlaced: number = 0;
   public globalParameterSteps: Record<GlobalParameter, number> = {...DEFAULT_GLOBAL_PARAMETER_STEPS};
@@ -1861,6 +1863,7 @@ export class Player implements IPlayer {
       timer: this.timer.serialize(),
       // Stats
       actionsTakenThisGame: this.actionsTakenThisGame,
+      actionsTakenAtGenerationStart: this.actionsTakenAtGenerationStart,
       victoryPointsByGeneration: this.victoryPointsByGeneration,
       totalDelegatesPlaced: this.totalDelegatesPlaced,
       underworldData: this.underworldData,
@@ -1884,6 +1887,7 @@ export class Player implements IPlayer {
     const player = new Player(d.name, d.color, d.beginner, Number(d.handicap), d.id);
 
     player.actionsTakenThisGame = d.actionsTakenThisGame;
+    player.actionsTakenAtGenerationStart = d.actionsTakenAtGenerationStart ?? 0;
     player.actionsThisGeneration = new Set(d.actionsThisGeneration);
     player.actionsTakenThisRound = d.actionsTakenThisRound;
     player.availableActionsThisRound = d.availableActionsThisRound ?? 2;

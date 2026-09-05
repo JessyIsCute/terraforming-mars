@@ -22,9 +22,13 @@ export class TagTaxer extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.text('this gen').colon().megacredits(1, {all}).slash().text('tag you have');
         }),
-        description: 'For the rest of this generation, every card costs each player 1 M€ more for each tag they already have of that card\'s tags. (E.g. if you have 5 Earth tags, Earth Office costs you 5 M€ more.)',
+        description: 'Play as your first action of a generation. For the rest of this generation, every card costs each player 1 M€ more for each tag they already have of that card\'s tags. (E.g. if you have 5 Earth tags, Earth Office costs you 5 M€ more.)',
       },
     });
+  }
+
+  public override bespokeCanPlay(player: IPlayer): boolean {
+    return player.actionsTakenThisGame === player.actionsTakenAtGenerationStart;
   }
 
   public override bespokePlay(player: IPlayer) {

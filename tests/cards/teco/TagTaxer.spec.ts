@@ -34,4 +34,15 @@ describe('TagTaxer', () => {
     player.game.generation += 1;
     expect(card.getCardDiscount(player, earthCard)).to.eq(0);
   });
+
+  it('can only be played as the first action of a generation', () => {
+    expect(card.canPlay(player)).is.true;
+
+    player.actionsTakenThisGame++;
+    expect(card.canPlay(player)).is.false;
+
+    // A new generation resets the snapshot, so the first action of the new generation is allowed again.
+    player.actionsTakenAtGenerationStart = player.actionsTakenThisGame;
+    expect(card.canPlay(player)).is.true;
+  });
 });

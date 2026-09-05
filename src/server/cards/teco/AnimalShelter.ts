@@ -23,7 +23,7 @@ export class AnimalShelter extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T22',
         renderData: CardRenderer.builder((b) => {
-          b.city({amount: 2, all}).startEffect.resource(CardResource.ANIMAL);
+          b.resource(CardResource.ANIMAL).slash().city({amount: 2, all});
         }),
         description: 'Requires 4 city tiles ON MARS. Add 1 animal to a card of yours for every 2 cities on Mars.',
       },

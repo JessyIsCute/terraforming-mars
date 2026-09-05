@@ -911,6 +911,7 @@ export class Game implements IGame, Logger {
         player.preservationProgram = true;
       }
       player.trThisGeneration = 0;
+      player.actionsTakenAtGenerationStart = player.actionsTakenThisGame;
     });
 
     if (this.gameOptions.draftVariant) {

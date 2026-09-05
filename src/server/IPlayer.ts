@@ -183,6 +183,7 @@ export interface IPlayer {
 
   // Stats
   actionsTakenThisGame: number;
+  actionsTakenAtGenerationStart: number;
   victoryPointsByGeneration: Array<number>;
   totalDelegatesPlaced: number;
 

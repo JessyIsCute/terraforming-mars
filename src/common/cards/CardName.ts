@@ -672,7 +672,6 @@ export enum CardName {
   SHARED_KNOWLEDGE = 'Shared Knowledge',
   SPIRE_TECH = 'SpireTech',
   ANIMAL_SHELTER = 'Animal Shelter',
-  MARKET_INSURANCE = 'Market Insurance',
   JUPITER = 'Jupiter',
   GAMBLING_PROBLEM = 'Gambling Problem',
   RAW_ENERGY = 'Raw Energy',

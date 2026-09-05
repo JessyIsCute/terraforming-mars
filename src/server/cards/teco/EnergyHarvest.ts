@@ -21,6 +21,7 @@ export class EnergyHarvest extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T29',
         renderData: CardRenderer.builder((b) => {
+          b.greenery().asterix().br;
           b.production((pb) => pb.energy(2));
         }),
         description: 'Requires that your last action was placing a greenery tile.',

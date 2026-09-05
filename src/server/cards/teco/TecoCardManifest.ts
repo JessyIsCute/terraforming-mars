@@ -22,7 +22,6 @@ import {MarketCrash} from './MarketCrash';
 import {SharedKnowledge} from './SharedKnowledge';
 import {SpireTech} from './SpireTech';
 import {AnimalShelter} from './AnimalShelter';
-import {MarketInsurance} from './MarketInsurance';
 import {Jupiter} from './Jupiter';
 import {GamblingProblem} from './GamblingProblem';
 import {RawEnergy} from './RawEnergy';
@@ -56,7 +55,6 @@ export const TECO_CARD_MANIFEST = new ModuleManifest({
     [CardName.SHARED_KNOWLEDGE]: {Factory: SharedKnowledge},
     [CardName.SPIRE_TECH]: {Factory: SpireTech},
     [CardName.ANIMAL_SHELTER]: {Factory: AnimalShelter},
-    [CardName.MARKET_INSURANCE]: {Factory: MarketInsurance},
     [CardName.JUPITER]: {Factory: Jupiter},
     [CardName.GAMBLING_PROBLEM]: {Factory: GamblingProblem},
     [CardName.RAW_ENERGY]: {Factory: RawEnergy},

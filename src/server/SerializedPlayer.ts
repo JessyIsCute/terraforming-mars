@@ -14,6 +14,7 @@ interface DeprecatedFields {
 
 export interface SerializedPlayer extends DeprecatedFields{
   actionsTakenThisGame: number;
+  actionsTakenAtGenerationStart?: number;
   actionsTakenThisRound: number;
   availableActionsThisRound?: number;
   actionsThisGeneration: Array<CardName>;
