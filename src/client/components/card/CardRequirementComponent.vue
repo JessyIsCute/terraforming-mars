@@ -34,6 +34,7 @@ import {RequirementType} from '@/common/cards/RequirementType';
 import {range} from '@/common/utils/utils';
 import CardParty from '@/client/components/card/CardParty.vue';
 import {PartyName} from '@/common/turmoil/PartyName';
+import {Resource} from '@/common/Resource';
 
 export default defineComponent({
   name: 'CardRequirementComponent',
@@ -159,7 +160,9 @@ export default defineComponent({
     },
     productionClass(): string {
       if (this.type === RequirementType.PRODUCTION) {
-        const resource = this.requirement.production;
+        // The plants resource icon class is singular ("card-resource-plant"), unlike every
+        // other resource which matches the Resource enum value directly.
+        const resource = this.requirement.production === Resource.PLANTS ? 'plant' : this.requirement.production;
         return `card-resource card-resource-${resource}`;
       } else {
         // Doesn't matter what this value is, as it is ignored.
