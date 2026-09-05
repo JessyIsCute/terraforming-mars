@@ -11,6 +11,7 @@ import {SelectOption} from '../../inputs/SelectOption';
 import {DeltaProjectExpansion} from '../../delta/DeltaProjectExpansion';
 import {DeltaProjectInput} from '../../delta/DeltaProjectInput';
 import {digit} from '../Options';
+import {Size} from '../../../common/cards/render/Size';
 
 /** Grants a second, independently-controlled marker on the Delta Project track, which can
  * also move backward - so a player with this corp can claim every position's reward twice
@@ -33,12 +34,12 @@ export class EpsilonDample extends CorporationCard implements ICorporationCard, 
         renderData: CardRenderer.builder((b) => {
           b.megacredits(28).nbsp.steel(8, {digit}).nbsp.energy(5, {digit}).br;
           b.production((pb) => pb.energy(1)).br;
-          b.corpBox('action', (ce) => {
-            ce.action('Spend energy to advance a second marker that many steps on the Delta Project track, following the normal tag requirements.', (ab) => {
-              ab.text('X').energy(1).startAction.text('X').plate('Delta track');
+          b.corpBox('effect-action', (cea) => {
+            cea.effect('You have 1 special Delta Project marker.', (eb) => {
+              eb.empty().startEffect.plate('Delta track', {size: Size.SMALL});
             });
-            ce.action('Spend energy to move that marker backward instead. Landing on a position it has never reached before (either direction) still grants that position\'s reward.', (ab) => {
-              ab.text('X').energy(1).startAction.text('-X').plate('Delta track');
+            cea.action('Move the special marker forward or backward on the Delta Project track.', (ab) => {
+              ab.text('X', {size: Size.SMALL}).energy(1, {size: Size.SMALL}).startAction.text('±X', {size: Size.SMALL}).plate('Delta track', {size: Size.SMALL});
             });
           });
         }),
