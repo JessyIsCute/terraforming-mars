@@ -12,6 +12,7 @@ import {statusCode} from '../../src/common/http/statusCode';
 import {cast} from '@/common/utils/utils';
 import {SelectInitialCards} from '../../src/server/inputs/SelectInitialCards';
 import {DiscordUser} from '../../src/server/server/auth/discord';
+import {MapLibraryEntry} from '../../src/common/boards/MapLibraryEntry';
 
 // Removes any fields that have undefined values, and filters undefined from arrays.
 function stripUndefined(obj: unknown): unknown {
@@ -482,6 +483,51 @@ export function describeDatabaseSuite<T extends ITestDatabase>(dtor: DatabaseTes
     it('stats', async () => {
       const result = await db.stats();
       expect(result).deep.eq(dtor.stats);
+    });
+
+    describe('map library', () => {
+      const entry: MapLibraryEntry = {
+        id: 'm123',
+        code: 'TMB3fake',
+        description: 'a test map',
+        submittedBy: 'someone',
+        origin: 'fanmade',
+        status: 'submitted',
+        createdAt: 1700000000000,
+      };
+
+      it('insert and list', async () => {
+        await db.insertMapLibraryEntry(entry);
+        const entries = await db.listMapLibraryEntries();
+        expect(entries).deep.eq([entry]);
+      });
+
+      it('get - found and not found', async () => {
+        await db.insertMapLibraryEntry(entry);
+        expect(await db.getMapLibraryEntry('m123')).deep.eq(entry);
+        expect(await db.getMapLibraryEntry('m-nope')).eq(undefined);
+      });
+
+      it('setMapLibraryEntryStatus', async () => {
+        await db.insertMapLibraryEntry(entry);
+        await db.setMapLibraryEntryStatus('m123', 'approved');
+        const updated = await db.getMapLibraryEntry('m123');
+        expect(updated?.status).eq('approved');
+      });
+
+      it('deleteMapLibraryEntry', async () => {
+        await db.insertMapLibraryEntry(entry);
+        await db.deleteMapLibraryEntry('m123');
+        expect(await db.listMapLibraryEntries()).deep.eq([]);
+      });
+
+      it('listMapLibraryEntries orders newest first', async () => {
+        await db.insertMapLibraryEntry({...entry, id: 'm1', createdAt: 1000});
+        await db.insertMapLibraryEntry({...entry, id: 'm2', createdAt: 3000});
+        await db.insertMapLibraryEntry({...entry, id: 'm3', createdAt: 2000});
+        const ids = (await db.listMapLibraryEntries()).map((e) => e.id);
+        expect(ids).deep.eq(['m2', 'm3', 'm1']);
+      });
     });
 
     dtor.otherTests?.(() => db);

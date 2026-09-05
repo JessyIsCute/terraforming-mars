@@ -11,6 +11,7 @@ import {daysAgoToSeconds} from './utils';
 import {MultiMap} from 'mnemonist';
 import {Session, SessionId} from '../auth/Session';
 import {toID} from '../../common/utils/utils';
+import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
 
 export const IN_MEMORY_SQLITE_PATH = ':memory:';
 
@@ -56,6 +57,18 @@ export class SQLite implements IDatabase {
         data varchar not null,
         expiration_time timestamp not null,
         PRIMARY KEY (session_id)
+      )`);
+
+    await this.asyncRun(
+      `CREATE TABLE IF NOT EXISTS map_library(
+        id varchar not null,
+        code text not null,
+        description varchar not null,
+        submitted_by varchar not null,
+        origin varchar not null,
+        status varchar not null,
+        created_time timestamp not null default (strftime('%s', 'now')),
+        PRIMARY KEY (id)
       )`);
   }
 
@@ -290,6 +303,42 @@ export class SQLite implements IDatabase {
         expirationTimeMillis: row.expiration_time * 1000,
       };
     });
+  }
+
+  public async listMapLibraryEntries(): Promise<Array<MapLibraryEntry>> {
+    const rows = await this.asyncAll('SELECT * FROM map_library ORDER BY created_time DESC');
+    return rows.map((row) => this.rowToMapLibraryEntry(row));
+  }
+
+  public async getMapLibraryEntry(id: MapLibraryEntryId): Promise<MapLibraryEntry | undefined> {
+    const row = await this.asyncGet('SELECT * FROM map_library WHERE id = ?', [id]);
+    return row === undefined ? undefined : this.rowToMapLibraryEntry(row);
+  }
+
+  public async insertMapLibraryEntry(entry: MapLibraryEntry): Promise<void> {
+    await this.asyncRun(
+      'INSERT INTO map_library (id, code, description, submitted_by, origin, status, created_time) VALUES(?, ?, ?, ?, ?, ?, ?)',
+      [entry.id, entry.code, entry.description, entry.submittedBy, entry.origin, entry.status, entry.createdAt / 1000]);
+  }
+
+  public async setMapLibraryEntryStatus(id: MapLibraryEntryId, status: MapLibraryStatus): Promise<void> {
+    await this.asyncRun('UPDATE map_library SET status = ? WHERE id = ?', [status, id]);
+  }
+
+  public async deleteMapLibraryEntry(id: MapLibraryEntryId): Promise<void> {
+    await this.asyncRun('DELETE FROM map_library WHERE id = ?', [id]);
+  }
+
+  private rowToMapLibraryEntry(row: any): MapLibraryEntry {
+    return {
+      id: row.id,
+      code: row.code,
+      description: row.description,
+      submittedBy: row.submitted_by,
+      origin: row.origin,
+      status: row.status,
+      createdAt: row.created_time * 1000,
+    };
   }
 
   protected asyncRun(sql: string, params?: any): Promise<BetterSqlite3.RunResult> {

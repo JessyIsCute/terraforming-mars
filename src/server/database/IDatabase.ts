@@ -3,6 +3,7 @@ import {GameOptions} from '../game/GameOptions';
 import {GameId, ParticipantId} from '../../common/Types';
 import {SerializedGame} from '../SerializedGame';
 import {Session, SessionId} from '../auth/Session';
+import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
 
 export type GameIdLedger = {gameId: GameId, participantIds: Array<ParticipantId>}
 
@@ -148,4 +149,13 @@ export interface IDatabase {
     createSession(session: Session): Promise<void>;
     deleteSession(sessionId: SessionId): Promise<void>;
     getSessions(): Promise<Array<Session>>;
+
+    /**
+     * The public Map Library: official boards plus community-submitted custom maps.
+     */
+    listMapLibraryEntries(): Promise<Array<MapLibraryEntry>>;
+    getMapLibraryEntry(id: MapLibraryEntryId): Promise<MapLibraryEntry | undefined>;
+    insertMapLibraryEntry(entry: MapLibraryEntry): Promise<void>;
+    setMapLibraryEntryStatus(id: MapLibraryEntryId, status: MapLibraryStatus): Promise<void>;
+    deleteMapLibraryEntry(id: MapLibraryEntryId): Promise<void>;
 }

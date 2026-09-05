@@ -28,6 +28,12 @@ const FAKE_DATABASE: IDatabase = {
   createSession: () => Promise.resolve(),
   deleteSession: () => Promise.resolve(),
   getSessions: () => Promise.resolve([]),
+
+  listMapLibraryEntries: () => Promise.resolve([]),
+  getMapLibraryEntry: () => Promise.resolve(undefined),
+  insertMapLibraryEntry: () => Promise.resolve(),
+  setMapLibraryEntryStatus: () => Promise.resolve(),
+  deleteMapLibraryEntry: () => Promise.resolve(),
 };
 
 let databaseUnderTest: IDatabase = FAKE_DATABASE;

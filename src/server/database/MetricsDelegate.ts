@@ -5,6 +5,7 @@ import {GameOptions} from '../game/GameOptions';
 import {GameId, ParticipantId} from '../../common/Types';
 import {SerializedGame} from '../SerializedGame';
 import {Session, SessionId} from '../auth/Session';
+import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
 
 // Operation names that get routed to `maintenanceLatency` instead of `operationLatency`. These are
 // batch/background jobs (purge, compress) that run on a much longer timescale than a typical
@@ -162,5 +163,25 @@ export class MetricsDelegate implements IDatabase {
 
   getSessions(): Promise<Array<Session>> {
     return withDatabaseMetrics('getSessions', () => this.delegate.getSessions());
+  }
+
+  listMapLibraryEntries(): Promise<Array<MapLibraryEntry>> {
+    return withDatabaseMetrics('listMapLibraryEntries', () => this.delegate.listMapLibraryEntries());
+  }
+
+  getMapLibraryEntry(id: MapLibraryEntryId): Promise<MapLibraryEntry | undefined> {
+    return withDatabaseMetrics('getMapLibraryEntry', () => this.delegate.getMapLibraryEntry(id));
+  }
+
+  insertMapLibraryEntry(entry: MapLibraryEntry): Promise<void> {
+    return withDatabaseMetrics('insertMapLibraryEntry', () => this.delegate.insertMapLibraryEntry(entry));
+  }
+
+  setMapLibraryEntryStatus(id: MapLibraryEntryId, status: MapLibraryStatus): Promise<void> {
+    return withDatabaseMetrics('setMapLibraryEntryStatus', () => this.delegate.setMapLibraryEntryStatus(id, status));
+  }
+
+  deleteMapLibraryEntry(id: MapLibraryEntryId): Promise<void> {
+    return withDatabaseMetrics('deleteMapLibraryEntry', () => this.delegate.deleteMapLibraryEntry(id));
   }
 }
