@@ -116,7 +116,7 @@
                             </template>
 
                             <template v-if="expansions.turmoil">
-                                <input type="checkbox" name="politicalAgendas" id="politicalAgendas-checkbox" @change="politicalAgendasExtensionToggle()">
+                                <input type="checkbox" name="politicalAgendas" id="politicalAgendas-checkbox" :checked="isPoliticalAgendasExtensionEnabled()" @change="politicalAgendasExtensionToggle()">
                                 <label for="politicalAgendas-checkbox" class="expansion-button">
                                     <div class="create-game-expansion-icon expansion-icon-agendas"></div>
                                     <span v-i18n>Agendas</span>&nbsp;<a href="https://www.notion.so/Political-Agendas-8c6b0b018a884692be29b3ef44b340a9" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
@@ -426,7 +426,7 @@
                                 <span v-i18n>Random first player</span>
                             </label>
 
-                            <input type="checkbox" name="randomMAToggle" id="randomMA-checkbox" @change="randomMAToggle()">
+                            <input type="checkbox" name="randomMAToggle" id="randomMA-checkbox" :checked="isRandomMAEnabled()" @change="randomMAToggle()">
                             <label for="randomMA-checkbox">
                                 <span v-i18n>Random Milestones/Awards</span>&nbsp;<a :href="wikiUrls.randomMilestonesAndAwards" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
@@ -956,7 +956,7 @@ export default defineComponent({
     getPlayers(): Array<NewPlayerModel> {
       return this.players.slice(0, this.playersCount);
     },
-    isRandomMAEnabled(): Boolean {
+    isRandomMAEnabled(): boolean {
       return this.randomMA !== RandomMAOptionType.NONE;
     },
     randomMAToggle() {
@@ -975,7 +975,7 @@ export default defineComponent({
         return RandomMAOptionType.NONE;
       }
     },
-    isPoliticalAgendasExtensionEnabled(): Boolean {
+    isPoliticalAgendasExtensionEnabled(): boolean {
       return this.politicalAgendasExtension !== 'Standard';
     },
     politicalAgendasExtensionToggle() {

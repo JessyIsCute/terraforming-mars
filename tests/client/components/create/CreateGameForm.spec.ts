@@ -9,6 +9,7 @@ import {DEFAULT_EXPANSIONS} from '@/common/cards/GameModule';
 import {JSONObject} from '@/common/Types';
 import {defineComponent} from 'vue';
 import {NewGameConfig} from '@/common/game/NewGameConfig';
+import {RandomMAOptionType} from '@/common/ma/RandomMAOptionType';
 
 // Minimal serialized Create Game payload used by settings restore tests.
 function createNewGameConfig(overrides: JSONObject = {}):  NewGameConfig {
@@ -44,6 +45,31 @@ describe('CreateGameForm', () => {
       ...globalConfig,
     });
     expect(wrapper.exists()).to.be.true;
+  });
+
+  it('keeps the randomMA and agendas toggle checkboxes in sync with restored state', async () => {
+    // Regression: these two checkboxes toggle their bound value via @change instead of
+    // v-model, so restoring settings (e.g. after a page refresh) updated the underlying data
+    // and the sub-option radios (which do use v-model) but left the checkbox itself showing
+    // unchecked -- looking like the feature was off while its sub-option was highlighted on.
+    const wrapper = mount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+
+    vm.playersCount = 2; // the randomMA/agendas section only renders for 2+ players
+    vm.randomMA = RandomMAOptionType.LIMITED;
+    vm.expansions.turmoil = true;
+    vm.politicalAgendasExtension = 'Random';
+    await wrapper.vm.$nextTick();
+
+    expect((wrapper.find('#randomMA-checkbox').element as HTMLInputElement).checked).to.be.true;
+    expect((wrapper.find('#politicalAgendas-checkbox').element as HTMLInputElement).checked).to.be.true;
+
+    vm.randomMA = RandomMAOptionType.NONE;
+    vm.politicalAgendasExtension = 'Standard';
+    await wrapper.vm.$nextTick();
+
+    expect((wrapper.find('#randomMA-checkbox').element as HTMLInputElement).checked).to.be.false;
+    expect((wrapper.find('#politicalAgendas-checkbox').element as HTMLInputElement).checked).to.be.false;
   });
 
   it('has a custom map code field that loads a board from a pasted code', async () => {
