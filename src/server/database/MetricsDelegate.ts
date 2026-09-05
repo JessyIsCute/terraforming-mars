@@ -6,6 +6,7 @@ import {GameId, ParticipantId} from '../../common/Types';
 import {SerializedGame} from '../SerializedGame';
 import {Session, SessionId} from '../auth/Session';
 import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
+import {CustomCardLibraryEntry, CustomCardEntryId, CustomCardStatus} from '../../common/cards/CustomCardLibraryEntry';
 
 // Operation names that get routed to `maintenanceLatency` instead of `operationLatency`. These are
 // batch/background jobs (purge, compress) that run on a much longer timescale than a typical
@@ -183,5 +184,29 @@ export class MetricsDelegate implements IDatabase {
 
   deleteMapLibraryEntry(id: MapLibraryEntryId): Promise<void> {
     return withDatabaseMetrics('deleteMapLibraryEntry', () => this.delegate.deleteMapLibraryEntry(id));
+  }
+
+  listCustomCardLibraryEntries(): Promise<Array<CustomCardLibraryEntry>> {
+    return withDatabaseMetrics('listCustomCardLibraryEntries', () => this.delegate.listCustomCardLibraryEntries());
+  }
+
+  getCustomCardLibraryEntry(id: CustomCardEntryId): Promise<CustomCardLibraryEntry | undefined> {
+    return withDatabaseMetrics('getCustomCardLibraryEntry', () => this.delegate.getCustomCardLibraryEntry(id));
+  }
+
+  insertCustomCardLibraryEntry(entry: CustomCardLibraryEntry): Promise<void> {
+    return withDatabaseMetrics('insertCustomCardLibraryEntry', () => this.delegate.insertCustomCardLibraryEntry(entry));
+  }
+
+  setCustomCardLibraryEntryStatus(id: CustomCardEntryId, status: CustomCardStatus): Promise<void> {
+    return withDatabaseMetrics('setCustomCardLibraryEntryStatus', () => this.delegate.setCustomCardLibraryEntryStatus(id, status));
+  }
+
+  updateCustomCardLibraryEntry(id: CustomCardEntryId, entry: CustomCardLibraryEntry): Promise<void> {
+    return withDatabaseMetrics('updateCustomCardLibraryEntry', () => this.delegate.updateCustomCardLibraryEntry(id, entry));
+  }
+
+  deleteCustomCardLibraryEntry(id: CustomCardEntryId): Promise<void> {
+    return withDatabaseMetrics('deleteCustomCardLibraryEntry', () => this.delegate.deleteCustomCardLibraryEntry(id));
   }
 }
