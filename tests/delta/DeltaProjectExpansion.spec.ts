@@ -843,6 +843,28 @@ describe('DeltaProjectExpansion', () => {
         runAllActions(game);
         expect(player2.popWaitingFor()).is.undefined; // no reward (position 5 would draw 4 keep 2)
       });
+
+      it('does not double the bonus when the owner has both corporations and their own two markers tie for the lead', () => {
+        // Two-corporations variant: the same player owns both Zeta Tollkeeper (from the
+        // outer beforeEach) and Epsilon Dample, and their two markers are tied for the
+        // overall lead - only one of them should be knocked back and rewarded, not both.
+        player.epsilonDampleData = {position: 6, jovianBonus: false};
+        player.deltaProjectData!.position = 6;
+        player2.deltaProjectData!.position = 2;
+        player.production.override({titanium: 0, megacredits: 0});
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        // The primary marker is the deterministic tie-break winner - it moves back and
+        // is rewarded; the epsilon marker, tied at the same position, is untouched.
+        expect(player.deltaProjectData!.position).eq(5);
+        expect(player.epsilonDampleData!.position).eq(6);
+
+        // Positions 1-5's rewards are each granted exactly once, not doubled up.
+        expect(player.production.megacredits).eq(2); // position 3
+        expect(player.production.titanium).eq(1); // position 4
+        expect(game.deferredActions).has.lengthOf(3); // positions 1, 2 and 5's choices
+      });
     });
   });
 });
