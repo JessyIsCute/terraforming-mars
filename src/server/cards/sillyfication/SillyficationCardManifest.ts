@@ -53,6 +53,7 @@ import {OvercrowdedColony} from './OvercrowdedColony';
 import {NecroticBloom} from './NecroticBloom';
 import {GuerrillaGardening} from './GuerrillaGardening';
 import {SlashAndBurn} from './SlashAndBurn';
+import {ColonySale} from './ColonySale';
 import {Nepotism} from './Nepotism';
 import {RotatingHands} from './RotatingHands';
 import {ShowAndTell} from './ShowAndTell';
@@ -184,6 +185,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.VITOR_VITALIS]: {Factory: VitorVitalis},
     [CardName.CORRUPT_GOVERNORS]: {Factory: CorruptGovernors, compatibility: 'turmoil'},
     [CardName.OVERCROWDED_COLONY]: {Factory: OvercrowdedColony, compatibility: 'colonies'},
+    [CardName.COLONY_SALE]: {Factory: ColonySale, compatibility: 'colonies'},
     [CardName.NECROTIC_BLOOM]: {Factory: NecroticBloom},
     [CardName.GUERRILLA_GARDENING]: {Factory: GuerrillaGardening},
     [CardName.SLASH_AND_BURN]: {Factory: SlashAndBurn},

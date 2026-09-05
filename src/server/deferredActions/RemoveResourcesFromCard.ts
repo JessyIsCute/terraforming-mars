@@ -23,6 +23,7 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
   private title: string | Message;
   private log: boolean;
   private min: number;
+  private restrictToPlayer: IPlayer | undefined;
 
   public override priority: Priority = Priority.ATTACK_OPPONENT;
   constructor(
@@ -41,6 +42,9 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
       log?: boolean,
       /** Minimum resources a card must have to be offered as a target. Default 1 — most callers remove "up to count," not exactly count. */
       min?: number,
+      /** Narrow `source` down to one specific player (e.g. "opponents" who also placed a
+       * particular tile), instead of every player that `source` would otherwise allow. */
+      restrictToPlayer?: IPlayer,
     }) {
     super(player, Priority.ATTACK_OPPONENT);
     this.cardResource = cardResource;
@@ -52,6 +56,7 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
     this.log = options?.log ?? false;
     this.title = options?.title ?? (`Select card to remove ${count} ${cardResource}(s)`);
     this.min = options?.min ?? 1;
+    this.restrictToPlayer = options?.restrictToPlayer;
     if (this.source === 'self') {
       this.priority = Priority.LOSE_RESOURCE_OR_PRODUCTION;
       if (this.blockable) {
@@ -67,7 +72,11 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
       return undefined;
     }
 
-    const cards = RemoveResourcesFromCard.getAvailableTargetCards(this.player, this.cardResource, this.source, this.min);
+    let cards = RemoveResourcesFromCard.getAvailableTargetCards(this.player, this.cardResource, this.source, this.min);
+    if (this.restrictToPlayer !== undefined) {
+      const restrictToPlayer = this.restrictToPlayer;
+      cards = cards.filter((card) => this.player.game.getCardPlayerOrThrow(card.name) === restrictToPlayer);
+    }
 
     if (cards.length === 0) {
       this.cb({card: undefined, owner: undefined, proceed: false});
