@@ -39,11 +39,11 @@ describe('Critterworld', () => {
     expect(card.resourceCount).to.eq(3);
   });
 
-  it('initial action draws 3 animal-tag cards', () => {
+  it('initial action draws 2 animal-tag cards', () => {
     player.cardsInHand = [];
     player.defer(card.initialAction(player));
     runAllActions(game);
-    expect(player.cardsInHand).to.have.length(3);
+    expect(player.cardsInHand).to.have.length(2);
     expect(player.cardsInHand.every((c) => c.tags.includes('animal' as any))).is.true;
   });
 

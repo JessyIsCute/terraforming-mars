@@ -19,7 +19,7 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
       startingMegaCredits: 36,
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}, per: 4},
-      initialActionText: 'Draw 3 cards with an animal tag',
+      initialActionText: 'Draw 2 cards with an animal tag',
 
       behavior: {
         addResources: 8,
@@ -27,9 +27,9 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
 
       metadata: {
         cardNumber: 'XC3',
-        description: 'You start with 36 M€ and add 8 animals to this card. As your first action, draw 3 cards with an animal tag.',
+        description: 'You start with 36 M€ and add 8 animals to this card. As your first action, draw 2 cards with an animal tag.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(36).nbsp.resource(CardResource.ANIMAL, {amount: 8, digit}).nbsp.cards(3, {secondaryTag: Tag.ANIMAL});
+          b.megacredits(36).nbsp.resource(CardResource.ANIMAL, {amount: 8, digit}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you add an animal to another card, add an animal to this card.', (eb) => {
@@ -45,7 +45,7 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
   }
 
   public override initialAction(player: IPlayer) {
-    player.drawCard(3, {include: (card) => card.tags.includes(Tag.ANIMAL)});
+    player.drawCard(2, {include: (card) => card.tags.includes(Tag.ANIMAL)});
     return undefined;
   }
 
