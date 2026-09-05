@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {SteelPhobo} from '../../../src/server/cards/sillyfication/SteelPhobo';
+import {Tag} from '../../../src/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 
@@ -10,6 +11,10 @@ describe('SteelPhobo', () => {
   beforeEach(() => {
     card = new SteelPhobo();
     [/* game */, player] = testGame(2);
+  });
+
+  it('has a Space tag and a Building tag', () => {
+    expect(card.tags).to.deep.eq([Tag.SPACE, Tag.BUILDING]);
   });
 
   it('steel is worth 2 more, titanium 1 less', () => {

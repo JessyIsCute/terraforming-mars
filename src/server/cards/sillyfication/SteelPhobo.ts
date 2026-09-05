@@ -12,7 +12,7 @@ export class SteelPhobo extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.STEEL_PHOBO,
-      tags: [Tag.SPACE],
+      tags: [Tag.SPACE, Tag.BUILDING],
       cost: 13,
 
       behavior: {
