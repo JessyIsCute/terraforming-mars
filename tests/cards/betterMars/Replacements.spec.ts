@@ -9,6 +9,9 @@ import {LunarBeamBetterMars} from '../../../src/server/cards/betterMars/LunarBea
 import {LunaMetropolisBetterMars} from '../../../src/server/cards/betterMars/LunaMetropolisBetterMars';
 import {LunarExportsBetterMars} from '../../../src/server/cards/betterMars/LunarExportsBetterMars';
 import {MarsUniversityBetterMars} from '../../../src/server/cards/betterMars/MarsUniversityBetterMars';
+import {MeatIndustryBetterMars} from '../../../src/server/cards/betterMars/MeatIndustryBetterMars';
+import {Fish} from '../../../src/server/cards/base/Fish';
+import {runAllActions} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 
 const MOON_SWAPS: ReadonlyArray<[CardName, ReadonlyArray<Tag>]> = [
@@ -50,6 +53,7 @@ const ALL_REPLACEMENTS: ReadonlyArray<[CardName, CardName]> = [
   [CardName.PROTECTED_HABITATS_BETTER_MARS, CardName.PROTECTED_HABITATS],
   [CardName.TROPICAL_RESORT_BETTER_MARS, CardName.TROPICAL_RESORT],
   [CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS, CardName.MARTIAN_MEDIA_CENTER],
+  [CardName.MEAT_INDUSTRY_BETTER_MARS, CardName.MEAT_INDUSTRY],
 ];
 
 describe('BetterMars replacement cards', () => {
@@ -68,9 +72,10 @@ describe('BetterMars replacement cards', () => {
     }
   });
 
-  it('cost bumps: Lunar Exports +1, Mars University +2', () => {
+  it('cost bumps: Lunar Exports +1, Mars University +2, Meat Industry +1', () => {
     expect(new LunarExportsBetterMars().cost).to.eq(20);
     expect(new MarsUniversityBetterMars().cost).to.eq(10);
+    expect(new MeatIndustryBetterMars().cost).to.eq(6);
   });
 
   it('each replacement has a unique BetterMars card number', () => {
@@ -92,6 +97,7 @@ describe('BetterMars replacement cards', () => {
       venusNextExtension: true,
       coloniesExtension: true,
       turmoilExtension: true,
+      promoCardsOption: true,
       betterMarsExpansion: true,
     };
     const cards = new GameCards(gameOptions);
@@ -114,6 +120,7 @@ describe('BetterMars replacement cards', () => {
       venusNextExtension: true,
       coloniesExtension: true,
       turmoilExtension: true,
+      promoCardsOption: true,
       betterMarsExpansion: false,
     };
     const cards = new GameCards(gameOptions);
@@ -126,6 +133,22 @@ describe('BetterMars replacement cards', () => {
       expect(pool, `${base} present`).to.contain(base);
       expect(pool, `${replacement} absent`).to.not.contain(replacement);
     }
+  });
+
+  it('Meat Industry:bm has an Animal tag and gains 1 M€ per animal (was 2)', () => {
+    const card = new MeatIndustryBetterMars();
+    expect(card.tags).to.deep.eq([Tag.BUILDING, Tag.ANIMAL]);
+
+    const [game, player] = testGame(2);
+    player.playedCards.push(card);
+
+    const fish = new Fish();
+    player.playedCards.push(fish);
+    fish.action(player);
+    runAllActions(game);
+
+    expect(fish.resourceCount).to.eq(1);
+    expect(player.megaCredits).to.eq(1);
   });
 
   it('Lunar Beam:bm still works like Lunar Beam', () => {

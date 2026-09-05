@@ -704,6 +704,7 @@ export enum CardName {
   PROTECTED_HABITATS_BETTER_MARS = 'Protected Habitats:bm',
   TROPICAL_RESORT_BETTER_MARS = 'Tropical Resort:bm',
   MARTIAN_MEDIA_CENTER_BETTER_MARS = 'Martian Media Center:bm',
+  MEAT_INDUSTRY_BETTER_MARS = 'Meat Industry:bm',
 
   // Community corps
   AEROTECH = 'Aerotech',

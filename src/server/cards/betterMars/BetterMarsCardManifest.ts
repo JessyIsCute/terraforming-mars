@@ -16,10 +16,12 @@ import {MarsUniversityBetterMars} from './MarsUniversityBetterMars';
 import {ProtectedHabitatsBetterMars} from './ProtectedHabitatsBetterMars';
 import {TropicalResortBetterMars} from './TropicalResortBetterMars';
 import {MartianMediaCenterBetterMars} from './MartianMediaCenterBetterMars';
+import {MeatIndustryBetterMars} from './MeatIndustryBetterMars';
 
 /**
- * BetterMars: replaces a handful of official cards with Mars-flavoured variants
- * (an extra Mars tag, or an Earth tag turned into a Moon tag). The base cards are
+ * BetterMars: replaces a handful of official cards with tag-variant reworks
+ * (an extra Mars tag, an Earth tag turned into a Moon tag, an Animal tag added
+ * to a meat-industry card, etc). The base cards are
  * swapped out via `cardsToRemove` whenever this module is enabled.
  */
 export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
@@ -45,6 +47,7 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.PROTECTED_HABITATS_BETTER_MARS]: {Factory: ProtectedHabitatsBetterMars},
     [CardName.TROPICAL_RESORT_BETTER_MARS]: {Factory: TropicalResortBetterMars},
     [CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS]: {Factory: MartianMediaCenterBetterMars, compatibility: 'turmoil'},
+    [CardName.MEAT_INDUSTRY_BETTER_MARS]: {Factory: MeatIndustryBetterMars},
   },
   cardsToRemove: [
     CardName.LUNAR_BEAM,
@@ -63,5 +66,6 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     CardName.PROTECTED_HABITATS,
     CardName.TROPICAL_RESORT,
     CardName.MARTIAN_MEDIA_CENTER,
+    CardName.MEAT_INDUSTRY,
   ],
 });
