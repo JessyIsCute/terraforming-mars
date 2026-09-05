@@ -11,13 +11,13 @@ export class Jupiter extends Card implements IProjectCard {
       name: CardName.JUPITER,
       tags: [Tag.JOVIAN, Tag.JOVIAN, Tag.JOVIAN],
       cost: 50,
-      victoryPoints: 10,
+      victoryPoints: 6,
 
       requirements: {tag: Tag.JOVIAN, count: 3},
 
       metadata: {
         cardNumber: 'T24',
-        description: 'Requires 3 Jovian tags.',
+        description: 'Requires 3 Jovian tags. Yes, the planet itself',
       },
     });
   }

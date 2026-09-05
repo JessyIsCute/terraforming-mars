@@ -17,8 +17,18 @@ describe('AriAdore', () => {
     player.megaCredits = 0;
   });
 
-  it('scores 2 VP', () => {
+  it('costs 20 and scores 2 VP', () => {
+    expect(card.cost).to.eq(20);
     expect(card.getVictoryPoints(player)).to.eq(2);
+  });
+
+  it('gains 3 M€ per unique tag already in play when played', () => {
+    player.playedCards.push(new Fish()); // animal
+    player.playedCards.push(new LunarBeam()); // energy, earth
+
+    card.bespokePlay(player);
+
+    expect(player.megaCredits).to.eq(3 * 3);
   });
 
   it('gains 1 M€ per unique tag type in play, on each new type', () => {

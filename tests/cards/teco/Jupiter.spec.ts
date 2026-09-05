@@ -13,9 +13,9 @@ describe('Jupiter', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('has three Jovian tags and 10 VP', () => {
+  it('has three Jovian tags and 6 VP', () => {
     expect(card.tags).to.deep.eq([Tag.JOVIAN, Tag.JOVIAN, Tag.JOVIAN]);
-    expect(card.getVictoryPoints(player)).to.eq(10);
+    expect(card.getVictoryPoints(player)).to.eq(6);
   });
 
   it('requires 3 Jovian tags', () => {

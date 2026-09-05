@@ -17,12 +17,15 @@ export class AriAdore extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.ARI_ADORE,
-      cost: 28,
+      cost: 20,
       victoryPoints: 2,
 
       metadata: {
         cardNumber: 'X39',
         renderData: CardRenderer.builder((b) => {
+          b.effect('When played, gain 3 M€ for each unique tag you have.', (eb) => {
+            eb.startEffect.megacredits(3).slash().diverseTag();
+          }).br;
           b.effect('When you get a new type of tag in play [event cards do not count], gain 1 M€ for each unique tag you have.', (eb) => {
             eb.diverseTag().startEffect.megacredits(1).slash().diverseTag();
           });
@@ -44,6 +47,7 @@ export class AriAdore extends Card implements IProjectCard {
         this.allTags.add(tag);
       }
     }
+    player.stock.add(Resource.MEGACREDITS, this.allTags.size * 3, {log: true});
     return undefined;
   }
 
