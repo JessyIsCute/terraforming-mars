@@ -11,10 +11,10 @@ export class Electrobic extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       name: CardName.ELECTROBIC,
       tags: [Tag.MICROBE, Tag.POWER],
-      cost: 4,
+      cost: 3,
 
       behavior: {
-        spend: {plants: 4},
+        spend: {plants: 3},
         production: {energy: 2},
       },
 
@@ -22,9 +22,9 @@ export class Electrobic extends Card implements IProjectCard {
         cardNumber: 'T30',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.energy(2)).br;
-          b.minus().plants(4);
+          b.minus().plants(3);
         }),
-        description: 'Lose 4 plants. Increase your energy production 2 steps.',
+        description: 'Lose 3 plants. Increase your energy production 2 steps.',
       },
     });
   }

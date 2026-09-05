@@ -222,7 +222,8 @@ export default defineComponent({
           return this.playerinput.paymentOptions.heat === true;
         case 'steel':
           return this.tags.includes(Tag.BUILDING) ||
-          this.playerView.thisPlayer.lastCardPlayed === CardName.LAST_RESORT_INGENUITY;
+          this.playerView.thisPlayer.lastCardPlayed === CardName.LAST_RESORT_INGENUITY ||
+          (this.tags.includes(Tag.CITY) && this.playerView.thisPlayer.tableau.some((c) => c.name === CardName.BLOCKHOUSE));
         case 'titanium':
           return this.canUseTitaniumRegularly() ||
           this.playerinput.paymentOptions.lunaTradeFederationTitanium === true;

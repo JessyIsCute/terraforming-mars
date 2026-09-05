@@ -25,12 +25,12 @@ export class MoonCow extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T01',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.ANIMAL).br;
           b.effect('When any tile is placed on the Moon, add an animal to this card.', (eb) => {
             eb.emptyTile().startEffect.resource(CardResource.ANIMAL);
-          });
+          }).br;
+          b.resource(CardResource.ANIMAL);
         }),
-        description: 'Requires 2 habitat tiles on the Moon. Starts with 1 animal.',
+        description: 'Requires 2 habitat tiles on the Moon. Add 1 animal to this card when played.',
       },
     });
   }

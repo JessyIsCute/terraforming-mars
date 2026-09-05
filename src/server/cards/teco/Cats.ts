@@ -25,12 +25,12 @@ export class Cats extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T12',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.ANIMAL).br;
           b.effect('When any city tile is placed, steal an animal from any player\'s card and add it to this card. If no player has an animal, add one here anyway.', (eb) => {
             eb.city({all}).startEffect.resource(CardResource.ANIMAL);
-          });
+          }).br;
+          b.resource(CardResource.ANIMAL);
         }),
-        description: 'Starts with 1 animal.',
+        description: 'Add 1 animal to this card when played.',
       },
     });
   }

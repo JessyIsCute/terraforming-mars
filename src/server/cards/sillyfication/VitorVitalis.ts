@@ -14,10 +14,10 @@ export class VitorVitalis extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.VITOR_VITALIS,
       tags: [Tag.SCIENCE],
-      cost: 24,
-      victoryPoints: 4,
+      cost: 20,
+      victoryPoints: 3,
 
-      requirements: {tag: Tag.SCIENCE, count: 6},
+      requirements: {tag: Tag.SCIENCE, count: 4},
 
       metadata: {
         cardNumber: 'X48',
@@ -26,7 +26,7 @@ export class VitorVitalis extends Card implements IProjectCard {
             eb.vpIcon().asterix().startEffect.megacredits(1);
           });
         }),
-        description: 'Requires 6 science tags.',
+        description: 'Requires 4 science tags.',
       },
     });
   }

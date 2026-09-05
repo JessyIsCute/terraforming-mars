@@ -12,7 +12,7 @@ export class ThermalSmeltery extends ActionCard implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.THERMAL_SMELTERY,
       tags: [Tag.BUILDING],
-      cost: 6,
+      cost: 9,
 
       action: {
         spend: {heat: 6},

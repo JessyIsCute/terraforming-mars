@@ -13,8 +13,8 @@ export class GenerousRedistribution extends PreludeCard {
       metadata: {
         cardNumber: 'T13',
         renderData: CardRenderer.builder((b) => {
-          b.tr(3, {all}).plants(2, {all}).cards(1, {all}).br;
-          b.text('you get twice that').colon().tr(6).plants(4, {digit}).cards(2);
+          b.tr(3, {all, digit}).plants(2, {all}).cards(1, {all}).br;
+          b.tr(6, {digit}).plants(4, {digit}).cards(2);
         }),
         description: 'Every player gains 3 TR, 2 plants, and 1 card. You gain twice as much of each.',
       },

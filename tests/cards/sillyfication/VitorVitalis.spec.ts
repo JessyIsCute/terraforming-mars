@@ -17,12 +17,12 @@ describe('VitorVitalis', () => {
     player.megaCredits = 0;
   });
 
-  it('requires 6 science tags; scores 4 VP', () => {
-    player.tagsForTest = {science: 5};
+  it('requires 4 science tags; scores 3 VP', () => {
+    player.tagsForTest = {science: 3};
     expect(card.canPlay(player)).is.false;
-    player.tagsForTest = {science: 6};
+    player.tagsForTest = {science: 4};
     expect(card.canPlay(player)).is.true;
-    expect(card.getVictoryPoints(player)).to.eq(4);
+    expect(card.getVictoryPoints(player)).to.eq(3);
   });
 
   it('gains 1 M€ on a non-negative VP card, nothing otherwise', () => {

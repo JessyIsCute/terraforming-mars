@@ -14,7 +14,7 @@ export class Microbitic extends Card implements IProjectCard {
       cost: 12,
 
       behavior: {
-        spend: {plants: 4},
+        spend: {plants: 2},
         production: {plants: 2},
       },
 
@@ -22,9 +22,9 @@ export class Microbitic extends Card implements IProjectCard {
         cardNumber: 'T32',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.plants(2)).br;
-          b.minus().plants(4);
+          b.minus().plants(2);
         }),
-        description: 'Lose 4 plants. Increase your plant production 2 steps.',
+        description: 'Lose 2 plants. Increase your plant production 2 steps.',
       },
     });
   }

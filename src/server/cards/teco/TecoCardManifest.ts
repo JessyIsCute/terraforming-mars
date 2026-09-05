@@ -76,6 +76,6 @@ export const TECO_CARD_MANIFEST = new ModuleManifest({
     [CardName.BALANCE]: {Factory: Balance, compatibility: 'prelude'},
     [CardName.MARS_HOMESTEAD_ACT]: {Factory: MarsHomesteadAct, compatibility: 'prelude'},
     [CardName.INSIDER_TRADING]: {Factory: InsiderTrading, compatibility: ['prelude', 'underworld']},
-    [CardName.MARKET_CRASH]: {Factory: MarketCrash, compatibility: 'prelude'},
+    [CardName.MARKET_CRASH]: {Factory: MarketCrash, compatibility: ['prelude', 'underworld']},
   },
 });

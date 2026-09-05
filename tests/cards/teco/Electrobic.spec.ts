@@ -12,15 +12,15 @@ describe('Electrobic', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('requires 4 plants to play', () => {
-    player.plants = 3;
+  it('requires 3 plants to play', () => {
+    player.plants = 2;
     expect(card.canPlay(player)).is.false;
-    player.plants = 4;
+    player.plants = 3;
     expect(card.canPlay(player)).is.true;
   });
 
-  it('spends 4 plants for 2 energy production', () => {
-    player.plants = 4;
+  it('spends 3 plants for 2 energy production', () => {
+    player.plants = 3;
     player.production.override({energy: 0});
 
     card.play(player);

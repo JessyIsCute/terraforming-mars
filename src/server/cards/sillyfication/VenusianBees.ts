@@ -14,7 +14,7 @@ export class VenusianBees extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       name: CardName.VENUSIAN_BEES,
       tags: [Tag.VENUS, Tag.ANIMAL, Tag.MICROBE],
-      cost: 12,
+      cost: 10,
 
       requirements: {venus: 14},
 

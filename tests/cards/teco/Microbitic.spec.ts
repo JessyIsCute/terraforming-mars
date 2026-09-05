@@ -12,15 +12,15 @@ describe('Microbitic', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('requires 4 plants to play', () => {
-    player.plants = 3;
+  it('requires 2 plants to play', () => {
+    player.plants = 1;
     expect(card.canPlay(player)).is.false;
-    player.plants = 4;
+    player.plants = 2;
     expect(card.canPlay(player)).is.true;
   });
 
-  it('spends 4 plants for 2 plant production', () => {
-    player.plants = 4;
+  it('spends 2 plants for 2 plant production', () => {
+    player.plants = 2;
     player.production.override({plants: 0});
 
     card.play(player);

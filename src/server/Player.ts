@@ -754,7 +754,8 @@ export class Player implements IPlayer {
   private paymentOptionsForCard(card: IProjectCard): PaymentOptions {
     return {
       heat: this.canUseHeatAsMegaCredits,
-      steel: this.lastCardPlayed === CardName.LAST_RESORT_INGENUITY || card.tags.includes(Tag.BUILDING),
+      steel: this.lastCardPlayed === CardName.LAST_RESORT_INGENUITY || card.tags.includes(Tag.BUILDING) ||
+        (card.tags.includes(Tag.CITY) && this.tableau.has(CardName.BLOCKHOUSE)),
       plants: card.tags.includes(Tag.BUILDING) && this.playedCards.has(CardName.MARTIAN_LUMBER_CORP),
       titanium: this.lastCardPlayed === CardName.LAST_RESORT_INGENUITY || card.tags.includes(Tag.SPACE),
       lunaTradeFederationTitanium: this.canUseTitaniumAsMegacredits,
@@ -798,7 +799,12 @@ export class Player implements IPlayer {
     }
 
     // TODO(kberg): Move this.paymentOptionsForCard to a parameter.
-    const totalToPay = this.payingAmount(payment, this.paymentOptionsForCard(selectedCard));
+    let totalToPay = this.payingAmount(payment, this.paymentOptionsForCard(selectedCard));
+
+    // Blockhouse: steel is worth 2 M€ extra when paying for a City-tagged card.
+    if (payment.steel > 0 && selectedCard.tags.includes(Tag.CITY) && this.tableau.has(CardName.BLOCKHOUSE)) {
+      totalToPay += payment.steel * 2;
+    }
 
     if (totalToPay < cardCost) {
       throw new Error('Did not spend enough to pay for card');

@@ -23,7 +23,7 @@ export class Microbetronics extends Card implements IProjectCard {
         cardNumber: 'T31',
         renderData: CardRenderer.builder((b) => {
           b.effect('Gain 1 energy production for every 2 microbe tags you have, including this one.', (eb) => {
-            eb.tag(Tag.MICROBE, 2).startEffect.production((pb) => pb.energy(1));
+            eb.tag(Tag.MICROBE).startEffect.production((pb) => pb.energy(1)).slash().tag(Tag.MICROBE, 2);
           });
         }),
       },

@@ -25,4 +25,12 @@ describe('Teco module', () => {
     expect(onPool).to.contain(CardName.GENEROUS_REDISTRIBUTION);
     expect(onPool).to.contain(CardName.MARS_HOMESTEAD_ACT);
   });
+
+  it('only offers Market Crash (a Crime-tagged prelude) when underworldExpansion is on', () => {
+    const withoutUnderworld: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, tecoExpansion: true, underworldExpansion: false};
+    const withUnderworld: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, tecoExpansion: true, underworldExpansion: true};
+
+    expect(new GameCards(withoutUnderworld).getPreludeCards().map(toName)).to.not.contain(CardName.MARKET_CRASH);
+    expect(new GameCards(withUnderworld).getPreludeCards().map(toName)).to.contain(CardName.MARKET_CRASH);
+  });
 });
