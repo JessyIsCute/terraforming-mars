@@ -14,6 +14,8 @@ import {ApiGames} from '../routes/ApiGames';
 import {ApiHeapSnapshot} from '../routes/ApiHeapSnapshot';
 import {ApiIPs} from '../routes/ApiIPs';
 import {ApiLogout} from '../routes/ApiLogout';
+import {ApiMapLibrary} from '../routes/ApiMapLibrary';
+import {ApiMapLibraryReview} from '../routes/ApiMapLibraryReview';
 import {ApiMetrics} from '../routes/ApiMetrics';
 import {ApiPlayer} from '../routes/ApiPlayer';
 import {ApiProfile} from '../routes/ApiProfile';
@@ -114,6 +116,9 @@ const handlers: Map<string, IHandler> = new Map(
     [paths.LOAD_GAME, LoadGame.INSTANCE],
     [paths.LOGIN, Login.INSTANCE],
     [paths.MAP_EDITOR, ServeApp.INSTANCE],
+    [paths.MAP_LIBRARY, ServeApp.INSTANCE],
+    [paths.API_MAP_LIBRARY, ApiMapLibrary.INSTANCE],
+    [paths.API_MAP_LIBRARY_REVIEW, ApiMapLibraryReview.INSTANCE],
     [paths.API_LOGOUT, ApiLogout.INSTANCE],
     ['main.js', ServeAsset.INSTANCE],
     ['main.js.map', ServeAsset.INSTANCE],
