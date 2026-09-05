@@ -42,7 +42,8 @@ import {CardMetadata} from '@/common/cards/CardMetadata';
 import {Tag} from '@/common/cards/Tag';
 import {getPreferences} from '@/client/utils/PreferencesManager';
 import {CardResource} from '@/common/CardResource';
-import {getCardOrThrow} from '@/client/cards/ClientCardManifest';
+import {getCard} from '@/client/cards/ClientCardManifest';
+import {buildClientCardFromCustom} from '@/client/cards/CustomCardAdapter';
 import {Color} from '@/common/Color';
 import {CardRequirementDescriptor} from '@/common/cards/CardRequirementDescriptor';
 import {GameModule} from '@/common/cards/GameModule';
@@ -90,7 +91,15 @@ export default defineComponent({
   },
   data() {
     const cardName = this.card.name;
-    const card = getCardOrThrow(cardName);
+    // A card not in the compiled static manifest is always a Custom Card Maker card -- its
+    // face-of-card data instead came over the wire in `card.customCard` (see CustomCardModel's
+    // doc comment). Fail loudly (matching getCardOrThrow's old behavior) if somehow neither
+    // resolves -- that's a server-side bug, not something to silently paper over here.
+    const staticCard = getCard(cardName);
+    const card = staticCard ?? (this.card.customCard && buildClientCardFromCustom(cardName, this.card.customCard));
+    if (card === undefined || card === null) {
+      throw new Error(`card not found ${cardName}`);
+    }
 
     return {
       cardInstance: card,
