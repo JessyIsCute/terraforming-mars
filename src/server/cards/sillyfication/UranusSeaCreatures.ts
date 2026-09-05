@@ -19,7 +19,7 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}},
 
-      requirements: {tag: Tag.JOVIAN, count: 3},
+      requirements: {tag: Tag.JOVIAN, count: 3, all},
 
       metadata: {
         cardNumber: 'X41',
@@ -29,7 +29,7 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
           }).br;
           b.vpText('1 VP per animal on this card.');
         }),
-        description: 'Requires 3 Jovian tags.',
+        description: 'Requires ANY 3 Jovian tags in play.',
       },
     });
   }

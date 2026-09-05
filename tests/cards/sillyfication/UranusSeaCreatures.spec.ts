@@ -18,10 +18,18 @@ describe('UranusSeaCreatures', () => {
     player.playedCards.push(card);
   });
 
-  it('requires 3 Jovian tags', () => {
+  it('requires ANY 3 Jovian tags in play', () => {
     player.tagsForTest = {jovian: 2};
     expect(card.canPlay(player)).is.false;
     player.tagsForTest = {jovian: 3};
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('counts an opponent\'s Jovian tags towards the requirement', () => {
+    player.tagsForTest = {jovian: 2};
+    expect(card.canPlay(player)).is.false;
+
+    player2.tagsForTest = {jovian: 1};
     expect(card.canPlay(player)).is.true;
   });
 
