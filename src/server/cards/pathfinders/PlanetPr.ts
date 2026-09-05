@@ -8,6 +8,7 @@ import {CardRenderer} from '../render/CardRenderer';
 import {DeclareCloneTag} from '../../pathfinders/DeclareCloneTag';
 import {ICloneTagCard} from './ICloneTagCard';
 import {DrawCards} from '../../deferredActions/DrawCards';
+import {CardResource} from '../../../common/CardResource';
 
 export class PlanetPr extends CorporationCard implements ICorporationCard, ICloneTagCard {
   constructor() {
@@ -25,9 +26,21 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
             ce.effect('When you raise a planetary track 1 or more steps, raise it 1 additional step, including this time.', (eb) => {
               eb.planetaryTrack().startEffect.planetaryTrack();
             });
-            ce.effect('Whenever you trigger a planetary track bonus, also gain a resource depending on the track: ' +
-              'Venus → 1 floater, Earth → 2 M€, Mars/Moon → 1 steel, Jovian → 1 titanium.', (eb) => {
-              eb.planetaryTrack().startEffect.text('bonus');
+            ce.br;
+            ce.effect('Whenever you trigger the Venus track\'s bonus, also gain 1 floater.', (eb) => {
+              eb.tag(Tag.VENUS).startEffect.resource(CardResource.FLOATER);
+            });
+            ce.br;
+            ce.effect('Whenever you trigger the Earth track\'s bonus, also gain 2 M€.', (eb) => {
+              eb.tag(Tag.EARTH).startEffect.megacredits(2);
+            });
+            ce.br;
+            ce.effect('Whenever you trigger the Mars or Moon track\'s bonus, also gain 1 steel.', (eb) => {
+              eb.tag(Tag.MARS).nbsp.tag(Tag.MOON).startEffect.steel(1);
+            });
+            ce.br;
+            ce.effect('Whenever you trigger the Jovian track\'s bonus, also gain 1 titanium.', (eb) => {
+              eb.tag(Tag.JOVIAN).startEffect.titanium(1);
             });
           });
         }),
