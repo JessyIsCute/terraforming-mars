@@ -124,11 +124,11 @@
           >
             <span class="map-editor-hex-bonuses" v-if="cell.space">
               <i
-                v-for="(b, i) in cell.space.bonus"
+                v-for="(item, i) in groupedBonus(cell.space.bonus)"
                 :key="i"
                 class="map-editor-hex-bonus"
-                :class="'board-space-bonus--' + bonusCss(b)"
-              ></i>
+                :class="'board-space-bonus--' + bonusCss(item.bonus)"
+              ><b v-if="item.count > 1" class="map-editor-hex-bonus-count">{{ item.count }}</b></i>
             </span>
           </button>
         </div>
@@ -190,6 +190,7 @@ import {
 import {decodeCustomBoard, encodeCustomBoard, validateCustomBoard} from '@/common/boards/customBoardCodec';
 import {paths} from '@/common/app/paths';
 import {HELLAS_BONUS_OCEAN_COST, VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST, TERRA_CIMMERIA_COLONY_COST} from '@/common/constants';
+import {groupSpaceBonuses, GroupedSpaceBonus} from '@/client/utils/spaceBonusIcon';
 
 type Cell = {x: number, y: number, space: CustomSpaceDef | null};
 
@@ -484,6 +485,9 @@ export default defineComponent({
     bonusCss(bonus: SpaceBonus): string {
       return BONUS_CSS[bonus] ?? '';
     },
+    groupedBonus(bonus: Array<SpaceBonus>): Array<GroupedSpaceBonus> {
+      return groupSpaceBonuses(bonus);
+    },
     bonusHasAmount(kind: ParameterBonus['kind']): boolean {
       return kind === 'heatProduction' || kind === 'card' || kind === 'tr';
     },
@@ -702,12 +706,28 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     height: 100%;
   }
   .map-editor-hex-bonus {
+    position: relative;
     display: inline-block;
     width: 13px;
     height: 13px;
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: contain !important;
+  }
+  .map-editor-hex-bonus-count {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    min-width: 8px;
+    padding: 0 1px;
+    font-size: 8px;
+    line-height: 8px;
+    font-style: normal;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 5px;
+    text-align: center;
   }
 
   .map-editor-warnings {

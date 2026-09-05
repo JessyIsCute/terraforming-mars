@@ -105,6 +105,38 @@
   &.board-space-bonus-pos--3 {
     margin: 23px 0 0 14px;
   }
+
+  // Beyond 3 icons, position is computed per-icon by Bonus.vue's getStyle() (left/top),
+  // not by a fixed margin -- this class only clears the default margin out of the way.
+  &.board-space-bonus-pos--grid {
+    margin: 0;
+  }
+
+  // Shrink to fit a computed grid (see Bonus.vue's GRID_ICON_SIZE/getStyle()) once more
+  // than 3 bonuses are stacked on one space. !important overrides the per-type size rules
+  // below. Keep this size in sync with Bonus.vue's GRID_ICON_SIZE constant.
+  &.board-space-bonus--compact {
+    width: 12px !important;
+    height: 12px !important;
+    background-size: 12px !important;
+  }
+}
+
+.board-space-bonus-count {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  min-width: 9px;
+  padding: 0 1px;
+  font-size: 9px;
+  line-height: 9px;
+  font-style: normal;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
+  text-align: center;
+  pointer-events: none;
 }
 
 .board-space-bonus--plant {

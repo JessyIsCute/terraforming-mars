@@ -118,6 +118,24 @@ describe('MapEditor', () => {
     expect(decodeCustomBoard(vm.code).spaces[0].bonus).to.deep.eq([]);
   });
 
+  it('collapses repeated M€ placement bonuses into one icon with a count badge', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const hex = () => wrapper.findAll('.map-editor-hex')[0];
+
+    vm.tool = 'bonus:' + 6; // MEGACREDITS
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    await hex().trigger('click'); // 2 M€
+
+    expect(decodeCustomBoard(vm.code).spaces[0].bonus).to.deep.eq([6, 6]);
+
+    const bonusIcons = hex().findAll('.map-editor-hex-bonus');
+    expect(bonusIcons.length).to.eq(1);
+    expect(bonusIcons[0].classes()).to.include('board-space-bonus--megacredit');
+    expect(bonusIcons[0].find('.map-editor-hex-bonus-count').text()).to.eq('2');
+  });
+
   it('paints terrain with the real board sprite classes', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;
