@@ -10,6 +10,7 @@ import {JSONObject} from '@/common/Types';
 import {defineComponent} from 'vue';
 import {NewGameConfig} from '@/common/game/NewGameConfig';
 import {RandomMAOptionType} from '@/common/ma/RandomMAOptionType';
+import {CardName} from '@/common/cards/CardName';
 
 // Minimal serialized Create Game payload used by settings restore tests.
 function createNewGameConfig(overrides: JSONObject = {}):  NewGameConfig {
@@ -157,6 +158,30 @@ describe('CreateGameForm', () => {
     expect((wrapper.vm as any).draftVariant).eq(true);
     expect(settingsStorage.loadSettings()).eq(undefined);
     expect(wrapper.findAllComponents({name: 'AppButton'}).map((button) => button.props('title'))).includes('Reset');
+  });
+
+  it('clearCustomLists clears only the custom/banned/included card lists, not the rest of the form', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.board = BoardName.HELLAS;
+    vm.customCorporations = [CardName.THORGATE];
+    vm.customPreludes = [CardName.MERGER];
+    vm.customCeos = [CardName.HAL9000];
+    vm.customColonies = ['Callisto'];
+    vm.bannedCards = [CardName.MERGER];
+    vm.includedCards = [CardName.THORGATE];
+
+    vm.clearCustomLists();
+    await wrapper.vm.$nextTick();
+
+    expect(vm.customCorporations).deep.eq([]);
+    expect(vm.customPreludes).deep.eq([]);
+    expect(vm.customCeos).deep.eq([]);
+    expect(vm.customColonies).deep.eq([]);
+    expect(vm.bannedCards).deep.eq([]);
+    expect(vm.includedCards).deep.eq([]);
+    // Untouched -- this is deliberately narrower than resetSettings().
+    expect(vm.board).eq(BoardName.HELLAS);
   });
 
   it('clears uploading when applying settings throws', () => {

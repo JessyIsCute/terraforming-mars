@@ -338,6 +338,10 @@
 
                             <div class="create-game-subsection-label" v-i18n>Filter</div>
 
+                            <AppButton
+                                v-if="customCorporations.length || customPreludes.length || customCeos.length || customColonies.length || bannedCards.length || includedCards.length"
+                                title="Clear custom lists" size="small" @click="clearCustomLists"/>
+
                             <input type="checkbox" v-model="showCorporationList" id="customCorps-checkbox">
                             <label for="customCorps-checkbox">
                                 <span v-i18n>Custom Corporation list</span>
@@ -911,6 +915,25 @@ export default defineComponent({
           refs.cardsFilter2.selected = [];
         }
       });
+    },
+    // A narrower cousin of resetSettings(): clears only the custom corporation/prelude/CEO/
+    // colony lists and the banned/included card lists, leaving players/expansions/other
+    // options untouched. Useful for recovering from a stale card name left over from a rename
+    // (e.g. localStorage still holding an old card name) without losing the rest of the form.
+    clearCustomLists() {
+      this.customCorporations = [];
+      this.customPreludes = [];
+      this.customCeos = [];
+      this.customColonies = [];
+      this.bannedCards = [];
+      this.includedCards = [];
+      const refs = this.typedRefs;
+      if (refs.cardsFilter) {
+        refs.cardsFilter.selected = [];
+      }
+      if (refs.cardsFilter2) {
+        refs.cardsFilter2.selected = [];
+      }
     },
     async downloadSettings() {
       const newGameConfig = await this.serializeSettings();
