@@ -125,6 +125,8 @@ export class Player implements IPlayer {
   public actionsTakenThisRound: number = 0;
   public actionsThisGeneration: Set<CardName> = new Set();
   public lastCardPlayed: CardName | undefined;
+  /** Set whenever this player places a greenery tile; equals `actionsTakenThisGame` exactly when that placement was this player's most recent action. */
+  public lastGreeneryActionNumber: number | undefined;
   public pendingInitialActions: Array<ICorporationCard> = [];
 
   // Cards
@@ -1866,6 +1868,9 @@ export class Player implements IPlayer {
     if (this.lastCardPlayed !== undefined) {
       result.lastCardPlayed = this.lastCardPlayed;
     }
+    if (this.lastGreeneryActionNumber !== undefined) {
+      result.lastGreeneryActionNumber = this.lastGreeneryActionNumber;
+    }
     result.deltaProject = this.deltaProjectData;
     return result;
   }
@@ -1892,6 +1897,7 @@ export class Player implements IPlayer {
     player.hasTurmoilScienceTagBonus = d.hasTurmoilScienceTagBonus;
     player.heat = d.heat;
     player.lastCardPlayed = d.lastCardPlayed;
+    player.lastGreeneryActionNumber = d.lastGreeneryActionNumber;
     player.standardProjectsThisGeneration = new Set(d.standardProjectsThisGeneration);
     player.megaCredits = d.megaCredits;
     player.needsToDraft = d.needsToDraft;

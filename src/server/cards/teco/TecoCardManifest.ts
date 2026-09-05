@@ -21,6 +21,21 @@ import {InsiderTrading} from './InsiderTrading';
 import {MarketCrash} from './MarketCrash';
 import {SharedKnowledge} from './SharedKnowledge';
 import {SpireTech} from './SpireTech';
+import {AnimalShelter} from './AnimalShelter';
+import {MarketInsurance} from './MarketInsurance';
+import {Jupiter} from './Jupiter';
+import {GamblingProblem} from './GamblingProblem';
+import {RawEnergy} from './RawEnergy';
+import {PureEnergy} from './PureEnergy';
+import {Insurance} from './Insurance';
+import {EnergyHarvest} from './EnergyHarvest';
+import {Electrobic} from './Electrobic';
+import {Microbetronics} from './Microbetronics';
+import {Microbitic} from './Microbitic';
+import {ResearchPhase} from './ResearchPhase';
+import {Blockhouse} from './Blockhouse';
+import {Mulligangs} from './Mulligangs';
+import {Mulligens} from './Mulligens';
 
 /** Teco: an original fan expansion of project cards and preludes. Icon: a "T" in a circle. */
 export const TECO_CARD_MANIFEST = new ModuleManifest({
@@ -40,6 +55,21 @@ export const TECO_CARD_MANIFEST = new ModuleManifest({
     [CardName.CATS]: {Factory: Cats},
     [CardName.SHARED_KNOWLEDGE]: {Factory: SharedKnowledge},
     [CardName.SPIRE_TECH]: {Factory: SpireTech},
+    [CardName.ANIMAL_SHELTER]: {Factory: AnimalShelter},
+    [CardName.MARKET_INSURANCE]: {Factory: MarketInsurance},
+    [CardName.JUPITER]: {Factory: Jupiter},
+    [CardName.GAMBLING_PROBLEM]: {Factory: GamblingProblem},
+    [CardName.RAW_ENERGY]: {Factory: RawEnergy},
+    [CardName.PURE_ENERGY]: {Factory: PureEnergy},
+    [CardName.INSURANCE]: {Factory: Insurance, compatibility: 'turmoil'},
+    [CardName.ENERGY_HARVEST]: {Factory: EnergyHarvest},
+    [CardName.ELECTROBIC]: {Factory: Electrobic},
+    [CardName.MICROBETRONICS]: {Factory: Microbetronics},
+    [CardName.MICROBITIC]: {Factory: Microbitic},
+    [CardName.RESEARCH_PHASE]: {Factory: ResearchPhase},
+    [CardName.BLOCKHOUSE]: {Factory: Blockhouse},
+    [CardName.MULLIGANGS]: {Factory: Mulligangs},
+    [CardName.MULLIGENS]: {Factory: Mulligens},
   },
   preludeCards: {
     [CardName.GENEROUS_REDISTRIBUTION]: {Factory: GenerousRedistribution, compatibility: 'prelude'},

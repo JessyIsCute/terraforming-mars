@@ -36,7 +36,7 @@ import {RemoveColonyFromGame} from './deferredActions/RemoveColonyFromGame';
 import {GainResourcesDeferred} from './deferredActions/GainResourcesDeferred';
 import {SerializedGame} from './SerializedGame';
 import {SpaceBonus} from '../common/boards/SpaceBonus';
-import {TileType} from '../common/TileType';
+import {TileType, GREENERY_TILES} from '../common/TileType';
 import {Turmoil} from './turmoil/Turmoil';
 import {RandomMAOptionType} from '../common/ma/RandomMAOptionType';
 import {AresHandler} from './ares/AresHandler';
@@ -1435,6 +1435,11 @@ export class Game implements IGame, Logger {
 
     // Clear out underworld components.
     UnderworldExpansion.onTilePlaced(this, space);
+
+    // Teco: Energy Harvest tracks whether a player's most recent action placed a greenery.
+    if (space.tile !== undefined && space.player === player && GREENERY_TILES.has(space.tile.tileType)) {
+      player.lastGreeneryActionNumber = player.actionsTakenThisGame + 1;
+    }
 
     this.triggerForAllCards((p, c) => c.onTilePlaced?.(p, player, space, BoardType.MARS));
 

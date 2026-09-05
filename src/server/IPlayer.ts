@@ -100,6 +100,7 @@ export interface IPlayer {
   // This generation / this round
   actionsTakenThisRound: number;
   lastCardPlayed: CardName | undefined;
+  lastGreeneryActionNumber: number | undefined;
   pendingInitialActions: Array<ICorporationCard>;
 
   // Cards

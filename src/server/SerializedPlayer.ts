@@ -50,6 +50,7 @@ export interface SerializedPlayer extends DeprecatedFields{
   id: PlayerId;
   jovianTagCount: number;
   lastCardPlayed?: CardName;
+  lastGreeneryActionNumber?: number;
   megaCreditProduction: number;
   megaCredits: number;
   name: string;
