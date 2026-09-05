@@ -30,8 +30,8 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
           b.action('Spend 2 energy to gain 7 heat.', (eb) => {
             eb.energy(2).startAction.heat(7, {digit});
           }).br;
-          b.action('Blow up the reactor: raise temperature 2 steps. This card then becomes unusable.', (eb) => {
-            eb.empty().startAction.temperature(2).asterix();
+          b.action('Blow up the reactor: raise temperature 1 step. This card then becomes unusable.', (eb) => {
+            eb.empty().startAction.temperature(1).asterix();
           });
         }),
       },
@@ -53,8 +53,8 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
       }));
     }
 
-    options.options.push(new SelectOption('Blow up the reactor: raise temperature 2 steps (this card becomes unusable)', 'Blow it up').andThen(() => {
-      player.game.increaseTemperature(player, 2);
+    options.options.push(new SelectOption('Blow up the reactor: raise temperature 1 step (this card becomes unusable)', 'Blow it up').andThen(() => {
+      player.game.increaseTemperature(player, 1);
       this.isDisabled = true;
       player.game.log('${0} blew up ${1}', (b) => b.player(player).card(this));
       return undefined;

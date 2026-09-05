@@ -7,6 +7,7 @@ import {CitiesRequirement} from './CitiesRequirement';
 import {ColoniesRequirement} from './ColoniesRequirement';
 import {FloatersRequirement} from './FloatersRequirement';
 import {GreeneriesRequirement} from './GreeneriesRequirement';
+import {GreeneryLastActionRequirement} from './GreeneryLastActionRequirement';
 import {HabitatRateRequirement} from './HabitatRateRequirement';
 import {HabitatTilesRequirement} from './HabitatTilesRequirement';
 import {LogisticRateRequirement} from './LogisticRateRequirement';
@@ -83,6 +84,8 @@ export class CardRequirements {
       return new ResourceTypeRequirement({...descriptor, count: descriptor.resourceTypes});
     } else if (descriptor.greeneries !== undefined) {
       return new GreeneriesRequirement({...descriptor, count: descriptor.greeneries});
+    } else if (descriptor.greeneryLastAction !== undefined) {
+      return new GreeneryLastActionRequirement();
     } else if (descriptor.cities !== undefined) {
       return new CitiesRequirement({...descriptor, count: descriptor.cities});
     } else if (descriptor.colonies !== undefined) {

@@ -27,7 +27,7 @@ describe('PercussiveReactor', () => {
     expect(player.heat).to.eq(7);
   });
 
-  it('blowing up the reactor raises temperature 2 steps and disables the card', () => {
+  it('blowing up the reactor raises temperature 1 step and disables the card', () => {
     player.energy = 0;
     setTemperature(game, -18);
 
@@ -35,7 +35,7 @@ describe('PercussiveReactor', () => {
     expect(card.action(player)).is.undefined;
     runAllActions(game);
 
-    expect(game.getTemperature()).to.eq(-14);
+    expect(game.getTemperature()).to.eq(-16);
     expect(card.isDisabled).is.true;
     expect(card.canAct()).is.false;
   });

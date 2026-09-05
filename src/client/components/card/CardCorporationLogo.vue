@@ -299,7 +299,10 @@
         <div class="card-nereid-biosystems-logo"><span class="word-1">NEREID</span> <span class="word-2"><span class="bio">BIO</span><span class="systems">SYSTEMS</span></span></div>
       </template>
       <template v-else-if="title === CardName.THE_SYNDICATE">
-        <div class="card-the-syndicate-logo"><span class="word-1">THE</span><span class="word-2">SYNDICATE</span></div>
+        <div class="card-the-syndicate-logo">
+          <span class="stack"><span class="word-1">THE</span><span class="word-1b">SYN</span></span>
+          <span class="word-2">DICATE</span>
+        </div>
       </template>
     </template>
     <template v-else>

@@ -32,6 +32,16 @@ describe('TheSyndicate', () => {
     expect(turmoil.getInfluence(player)).eq(influenceBefore + 1);
   });
 
+  it('triggers its own negative-VP ability when played, since it is -5 VP itself', () => {
+    player.underworldData.corruption = 0;
+
+    player.playCorporationCard(card);
+    runAllActions(game);
+
+    expect(player.underworldData.corruption).eq(1);
+    cast(player.popWaitingFor(), SelectParty);
+  });
+
   it('gains 1 corruption and sends a delegate when playing a card with negative VP', () => {
     player.playedCards.push(card);
     player.underworldData.corruption = 0;

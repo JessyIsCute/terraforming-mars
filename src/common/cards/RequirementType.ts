@@ -5,6 +5,7 @@ export enum RequirementType {
     TR = 'TR',
     RESOURCE_TYPES = 'Resource type',
     GREENERIES = 'Greenery',
+    GREENERY_LAST_ACTION = 'Greenery last action',
     CITIES = 'City',
     TAG = 'tag',
     PRODUCTION = 'production',

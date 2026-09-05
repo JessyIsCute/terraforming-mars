@@ -40,7 +40,7 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.text()).to.eq('PRISTAR');
   });
 
-  it('renders The Syndicate bespoke logo, with SYNDICATE split out from THE', () => {
+  it('renders The Syndicate bespoke logo, with THE/SYN stacked and DICATE vertical', () => {
     const wrapper = shallowMount(CardCorporationLogo, {
       ...globalConfig,
       props: {
@@ -49,6 +49,7 @@ describe('CardCorporationLogo', () => {
     });
     expect(wrapper.find('.card-the-syndicate-logo').exists()).to.be.true;
     expect(wrapper.find('.word-1').text()).to.eq('THE');
-    expect(wrapper.find('.word-2').text()).to.eq('SYNDICATE');
+    expect(wrapper.find('.word-1b').text()).to.eq('SYN');
+    expect(wrapper.find('.word-2').text()).to.eq('DICATE');
   });
 });

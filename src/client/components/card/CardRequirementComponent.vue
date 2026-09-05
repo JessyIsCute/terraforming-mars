@@ -7,6 +7,10 @@
           <div class="card-special card-minus"></div>
           <div class="card-resource card-resource-plant red-outline"></div>
         </template>
+        <template v-if="type === RequirementType.GREENERY_LAST_ACTION">
+          <div class="card-tile greenery-tile tile-size--req"></div>
+          <div class="card-special card-asterix">*</div>
+        </template>
         <template v-if="type === RequirementType.PRODUCTION">
           <div class="card-production-box card-production-box--req">
             <div class="card-production-box-row">
@@ -146,6 +150,7 @@ export default defineComponent({
         return ['card-resource', 'card-resource-corruption'];
       case RequirementType.PRODUCTION:
       case RequirementType.REMOVED_PLANTS:
+      case RequirementType.GREENERY_LAST_ACTION:
         break;
       }
       return [];
@@ -180,6 +185,7 @@ export default defineComponent({
       case RequirementType.PARTY:
       case RequirementType.REMOVED_PLANTS:
       case RequirementType.UNDERGROUND_TOKENS:
+      case RequirementType.GREENERY_LAST_ACTION:
         return false;
       }
       return this.count > 0 && this.count < 4;

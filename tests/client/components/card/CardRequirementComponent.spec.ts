@@ -51,4 +51,15 @@ describe('CardRequirementComponent', () => {
     expect(wrapper.find('.card-resource-plant').exists()).to.be.true;
     expect(wrapper.find('.card-resource-plants').exists()).to.be.false;
   });
+
+  it('renders a greenery-last-action requirement as a greenery tile plus an asterisk', () => {
+    const wrapper = shallowMount(CardRequirementComponent, {
+      ...globalConfig,
+      props: {
+        requirement: {greeneryLastAction: true},
+      },
+    });
+    expect(wrapper.find('.greenery-tile').exists()).to.be.true;
+    expect(wrapper.find('.card-asterix').exists()).to.be.true;
+  });
 });

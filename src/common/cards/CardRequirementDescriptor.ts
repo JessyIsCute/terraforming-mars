@@ -31,6 +31,8 @@ export type CardRequirementDescriptor = {
   oxygen?: number,
   temperature?: number,
   greeneries?: number,
+  /** Whether the player's last action this game was placing a greenery tile. */
+  greeneryLastAction?: boolean,
   cities?: number,
   oceans?: number,
   production?: Resource,
@@ -89,6 +91,8 @@ export function requirementType(descriptor: CardRequirementDescriptor): Requirem
     return RequirementType.RESOURCE_TYPES;
   } else if (descriptor.greeneries !== undefined) {
     return RequirementType.GREENERIES;
+  } else if (descriptor.greeneryLastAction !== undefined) {
+    return RequirementType.GREENERY_LAST_ACTION;
   } else if (descriptor.cities !== undefined) {
     return RequirementType.CITIES;
   } else if (descriptor.colonies !== undefined) {
