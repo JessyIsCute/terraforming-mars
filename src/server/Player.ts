@@ -387,6 +387,7 @@ export class Player implements IPlayer {
   public plantsAreProtected(): boolean {
     return this.withinDeflectionZone ||
       this.playedCards.has(CardName.PROTECTED_HABITATS) ||
+      this.playedCards.has(CardName.PROTECTED_HABITATS_BETTER_MARS) ||
       this.playedCards.has(CardName.ASTEROID_DEFLECTION_SYSTEM);
   }
 

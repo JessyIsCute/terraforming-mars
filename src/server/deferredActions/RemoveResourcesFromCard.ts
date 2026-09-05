@@ -135,7 +135,8 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
         }
       } else {
         if (source !== 'self') {
-          const hasProtetedHabitats = p.tableau.has(CardName.PROTECTED_HABITATS);
+          const hasProtetedHabitats = p.tableau.has(CardName.PROTECTED_HABITATS) ||
+            p.tableau.has(CardName.PROTECTED_HABITATS_BETTER_MARS);
           for (const card of p.getCardsWithResources(resourceType)) {
             if (card.resourceCount < min) {
               continue;
