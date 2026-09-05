@@ -40,6 +40,7 @@
         v-else-if="screen === 'games-overview'"
       />
       <CardList v-else-if="screen === 'cards'"/>
+      <CardMaker v-else-if="screen === 'card-maker'"/>
       <MapEditor v-else-if="screen === 'map-editor'"/>
       <MapLibrary v-else-if="screen === 'map-library'"/>
       <AdminHome v-else-if="screen === 'admin'"/>
@@ -69,6 +70,7 @@ const PlayerHome = defineAsyncComponent(() => import(/* webpackChunkName: "playe
 const SpectatorHome = defineAsyncComponent(() => import(/* webpackChunkName: "spectator-home" */ '@/client/components/SpectatorHome.vue'));
 const StartScreen = defineAsyncComponent(() => import(/* webpackChunkName: "start-screen" */ '@/client/components/StartScreen.vue'));
 const MapEditor = defineAsyncComponent(() => import(/* webpackChunkName: "map-editor" */ '@/client/components/MapEditor.vue'));
+const CardMaker = defineAsyncComponent(() => import(/* webpackChunkName: "card-maker" */ '@/client/components/cardmaker/CardMaker.vue'));
 const MapLibrary = defineAsyncComponent(() => import(/* webpackChunkName: "map-library" */ '@/client/components/maplibrary/MapLibrary.vue'));
 import {$t, setTranslationContext} from '@/client/directives/i18n';
 import {paths} from '@/common/app/paths';
@@ -90,6 +92,7 @@ type Screen = 'admin' |
             'help' |
             'load' |
             'login-home' |
+            'card-maker' |
             'map-editor' |
             'map-library' |
             'player-home' |
@@ -151,6 +154,7 @@ export default defineComponent({
     StartScreen,
     MapEditor,
     MapLibrary,
+    CardMaker,
     CreateGameForm,
     LoadGameForm,
     GameHome,
@@ -301,6 +305,8 @@ export default defineComponent({
       app.screen = 'load';
     } else if (currentPathname === paths.CARDS) {
       app.screen = 'cards';
+    } else if (currentPathname === paths.CUSTOM_CARD_MAKER) {
+      app.screen = 'card-maker';
     } else if (currentPathname === paths.MAP_EDITOR) {
       app.screen = 'map-editor';
     } else if (currentPathname === paths.MAP_LIBRARY) {

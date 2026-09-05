@@ -75,6 +75,8 @@ export class GlobalEventDealer {
       deltaProject: gameOptions.deltaProjectExpansion,
       sillyfication: gameOptions.sillyficationExpansion,
       betterMars: gameOptions.betterMarsExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      customCards: gameOptions.customCardsExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {
