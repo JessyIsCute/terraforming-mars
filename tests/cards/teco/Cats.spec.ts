@@ -67,4 +67,19 @@ describe('Cats', () => {
     runAllActions(game);
     expect(card.resourceCount).to.eq(1);
   });
+
+  it('does not steal from itself when it is the only card holding an animal', () => {
+    // Regression: Cats itself is a valid RemoveResourcesFromCard target once it holds an
+    // animal, so without excluding itself it would "steal" from itself and hand the animal
+    // right back, netting zero instead of the guaranteed +1.
+    card.bespokePlay(player);
+    expect(card.resourceCount).to.eq(1);
+
+    const game = player.game;
+    const space = game.board.getAvailableSpacesForCity(player)[0];
+    game.addCity(player, space);
+    runAllActions(game);
+
+    expect(card.resourceCount).to.eq(2);
+  });
 });

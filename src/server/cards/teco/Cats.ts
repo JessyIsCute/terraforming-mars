@@ -45,7 +45,11 @@ export class Cats extends Card implements IProjectCard {
       return;
     }
     const game = cardOwner.game;
-    const targets = RemoveResourcesFromCard.getAvailableTargetCards(cardOwner, CardResource.ANIMAL, 'all');
+    // Exclude this card itself: otherwise, once Cats already holds an animal and no other
+    // card does, it would be the sole "target," stealing from itself and handing it right
+    // back — a net-zero result instead of the guaranteed +1 the card text promises.
+    const targets = RemoveResourcesFromCard.getAvailableTargetCards(cardOwner, CardResource.ANIMAL, 'all')
+      .filter((card) => card !== this);
     if (targets.length === 0) {
       cardOwner.addResourceTo(this, {qty: 1, log: true});
       return;
