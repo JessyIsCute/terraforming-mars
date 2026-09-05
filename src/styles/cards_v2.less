@@ -100,7 +100,8 @@
     }
     // Sillyfication corps: jaunty, two-tone, nudged left/down so the tags don't cover them.
     .card-wellness-deluxe-logo,
-    .card-venus-ventures-logo {
+    .card-venus-ventures-logo,
+    .card-nereid-genetics-logo {
       position: absolute;
       top: 18px;
       left: -6px;
@@ -139,6 +140,24 @@
       line-height: 15px;
       margin-top: -3px;
       margin-left: -2px;
+    }
+    // "NEREID" is water (dark blue); "GENETICS" is microbial (dark-to-light green gradient).
+    .card-nereid-genetics-logo .word-1 {
+      color: #16407a;
+      display: block;
+    }
+    // Same treatment as Venus Ventures/Wellness Deluxe: the longer second word drops to
+    // its own line, smaller, tucked up and to the left under the first word.
+    .card-nereid-genetics-logo .word-2 {
+      display: block;
+      font-size: 17px;
+      line-height: 15px;
+      margin-top: -3px;
+      margin-left: -2px;
+      background: linear-gradient(to right, #1b5e20, #8bc34a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .card-critterworld-logo {
       position: absolute;

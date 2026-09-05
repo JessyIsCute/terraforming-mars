@@ -295,6 +295,9 @@
       <template v-else-if="title === CardName.WELLNESS_DELUXE">
         <div class="card-wellness-deluxe-logo"><span class="word-1">WELLNESS</span> <span class="word-2">DELUXE</span></div>
       </template>
+      <template v-else-if="title === CardName.NEREID_GENETICS">
+        <div class="card-nereid-genetics-logo"><span class="word-1">NEREID</span> <span class="word-2">GENETICS</span></div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -367,6 +370,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.MONS_INSURANCE]: 'bespoke',
   [CardName.MORNING_STAR_INC]: 'css',
   [CardName.NANOTECH_INDUSTRIES]: 'image',
+  [CardName.NEREID_GENETICS]: 'bespoke',
   [CardName.NIRGAL_ENTERPRISES]: 'bespoke',
   [CardName.ODYSSEY]: 'image',
   [CardName.PALLADIN_SHIPPING]: 'bespoke',

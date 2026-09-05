@@ -14,4 +14,16 @@ describe('CardCorporationLogo', () => {
     });
     expect(wrapper.exists()).to.be.true;
   });
+
+  it('renders the Nereid Genetics bespoke logo', () => {
+    const wrapper = shallowMount(CardCorporationLogo, {
+      ...globalConfig,
+      props: {
+        title: CardName.NEREID_GENETICS,
+      },
+    });
+    expect(wrapper.find('.card-nereid-genetics-logo').exists()).to.be.true;
+    expect(wrapper.find('.word-1').text()).to.eq('NEREID');
+    expect(wrapper.find('.word-2').text()).to.eq('GENETICS');
+  });
 });
