@@ -39,7 +39,7 @@ export const DEFAULT_PAYMENT_VALUES = {
   auroraiData: DATA_VALUE,
   graphene: GRAPHENE_VALUE,
   kuiperAsteroids: 1,
-  nereidMicrobes: 3,
+  nereidMicrobes: 2,
 } satisfies Record<SpendableResource, number>;
 
 export namespace Payment {

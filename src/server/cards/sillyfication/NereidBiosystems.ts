@@ -15,14 +15,15 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
     super({
       name: CardName.NEREID_BIOSYSTEMS,
       tags: [Tag.JOVIAN, Tag.MICROBE],
-      startingMegaCredits: 45,
+      startingMegaCredits: 35,
       resourceType: CardResource.MICROBE,
+      initialActionText: 'Draw 1 card with a Jovian tag and 1 card with a Microbe tag',
 
       metadata: {
         cardNumber: 'XC4',
-        description: 'You start with 45 M€.',
+        description: 'You start with 35 M€. As your first action, draw 1 card with a Jovian tag and 1 card with a Microbe tag.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(45).br;
+          b.megacredits(35).nbsp.cards(1, {secondaryTag: Tag.JOVIAN}).nbsp.cards(1, {secondaryTag: Tag.MICROBE}).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
             ce.effect('Your Jovian tags also count as microbe tags.', (eb) => {
@@ -31,13 +32,19 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
             ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
             });
-            ce.effect('When paying for a card with a Jovian tag, microbes here may be used as 3 M€ each.', (eb) => {
-              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE).equals().megacredits(3);
+            ce.effect('When paying for a card with a Jovian tag, microbes here may be used as 2 M€ each.', (eb) => {
+              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE).equals().megacredits(2);
             });
           }).br;
         }),
       },
     });
+  }
+
+  public override initialAction(player: IPlayer) {
+    player.drawCard(1, {include: (card) => card.tags.includes(Tag.JOVIAN)});
+    player.drawCard(1, {include: (card) => card.tags.includes(Tag.MICROBE)});
+    return undefined;
   }
 
   public onCardPlayed(player: IPlayer, card: ICard) {

@@ -161,19 +161,19 @@ describe('SelectProjectCardToPlay', () => {
   });
 
   it('using nereid microbes', async () => {
-    // Ganymede Colony (a Jovian-tag card) will cost 10. Player has 6M€ and 4 available nereid microbes (rate 3).
-    // Greedy: uses 3 nereid microbes (=9 MC), MC fills remaining 1.
+    // Ganymede Colony (a Jovian-tag card) will cost 10. Player has 7M€ and 4 available nereid microbes (rate 2).
+    // Greedy: uses all 4 nereid microbes (=8 MC), MC fills remaining 2.
     const wrapper = setupCardForPurchase(
       CardName.GANYMEDE_COLONY, 10,
-      {megacredits: 6},
+      {megacredits: 7},
       {nereidMicrobes: 4});
 
     const tester = new PaymentTester(wrapper);
     await tester.nextTick();
-    tester.expectPayment({nereidMicrobes: 3, megacredits: 1});
+    tester.expectPayment({nereidMicrobes: 4, megacredits: 2});
 
     await tester.clickSave();
-    expect(saveResponse.payment).deep.eq(Payment.of({nereidMicrobes: 3, megacredits: 1}));
+    expect(saveResponse.payment).deep.eq(Payment.of({nereidMicrobes: 4, megacredits: 2}));
   });
 
   it('nereid microbes are not usable for a card without a Jovian tag', async () => {
