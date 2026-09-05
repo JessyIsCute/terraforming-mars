@@ -1,26 +1,29 @@
 <template>
-  <div class="map-library-row">
-    <MapThumbnail v-if="decoded !== undefined" :definition="decoded"/>
-    <div v-else class="map-thumbnail map-thumbnail--error" v-i18n>Can't preview this map</div>
+  <div class="map-card">
+    <div class="map-card-thumb">
+      <MapThumbnail v-if="decoded !== undefined" :definition="decoded"/>
+      <div v-else class="map-thumbnail map-thumbnail--error" v-i18n>Can't preview this map</div>
+    </div>
 
-    <div class="map-library-row-body">
-      <div class="map-library-row-title">
-        <strong>{{ name }}</strong>
+    <div class="map-card-body">
+      <div class="map-card-title">{{ name }}</div>
+      <div class="map-card-tags">
         <span class="map-library-tag" :class="'map-library-tag--' + entry.origin">{{ entry.origin }}</span>
         <span v-if="entry.origin === 'fanmade'" class="map-library-tag" :class="'map-library-tag--' + entry.status">{{ entry.status }}</span>
       </div>
-      <p v-if="entry.description" class="map-library-row-description">{{ entry.description }}</p>
-      <p v-if="entry.submittedBy" class="map-library-row-submitter">
+      <p v-if="entry.description" class="map-card-description">{{ entry.description }}</p>
+      <p v-if="entry.submittedBy" class="map-card-submitter">
         <span v-i18n>Submitted by</span>: {{ entry.submittedBy }}
       </p>
 
-      <div class="map-library-row-actions">
+      <div class="map-card-actions">
         <button type="button" class="btn btn-primary" @click="play" v-i18n>Play this map</button>
+        <button type="button" class="btn" @click="copyCode" v-i18n>{{ copyButtonLabel }}</button>
         <template v-if="isAdmin">
           <button v-if="entry.origin === 'fanmade' && entry.status === 'submitted'" type="button" class="btn" @click="$emit('approve', entry.id)" v-i18n>
             Approve
           </button>
-          <button type="button" class="btn btn-error" @click="$emit('delete', entry.id)" v-i18n>Delete</button>
+          <button v-if="entry.origin === 'fanmade'" type="button" class="btn btn-error" @click="$emit('delete', entry.id)" v-i18n>Delete</button>
         </template>
       </div>
     </div>
@@ -36,6 +39,10 @@ import {decodeCustomBoard} from '@/common/boards/customBoardCodec';
 import {boardNameForOfficialMapLibraryId} from '@/common/boards/officialMapLibraryLookup';
 import {paths} from '@/common/app/paths';
 
+type DataModel = {
+  copied: boolean;
+};
+
 export default defineComponent({
   name: 'MapLibraryRow',
   components: {MapThumbnail},
@@ -44,6 +51,9 @@ export default defineComponent({
     isAdmin: {type: Boolean, default: false},
   },
   emits: ['approve', 'delete'],
+  data(): DataModel {
+    return {copied: false};
+  },
   computed: {
     decoded(): CustomBoardDefinition | undefined {
       try {
@@ -54,6 +64,9 @@ export default defineComponent({
     },
     name(): string {
       return this.decoded?.name ?? this.entry.id;
+    },
+    copyButtonLabel(): string {
+      return this.copied ? 'Copied!' : 'Copy code';
     },
   },
   methods: {
@@ -74,20 +87,37 @@ export default defineComponent({
       }
       window.location.href = `${paths.NEW_GAME}?customBoard=1`;
     },
+    async copyCode(): Promise<void> {
+      try {
+        await navigator.clipboard?.writeText(this.entry.code);
+        this.copied = true;
+        setTimeout(() => {
+          this.copied = false;
+        }, 1500);
+      } catch (e) {
+        // Clipboard access may be unavailable/denied; nothing more we can do here.
+      }
+    },
   },
 });
 </script>
 
 <style scoped lang="less">
-.map-library-row {
+.map-card {
   display: flex;
-  gap: 12px;
-  padding: 10px;
+  flex-direction: column;
   border: 1px solid #444;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  overflow: hidden;
   background: #201d2b;
   color: #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.map-card-thumb {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: #15131f;
 }
 .map-thumbnail--error {
   width: 160px;
@@ -103,14 +133,23 @@ export default defineComponent({
   flex: 0 0 auto;
   padding: 8px;
 }
-.map-library-row-body {
+.map-card-body {
   flex: 1;
   min-width: 0;
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.map-library-row-title {
+.map-card-title {
+  font-weight: bold;
+  font-size: 15px;
+  color: #fff;
+}
+.map-card-tags {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .map-library-tag {
@@ -124,18 +163,21 @@ export default defineComponent({
   &--submitted { background: #b8860b; }
   &--approved { background: #2e7d32; }
 }
-.map-library-row-description {
-  margin: 6px 0;
-  font-size: 13px;
+.map-card-description {
+  margin: 0;
+  font-size: 12px;
   color: #cfc9e6;
 }
-.map-library-row-submitter {
-  margin: 0 0 6px;
+.map-card-submitter {
+  margin: 0;
   font-size: 11px;
   color: #999;
 }
-.map-library-row-actions {
+.map-card-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 6px;
 }
 </style>

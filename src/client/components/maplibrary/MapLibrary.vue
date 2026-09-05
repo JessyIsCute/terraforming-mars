@@ -36,14 +36,16 @@
     <p v-if="loading" v-i18n>Loading…</p>
     <p v-else-if="error" class="map-library-error">{{ error }}</p>
     <p v-else-if="sortedEntries.length === 0" v-i18n>No maps match these filters.</p>
-    <MapLibraryRow
-      v-for="entry in sortedEntries"
-      :key="entry.id"
-      :entry="entry"
-      :is-admin="isAdmin"
-      @approve="approve"
-      @delete="remove"
-    />
+    <div v-else class="map-library-grid">
+      <MapLibraryRow
+        v-for="entry in sortedEntries"
+        :key="entry.id"
+        :entry="entry"
+        :is-admin="isAdmin"
+        @approve="approve"
+        @delete="remove"
+      />
+    </div>
   </div>
 </template>
 
@@ -191,7 +193,7 @@ export default defineComponent({
 .map-library {
   padding: 20px;
   color: #ddd;
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
 
   h1 { color: #fff; margin: 0; }
@@ -225,4 +227,11 @@ export default defineComponent({
   font-size: 13px;
 }
 .map-library-error { color: #e74c3c; }
+// 2-3 cards per row, reflowing to fewer on narrower viewports.
+.map-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
 </style>

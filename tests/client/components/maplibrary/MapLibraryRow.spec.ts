@@ -74,11 +74,37 @@ describe('MapLibraryRow', () => {
 
   it('emits approve/delete with the entry id', async () => {
     const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry: fanmadeEntry({id: 'm42'}), isAdmin: true}});
-    await wrapper.find('button.btn:not(.btn-primary):not(.btn-error)').trigger('click');
+    const findButton = (text: string) => wrapper.findAll('button').find((b) => b.text() === text)!;
+    await findButton('Approve').trigger('click');
     expect(wrapper.emitted('approve')).deep.eq([['m42']]);
 
-    await wrapper.find('button.btn-error').trigger('click');
+    await findButton('Delete').trigger('click');
     expect(wrapper.emitted('delete')).deep.eq([['m42']]);
+  });
+
+  it('never shows Delete (or Approve) for an official map, even when admin', () => {
+    const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry: fanmadeEntry({origin: 'official', status: 'approved'}), isAdmin: true}});
+    expect(wrapper.text()).to.not.contain('Delete');
+    expect(wrapper.text()).to.not.contain('Approve');
+  });
+
+  it('copies the map code to the clipboard', async () => {
+    let copiedText: string | undefined;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {writeText: (text: string) => {
+        copiedText = text; return Promise.resolve();
+      }},
+    });
+
+    const entry = fanmadeEntry();
+    const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry}});
+    const copyButton = wrapper.findAll('button').find((b) => b.text() === 'Copy code')!;
+    await copyButton.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(copiedText).eq(entry.code);
+    expect(copyButton.text()).eq('Copied!');
   });
 
   it('playing a fanmade map stores its code and navigates to customBoard=1', async () => {
