@@ -100,6 +100,16 @@ export interface ICard {
   onCardsDrawn?(cardOwner: IPlayer, drawingPlayer: IPlayer, count: number): void;
   onStandardProject?(player: IPlayer, project: IStandardProjectCard): void;
   onTilePlaced?(cardOwner: IPlayer, activePlayer: IPlayer, space: Space, boardType: BoardType): void;
+  /**
+   * Called on every card in every player's tableau whenever anybody moves a marker (either
+   * direction) on the Delta Project track.
+   *
+   * @param cardOwner the player who owns THIS CARD.
+   * @param mover the player whose marker moved.
+   * @param steps how many steps were taken in this one move.
+   * @param forward true if advancing, false if retreating (Epsilon Dample only).
+   */
+  onDeltaTrackMoved?(cardOwner: IPlayer, mover: IPlayer, steps: number, forward: boolean): void;
   onDiscard?(player: IPlayer): void;
   /**
    * Called when anybody gains TR

@@ -74,6 +74,30 @@ export class DeltaProjectExpansion {
     return false;
   }
 
+  // Delta Works: steel can substitute for energy when paying for Delta Project movement.
+  private static availableEnergyForDelta(player: IPlayer): number {
+    return player.energy + (player.tableau.has(CardName.DELTA_WORKS) ? player.steel : 0);
+  }
+
+  private static deductEnergyForDelta(player: IPlayer, amount: number): void {
+    if (player.tableau.has(CardName.DELTA_WORKS)) {
+      const fromEnergy = Math.min(player.energy, amount);
+      player.stock.deduct(Resource.ENERGY, fromEnergy);
+      player.stock.deduct(Resource.STEEL, amount - fromEnergy);
+    } else {
+      player.stock.deduct(Resource.ENERGY, amount);
+    }
+  }
+
+  // Notifies every player's tableau (Development Manager, Social Heating) that a marker moved.
+  private static notifyMovement(player: IPlayer, steps: number, forward: boolean): void {
+    for (const p of player.game.players) {
+      for (const card of p.tableau) {
+        card.onDeltaTrackMoved?.(p, player, steps, forward);
+      }
+    }
+  }
+
   // Whether the player has enough tags (using wilds to fill gaps) to reach targetPos.
   private static canReachPosition(player: IPlayer, targetPos: number): boolean {
     let missing = 0;
@@ -106,12 +130,17 @@ export class DeltaProjectExpansion {
     const progress = DeltaProjectExpansion.getMarkerData(player, marker);
     const currentPos = progress.position;
 
+    // Little Dutch Boy: this marker was blocked for the rest of the generation.
+    if (progress.blocked === true) {
+      return [];
+    }
+
     if (currentPos >= MAX_TRACK_POSITION) {
       return [];
     }
 
     const result: number[] = [];
-    const maxByEnergy = Math.min(player.energy, MAX_TRACK_POSITION - currentPos);
+    const maxByEnergy = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player), MAX_TRACK_POSITION - currentPos);
 
     for (let steps = 1; steps <= maxByEnergy; steps++) {
       const newPos = currentPos + steps;
@@ -135,13 +164,16 @@ export class DeltaProjectExpansion {
   /**
    * Returns the allowed values for `retreatEpsilon(player, steps)`: how far Epsilon
    * Dample's second marker can move backward. Unlike advancing, retreating has no tag
-   * requirement, and never re-triggers a position's reward - it's a repositioning tool,
-   * not a way to farm rewards by shuttling back and forth.
+   * requirement - see {@link maybeResolveEpsilonReward} for how landing rewards are
+   * (and aren't) re-triggered.
    */
   public static getValidEpsilonRetreatSteps(player: IPlayer): ReadonlyArray<number> {
     const game = player.game;
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
-    const maxSteps = Math.min(player.energy, progress.position);
+    if (progress.blocked === true) {
+      return [];
+    }
+    const maxSteps = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player), progress.position);
 
     const result: number[] = [];
     for (let steps = 1; steps <= maxSteps; steps++) {
@@ -188,10 +220,19 @@ export class DeltaProjectExpansion {
     const currentPos = progress.position;
     const newPos = currentPos + steps;
 
-    player.stock.deduct(Resource.ENERGY, steps);
+    DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
 
-    DeltaProjectExpansion.resolveReward(player, newPos, 'primary');
+    // Delta Surge: gain every step's reward when advancing multiple steps at once, not
+    // just the landing position (resolveReward already no-ops for the VP-only positions).
+    if (player.tableau.has(CardName.DELTA_SURGE)) {
+      for (let pos = currentPos + 1; pos <= newPos; pos++) {
+        DeltaProjectExpansion.resolveReward(player, pos, 'primary');
+      }
+    } else {
+      DeltaProjectExpansion.resolveReward(player, newPos, 'primary');
+    }
+    DeltaProjectExpansion.notifyMovement(player, steps, true);
 
     player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
   }
@@ -206,11 +247,20 @@ export class DeltaProjectExpansion {
     }
 
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
-    const newPos = progress.position + steps;
+    const currentPos = progress.position;
+    const newPos = currentPos + steps;
 
-    player.stock.deduct(Resource.ENERGY, steps);
+    DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
-    DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
+
+    if (player.tableau.has(CardName.DELTA_SURGE)) {
+      for (let pos = currentPos + 1; pos <= newPos; pos++) {
+        DeltaProjectExpansion.maybeResolveEpsilonReward(player, pos);
+      }
+    } else {
+      DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
+    }
+    DeltaProjectExpansion.notifyMovement(player, steps, true);
 
     player.game.log('${0} spent ${1} energy to advance their second marker on the Delta Project track', (b) => b.player(player).number(steps));
   }
@@ -227,9 +277,10 @@ export class DeltaProjectExpansion {
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
     const newPos = progress.position - steps;
 
-    player.stock.deduct(Resource.ENERGY, steps);
+    DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
     DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
+    DeltaProjectExpansion.notifyMovement(player, steps, false);
 
     player.game.log('${0} spent ${1} energy to move their second marker backward on the Delta Project track', (b) => b.player(player).number(steps));
   }
@@ -249,6 +300,80 @@ export class DeltaProjectExpansion {
     }
     rewardedPositions.push(position);
     DeltaProjectExpansion.resolveReward(player, position, 'epsilon');
+  }
+
+  /**
+   * Grants `position`'s landing reward outright, bypassing all the normal step/cost/tag
+   * machinery. For markers that track claimed positions (Epsilon Dample), this still only
+   * grants a position once; for the primary marker there's no such tracking, so callers
+   * (e.g. Corporate Espionage's opponent-facing effect) can grant the same position's
+   * reward more than once over a game if it's legitimately triggered more than once.
+   */
+  public static grantRewardForPosition(player: IPlayer, position: number, marker: MarkerKind): void {
+    if (marker === 'epsilon') {
+      DeltaProjectExpansion.maybeResolveEpsilonReward(player, position);
+    } else {
+      DeltaProjectExpansion.resolveReward(player, position, marker);
+    }
+  }
+
+  /** Non-mutating check for whether {@link forceAdvanceOneStep} would succeed right now. */
+  public static canForceAdvanceOneStep(player: IPlayer, marker: MarkerKind, options?: {ignoreTag?: boolean}): boolean {
+    const game = player.game;
+    const progress = DeltaProjectExpansion.getMarkerData(player, marker);
+    if (progress.blocked === true) {
+      return false;
+    }
+    const newPos = progress.position + 1;
+    if (newPos > MAX_TRACK_POSITION) {
+      return false;
+    }
+    if (options?.ignoreTag !== true && !DeltaProjectExpansion.canReachPosition(player, newPos)) {
+      return false;
+    }
+    if ((newPos === VP2_POSITION || newPos === VP5_POSITION) &&
+      DeltaProjectExpansion.isOccupiedByOther(game, newPos, player, marker)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Moves `marker` exactly one step, without spending energy and without going through
+   * {@link getValidAdvanceSteps} (so it can't be used to jump multiple steps, or land on
+   * an occupied VP spot). Used by cards that grant a one-off Delta Project step outside the
+   * normal action (Corporate Espionage, Dynamic Ocean Barrier).
+   *
+   * Returns false (and does nothing) if the move isn't legal - beyond the end of the track,
+   * onto an occupied VP spot, or (unless `ignoreTag` is set) missing the required tag.
+   */
+  public static forceAdvanceOneStep(player: IPlayer, marker: MarkerKind, options?: {ignoreTag?: boolean}): boolean {
+    if (!DeltaProjectExpansion.canForceAdvanceOneStep(player, marker, options)) {
+      return false;
+    }
+    const progress = DeltaProjectExpansion.getMarkerData(player, marker);
+    const newPos = progress.position + 1;
+
+    progress.position = newPos;
+    DeltaProjectExpansion.grantRewardForPosition(player, newPos, marker);
+    DeltaProjectExpansion.notifyMovement(player, 1, true);
+    return true;
+  }
+
+  /**
+   * Moves `marker` exactly one step backward outright - no energy, no tag check - used by
+   * Corporate Espionage to push another player's primary marker down. Does nothing if the
+   * marker is already at position 0 or already at a VP spot (per that card's own text).
+   */
+  public static forceRetreatOneStep(player: IPlayer, marker: MarkerKind): boolean {
+    const progress = DeltaProjectExpansion.getMarkerData(player, marker);
+    if (progress.position <= 0 || progress.position === VP2_POSITION || progress.position === VP5_POSITION) {
+      return false;
+    }
+    progress.position -= 1;
+    DeltaProjectExpansion.grantRewardForPosition(player, progress.position, marker);
+    DeltaProjectExpansion.notifyMovement(player, 1, false);
+    return true;
   }
 
   private static resolveReward(player: IPlayer, position: number, marker: MarkerKind): void {

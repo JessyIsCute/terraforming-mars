@@ -1195,6 +1195,16 @@ export enum CardName {
   // Delta Project
   DELTA_PROJECT = 'Delta Project',
   EPSILON_DAMPLE = 'Epsilon Dample',
+  QUANTUM_RESEARCH = 'Quantum Research',
+  DELTA_SURGE = 'Delta Surge',
+  CORPORATE_ESPIONAGE = 'Corporate Espionage',
+  DELTA_WORKS = 'Delta Works',
+  DEVELOPMENT_MANAGER = 'Development Manager',
+  DUTCH_MOUNTAINS = 'Dutch Mountains',
+  DYNAMIC_OCEAN_BARRIER = 'Dynamic Ocean Barrier',
+  LITTLE_DUTCH_BOY = 'Little Dutch Boy',
+  SOCIAL_HEATING = 'Social Heating',
+  STORM_SURGE_BARRIER = 'Storm Surge Barrier',
 
   // Underworld Standard Projects
   EXCAVATE_STANDARD_PROJECT = 'Excavate:SP',

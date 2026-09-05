@@ -911,6 +911,13 @@ export class Game implements IGame, Logger {
       }
       player.trThisGeneration = 0;
       player.actionsTakenAtGenerationStart = player.actionsTakenThisGame;
+      // Little Dutch Boy's blockade only lasts for the generation it was placed in.
+      if (player.deltaProjectData) {
+        player.deltaProjectData.blocked = false;
+      }
+      if (player.epsilonDampleData) {
+        player.epsilonDampleData.blocked = false;
+      }
     });
 
     if (this.gameOptions.draftVariant) {
