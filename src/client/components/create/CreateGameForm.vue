@@ -732,6 +732,7 @@ export default defineComponent({
     setDocumentTitle('Create New Game');
     this.restoreLastSettings();
     this.adoptCustomBoardFromEditor();
+    this.adoptBoardFromQuery();
 
     // Set the viewport width to width=device-width on the create game form so mobile browsers use their actual CSS viewport width.
     // The current global viewport is width=1260, which prevents the create game form from using the device width on phones.
@@ -792,6 +793,19 @@ export default defineComponent({
     },
   },
   methods: {
+    // Deep-link from the Map Library: "Play this map" on an official entry sets ?board=<name>
+    // to preselect a real board via the normal radio mechanism -- never through the
+    // customBoardCode path, so official gameplay is untouched.
+    adoptBoardFromQuery() {
+      const boardParam = new URLSearchParams(window.location.search).get('board');
+      if (boardParam === null) {
+        return;
+      }
+      const validBoardNames: Array<string> = Object.values(BoardName).filter((name) => name !== BoardName.CUSTOM);
+      if (validBoardNames.includes(boardParam)) {
+        this.board = boardParam as BoardName;
+      }
+    },
     adoptCustomBoardFromEditor() {
       if (!window.location.search.includes('customBoard=1')) {
         return;
