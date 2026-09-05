@@ -22,6 +22,7 @@ export class PureEnergy extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T27',
         renderData: CardRenderer.builder((b) => {
+          b.megacredits(-1).slash().energy(1).plus().tag(Tag.POWER).plus().production((pb) => pb.energy(1)).br;
           b.production((pb) => pb.energy(7));
         }),
         description: 'This card costs 1 M€ less for each energy resource, Power tag, and energy production you have.',

@@ -4,6 +4,8 @@ import {IPlayer} from '../../IPlayer';
 import {Space} from '../../boards/Space';
 import {Resource} from '../../../common/Resource';
 import {CardName} from '../../../common/cards/CardName';
+import {Priority} from '../../deferredActions/Priority';
+import {GainProduction} from '../../deferredActions/GainProduction';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {all} from '../Options';
@@ -25,8 +27,8 @@ export class LakefrontResorts extends CorporationCard implements ICorporationCar
           b.megacredits(54);
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
-            ce.effect('When any ocean tile is placed, gain 2 heat. Your bonus for placing adjacent to oceans is 3M€ instead of 2 M€.', (eb) => {
-              eb.oceans(1, {size: Size.SMALL, all}).colon().heat(2);
+            ce.effect('When any ocean tile is placed, increase your M€ production 1 step. Your bonus for placing adjacent to oceans is 3M€ instead of 2 M€.', (eb) => {
+              eb.oceans(1, {size: Size.SMALL, all}).colon().production((pb) => pb.megacredits(1));
               eb.emptyTile('normal', {size: Size.SMALL}).oceans(1, {size: Size.SMALL});
               eb.startEffect.megacredits(3);
             });
@@ -45,9 +47,12 @@ export class LakefrontResorts extends CorporationCard implements ICorporationCar
     player.oceanBonus = 2;
   }
 
-  public onTilePlaced(cardOwner: IPlayer, _activePlayer: IPlayer, space: Space) {
+  public onTilePlaced(cardOwner: IPlayer, activePlayer: IPlayer, space: Space) {
     if (Board.isUncoveredOceanSpace(space)) {
-      cardOwner.stock.add(Resource.HEAT, 2, {log: true});
+      cardOwner.game.defer(
+        new GainProduction(cardOwner, Resource.MEGACREDITS, {log: true}),
+        cardOwner.id !== activePlayer.id ? Priority.OPPONENT_TRIGGER : undefined,
+      );
     }
   }
 }

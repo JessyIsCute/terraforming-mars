@@ -16,7 +16,7 @@ describe('LakefrontResorts', () => {
     addOcean(player, '07');
     runAllActions(game);
 
-    expect(player.heat).to.eq(4);
+    expect(player.production.megacredits).to.eq(2);
     // The 2 oceans are adjacent
     expect(player.megaCredits).to.eq(3);
   });
