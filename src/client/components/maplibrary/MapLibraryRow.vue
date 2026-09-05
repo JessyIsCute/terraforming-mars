@@ -44,8 +44,8 @@ type DataModel = {
 };
 
 // Sized well above MapThumbnail's own default -- the map itself is the point of a library card.
-const THUMBNAIL_WIDTH = 300;
-const THUMBNAIL_HEIGHT = 230;
+const THUMBNAIL_WIDTH = 460;
+const THUMBNAIL_HEIGHT = 380;
 
 export default defineComponent({
   name: 'MapLibraryRow',
@@ -126,8 +126,8 @@ export default defineComponent({
   background: #15131f;
 }
 .map-thumbnail--error {
-  width: 300px;
-  height: 230px;
+  width: 460px;
+  height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;

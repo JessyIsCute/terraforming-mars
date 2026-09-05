@@ -37,6 +37,11 @@ import {spaceBonusCss} from '@/client/utils/spaceBonusIcon';
 // mars-without-venus.png (620x600) that lines up with the standard hex bounding box.
 const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 620, naturalHeight: 600};
 
+// Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
+// every side, so the heat/oxygen tracks painted just outside the diamond peek into the preview
+// instead of being cropped off flush with the hexes.
+const TRACK_MARGIN = 30;
+
 export default defineComponent({
   name: 'MapThumbnail',
   props: {
@@ -71,7 +76,10 @@ export default defineComponent({
       return {minLeft, minTop, maxLeft, maxTop};
     },
     naturalSize(): {width: number, height: number} {
-      return {width: this.bounds.maxLeft + 90, height: this.bounds.maxTop + 90};
+      return {
+        width: this.bounds.maxLeft + 90 + TRACK_MARGIN * 2,
+        height: this.bounds.maxTop + 90 + TRACK_MARGIN * 2,
+      };
     },
     scale(): number {
       if (this.naturalSize.width === 0 || this.naturalSize.height === 0) {
@@ -81,10 +89,13 @@ export default defineComponent({
     },
     backdropStyle(): Record<string, string> {
       const {minLeft, minTop, maxLeft, maxTop} = this.bounds;
+      // sx/sy keep mapping the painted diamond onto the *unpadded* hex bounding box -- only the
+      // container and background position grow by TRACK_MARGIN, so the diamond itself stays at
+      // the same scale/alignment, with a uniform strip of extra board revealed on every side.
       const sx = ((maxLeft - minLeft) + 46) / MARS_IMAGE.width;
       const sy = ((maxTop - minTop) + 51) / MARS_IMAGE.height;
-      const bgX = (minLeft - MARS_IMAGE.left * sx).toFixed(1);
-      const bgY = (minTop - MARS_IMAGE.top * sy).toFixed(1);
+      const bgX = (minLeft - MARS_IMAGE.left * sx + TRACK_MARGIN).toFixed(1);
+      const bgY = (minTop - MARS_IMAGE.top * sy + TRACK_MARGIN).toFixed(1);
       return {
         background:
           'linear-gradient(rgba(21, 19, 31, 0.45), rgba(21, 19, 31, 0.45)) local, ' +
@@ -107,7 +118,7 @@ export default defineComponent({
     },
     hexStyle(space: CustomSpaceDef): Record<string, string> {
       const p = customSpacePixel(space.x, space.y, this.maxY);
-      return {left: `${p.left}px`, top: `${p.top}px`};
+      return {left: `${p.left + TRACK_MARGIN}px`, top: `${p.top + TRACK_MARGIN}px`};
     },
     hexClass(space: CustomSpaceDef): Record<string, boolean> {
       const isCove = space.spaceType === SpaceType.COVE;

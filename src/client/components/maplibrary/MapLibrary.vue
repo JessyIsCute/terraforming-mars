@@ -199,7 +199,7 @@ export default defineComponent({
 .map-library {
   padding: 20px;
   color: #ddd;
-  max-width: 1180px;
+  max-width: 1560px;
   margin: 0 auto;
 
   h1 { color: #fff; margin: 0; }
@@ -240,7 +240,7 @@ export default defineComponent({
 // 2-3 cards per row, reflowing to fewer on narrower viewports.
 .map-library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
   gap: 16px;
   align-items: stretch;
 }
