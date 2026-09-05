@@ -22,9 +22,9 @@ describe('VenusVentures', () => {
     expect(card.tags.filter((t) => t === 'venus')).to.have.length(2);
   });
 
-  it('starts with 44 M€ and 1 M€ production', () => {
-    expect(card.startingMegaCredits).to.eq(44);
-    expect(card.behavior?.production?.megacredits).to.eq(1);
+  it('starts with 40 M€ and 2 M€ production', () => {
+    expect(card.startingMegaCredits).to.eq(40);
+    expect(card.behavior?.production?.megacredits).to.eq(2);
   });
 
   it('adds 1 floater per Venus tag played; 2 for its own two Venus tags', () => {
@@ -44,7 +44,7 @@ describe('VenusVentures', () => {
     expect(card.resourceCount).to.eq(0);
   });
 
-  it('action removes floaters for 3 M€ each', () => {
+  it('action removes floaters for 2 M€ each', () => {
     expect(card.canAct()).is.false;
     player.addResourceTo(card, 5);
     player.megaCredits = 0;
@@ -55,6 +55,6 @@ describe('VenusVentures', () => {
     runAllActions(game);
 
     expect(card.resourceCount).to.eq(2);
-    expect(player.megaCredits).to.eq(9);
+    expect(player.megaCredits).to.eq(6);
   });
 });

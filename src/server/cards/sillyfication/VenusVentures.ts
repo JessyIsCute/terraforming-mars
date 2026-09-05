@@ -16,25 +16,25 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
     super({
       name: CardName.VENUS_VENTURES,
       tags: [Tag.VENUS, Tag.VENUS],
-      startingMegaCredits: 44,
+      startingMegaCredits: 40,
       resourceType: CardResource.FLOATER,
 
       behavior: {
-        production: {megacredits: 1},
+        production: {megacredits: 2},
       },
 
       metadata: {
         cardNumber: 'XC2',
-        description: 'You start with 44 M€ and 1 M€ production.',
+        description: 'You start with 40 M€ and 2 M€ production.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(44).nbsp.production((pb) => pb.megacredits(1));
+          b.megacredits(40).nbsp.production((pb) => pb.megacredits(2));
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.effect('When you play a Venus tag, including this, add 1 floater to any card.', (eb) => {
               eb.tag(Tag.VENUS).startEffect.resource(CardResource.FLOATER).asterix();
             });
-            cea.action('Remove any number of floaters from this card to gain 3 M€ each.', (ab) => {
-              ab.text('x').resource(CardResource.FLOATER).startAction.megacredits(3, {size: Size.SMALL, text: '3X'});
+            cea.action('Remove any number of floaters from this card to gain 2 M€ each.', (ab) => {
+              ab.text('x').resource(CardResource.FLOATER).startAction.megacredits(2, {size: Size.SMALL, text: '2X'});
             });
           });
         }),
@@ -56,10 +56,10 @@ export class VenusVentures extends CorporationCard implements ICorporationCard, 
   }
 
   public action(player: IPlayer) {
-    return new SelectAmount('Remove floaters to gain 3 M€ each', 'Remove floaters', 1, this.resourceCount, true)
+    return new SelectAmount('Remove floaters to gain 2 M€ each', 'Remove floaters', 1, this.resourceCount, true)
       .andThen((amount) => {
         player.removeResourceFrom(this, amount, {log: false});
-        const gained = 3 * amount;
+        const gained = 2 * amount;
         player.stock.add(Resource.MEGACREDITS, gained, {log: false});
         player.game.log('${0} removed ${1} floaters from ${2} to gain ${3} M€',
           (b) => b.player(player).number(amount).card(this).number(gained));
