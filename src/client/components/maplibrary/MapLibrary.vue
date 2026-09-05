@@ -2,7 +2,10 @@
   <div class="map-library">
     <div class="map-library-header">
       <h1 v-i18n>Map library</h1>
-      <a class="btn btn-primary" :href="paths.MAP_EDITOR" v-i18n>Open map editor</a>
+      <div class="map-library-header-links">
+        <a v-if="isAdmin" class="btn" :href="`${paths.GAMES_OVERVIEW}?serverId=${serverId}`" v-i18n>Games overview</a>
+        <a class="btn btn-primary" :href="paths.MAP_EDITOR" v-i18n>Open map editor</a>
+      </div>
     </div>
 
     <div class="map-library-toolbar">
@@ -207,6 +210,10 @@ export default defineComponent({
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+.map-library-header-links {
+  display: flex;
+  gap: 8px;
 }
 .map-library-toolbar {
   display: flex;

@@ -2,6 +2,9 @@
   <div id="games-overview" class="games-overview-container">
     <h1 v-i18n>{{ constants.APP_NAME }} — Games Overview</h1>
       <p v-i18n>The following games are available on this server:</p>
+      <p class="games-overview-admin-links">
+        <a :href="`${paths.MAP_LIBRARY}?serverId=${serverId}`" v-i18n>Map library admin</a>
+      </p>
       <div class="games-overview-actions">
         <button type="button" class="btn btn-error" :disabled="bulkPurging" @click="purgeFinishedAndAbandoned" v-i18n>
           Purge finished &amp; abandoned games
@@ -132,6 +135,9 @@ export default defineComponent({
   computed: {
     constants(): typeof constants {
       return constants;
+    },
+    paths(): typeof paths {
+      return paths;
     },
     serverId(): string {
       return (new URL(location.href)).searchParams.get('serverId') || '';
