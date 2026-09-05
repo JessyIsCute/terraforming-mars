@@ -90,8 +90,8 @@ export default defineComponent({
   color: #ddd;
 }
 .map-thumbnail--error {
-  width: 140px;
-  height: 110px;
+  width: 160px;
+  height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;

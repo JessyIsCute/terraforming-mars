@@ -7,20 +7,38 @@
         class="map-thumbnail-hex"
         :class="hexClass(space)"
         :style="hexStyle(space)"
-      ></div>
+      >
+        <span class="map-thumbnail-hex-bonuses" v-if="space.bonus.length">
+          <i
+            v-for="(b, i) in space.bonus"
+            :key="i"
+            class="map-thumbnail-hex-bonus"
+            :class="'board-space-bonus--' + spaceBonusCss(b)"
+          ></i>
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, PropType} from 'vue';
-import {CustomBoardDefinition, CustomSpaceDef, customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
+import {CustomBoardDefinition, CustomSpaceDef, customSpacePixel, hexRowLayout} from '@/common/boards/CustomBoardDefinition';
+import {SpaceBonus} from '@/common/boards/SpaceBonus';
 import {SpaceType} from '@/common/boards/SpaceType';
+import {spaceBonusCss} from '@/client/utils/spaceBonusIcon';
 
-// Cheap, non-interactive preview reusing MapEditor.vue's own hex-grid math and the real board
-// sprites (board.less) -- a full <Board> is too heavy to mount once per row in a list.
-const THUMB_WIDTH = 140;
-const THUMB_HEIGHT = 110;
+// Cheap, non-interactive preview reusing MapEditor.vue's own hex-grid math, the real board
+// sprites (board.less), and its Mars-backdrop technique (a full <Board> is too heavy to mount
+// once per row in a list). The whole grid -- hexes, bonus icons, and backdrop alike -- is built
+// at natural (1:1) pixel size, then shrunk to fit the thumbnail box with a single CSS
+// `transform: scale()`, so everything scales down together.
+const THUMB_WIDTH = 160;
+const THUMB_HEIGHT = 130;
+
+// Same painted-diamond mapping MapEditor.vue's gridStyle uses: the region of
+// mars-without-venus.png (620x600) that lines up with the standard hex bounding box.
+const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 620, naturalHeight: 600};
 
 export default defineComponent({
   name: 'MapThumbnail',
@@ -34,9 +52,26 @@ export default defineComponent({
     maxY(): number {
       return Math.max(this.definition.rows - 1, 0);
     },
+    // The full bounding hexagon (including void cells), matching how MapEditor.vue frames and
+    // backdrops its own grid -- carved-out voids shouldn't shift the Mars backdrop's alignment.
+    bounds(): {minLeft: number, minTop: number, maxLeft: number, maxTop: number} {
+      let minLeft = Infinity;
+      let minTop = Infinity;
+      let maxLeft = -Infinity;
+      let maxTop = -Infinity;
+      for (const row of hexRowLayout(this.definition.rows)) {
+        for (let i = 0; i < row.width; i++) {
+          const p = customSpacePixel(row.xOffset + i, row.y, this.maxY);
+          minLeft = Math.min(minLeft, p.left);
+          minTop = Math.min(minTop, p.top);
+          maxLeft = Math.max(maxLeft, p.left);
+          maxTop = Math.max(maxTop, p.top);
+        }
+      }
+      return {minLeft, minTop, maxLeft, maxTop};
+    },
     naturalSize(): {width: number, height: number} {
-      const maxX = this.spaces.reduce((m, s) => Math.max(m, s.x), 0);
-      return customBoardPixelSize(maxX, this.maxY);
+      return {width: this.bounds.maxLeft + 90, height: this.bounds.maxTop + 90};
     },
     scale(): number {
       if (this.naturalSize.width === 0 || this.naturalSize.height === 0) {
@@ -44,15 +79,32 @@ export default defineComponent({
       }
       return Math.min(THUMB_WIDTH / this.naturalSize.width, THUMB_HEIGHT / this.naturalSize.height);
     },
+    backdropStyle(): Record<string, string> {
+      const {minLeft, minTop, maxLeft, maxTop} = this.bounds;
+      const sx = ((maxLeft - minLeft) + 46) / MARS_IMAGE.width;
+      const sy = ((maxTop - minTop) + 51) / MARS_IMAGE.height;
+      const bgX = (minLeft - MARS_IMAGE.left * sx).toFixed(1);
+      const bgY = (minTop - MARS_IMAGE.top * sy).toFixed(1);
+      return {
+        background:
+          'linear-gradient(rgba(21, 19, 31, 0.45), rgba(21, 19, 31, 0.45)) local, ' +
+          `url("/assets/board/mars-without-venus.png") local no-repeat ${bgX}px ${bgY}px / ${(MARS_IMAGE.naturalWidth * sx).toFixed(1)}px ${(MARS_IMAGE.naturalHeight * sy).toFixed(1)}px, ` +
+          '#15131f',
+      };
+    },
     innerStyle(): Record<string, string> {
       return {
         width: `${this.naturalSize.width}px`,
         height: `${this.naturalSize.height}px`,
         transform: `scale(${this.scale})`,
+        ...this.backdropStyle,
       };
     },
   },
   methods: {
+    spaceBonusCss(bonus: SpaceBonus): string {
+      return spaceBonusCss(bonus);
+    },
     hexStyle(space: CustomSpaceDef): Record<string, string> {
       const p = customSpacePixel(space.x, space.y, this.maxY);
       return {left: `${p.left}px`, top: `${p.top}px`};
@@ -77,8 +129,8 @@ export default defineComponent({
 
 <style scoped lang="less">
 .map-thumbnail {
-  width: 140px;
-  height: 110px;
+  width: 160px;
+  height: 130px;
   overflow: hidden;
   position: relative;
   background: #15131f;
@@ -99,5 +151,22 @@ export default defineComponent({
 
   &--restricted { background-color: rgba(70, 70, 78, 0.85); }
   &--reserved { background-color: rgba(241, 196, 15, 0.55); }
+}
+.map-thumbnail-hex-bonuses {
+  display: flex;
+  flex-wrap: wrap;
+  place-content: center;
+  align-items: center;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+}
+.map-thumbnail-hex-bonus {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
 }
 </style>
