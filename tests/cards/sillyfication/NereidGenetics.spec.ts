@@ -21,8 +21,8 @@ describe('NereidGenetics', () => {
     expect(card.tags).to.deep.eq([Tag.JOVIAN, Tag.MICROBE]);
   });
 
-  it('starts with 38 M€', () => {
-    expect(card.startingMegaCredits).to.eq(38);
+  it('starts with 45 M€', () => {
+    expect(card.startingMegaCredits).to.eq(45);
   });
 
   it('counts Jovian tags as microbe tags for tag totals', () => {
