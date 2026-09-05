@@ -87,6 +87,24 @@ describe('MapLibrary', () => {
     expect(hasApproveButton(wrapper)).is.true;
   });
 
+  it('defaults to Oldest first, and Newest reverses the order', async () => {
+    global.fetch = (() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve([
+        entry({id: 'm-old', createdAt: 1, code: encodeCustomBoard(blankCustomBoard(9, 'Old Map'))}),
+        entry({id: 'm-mid', createdAt: 2, code: encodeCustomBoard(blankCustomBoard(9, 'Mid Map'))}),
+        entry({id: 'm-new', createdAt: 3, code: encodeCustomBoard(blankCustomBoard(9, 'New Map'))}),
+      ]),
+    } as Response)) as typeof fetch;
+    const wrapper = await mountReady();
+
+    expect((wrapper.find('select').element as HTMLSelectElement).value).eq('oldest');
+    expect(wrapper.findAll('.map-card-title').map((t) => t.text())).deep.eq(['Old Map', 'Mid Map', 'New Map']);
+
+    await wrapper.find('select').setValue('newest');
+    expect(wrapper.findAll('.map-card-title').map((t) => t.text())).deep.eq(['New Map', 'Mid Map', 'Old Map']);
+  });
+
   it('opens the submit form and prepends a newly submitted entry', async () => {
     const wrapper = await mountReady();
     await wrapper.find('.map-library-toolbar button.btn').trigger('click');

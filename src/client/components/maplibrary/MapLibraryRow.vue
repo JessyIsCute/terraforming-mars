@@ -1,7 +1,7 @@
 <template>
   <div class="map-card">
     <div class="map-card-thumb">
-      <MapThumbnail v-if="decoded !== undefined" :definition="decoded"/>
+      <MapThumbnail v-if="decoded !== undefined" :definition="decoded" :width="THUMBNAIL_WIDTH" :height="THUMBNAIL_HEIGHT"/>
       <div v-else class="map-thumbnail map-thumbnail--error" v-i18n>Can't preview this map</div>
     </div>
 
@@ -43,6 +43,10 @@ type DataModel = {
   copied: boolean;
 };
 
+// Sized well above MapThumbnail's own default -- the map itself is the point of a library card.
+const THUMBNAIL_WIDTH = 300;
+const THUMBNAIL_HEIGHT = 230;
+
 export default defineComponent({
   name: 'MapLibraryRow',
   components: {MapThumbnail},
@@ -55,6 +59,8 @@ export default defineComponent({
     return {copied: false};
   },
   computed: {
+    THUMBNAIL_WIDTH: () => THUMBNAIL_WIDTH,
+    THUMBNAIL_HEIGHT: () => THUMBNAIL_HEIGHT,
     decoded(): CustomBoardDefinition | undefined {
       try {
         return decodeCustomBoard(this.entry.code);
@@ -120,8 +126,8 @@ export default defineComponent({
   background: #15131f;
 }
 .map-thumbnail--error {
-  width: 160px;
-  height: 130px;
+  width: 300px;
+  height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;

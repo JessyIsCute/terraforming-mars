@@ -1,5 +1,5 @@
 <template>
-  <div class="map-thumbnail">
+  <div class="map-thumbnail" :style="{width: width + 'px', height: height + 'px'}">
     <div class="map-thumbnail-inner" :style="innerStyle">
       <div
         v-for="space in spaces"
@@ -33,9 +33,6 @@ import {spaceBonusCss} from '@/client/utils/spaceBonusIcon';
 // once per row in a list). The whole grid -- hexes, bonus icons, and backdrop alike -- is built
 // at natural (1:1) pixel size, then shrunk to fit the thumbnail box with a single CSS
 // `transform: scale()`, so everything scales down together.
-const THUMB_WIDTH = 160;
-const THUMB_HEIGHT = 130;
-
 // Same painted-diamond mapping MapEditor.vue's gridStyle uses: the region of
 // mars-without-venus.png (620x600) that lines up with the standard hex bounding box.
 const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 620, naturalHeight: 600};
@@ -44,6 +41,9 @@ export default defineComponent({
   name: 'MapThumbnail',
   props: {
     definition: {type: Object as PropType<CustomBoardDefinition>, required: true},
+    // Rendered box size in pixels; the hex grid + backdrop scale down to fit it.
+    width: {type: Number, default: 160},
+    height: {type: Number, default: 130},
   },
   computed: {
     spaces(): Array<CustomSpaceDef> {
@@ -77,7 +77,7 @@ export default defineComponent({
       if (this.naturalSize.width === 0 || this.naturalSize.height === 0) {
         return 1;
       }
-      return Math.min(THUMB_WIDTH / this.naturalSize.width, THUMB_HEIGHT / this.naturalSize.height);
+      return Math.min(this.width / this.naturalSize.width, this.height / this.naturalSize.height);
     },
     backdropStyle(): Record<string, string> {
       const {minLeft, minTop, maxLeft, maxTop} = this.bounds;
@@ -129,8 +129,6 @@ export default defineComponent({
 
 <style scoped lang="less">
 .map-thumbnail {
-  width: 160px;
-  height: 130px;
   overflow: hidden;
   position: relative;
   background: #15131f;

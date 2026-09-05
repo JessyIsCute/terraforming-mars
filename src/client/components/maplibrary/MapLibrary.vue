@@ -21,6 +21,7 @@
       <label class="map-library-sort">
         <span v-i18n>Sort by</span>
         <select v-model="sortBy">
+          <option value="oldest" v-i18n>Oldest</option>
           <option value="newest" v-i18n>Newest</option>
           <option value="name" v-i18n>Name</option>
         </select>
@@ -59,7 +60,7 @@ import {decodeCustomBoard} from '@/common/boards/customBoardCodec';
 import {paths} from '@/common/app/paths';
 import {setDocumentTitle} from '@/client/utils/documentTitle';
 
-type SortBy = 'newest' | 'name';
+type SortBy = 'oldest' | 'newest' | 'name';
 
 type DataModel = {
   entries: Array<MapLibraryEntry>;
@@ -82,7 +83,7 @@ export default defineComponent({
       showSubmitForm: false,
       originFilter: {official: true, fanmade: true},
       statusFilter: {submitted: true, approved: true},
-      sortBy: 'newest',
+      sortBy: 'oldest',
     };
   },
   mounted() {
@@ -127,6 +128,8 @@ export default defineComponent({
           const nameB = this.decodedById.get(b.id)?.name ?? '';
           return nameA.localeCompare(nameB);
         });
+      } else if (this.sortBy === 'oldest') {
+        list.sort((a, b) => a.createdAt - b.createdAt);
       } else {
         list.sort((a, b) => b.createdAt - a.createdAt);
       }
@@ -193,7 +196,7 @@ export default defineComponent({
 .map-library {
   padding: 20px;
   color: #ddd;
-  max-width: 980px;
+  max-width: 1180px;
   margin: 0 auto;
 
   h1 { color: #fff; margin: 0; }
@@ -230,7 +233,7 @@ export default defineComponent({
 // 2-3 cards per row, reflowing to fewer on narrower viewports.
 .map-library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 16px;
   align-items: stretch;
 }

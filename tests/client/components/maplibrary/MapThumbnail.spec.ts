@@ -33,4 +33,17 @@ describe('MapThumbnail', () => {
     const style = (wrapper.find('.map-thumbnail-inner').element as HTMLElement).style;
     expect(style.background).to.contain('mars-without-venus.png');
   });
+
+  it('defaults to a 160x130 box, and honors explicit width/height props', () => {
+    const definition = blankCustomBoard(9, 'Standard');
+    const defaultSize = mount(MapThumbnail, {...globalConfig, props: {definition}});
+    const defaultStyle = (defaultSize.find('.map-thumbnail').element as HTMLElement).style;
+    expect(defaultStyle.width).eq('160px');
+    expect(defaultStyle.height).eq('130px');
+
+    const bigger = mount(MapThumbnail, {...globalConfig, props: {definition, width: 300, height: 230}});
+    const biggerStyle = (bigger.find('.map-thumbnail').element as HTMLElement).style;
+    expect(biggerStyle.width).eq('300px');
+    expect(biggerStyle.height).eq('230px');
+  });
 });
