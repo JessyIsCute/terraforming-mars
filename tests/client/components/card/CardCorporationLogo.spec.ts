@@ -15,7 +15,7 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders the Nereid Biosystems bespoke logo', () => {
+  it('renders the Nereid Biosystems bespoke logo, with BIO/SYSTEMS colored separately', () => {
     const wrapper = shallowMount(CardCorporationLogo, {
       ...globalConfig,
       props: {
@@ -25,5 +25,18 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.find('.card-nereid-biosystems-logo').exists()).to.be.true;
     expect(wrapper.find('.word-1').text()).to.eq('NEREID');
     expect(wrapper.find('.word-2').text()).to.eq('BIOSYSTEMS');
+    expect(wrapper.find('.bio').text()).to.eq('BIO');
+    expect(wrapper.find('.systems').text()).to.eq('SYSTEMS');
+  });
+
+  it('renders Pristar:bm with the same logo class as Pristar', () => {
+    const wrapper = shallowMount(CardCorporationLogo, {
+      ...globalConfig,
+      props: {
+        title: CardName.PRISTAR_BETTER_MARS,
+      },
+    });
+    expect(wrapper.find('.card-pristar-logo').exists()).to.be.true;
+    expect(wrapper.text()).to.eq('PRISTAR');
   });
 });

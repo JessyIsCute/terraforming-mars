@@ -296,7 +296,7 @@
         <div class="card-wellness-deluxe-logo"><span class="word-1">WELLNESS</span> <span class="word-2">DELUXE</span></div>
       </template>
       <template v-else-if="title === CardName.NEREID_BIOSYSTEMS">
-        <div class="card-nereid-biosystems-logo"><span class="word-1">NEREID</span> <span class="word-2">BIOSYSTEMS</span></div>
+        <div class="card-nereid-biosystems-logo"><span class="word-1">NEREID</span> <span class="word-2"><span class="bio">BIO</span><span class="systems">SYSTEMS</span></span></div>
       </template>
     </template>
     <template v-else>
@@ -384,6 +384,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.POLYPHEMOS]: 'css',
   [CardName.POSEIDON]: 'css',
   [CardName.PRISTAR]: 'css',
+  [CardName.PRISTAR_BETTER_MARS]: 'css',
   [CardName.PROJECT_WORKSHOP]: 'bespoke',
   [CardName.RECYCLON]: 'bespoke',
   [CardName.RINGCOM]: 'image',
@@ -438,7 +439,9 @@ export default defineComponent({
       switch (type) {
       case 'image':
       case 'css':
-        const local = this.title.toLowerCase()
+        // Strip a display suffix like ":bm"/":s" (BetterMars/Sillyfication replacement
+        // cards) so the variant reuses its base card's logo instead of a broken one.
+        const local = this.title.split(':')[0].toLowerCase()
           .replaceAll(' ', '-')
           .replaceAll('&', '')
           .replaceAll('--', '-');
@@ -448,7 +451,7 @@ export default defineComponent({
       }
     },
     capsTitle(): string {
-      return logos[this.title] === 'image' ? '' : this.title.toUpperCase();
+      return logos[this.title] === 'image' ? '' : this.title.split(':')[0].toUpperCase();
     },
   },
 });
