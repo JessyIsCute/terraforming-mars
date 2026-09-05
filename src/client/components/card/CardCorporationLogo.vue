@@ -304,6 +304,15 @@
           <span class="word-2">DICATE</span>
         </div>
       </template>
+      <template v-else-if="title === CardName.EPSILON_DAMPLE">
+        <div class="card-epsilon-dample-logo">
+          <img class="epsilon-dample-icon" src="assets/expansion_icons/expansion_icon_deltaProject.png">
+          <div class="epsilon-dample-title">
+            <div class="word-1">EPSILON</div>
+            <div class="word-2">DAMPLE</div>
+          </div>
+        </div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -344,6 +353,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.DEMETRON_LABS]: 'bespoke',
   [CardName.ECOLINE]: 'css',
   [CardName.ECOTEC]: 'bespoke',
+  [CardName.EPSILON_DAMPLE]: 'bespoke',
   [CardName.ERIS]: 'bespoke',
   [CardName.FACTORUM]: 'css',
   [CardName.GAGARIN_MOBILE_BASE]: 'bespoke',

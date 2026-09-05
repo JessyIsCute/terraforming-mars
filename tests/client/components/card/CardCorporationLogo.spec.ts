@@ -52,4 +52,17 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.find('.word-1b').text()).to.eq('SYN');
     expect(wrapper.find('.word-2').text()).to.eq('DICATE');
   });
+
+  it('renders Epsilon Dample bespoke logo, with the Delta Project chevron icon', () => {
+    const wrapper = shallowMount(CardCorporationLogo, {
+      ...globalConfig,
+      props: {
+        title: CardName.EPSILON_DAMPLE,
+      },
+    });
+    expect(wrapper.find('.card-epsilon-dample-logo').exists()).to.be.true;
+    expect(wrapper.find('.epsilon-dample-icon').attributes('src')).to.eq('assets/expansion_icons/expansion_icon_deltaProject.png');
+    expect(wrapper.find('.word-1').text()).to.eq('EPSILON');
+    expect(wrapper.find('.word-2').text()).to.eq('DAMPLE');
+  });
 });
