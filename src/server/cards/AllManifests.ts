@@ -19,7 +19,6 @@ import {UNDERWORLD_CARD_MANIFEST} from './underworld/UnderworldCardManifest';
 import {DELTA_PROJECT_CARD_MANIFEST} from './delta/DeltaProjectCardManifest';
 import {SILLYFICATION_CARD_MANIFEST} from './sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './betterMars/BetterMarsCardManifest';
-import {TECO_CARD_MANIFEST} from './teco/TecoCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -40,5 +39,4 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   DELTA_PROJECT_CARD_MANIFEST,
   SILLYFICATION_CARD_MANIFEST,
   BETTER_MARS_CARD_MANIFEST,
-  TECO_CARD_MANIFEST,
 ];

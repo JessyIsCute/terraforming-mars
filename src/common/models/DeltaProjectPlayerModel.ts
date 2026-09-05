@@ -3,8 +3,8 @@ export type DeltaProjectPlayerModel = {
   jovianBonus: boolean;
   /**
    * Only used by markers that can also move backward (e.g. Epsilon Dample's second
-   * marker): the furthest position ever reached, so retreating and re-advancing over
-   * already-claimed ground doesn't re-trigger that position's reward.
+   * marker): every position this marker has already claimed the landing reward for
+   * (forward or backward), so revisiting it doesn't re-trigger that reward.
    */
-  highestPosition?: number;
+  rewardedPositions?: Array<number>;
 }

@@ -53,7 +53,6 @@ const fanExpansions: ReadonlyArray<RulebookEntry> = [
   {module: 'deltaProject', name: 'Delta Project', iconClass: 'deltaProject', url: RULEBOOK_URLS.deltaProject},
   {module: 'sillyfication', name: 'Sillyfication', iconClass: 'sillyfication', url: RULEBOOK_URLS.sillyfication},
   {module: 'betterMars', name: 'BetterMars', iconClass: 'betterMars', url: RULEBOOK_URLS.betterMars},
-  {module: 'teco', name: 'Teco', iconClass: 'teco', url: RULEBOOK_URLS.teco},
 ];
 
 export default defineComponent({

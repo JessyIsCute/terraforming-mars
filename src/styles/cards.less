@@ -427,17 +427,6 @@ input[type="radio"]:checked+.filterDiv::after {
   content: "";
 }
 
-// Teco: a bare "T" in a circle.
-.teco-icon:after {
-  .expansion-icon-base();
-  background: #2c3e50;
-  color: white;
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 16px;
-  content: "T";
-}
-
 /*********** Style the tags ************/
 
 .tag-wild {
@@ -1130,23 +1119,6 @@ input[type="radio"]:checked+.filterDiv::after {
 // BetterMars uses the Mars tag sprite as its expansion icon.
 .expansion-icon-betterMars {
   background-image: url(./assets/tags/mars.png);
-}
-
-// Teco: a bare "T" in a circle. Works in both the .expansion-icon (25px) and
-// .create-game-expansion-icon (30px) boxes, same trick as Sillyfication above.
-.expansion-icon-teco {
-  background-image: none;
-  background-color: #2c3e50;
-  border-radius: 50%;
-  text-align: center;
-
-  &::before {
-    content: "T";
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 1.6;
-  }
 }
 
 .card-standard-project {

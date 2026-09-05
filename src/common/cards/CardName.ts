@@ -650,7 +650,7 @@ export enum CardName {
   NEREID_BIOSYSTEMS = 'Nereid Biosystems',
   THE_SYNDICATE = 'The Syndicate',
 
-  // Teco (new fan expansion)
+  // Formerly the separate Teco fan expansion, merged into Sillyfication.
   MOON_COW = 'Moon Cow',
   UNDERGROUND_WORMS = 'Underground Worms',
   VENUPHILE = 'Venuphile',

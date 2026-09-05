@@ -26,7 +26,7 @@ import {STAR_WARS_CARD_MANIFEST} from './cards/starwars/StarwarsCardManifest';
 import {UNDERWORLD_CARD_MANIFEST} from './cards/underworld/UnderworldCardManifest';
 import {SILLYFICATION_CARD_MANIFEST} from './cards/sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManifest';
-import {TECO_CARD_MANIFEST} from './cards/teco/TecoCardManifest';
+import {DELTA_PROJECT_CARD_MANIFEST} from './cards/delta/DeltaProjectCardManifest';
 
 /**
  * Returns the cards available to a game based on its `GameOptions`.
@@ -66,7 +66,10 @@ export class GameCards {
       [gameOptions.underworldExpansion, UNDERWORLD_CARD_MANIFEST],
       [gameOptions.sillyficationExpansion, SILLYFICATION_CARD_MANIFEST],
       [gameOptions.betterMarsExpansion, BETTER_MARS_CARD_MANIFEST],
-      [gameOptions.tecoExpansion, TECO_CARD_MANIFEST],
+      // DeltaProject's own card (the prelude) is force-dealt directly in Game.ts, not drawn
+      // from this pool - but other cards depending on the expansion (e.g. Epsilon Dample,
+      // via its `compatibility: 'deltaProject'`) still need this manifest present here.
+      [gameOptions.deltaProjectExpansion, DELTA_PROJECT_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests

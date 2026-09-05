@@ -196,8 +196,9 @@ export class DeltaProjectExpansion {
     player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
-  /** Advance Epsilon Dample's second marker. Like {@link advance}, but rewards only fire
-   * the first time this marker reaches a position - see {@link getValidEpsilonRetreatSteps}. */
+  /** Advance Epsilon Dample's second marker. Grants the landing position's reward, like
+   * {@link advance} - but see {@link maybeResolveEpsilonReward} for the one-claim-per-position
+   * rule that keeps this (and {@link retreatEpsilon}) from being a farming loop. */
   public static advanceEpsilon(player: IPlayer, steps: number): void {
     const valid = DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player);
     if (!valid.includes(steps)) {
@@ -205,23 +206,18 @@ export class DeltaProjectExpansion {
     }
 
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
-    const currentPos = progress.position;
-    const newPos = currentPos + steps;
+    const newPos = progress.position + steps;
 
     player.stock.deduct(Resource.ENERGY, steps);
     progress.position = newPos;
-
-    const highWaterMark = progress.highestPosition ?? 0;
-    if (newPos > highWaterMark) {
-      progress.highestPosition = newPos;
-      DeltaProjectExpansion.resolveReward(player, newPos, 'epsilon');
-    }
+    DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
 
     player.game.log('${0} spent ${1} energy to advance their second marker on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
   /** Move Epsilon Dample's second marker backward. Costs 1 energy per step, same as
-   * advancing, but never triggers a position's reward. */
+   * advancing, and also grants the landing position's reward if this marker has never
+   * claimed it before (see {@link maybeResolveEpsilonReward}). */
   public static retreatEpsilon(player: IPlayer, steps: number): void {
     const valid = DeltaProjectExpansion.getValidEpsilonRetreatSteps(player);
     if (!valid.includes(steps)) {
@@ -229,10 +225,30 @@ export class DeltaProjectExpansion {
     }
 
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
+    const newPos = progress.position - steps;
+
     player.stock.deduct(Resource.ENERGY, steps);
-    progress.position -= steps;
+    progress.position = newPos;
+    DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
 
     player.game.log('${0} spent ${1} energy to move their second marker backward on the Delta Project track', (b) => b.player(player).number(steps));
+  }
+
+  /**
+   * Epsilon Dample's marker can move in both directions, so unlike the primary marker
+   * (which can only ever reach a new position by advancing), it can land on the same
+   * position more than once. Each position's reward is only granted the first time this
+   * marker lands there - forward or backward - so shuttling back and forth can't be used
+   * to farm a reward repeatedly.
+   */
+  private static maybeResolveEpsilonReward(player: IPlayer, position: number): void {
+    const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
+    const rewardedPositions = progress.rewardedPositions ?? (progress.rewardedPositions = []);
+    if (rewardedPositions.includes(position)) {
+      return;
+    }
+    rewardedPositions.push(position);
+    DeltaProjectExpansion.resolveReward(player, position, 'epsilon');
   }
 
   private static resolveReward(player: IPlayer, position: number, marker: MarkerKind): void {

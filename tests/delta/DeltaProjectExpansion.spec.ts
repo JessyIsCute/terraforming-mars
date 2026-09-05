@@ -564,7 +564,7 @@ describe('DeltaProjectExpansion', () => {
 
   describe('Epsilon Dample second marker', () => {
     beforeEach(() => {
-      player.epsilonDampleData = {position: 0, jovianBonus: false, highestPosition: 0};
+      player.epsilonDampleData = {position: 0, jovianBonus: false, rewardedPositions: []};
     });
 
     it('advances independently of the primary marker', () => {
@@ -597,37 +597,42 @@ describe('DeltaProjectExpansion', () => {
       expect(player.tags.extraJovianTags).eq(2);
     });
 
-    it('retreating does not require tags and does not grant a reward', () => {
+    it('retreating does not require tags, and grants the reward if never claimed before', () => {
       player.epsilonDampleData!.position = 5;
-      player.epsilonDampleData!.highestPosition = 5;
       player.energy = 5;
       player.production.override({megacredits: 0});
 
+      // Position 3 (Earth) was jumped clean over on the way up here, never actually landed
+      // on - so retreating onto it for the first time still claims its reward.
       DeltaProjectExpansion.retreatEpsilon(player, 2);
 
       expect(player.epsilonDampleData!.position).eq(3);
       expect(player.energy).eq(3);
-      expect(player.production.megacredits).eq(0); // no re-trigger of position 3's reward
-    });
-
-    it('re-advancing over already-claimed ground does not re-trigger the reward', () => {
-      setupPlayerForThreeStepsFromStart(player);
-
-      DeltaProjectExpansion.advanceEpsilon(player, 3);
-      runAllActions(game);
-      expect(player.production.megacredits).eq(2);
-
-      player.energy = 3;
-      DeltaProjectExpansion.retreatEpsilon(player, 2);
-      player.energy = 2;
-      DeltaProjectExpansion.advanceEpsilon(player, 2);
-      runAllActions(game);
-
-      // Still just the one reward from the first time this marker reached position 3.
       expect(player.production.megacredits).eq(2);
     });
 
-    it('advancing past the old high-water mark still triggers the new position reward', () => {
+    it('re-landing on an already-claimed position does not re-trigger the reward', () => {
+      playAllDeltaTrackTags(player);
+      player.energy = 4;
+
+      DeltaProjectExpansion.advanceEpsilon(player, 4); // straight to position 4 (Space)
+      runAllActions(game);
+      expect(player.production.titanium).eq(1);
+
+      player.energy = 1;
+      DeltaProjectExpansion.retreatEpsilon(player, 1); // position 3 (Earth) - first time here
+      runAllActions(game);
+      expect(player.production.megacredits).eq(2);
+
+      player.energy = 1;
+      DeltaProjectExpansion.advanceEpsilon(player, 1); // back to position 4 - already claimed
+      runAllActions(game);
+
+      // Still just the one titanium step from the first time this marker reached position 4.
+      expect(player.production.titanium).eq(1);
+    });
+
+    it('advancing to a position never claimed before still triggers its reward', () => {
       setupPlayerForThreeStepsFromStart(player);
       DeltaProjectExpansion.advanceEpsilon(player, 3);
       runAllActions(game);

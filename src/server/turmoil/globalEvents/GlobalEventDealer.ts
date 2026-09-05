@@ -75,7 +75,6 @@ export class GlobalEventDealer {
       deltaProject: gameOptions.deltaProjectExpansion,
       sillyfication: gameOptions.sillyficationExpansion,
       betterMars: gameOptions.betterMarsExpansion,
-      teco: gameOptions.tecoExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

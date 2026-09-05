@@ -19,7 +19,7 @@ function customBoardGameConfig(customBoardCode: string): NewGameConfig {
     expansions: {
       corpera: true, promo: false, venus: false, colonies: false, prelude: false, prelude2: false,
       turmoil: false, community: false, ares: false, moon: false, pathfinders: false, ceo: false,
-      starwars: false, underworld: false, deltaProject: false, sillyfication: false, betterMars: false, teco: false,
+      starwars: false, underworld: false, deltaProject: false, sillyfication: false, betterMars: false,
     },
     board: BoardName.CUSTOM,
     customBoardCode,
@@ -129,7 +129,6 @@ describe('ApiCreateGame', () => {
           deltaProject: false,
           sillyfication: false,
           betterMars: false,
-          teco: false,
         },
         board: RandomBoardOption.OFFICIAL,
         seed: 0,

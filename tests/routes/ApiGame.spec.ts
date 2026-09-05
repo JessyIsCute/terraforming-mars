@@ -67,7 +67,6 @@ describe('ApiGame', () => {
           'expansions': {
             'ares': false,
             'betterMars': false,
-            'teco': false,
             'ceo': false,
             'colonies': false,
             'community': false,

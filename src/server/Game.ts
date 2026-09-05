@@ -114,7 +114,7 @@ export class Game implements IGame, Logger {
   public undoCount: number = 0; // Each undo increases it
   public inputsThisRound = 0;
   public resettable: boolean = false;
-  /** Set by a prelude (e.g. Teco's Slow Start) to route generation 1 straight to production, skipping every player's actions. Consumed immediately, never persisted. */
+  /** Set by a prelude (e.g. Slow Start) to route generation 1 straight to production, skipping every player's actions. Consumed immediately, never persisted. */
   public skipGeneration1Actions: boolean = false;
   public globalsPerGeneration: Array<Partial<Record<GlobalParameter, number>>> = [];
 
@@ -285,7 +285,6 @@ export class Game implements IGame, Logger {
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
-        teco: partialOptions.tecoExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -1437,7 +1436,7 @@ export class Game implements IGame, Logger {
     // Clear out underworld components.
     UnderworldExpansion.onTilePlaced(this, space);
 
-    // Teco: Energy Harvest tracks whether a player's most recent action placed a greenery.
+    // Energy Harvest tracks whether a player's most recent action placed a greenery.
     if (space.tile !== undefined && space.player === player && GREENERY_TILES.has(space.tile.tileType)) {
       player.lastGreeneryActionNumber = player.actionsTakenThisGame + 1;
     }
