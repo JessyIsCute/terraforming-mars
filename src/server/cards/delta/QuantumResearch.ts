@@ -9,7 +9,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class QuantumResearch extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.QUANTUM_RESEARCH,
       tags: [Tag.SCIENCE],
       cost: 9,
@@ -20,9 +20,11 @@ export class QuantumResearch extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'DP03',
         renderData: CardRenderer.builder((b) => {
-          b.cards(1).slash().megacredits(-1);
+          b.effect('When you buy a card to hand, you pay 1 M€ less for it.', (eb) => {
+            eb.cards(1).startEffect.megacredits(-1);
+          });
         }),
-        description: 'Requires 3 science tags. When you buy a card to hand, you pay 1 M€ less for it.',
+        description: 'Requires 3 science tags.',
       },
     });
   }

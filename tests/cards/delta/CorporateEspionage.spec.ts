@@ -5,6 +5,7 @@ import {testGame} from '../../TestGame';
 import {IGame} from '../../../src/server/IGame';
 import {SelectPlayer} from '../../../src/server/inputs/SelectPlayer';
 import {cast} from '../../../src/common/utils/utils';
+import {CardType} from '../../../src/common/cards/CardType';
 
 describe('CorporateEspionage', () => {
   let card: CorporateEspionage;
@@ -52,5 +53,9 @@ describe('CorporateEspionage', () => {
     expect(game.deferredActions).has.lengthOf(2);
     expect(player2.deltaProjectData!.position).eq(2);
     expect(player.deltaProjectData!.position).eq(1);
+  });
+
+  it('is a red (Event) card, unlike the other Delta Project cards', () => {
+    expect(card.type).eq(CardType.EVENT);
   });
 });

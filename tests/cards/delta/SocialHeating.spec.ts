@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {SocialHeating} from '../../../src/server/cards/delta/SocialHeating';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -41,5 +42,9 @@ describe('SocialHeating', () => {
     DeltaProjectExpansion.advance(player2, 2);
 
     expect(player.heat).eq(2);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

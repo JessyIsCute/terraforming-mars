@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {QuantumResearch} from '../../../src/server/cards/delta/QuantumResearch';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
+import {CardType} from '../../../src/common/cards/CardType';
 
 describe('QuantumResearch', () => {
   let card: QuantumResearch;
@@ -27,5 +28,9 @@ describe('QuantumResearch', () => {
 
   it('scores 1 VP', () => {
     expect(card.getVictoryPoints(player)).eq(1);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

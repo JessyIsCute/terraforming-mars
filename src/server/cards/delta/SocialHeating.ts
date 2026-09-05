@@ -10,7 +10,7 @@ import {all} from '../Options';
 export class SocialHeating extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.SOCIAL_HEATING,
       cost: 12,
 
@@ -19,9 +19,11 @@ export class SocialHeating extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'DP10',
         renderData: CardRenderer.builder((b) => {
-          b.plate('Delta track', {all}).slash().heat(1);
+          b.effect('Any time any player moves on the Delta Project track, gain heat equal to the number of steps taken.', (eb) => {
+            eb.plate('Delta track', {all}).startEffect.heat(1);
+          });
         }),
-        description: 'Requires that you have a city in play. Any time any player moves on the Delta Project track, gain heat equal to the number of steps taken.',
+        description: 'Requires that you have a city in play.',
       },
     });
   }

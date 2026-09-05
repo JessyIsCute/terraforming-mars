@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {StormSurgeBarrier} from '../../../src/server/cards/delta/StormSurgeBarrier';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -50,5 +51,9 @@ describe('StormSurgeBarrier', () => {
 
     const orOptions = cast(card.action(player), OrOptions);
     expect(orOptions.options).has.length(2);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

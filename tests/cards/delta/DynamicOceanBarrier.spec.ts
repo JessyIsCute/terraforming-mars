@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {DynamicOceanBarrier} from '../../../src/server/cards/delta/DynamicOceanBarrier';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -53,5 +54,9 @@ describe('DynamicOceanBarrier', () => {
 
     expect(player.deltaProjectData!.position).eq(1);
     expect(player.energy).eq(0);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

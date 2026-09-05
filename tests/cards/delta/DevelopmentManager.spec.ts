@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {DevelopmentManager} from '../../../src/server/cards/delta/DevelopmentManager';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -58,5 +59,9 @@ describe('DevelopmentManager', () => {
     DeltaProjectExpansion.advance(player2, 2);
 
     expect(player.megaCredits).eq(0);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {DeltaSurge} from '../../../src/server/cards/delta/DeltaSurge';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -40,5 +41,9 @@ describe('DeltaSurge', () => {
     // immediate M€ production. All three should have been triggered by this one jump.
     expect(player.production.megacredits).eq(2);
     expect(game.deferredActions).has.lengthOf(2);
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

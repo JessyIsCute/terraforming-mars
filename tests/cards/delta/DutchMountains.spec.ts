@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {CardType} from '../../../src/common/cards/CardType';
 import {DutchMountains} from '../../../src/server/cards/delta/DutchMountains';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -51,5 +52,9 @@ describe('DutchMountains', () => {
     const orOptions = cast(card.action(player), OrOptions);
     expect(orOptions.options.map((o) => o.title.toString())).to.not.include.members(['Re-trigger the jovian bonus (step 8)']);
     expect(orOptions.options).has.length(8); // positions 1-7, 9
+  });
+
+  it('is a blue (Active) card', () => {
+    expect(card.type).eq(CardType.ACTIVE);
   });
 });

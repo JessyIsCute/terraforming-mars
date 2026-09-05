@@ -14,16 +14,17 @@ import {DeltaProjectExpansion} from '../../delta/DeltaProjectExpansion';
 export class DynamicOceanBarrier extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.DYNAMIC_OCEAN_BARRIER,
       cost: 8,
 
       metadata: {
         cardNumber: 'DP08',
         renderData: CardRenderer.builder((b) => {
-          b.oceans(1).slash().plate('Delta track');
+          b.effect('Whenever you place an ocean tile, you may move 1 step on the Delta Project track without paying energy. If you pay 1 energy instead, you may ignore 1 required tag.', (eb) => {
+            eb.oceans(1).startEffect.plate('Delta track');
+          });
         }),
-        description: 'Whenever you place an ocean tile, you may move 1 step on the Delta Project track without paying energy. If you pay 1 energy instead, you may ignore 1 required tag.',
       },
     });
   }

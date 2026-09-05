@@ -6,12 +6,11 @@ import {CardRenderer} from '../render/CardRenderer';
 import {IProjectCard} from '../IProjectCard';
 import {IPlayer} from '../../IPlayer';
 import {Resource} from '../../../common/Resource';
-import {Size} from '../../../common/cards/render/Size';
 
 export class DevelopmentManager extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.DEVELOPMENT_MANAGER,
       tags: [Tag.BUILDING],
       cost: 8,
@@ -19,9 +18,13 @@ export class DevelopmentManager extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'DP06',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.wild(1)).nbsp.text('2+', {size: Size.SMALL}).slash().plate('Delta track').nbsp.text('2+', {size: Size.SMALL}).colon().megacredits(2);
+          b.effect('Each time you increase a production 2 or more steps, gain 2 M€.', (eb) => {
+            eb.production((pb) => pb.wild(1)).startEffect.megacredits(2);
+          }).br;
+          b.effect('Each time you advance 2 or more steps on the Delta Project track, gain 2 M€.', (eb) => {
+            eb.plate('Delta track').startEffect.megacredits(2);
+          });
         }),
-        description: 'Each time you increase a type of production 2 or more steps, or advance 2 or more steps on the Delta Project track, gain 2 M€.',
       },
     });
   }
