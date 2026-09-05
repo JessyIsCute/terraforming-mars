@@ -23,6 +23,7 @@ import {processRequest} from '@/server/server/requestProcessor';
 import {timeAsync} from '@/server/utils/timer';
 import {GameLoader} from '@/server/database/GameLoader';
 import {globalInitialize} from '@/server/globalInitialize';
+import {seedOfficialMapLibrary} from '@/server/database/seedOfficialMapLibrary';
 import {SessionManager} from '@/server/server/auth/SessionManager';
 
 process.on('uncaughtException', (err: any) => {
@@ -106,6 +107,8 @@ async function start() {
     .then((v) => {
       metrics.startDatabase.set(v.duration);
     });
+
+  await seedOfficialMapLibrary();
 
   // Initialize the session manager after initializing the database.
   await SessionManager.getInstance().initialize();
