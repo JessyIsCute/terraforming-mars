@@ -251,6 +251,7 @@ const MARKER_TOOLS: Array<Tool> = [
 ];
 
 const BONUS_TOOLS: Array<BonusTool> = ([
+  {bonus: SpaceBonus.MEGACREDITS, css: 'megacredit', label: 'M€', description: 'Gain 1 M€ when you place a tile on this space.'},
   {bonus: SpaceBonus.PLANT, css: 'plant', label: 'Plant', description: 'Gain 1 plant when you place a tile on this space.'},
   {bonus: SpaceBonus.STEEL, css: 'steel', label: 'Steel', description: 'Gain 1 steel when you place a tile on this space.'},
   {bonus: SpaceBonus.TITANIUM, css: 'titanium', label: 'Titanium', description: 'Gain 1 titanium when you place a tile on this space.'},

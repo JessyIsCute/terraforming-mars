@@ -4,6 +4,7 @@ import {SpaceBonus} from '@/common/boards/SpaceBonus';
 // defines the actual `.board-space-bonus--<suffix>` sprites) -- kept here too so other
 // non-interactive renderers (e.g. MapThumbnail.vue) don't need to pull in the whole editor.
 const SPACE_BONUS_CSS: Partial<Record<SpaceBonus, string>> = {
+  [SpaceBonus.MEGACREDITS]: 'megacredit',
   [SpaceBonus.PLANT]: 'plant',
   [SpaceBonus.STEEL]: 'steel',
   [SpaceBonus.TITANIUM]: 'titanium',

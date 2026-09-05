@@ -1532,6 +1532,9 @@ export class Game implements IGame, Logger {
     case SpaceBonus.HEAT:
       player.stock.add(Resource.HEAT, count, {log: true});
       break;
+    case SpaceBonus.MEGACREDITS:
+      player.stock.add(Resource.MEGACREDITS, count, {log: true});
+      break;
     case SpaceBonus.OCEAN:
       // Hellas special requirements ocean tile
       if (this.canAddOcean()) {

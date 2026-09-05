@@ -44,6 +44,14 @@ describe('Game.grantSpaceBonus with a custom board', () => {
     expect(deferred.amount).to.eq(constants.VASTITAS_BOREALIS_NOVA_BONUS_TEMPERATURE_COST);
   });
 
+  it('grants M€ directly for the MEGACREDITS bonus (a Custom Map Editor placement bonus)', () => {
+    const startingMegaCredits = player.megaCredits;
+    game.grantSpaceBonus(player, SpaceBonus.MEGACREDITS, 3);
+    expect(player.megaCredits).to.eq(startingMegaCredits + 3);
+    // Unlike ocean/temperature/colony, this is a free gain -- no SelectPaymentDeferred queued.
+    expect(game.deferredActions.length).to.eq(0);
+  });
+
   it('falls back to the official costs when the custom board sets none', () => {
     const [noCostsGame, noCostsPlayer] = testGame(2, {
       customBoard: {version: 1, name: 'x', rows: 9, spaces: [], milestones: [], awards: []},

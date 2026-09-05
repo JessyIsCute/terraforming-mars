@@ -16,7 +16,7 @@ const css: Record<SpaceBonus, string> = {
   [SpaceBonus.DRAW_CARD]: 'card',
   [SpaceBonus.HEAT]: 'heat',
   [SpaceBonus.OCEAN]: 'bonusocean',
-  [SpaceBonus.MEGACREDITS]: '', // Only used for Ares
+  [SpaceBonus.MEGACREDITS]: 'megacredit',
   [SpaceBonus.ANIMAL]: 'animal',
   [SpaceBonus.MICROBE]: 'microbe',
   [SpaceBonus.ENERGY]: 'energy',
