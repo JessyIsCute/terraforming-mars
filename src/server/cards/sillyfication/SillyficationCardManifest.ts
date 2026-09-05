@@ -64,6 +64,7 @@ import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
 import {NereidBiosystems} from './NereidBiosystems';
+import {TheSyndicate} from './TheSyndicate';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -72,6 +73,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.VENUS_VENTURES]: {Factory: VenusVentures, compatibility: 'venus'},
     [CardName.CRITTERWORLD]: {Factory: Critterworld},
     [CardName.NEREID_BIOSYSTEMS]: {Factory: NereidBiosystems},
+    [CardName.THE_SYNDICATE]: {Factory: TheSyndicate, compatibility: ['turmoil', 'underworld']},
   },
   preludeCards: {
     [CardName.DEIMOS_DOUBLE_DOWN]: {Factory: DeimosDoubleDown, compatibility: 'prelude'},

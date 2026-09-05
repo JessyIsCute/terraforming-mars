@@ -298,6 +298,9 @@
       <template v-else-if="title === CardName.NEREID_BIOSYSTEMS">
         <div class="card-nereid-biosystems-logo"><span class="word-1">NEREID</span> <span class="word-2"><span class="bio">BIO</span><span class="systems">SYSTEMS</span></span></div>
       </template>
+      <template v-else-if="title === CardName.THE_SYNDICATE">
+        <div class="card-the-syndicate-logo"><span class="word-1">THE</span><span class="word-2">SYNDICATE</span></div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -406,6 +409,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.THE_ARCHAIC_FOUNDATION_INSTITUTE]: 'image',
   [CardName.THE_DARKSIDE_OF_THE_MOON_SYNDICATE]: 'image',
   [CardName.THE_GRAND_LUNA_CAPITAL_GROUP]: 'image',
+  [CardName.THE_SYNDICATE]: 'bespoke',
   [CardName.THORGATE]: 'css',
   [CardName.TYCHO_MAGNETICS]: 'bespoke',
   [CardName.UNITED_NATIONS_MARS_INITIATIVE]: 'bespoke',

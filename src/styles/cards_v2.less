@@ -162,6 +162,35 @@
     .card-nereid-biosystems-logo .word-2 .systems {
       color: #ff9800;
     }
+    // "THE" sits normally; "SYNDICATE" runs vertically bottom-to-top beside it, like a
+    // spine label etched sideways into the card rather than announced across the top.
+    .card-the-syndicate-logo {
+      position: absolute;
+      top: 10px;
+      left: 4px;
+      width: 140px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: bold;
+      text-transform: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .card-the-syndicate-logo .word-1 {
+      color: #c9a24b;
+      font-size: 15px;
+      letter-spacing: 3px;
+      margin-top: 2px;
+      text-shadow: -1px 0 #1a0000, 0 1px #1a0000, 1px 0 #1a0000, 0 -1px #1a0000, 3px 2px 4px grey;
+    }
+    .card-the-syndicate-logo .word-2 {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      color: #8b0000;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-shadow: -1px 0 #1a0000, 0 1px #1a0000, 1px 0 #1a0000, 0 -1px #1a0000, 3px 2px 4px grey;
+    }
     .card-critterworld-logo {
       position: absolute;
       top: 16px;
