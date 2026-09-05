@@ -1201,6 +1201,7 @@ export enum CardName {
   // Delta Project
   DELTA_PROJECT = 'Delta Project',
   EPSILON_DAMPLE = 'Epsilon Dample',
+  ZETA_TOLLKEEPER = 'Zeta Tollkeeper',
   QUANTUM_RESEARCH = 'Quantum Research',
   DELTA_SURGE = 'Delta Surge',
   CORPORATE_ESPIONAGE = 'Corporate Espionage',

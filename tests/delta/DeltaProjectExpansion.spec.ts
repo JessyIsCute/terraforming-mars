@@ -722,4 +722,127 @@ describe('DeltaProjectExpansion', () => {
       expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1]);
     });
   });
+
+  describe('Zeta Tollkeeper', () => {
+    beforeEach(() => {
+      player.playedCards.push(fakeCard({name: CardName.ZETA_TOLLKEEPER}));
+    });
+
+    it('costs 1 extra energy on top of the usual per-step cost - minimum 2 to move at all', () => {
+      playAllDeltaTrackTags(player);
+      player.energy = 1;
+      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([]);
+
+      player.energy = 2;
+      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1]);
+
+      player.energy = 3;
+      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1, 2]);
+    });
+
+    it('deducts steps plus the 1 energy surcharge', () => {
+      playAllDeltaTrackTags(player);
+      player.energy = 3;
+
+      DeltaProjectExpansion.advance(player, 2);
+
+      expect(player.deltaProjectData!.position).eq(2);
+      expect(player.energy).eq(0);
+    });
+
+    it('grants every reward from position 1 up to the landing position, not just newly passed ones', () => {
+      playAllDeltaTrackTags(player);
+      player.deltaProjectData!.position = 3; // already past positions 1-3 by some other means
+      player.energy = 2;
+      player.production.override({titanium: 0});
+
+      DeltaProjectExpansion.advance(player, 1); // to position 4 (Space) - a single step
+
+      // Position 4's reward (titanium production) fires immediately...
+      expect(player.production.titanium).eq(1);
+      // ...and so does every earlier position's reward, even though this move only
+      // covered 1 step - position 1 (Building) and 2 (Power) each queue a choice.
+      expect(game.deferredActions).has.lengthOf(2);
+    });
+
+    it('is unaffected by having Delta Surge too - still covers positions 1..landing', () => {
+      player.playedCards.push(fakeCard({tags: DELTA_TRACK_TAGS.filter((t) => t !== undefined)}));
+      player.playedCards.push(fakeCard({name: CardName.DELTA_SURGE}));
+      player.deltaProjectData!.position = 5;
+      player.energy = 3;
+      player.production.override({titanium: 0});
+
+      DeltaProjectExpansion.advance(player, 2); // to position 7
+
+      runAllActions(game);
+      expect(player.production.titanium).eq(1); // position 4's reward still fires
+    });
+
+    describe('generation-start regression', () => {
+      it('knocks back the sole furthest player with no reward, when that is not the owner', () => {
+        playAllDeltaTrackTags(player2);
+        player2.deltaProjectData!.position = 5;
+        player.deltaProjectData!.position = 2;
+        player2.production.override({titanium: 0});
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player2.deltaProjectData!.position).eq(4);
+        runAllActions(game);
+        expect(player2.production.titanium).eq(0); // no reward for landing on position 4 (Space)
+        expect(game.deferredActions).has.lengthOf(0);
+      });
+
+      it('knocks back the owner too, but grants every reward up to their new position', () => {
+        playAllDeltaTrackTags(player);
+        player.deltaProjectData!.position = 5;
+        player2.deltaProjectData!.position = 2;
+        player.production.override({titanium: 0});
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player.deltaProjectData!.position).eq(4);
+        expect(player.production.titanium).eq(1); // position 4 (Space)
+        expect(game.deferredActions).has.lengthOf(2); // positions 1 and 2's choices
+      });
+
+      it('does nothing when there is a tie for furthest', () => {
+        player.deltaProjectData!.position = 5;
+        player2.deltaProjectData!.position = 5;
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player.deltaProjectData!.position).eq(5);
+        expect(player2.deltaProjectData!.position).eq(5);
+      });
+
+      it('does nothing when nobody has moved off position 0', () => {
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player.deltaProjectData!.position).eq(0);
+        expect(player2.deltaProjectData!.position).eq(0);
+      });
+
+      it('does nothing when no player has this corporation', () => {
+        [game, player, player2] = testGame(2, {deltaProjectExpansion: true});
+        player.deltaProjectData!.position = 5;
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player.deltaProjectData!.position).eq(5);
+      });
+
+      it('considers Epsilon Dample markers too when finding the furthest player', () => {
+        player2.epsilonDampleData = {position: 6, jovianBonus: false};
+        player.deltaProjectData!.position = 2;
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player2.epsilonDampleData!.position).eq(5);
+        expect(player2.deltaProjectData!.position).eq(0);
+        runAllActions(game);
+        expect(player2.popWaitingFor()).is.undefined; // no reward (position 5 would draw 4 keep 2)
+      });
+    });
+  });
 });

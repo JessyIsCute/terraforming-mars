@@ -69,6 +69,7 @@ import {IGame, Score} from './IGame';
 import {MarsBoard} from './boards/MarsBoard';
 import {UnderworldData} from './underworld/UnderworldData';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
+import {DeltaProjectExpansion} from './delta/DeltaProjectExpansion';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -919,6 +920,7 @@ export class Game implements IGame, Logger {
         player.epsilonDampleData.blocked = false;
       }
     });
+    DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(this);
 
     if (this.gameOptions.draftVariant) {
       this.gotoDraftPhase();

@@ -145,8 +145,12 @@ export class DeltaProjectExpansion {
       return [];
     }
 
+    // Zeta Tollkeeper: the Delta Project action costs a flat 1 extra energy on top of the
+    // usual 1-per-step (minimum 2 to move at all). Epsilon Dample's marker is unaffected.
+    const surcharge = marker === 'primary' && player.tableau.has(CardName.ZETA_TOLLKEEPER) ? 1 : 0;
+
     const result: number[] = [];
-    const maxByEnergy = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player), MAX_TRACK_POSITION - currentPos);
+    const maxByEnergy = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player) - surcharge, MAX_TRACK_POSITION - currentPos);
 
     for (let steps = 1; steps <= maxByEnergy; steps++) {
       const newPos = currentPos + steps;
@@ -228,13 +232,21 @@ export class DeltaProjectExpansion {
     const progress = DeltaProjectExpansion.getProgress(player);
     const currentPos = progress.position;
     const newPos = currentPos + steps;
+    const isTollkeeper = player.tableau.has(CardName.ZETA_TOLLKEEPER);
+    const surcharge = isTollkeeper ? 1 : 0;
 
-    DeltaProjectExpansion.deductEnergyForDelta(player, steps);
+    DeltaProjectExpansion.deductEnergyForDelta(player, steps + surcharge);
     progress.position = newPos;
 
+    // Zeta Tollkeeper: gain every step's reward from the very start of the track, not just
+    // the ones passed this move - a superset of what Delta Surge does, so check it first.
     // Delta Surge: gain every step's reward when advancing multiple steps at once, not
     // just the landing position (resolveReward already no-ops for the VP-only positions).
-    if (player.tableau.has(CardName.DELTA_SURGE)) {
+    if (isTollkeeper) {
+      for (let pos = 1; pos <= newPos; pos++) {
+        DeltaProjectExpansion.resolveReward(player, pos, 'primary');
+      }
+    } else if (player.tableau.has(CardName.DELTA_SURGE)) {
       for (let pos = currentPos + 1; pos <= newPos; pos++) {
         DeltaProjectExpansion.resolveReward(player, pos, 'primary');
       }
@@ -243,7 +255,11 @@ export class DeltaProjectExpansion {
     }
     DeltaProjectExpansion.notifyMovement(player, steps, true);
 
-    player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
+    if (isTollkeeper) {
+      player.game.log('${0} spent ${1} energy (including the Zeta Tollkeeper surcharge) to advance ${2} step(s) on the Delta Project track', (b) => b.player(player).number(steps + surcharge).number(steps));
+    } else {
+      player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
+    }
   }
 
   /** Advance Epsilon Dample's second marker. Grants the landing position's reward every
@@ -292,6 +308,65 @@ export class DeltaProjectExpansion {
     DeltaProjectExpansion.notifyMovement(player, steps, false);
 
     player.game.log('${0} spent ${1} energy to move their second marker backward on the Delta Project track', (b) => b.player(player).number(steps));
+  }
+
+  /**
+   * Zeta Tollkeeper's passive: at the start of every generation, whichever player is
+   * furthest along the Delta Project track (counting both their primary marker and, if
+   * they have it, their Epsilon Dample marker) is knocked back one step. Nobody claims
+   * the landing reward for this forced retreat - unless the affected player is the
+   * Tollkeeper's own owner, who (per the corp's core ability) claims every reward from
+   * position 1 up to their new position instead. Does nothing if there's no single
+   * unique leader (a tie skips the effect for that generation), or if no player in the
+   * game has this corporation. No-op for a "leader" sitting at position 0.
+   */
+  public static applyZetaTollkeeperGenerationStart(game: IGame): void {
+    const tollkeeper = game.players.find((p) => p.tableau.has(CardName.ZETA_TOLLKEEPER));
+    if (tollkeeper === undefined) {
+      return;
+    }
+
+    let leader: IPlayer | undefined;
+    let leaderMarker: MarkerKind = 'primary';
+    let leaderPos = -1;
+    let tied = false;
+
+    for (const p of game.players) {
+      const candidates: Array<[MarkerKind, number]> = [['primary', p.deltaProjectData?.position ?? -1]];
+      if (p.epsilonDampleData !== undefined) {
+        candidates.push(['epsilon', p.epsilonDampleData.position]);
+      }
+      for (const [marker, pos] of candidates) {
+        if (pos < 0) {
+          continue;
+        }
+        if (pos > leaderPos) {
+          leaderPos = pos;
+          leader = p;
+          leaderMarker = marker;
+          tied = false;
+        } else if (pos === leaderPos && p !== leader) {
+          tied = true;
+        }
+      }
+    }
+
+    if (leader === undefined || tied || leaderPos <= 0) {
+      return;
+    }
+    const knockedBackPlayer = leader;
+
+    const progress = DeltaProjectExpansion.getMarkerData(knockedBackPlayer, leaderMarker);
+    const newPos = progress.position - 1;
+    progress.position = newPos;
+    game.log('${0} is knocked back a step on the Delta Project track by ${1}\'s Zeta Tollkeeper', (b) => b.player(knockedBackPlayer).player(tollkeeper));
+
+    if (knockedBackPlayer === tollkeeper) {
+      for (let pos = 1; pos <= newPos; pos++) {
+        DeltaProjectExpansion.resolveReward(knockedBackPlayer, pos, leaderMarker);
+      }
+      game.log('${0} claims every reward up to their new position', (b) => b.player(knockedBackPlayer));
+    }
   }
 
   /**

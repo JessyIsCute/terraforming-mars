@@ -46,4 +46,12 @@ describe('Sillyfication module', () => {
     expect(new GameCards(withoutDelta).getCorporationCards().map(toName)).to.not.contain(CardName.EPSILON_DAMPLE);
     expect(new GameCards(withDelta).getCorporationCards().map(toName)).to.contain(CardName.EPSILON_DAMPLE);
   });
+
+  it('only offers Zeta Tollkeeper when deltaProjectExpansion is also on', () => {
+    const withoutDelta: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, sillyficationExpansion: true, deltaProjectExpansion: false};
+    const withDelta: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, sillyficationExpansion: true, deltaProjectExpansion: true};
+
+    expect(new GameCards(withoutDelta).getCorporationCards().map(toName)).to.not.contain(CardName.ZETA_TOLLKEEPER);
+    expect(new GameCards(withDelta).getCorporationCards().map(toName)).to.contain(CardName.ZETA_TOLLKEEPER);
+  });
 });

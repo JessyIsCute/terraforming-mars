@@ -66,6 +66,7 @@ import {Critterworld} from './Critterworld';
 import {NereidBiosystems} from './NereidBiosystems';
 import {TheSyndicate} from './TheSyndicate';
 import {EpsilonDample} from './EpsilonDample';
+import {ZetaTollkeeper} from './ZetaTollkeeper';
 import {EvergreenForest} from './EvergreenForest';
 import {IdeaBudgeting} from './IdeaBudgeting';
 import {FirstMissionToGanymede} from './FirstMissionToGanymede';
@@ -119,6 +120,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.NEREID_BIOSYSTEMS]: {Factory: NereidBiosystems},
     [CardName.THE_SYNDICATE]: {Factory: TheSyndicate, compatibility: ['turmoil', 'underworld']},
     [CardName.EPSILON_DAMPLE]: {Factory: EpsilonDample, compatibility: 'deltaProject'},
+    [CardName.ZETA_TOLLKEEPER]: {Factory: ZetaTollkeeper, compatibility: 'deltaProject'},
   },
   preludeCards: {
     [CardName.DEIMOS_DOUBLE_DOWN]: {Factory: DeimosDoubleDown, compatibility: 'prelude'},
