@@ -102,6 +102,7 @@ export const PaymentWidgetMixin = defineComponent({
         auroraiData: this.playerinput.auroraiData,
         graphene: this.playerinput.graphene,
         kuiperAsteroids: this.playerinput.kuiperAsteroids,
+        nereidMicrobes: this.playerinput.type === 'projectCard' ? this.playerinput.nereidMicrobes : 0,
       };
 
       // Stratospheric Birds requires discarding one floater from any card.

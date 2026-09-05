@@ -84,6 +84,7 @@ export default defineComponent({
         'heat',
         'plants',
         'microbes',
+        'nereidMicrobes',
         'floaters',
         'lunaArchivesScience',
         'seeds',
@@ -205,6 +206,7 @@ export default defineComponent({
           return canPayWith.kuiperAsteroids === true;
         case 'plants':
         case 'microbes':
+        case 'nereidMicrobes':
         case 'floaters':
         case 'lunaArchivesScience':
         case 'graphene':
@@ -228,6 +230,8 @@ export default defineComponent({
           return this.tags.includes(Tag.BUILDING) && this.playerinput.paymentOptions.plants === true;
         case 'microbes':
           return this.tags.includes(Tag.PLANT);
+        case 'nereidMicrobes':
+          return this.tags.includes(Tag.JOVIAN);
         case 'floaters':
           return this.tags.includes(Tag.VENUS);
         case 'lunaArchivesScience':

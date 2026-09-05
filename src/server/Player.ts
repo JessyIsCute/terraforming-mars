@@ -754,6 +754,7 @@ export class Player implements IPlayer {
       seeds: card.tags.includes(Tag.PLANT) || card.name === CardName.GREENERY_STANDARD_PROJECT,
       floaters: card.tags.includes(Tag.VENUS),
       microbes: card.tags.includes(Tag.PLANT),
+      nereidMicrobes: card.tags.includes(Tag.JOVIAN),
       lunaArchivesScience: card.tags.includes(Tag.MOON),
       spireScience: card.type === CardType.STANDARD_PROJECT,
       auroraiData: card.type === CardType.STANDARD_PROJECT,
@@ -840,6 +841,7 @@ export class Player implements IPlayer {
     removeResourcesOnCard(CardName.SOYLENT_SEEDLING_SYSTEMS, payment.seeds);
     removeResourcesOnCard(CardName.AURORAI, payment.auroraiData);
     removeResourcesOnCard(CardName.KUIPER_COOPERATIVE, payment.kuiperAsteroids);
+    removeResourcesOnCard(CardName.NEREID_GENETICS, payment.nereidMicrobes);
 
     if (payment.megacredits > 0 || payment.steel > 0 || payment.titanium > 0) {
       PathfindersExpansion.addToSolBank(this);
@@ -1304,6 +1306,7 @@ export class Player implements IPlayer {
       auroraiData: this.getSpendable('auroraiData'),
       graphene: this.getSpendable('graphene'),
       kuiperAsteroids: this.getSpendable('kuiperAsteroids'),
+      nereidMicrobes: this.getSpendable('nereidMicrobes'),
     };
   }
 
@@ -1345,6 +1348,7 @@ export class Player implements IPlayer {
       auroraiData: options?.auroraiData ?? false,
       graphene: options?.graphene ?? false,
       kuiperAsteroids: options?.kuiperAsteroids ?? false,
+      nereidMicrobes: options?.nereidMicrobes ?? false,
     };
 
     // HOOK: Luna Trade Federation

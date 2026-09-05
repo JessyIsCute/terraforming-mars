@@ -52,8 +52,14 @@ describe('NereidGenetics', () => {
     expect(card.resourceCount).to.eq(0);
   });
 
-  it('scores 1 VP per 3 microbes on this card', () => {
+  it('does not score VP for its microbes', () => {
     player.addResourceTo(card, 7);
-    expect(card.getVictoryPoints(player)).to.eq(2);
+    expect(card.getVictoryPoints(player)).to.eq(0);
+  });
+
+  it('microbes here are spendable towards paying for cards', () => {
+    expect(player.getSpendable('nereidMicrobes')).to.eq(0);
+    player.addResourceTo(card, 3);
+    expect(player.getSpendable('nereidMicrobes')).to.eq(3);
   });
 });

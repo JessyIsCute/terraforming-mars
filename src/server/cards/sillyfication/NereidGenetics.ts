@@ -17,7 +17,6 @@ export class NereidGenetics extends CorporationCard implements ICorporationCard 
       tags: [Tag.JOVIAN, Tag.MICROBE],
       startingMegaCredits: 45,
       resourceType: CardResource.MICROBE,
-      victoryPoints: {resourcesHere: {}, per: 3},
 
       metadata: {
         cardNumber: 'XC4',
@@ -32,8 +31,10 @@ export class NereidGenetics extends CorporationCard implements ICorporationCard 
             ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
             });
+            ce.effect('When paying for a card with a Jovian tag, microbes here may be used as 3 M€ each.', (eb) => {
+              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE).equals().megacredits(3);
+            });
           }).br;
-          b.vpText('1 VP per 3 microbes on this card.').br;
         }),
       },
     });

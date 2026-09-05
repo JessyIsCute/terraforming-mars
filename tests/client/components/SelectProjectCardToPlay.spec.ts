@@ -160,6 +160,36 @@ describe('SelectProjectCardToPlay', () => {
     expect(saveResponse.payment).deep.eq(Payment.of({floaters: 3, megacredits: 1}));
   });
 
+  it('using nereid microbes', async () => {
+    // Ganymede Colony (a Jovian-tag card) will cost 10. Player has 6M€ and 4 available nereid microbes (rate 3).
+    // Greedy: uses 3 nereid microbes (=9 MC), MC fills remaining 1.
+    const wrapper = setupCardForPurchase(
+      CardName.GANYMEDE_COLONY, 10,
+      {megacredits: 6},
+      {nereidMicrobes: 4});
+
+    const tester = new PaymentTester(wrapper);
+    await tester.nextTick();
+    tester.expectPayment({nereidMicrobes: 3, megacredits: 1});
+
+    await tester.clickSave();
+    expect(saveResponse.payment).deep.eq(Payment.of({nereidMicrobes: 3, megacredits: 1}));
+  });
+
+  it('nereid microbes are not usable for a card without a Jovian tag', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.BIRDS, 10,
+      {megacredits: 10},
+      {nereidMicrobes: 4});
+
+    const tester = new PaymentTester(wrapper);
+    await tester.nextTick();
+    tester.expectIsNotAvailable('nereidMicrobes');
+
+    await tester.clickSave();
+    expect(saveResponse.payment).deep.eq(Payment.of({megacredits: 10}));
+  });
+
   it('Paying for Stratospheric Birds without floaters', async () => {
     const wrapper = setupCardForPurchase(
       CardName.STRATOSPHERIC_BIRDS, 12,
@@ -720,7 +750,7 @@ describe('SelectProjectCardToPlay', () => {
       ],
       paymentOptions: {},
       floaters: 0, graphene: 0, kuiperAsteroids: 0, lunaArchivesScience: 0,
-      microbes: 0, seeds: 0, auroraiData: 0, spireScience: 0,
+      microbes: 0, seeds: 0, auroraiData: 0, spireScience: 0, nereidMicrobes: 0,
     };
     const playerView: Partial<PlayerViewModel> = {
       id: 'playerid-foo',
@@ -796,6 +826,7 @@ describe('SelectProjectCardToPlay', () => {
       seeds: 0,
       auroraiData: 0,
       spireScience: 0,
+      nereidMicrobes: 0,
       ...playerInputFields,
     };
     if (options !== undefined) {
