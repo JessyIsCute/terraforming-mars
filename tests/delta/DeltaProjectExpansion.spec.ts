@@ -564,7 +564,7 @@ describe('DeltaProjectExpansion', () => {
 
   describe('Epsilon Dample second marker', () => {
     beforeEach(() => {
-      player.epsilonDampleData = {position: 0, jovianBonus: false, rewardedPositions: []};
+      player.epsilonDampleData = {position: 0, jovianBonus: false};
     });
 
     it('advances independently of the primary marker', () => {
@@ -597,13 +597,27 @@ describe('DeltaProjectExpansion', () => {
       expect(player.tags.extraJovianTags).eq(2);
     });
 
-    it('retreating does not require tags, and grants the reward if never claimed before', () => {
+    it('the Jovian tag itself is still one-time per marker, even though other rewards can be farmed', () => {
+      playAllDeltaTrackTags(player);
+      player.epsilonDampleData!.position = 8;
+      player.energy = 4;
+
+      DeltaProjectExpansion.retreatEpsilon(player, 1); // position 7
+      player.energy = 1;
+      DeltaProjectExpansion.advanceEpsilon(player, 1); // back to position 8 - already have the tag
+      player.energy = 1;
+      DeltaProjectExpansion.retreatEpsilon(player, 1); // position 7 again
+      player.energy = 1;
+      DeltaProjectExpansion.advanceEpsilon(player, 1); // position 8 again
+
+      expect(player.tags.extraJovianTags).eq(1);
+    });
+
+    it('retreating does not require tags, and grants the landing reward', () => {
       player.epsilonDampleData!.position = 5;
       player.energy = 5;
       player.production.override({megacredits: 0});
 
-      // Position 3 (Earth) was jumped clean over on the way up here, never actually landed
-      // on - so retreating onto it for the first time still claims its reward.
       DeltaProjectExpansion.retreatEpsilon(player, 2);
 
       expect(player.epsilonDampleData!.position).eq(3);
@@ -611,28 +625,28 @@ describe('DeltaProjectExpansion', () => {
       expect(player.production.megacredits).eq(2);
     });
 
-    it('re-landing on an already-claimed position does not re-trigger the reward', () => {
+    it('re-landing on the same position grants its reward again - shuttling back and forth farms rewards', () => {
       playAllDeltaTrackTags(player);
       player.energy = 4;
+      player.production.override({titanium: 0});
 
       DeltaProjectExpansion.advanceEpsilon(player, 4); // straight to position 4 (Space)
       runAllActions(game);
       expect(player.production.titanium).eq(1);
 
       player.energy = 1;
-      DeltaProjectExpansion.retreatEpsilon(player, 1); // position 3 (Earth) - first time here
+      DeltaProjectExpansion.retreatEpsilon(player, 1); // position 3 (Earth)
       runAllActions(game);
-      expect(player.production.megacredits).eq(2);
 
       player.energy = 1;
-      DeltaProjectExpansion.advanceEpsilon(player, 1); // back to position 4 - already claimed
+      DeltaProjectExpansion.advanceEpsilon(player, 1); // back to position 4 (Space) - again
       runAllActions(game);
 
-      // Still just the one titanium step from the first time this marker reached position 4.
-      expect(player.production.titanium).eq(1);
+      // Position 4's reward fired both times this marker landed there.
+      expect(player.production.titanium).eq(2);
     });
 
-    it('advancing to a position never claimed before still triggers its reward', () => {
+    it('advancing to a new position triggers its reward', () => {
       setupPlayerForThreeStepsFromStart(player);
       DeltaProjectExpansion.advanceEpsilon(player, 3);
       runAllActions(game);

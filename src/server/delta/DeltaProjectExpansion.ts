@@ -237,9 +237,9 @@ export class DeltaProjectExpansion {
     player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
-  /** Advance Epsilon Dample's second marker. Grants the landing position's reward, like
-   * {@link advance} - but see {@link maybeResolveEpsilonReward} for the one-claim-per-position
-   * rule that keeps this (and {@link retreatEpsilon}) from being a farming loop. */
+  /** Advance Epsilon Dample's second marker. Grants the landing position's reward every
+   * time - the point of this marker is that it can shuttle back and forth to re-farm a
+   * reward repeatedly, as long as you keep paying the energy for it. */
   public static advanceEpsilon(player: IPlayer, steps: number): void {
     const valid = DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player);
     if (!valid.includes(steps)) {
@@ -255,10 +255,10 @@ export class DeltaProjectExpansion {
 
     if (player.tableau.has(CardName.DELTA_SURGE)) {
       for (let pos = currentPos + 1; pos <= newPos; pos++) {
-        DeltaProjectExpansion.maybeResolveEpsilonReward(player, pos);
+        DeltaProjectExpansion.resolveReward(player, pos, 'epsilon');
       }
     } else {
-      DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
+      DeltaProjectExpansion.resolveReward(player, newPos, 'epsilon');
     }
     DeltaProjectExpansion.notifyMovement(player, steps, true);
 
@@ -266,8 +266,8 @@ export class DeltaProjectExpansion {
   }
 
   /** Move Epsilon Dample's second marker backward. Costs 1 energy per step, same as
-   * advancing, and also grants the landing position's reward if this marker has never
-   * claimed it before (see {@link maybeResolveEpsilonReward}). */
+   * advancing, and also grants the landing position's reward every time - see
+   * {@link advanceEpsilon}. */
   public static retreatEpsilon(player: IPlayer, steps: number): void {
     const valid = DeltaProjectExpansion.getValidEpsilonRetreatSteps(player);
     if (!valid.includes(steps)) {
@@ -279,42 +279,19 @@ export class DeltaProjectExpansion {
 
     DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
-    DeltaProjectExpansion.maybeResolveEpsilonReward(player, newPos);
+    DeltaProjectExpansion.resolveReward(player, newPos, 'epsilon');
     DeltaProjectExpansion.notifyMovement(player, steps, false);
 
     player.game.log('${0} spent ${1} energy to move their second marker backward on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
   /**
-   * Epsilon Dample's marker can move in both directions, so unlike the primary marker
-   * (which can only ever reach a new position by advancing), it can land on the same
-   * position more than once. Each position's reward is only granted the first time this
-   * marker lands there - forward or backward - so shuttling back and forth can't be used
-   * to farm a reward repeatedly.
-   */
-  private static maybeResolveEpsilonReward(player: IPlayer, position: number): void {
-    const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
-    const rewardedPositions = progress.rewardedPositions ?? (progress.rewardedPositions = []);
-    if (rewardedPositions.includes(position)) {
-      return;
-    }
-    rewardedPositions.push(position);
-    DeltaProjectExpansion.resolveReward(player, position, 'epsilon');
-  }
-
-  /**
    * Grants `position`'s landing reward outright, bypassing all the normal step/cost/tag
-   * machinery. For markers that track claimed positions (Epsilon Dample), this still only
-   * grants a position once; for the primary marker there's no such tracking, so callers
-   * (e.g. Corporate Espionage's opponent-facing effect) can grant the same position's
-   * reward more than once over a game if it's legitimately triggered more than once.
+   * machinery. Used by cards that grant a reward independent of the normal action (Dutch
+   * Mountains re-triggering an old position, Corporate Espionage's opponent-facing effect).
    */
   public static grantRewardForPosition(player: IPlayer, position: number, marker: MarkerKind): void {
-    if (marker === 'epsilon') {
-      DeltaProjectExpansion.maybeResolveEpsilonReward(player, position);
-    } else {
-      DeltaProjectExpansion.resolveReward(player, position, marker);
-    }
+    DeltaProjectExpansion.resolveReward(player, position, marker);
   }
 
   /** Non-mutating check for whether {@link forceAdvanceOneStep} would succeed right now. */

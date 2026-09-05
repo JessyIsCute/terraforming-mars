@@ -76,7 +76,7 @@ describe('DeltaProjectBoard', () => {
     const player = fakePublicPlayerModel({
       color: 'blue',
       deltaProject: {position: 3, jovianBonus: false},
-      epsilonDample: {position: 7, jovianBonus: false, rewardedPositions: []},
+      epsilonDample: {position: 7, jovianBonus: false},
     });
     const wrapper = shallowMount(DeltaProjectBoard, {
       ...globalConfig,
@@ -90,7 +90,7 @@ describe('DeltaProjectBoard', () => {
     const player = fakePublicPlayerModel({
       color: 'blue',
       deltaProject: {position: 5, jovianBonus: false},
-      epsilonDample: {position: 5, jovianBonus: false, rewardedPositions: []},
+      epsilonDample: {position: 5, jovianBonus: false},
     });
     const wrapper = shallowMount(DeltaProjectBoard, {
       ...globalConfig,
@@ -103,7 +103,7 @@ describe('DeltaProjectBoard', () => {
     const blue = fakePublicPlayerModel({
       color: 'blue',
       deltaProject: {position: 0, jovianBonus: false},
-      epsilonDample: {position: 0, jovianBonus: false, rewardedPositions: []},
+      epsilonDample: {position: 0, jovianBonus: false},
     });
     const red = fakePublicPlayerModel({color: 'red', deltaProject: {position: 0, jovianBonus: false}});
     const wrapper = shallowMount(DeltaProjectBoard, {

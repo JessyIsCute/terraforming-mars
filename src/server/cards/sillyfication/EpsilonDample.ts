@@ -14,26 +14,25 @@ import {digit} from '../Options';
 import {Size} from '../../../common/cards/render/Size';
 
 /** Grants a second, independently-controlled marker on the Delta Project track, which can
- * also move backward - so a player with this corp can claim every position's reward twice
- * over as each marker reaches it for the first time. */
+ * also move backward. Every landing (either direction) grants that position's reward again -
+ * shuttling the marker back and forth to re-farm a reward as long as you keep paying the
+ * energy for it is the whole point of this corp. */
 export class EpsilonDample extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
     super({
       name: CardName.EPSILON_DAMPLE,
       tags: [Tag.POWER, Tag.BUILDING],
-      startingMegaCredits: 28,
+      startingMegaCredits: 29,
 
       behavior: {
-        stock: {steel: 8, energy: 5},
-        production: {energy: 1},
+        stock: {steel: 9, energy: 3},
       },
 
       metadata: {
         cardNumber: 'DP02',
-        description: 'You start with 28 M€, 8 steel, 5 energy, and 1 energy production.',
+        description: 'You start with 29 M€, 9 steel, and 3 energy.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(28).nbsp.steel(8, {digit}).nbsp.energy(5, {digit}).br;
-          b.production((pb) => pb.energy(1)).br;
+          b.megacredits(29).nbsp.steel(9, {digit}).nbsp.energy(3, {digit}).br;
           b.corpBox('effect-action', (cea) => {
             cea.effect('You have 1 special Delta Project marker.', (eb) => {
               eb.empty().startEffect.plate('Delta track', {size: Size.SMALL});
@@ -48,7 +47,7 @@ export class EpsilonDample extends CorporationCard implements ICorporationCard, 
   }
 
   public override bespokePlay(player: IPlayer) {
-    player.epsilonDampleData = {position: 0, jovianBonus: false, rewardedPositions: []};
+    player.epsilonDampleData = {position: 0, jovianBonus: false};
     return undefined;
   }
 
