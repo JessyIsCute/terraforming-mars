@@ -75,4 +75,12 @@ describe('EpsilonDample', () => {
     expect(player.epsilonDampleData!.position).eq(0);
     expect(player.energy).eq(3);
   });
+
+  it('cannot act once the marker is locked at a VP spot', () => {
+    player.playedCards.push(card);
+    player.epsilonDampleData = {position: 10, jovianBonus: false};
+    player.energy = 10;
+
+    expect(card.canAct(player)).is.false;
+  });
 });

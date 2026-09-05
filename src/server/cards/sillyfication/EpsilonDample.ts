@@ -16,7 +16,10 @@ import {Size} from '../../../common/cards/render/Size';
 /** Grants a second, independently-controlled marker on the Delta Project track, which can
  * also move backward. Every landing (either direction) grants that position's reward again -
  * shuttling the marker back and forth to re-farm a reward as long as you keep paying the
- * energy for it is the whole point of this corp. */
+ * energy for it is the whole point of this corp. It can still gain its own Jovian tag from
+ * position 8, independently of the primary marker. Once it reaches the 2VP or 5VP spot it
+ * locks in place - no more advancing or retreating - matching the fact that no marker (not
+ * even the player's own other one) can ever land on a VP spot another marker already holds. */
 export class EpsilonDample extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
     super({
@@ -37,7 +40,7 @@ export class EpsilonDample extends CorporationCard implements ICorporationCard, 
             cea.effect('You have 1 special Delta Project marker.', (eb) => {
               eb.empty().startEffect.plate('Delta track', {size: Size.SMALL});
             });
-            cea.action('Move the special marker forward or backward on the Delta Project track.', (ab) => {
+            cea.action('Move the special marker forward or backward on the Delta Project track. It locks in place once it reaches a VP spot.', (ab) => {
               ab.text('X', {size: Size.SMALL}).energy(1, {size: Size.SMALL}).startAction.text('±X', {size: Size.SMALL}).plate('Delta track', {size: Size.SMALL});
             });
           });

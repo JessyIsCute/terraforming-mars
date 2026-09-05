@@ -135,6 +135,12 @@ export class DeltaProjectExpansion {
       return [];
     }
 
+    // Epsilon Dample's marker locks in place once it reaches a VP spot - the primary
+    // marker has no such restriction and can still advance from 2VP to 5VP.
+    if (marker === 'epsilon' && (currentPos === VP2_POSITION || currentPos === VP5_POSITION)) {
+      return [];
+    }
+
     if (currentPos >= MAX_TRACK_POSITION) {
       return [];
     }
@@ -164,13 +170,16 @@ export class DeltaProjectExpansion {
   /**
    * Returns the allowed values for `retreatEpsilon(player, steps)`: how far Epsilon
    * Dample's second marker can move backward. Unlike advancing, retreating has no tag
-   * requirement - see {@link maybeResolveEpsilonReward} for how landing rewards are
-   * (and aren't) re-triggered.
+   * requirement. Every landing re-triggers that position's reward - see {@link resolveReward}.
    */
   public static getValidEpsilonRetreatSteps(player: IPlayer): ReadonlyArray<number> {
     const game = player.game;
     const progress = DeltaProjectExpansion.getMarkerData(player, 'epsilon');
     if (progress.blocked === true) {
+      return [];
+    }
+    // Locked in place once it reaches a VP spot - see computeValidAdvanceSteps.
+    if (progress.position === VP2_POSITION || progress.position === VP5_POSITION) {
       return [];
     }
     const maxSteps = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player), progress.position);
@@ -299,6 +308,9 @@ export class DeltaProjectExpansion {
     const game = player.game;
     const progress = DeltaProjectExpansion.getMarkerData(player, marker);
     if (progress.blocked === true) {
+      return false;
+    }
+    if (marker === 'epsilon' && (progress.position === VP2_POSITION || progress.position === VP5_POSITION)) {
       return false;
     }
     const newPos = progress.position + 1;

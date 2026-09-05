@@ -685,5 +685,41 @@ describe('DeltaProjectExpansion', () => {
 
       expectDeltaVp(player, 5);
     });
+
+    it('locks in place at the 2VP spot - no further advance or retreat', () => {
+      player.epsilonDampleData!.position = VP2_POSITION;
+      player.energy = 10;
+
+      expect(DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player)).deep.eq([]);
+      expect(DeltaProjectExpansion.getValidEpsilonRetreatSteps(player)).deep.eq([]);
+    });
+
+    it('locks in place at the 5VP spot - no further retreat', () => {
+      player.epsilonDampleData!.position = VP5_POSITION;
+      player.energy = 10;
+
+      expect(DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player)).deep.eq([]);
+      expect(DeltaProjectExpansion.getValidEpsilonRetreatSteps(player)).deep.eq([]);
+    });
+
+    it('reaching the 2VP spot locks the marker there immediately', () => {
+      playAllDeltaTrackTags(player);
+      player.epsilonDampleData!.position = 9;
+      player.energy = 10;
+
+      DeltaProjectExpansion.advanceEpsilon(player, 1);
+
+      expect(player.epsilonDampleData!.position).eq(VP2_POSITION);
+      expect(DeltaProjectExpansion.getValidEpsilonAdvanceSteps(player)).deep.eq([]);
+      expect(DeltaProjectExpansion.getValidEpsilonRetreatSteps(player)).deep.eq([]);
+    });
+
+    it('the primary marker is unaffected by the VP-lock and can still advance from 2VP to 5VP', () => {
+      playAllDeltaTrackTags(player);
+      player.deltaProjectData!.position = VP2_POSITION;
+      player.energy = 10;
+
+      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1]);
+    });
   });
 });
