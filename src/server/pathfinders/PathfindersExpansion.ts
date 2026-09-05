@@ -70,6 +70,11 @@ export class PathfindersExpansion {
   }
 
   public static raiseTrack(tag: PlanetaryTag, player: IPlayer, steps: number = 1): void {
+    // Planet PR: any track raise of 1+ steps goes 1 step further, including the raise
+    // triggered by playing Planet PR itself (it's already in the tableau by this point).
+    if (steps >= 1 && player.tableau.has(CardName.PLANET_PR)) {
+      steps += 1;
+    }
     PathfindersExpansion.raiseTrackEssense(tag, player, player.game, steps, true);
   }
 
@@ -124,6 +129,9 @@ export class PathfindersExpansion {
           rewards.risingPlayer.forEach((reward) => {
             PathfindersExpansion.grant(reward, from, tag);
           });
+          if (rewards.risingPlayer.length > 0) {
+            PathfindersExpansion.grantPlanetPrBonus(from, tag);
+          }
         }
       }
       rewards.everyone.forEach((reward) => {
@@ -252,6 +260,28 @@ export class PathfindersExpansion {
       break;
     default:
       throw new Error('Unknown reward: ' + reward);
+    }
+  }
+
+  /** Planet PR: whenever you trigger a planetary track bonus, also gain a small track-specific reward. */
+  private static grantPlanetPrBonus(player: IPlayer, tag: PlanetaryTag): void {
+    if (!player.tableau.has(CardName.PLANET_PR)) {
+      return;
+    }
+    switch (tag) {
+    case Tag.VENUS:
+      player.game.defer(new AddResourcesToCard(player, CardResource.FLOATER));
+      break;
+    case Tag.EARTH:
+      player.stock.add(Resource.MEGACREDITS, 2, {log: true});
+      break;
+    case Tag.MARS:
+    case Tag.MOON:
+      player.stock.add(Resource.STEEL, 1, {log: true});
+      break;
+    case Tag.JOVIAN:
+      player.stock.add(Resource.TITANIUM, 1, {log: true});
+      break;
     }
   }
 

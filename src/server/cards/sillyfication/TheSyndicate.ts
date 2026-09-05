@@ -7,6 +7,7 @@ import {ICard} from '../ICard';
 import {UnderworldExpansion} from '../../underworld/UnderworldExpansion';
 import {SendDelegateToArea} from '../../deferredActions/SendDelegateToArea';
 import {Turmoil} from '../../turmoil/Turmoil';
+import {Size} from '../../../common/cards/render/Size';
 
 /** A crime-and-politics corp: profits from bad press and turns corruption into influence. */
 export class TheSyndicate extends ActiveCorporationCard {
@@ -30,13 +31,13 @@ export class TheSyndicate extends ActiveCorporationCard {
         description: 'You start with 50 M€ and 1 influence.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(50).nbsp.influence().br;
-          b.corpBox('effect', (ce) => {
-            ce.effect('When you play a card with a negative VP icon, including this, gain 1 corruption and place a delegate.', (eb) => {
+          b.corpBox('effect-action', (cea) => {
+            cea.vSpace(Size.LARGE);
+            cea.effect('When you play a card with a negative VP icon, including this, gain 1 corruption and place a delegate.', (eb) => {
               eb.vpIcon().asterix().startEffect.corruption(1).nbsp.delegates(1);
             });
-          }).br;
-          b.corpBox('action', (ce) => {
-            ce.action('Spend 1 corruption to permanently add 1 delegate to your reserve.', (ab) => {
+            b.br;
+            cea.action('Spend 1 corruption to permanently add 1 delegate to your reserve.', (ab) => {
               ab.corruption(1).startAction.delegates(1);
             });
           });

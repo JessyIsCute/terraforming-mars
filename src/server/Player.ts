@@ -127,6 +127,8 @@ export class Player implements IPlayer {
   public lastCardPlayed: CardName | undefined;
   /** Set whenever this player places a greenery tile; equals `actionsTakenThisGame` exactly when that placement was this player's most recent action. */
   public lastGreeneryActionNumber: number | undefined;
+  /** When set, caps how many cards can be kept (bought) in this player's next research phase, then clears. */
+  public nextResearchKeepMax: number | undefined;
   public pendingInitialActions: Array<ICorporationCard> = [];
 
   // Cards
@@ -677,6 +679,10 @@ export class Player implements IPlayer {
     let selectable = this.draftedCards.length;
     if (this.playedCards.has(CardName.MARS_MATHS) && !this.playedCards.has(CardName.LUNA_PROJECT_OFFICE)) {
       selectable = Math.min(selectable, 4);
+    }
+    if (this.nextResearchKeepMax !== undefined) {
+      selectable = Math.min(selectable, this.nextResearchKeepMax);
+      this.nextResearchKeepMax = undefined;
     }
 
     const cards = copyAndClear(this.draftedCards);
@@ -1890,6 +1896,9 @@ export class Player implements IPlayer {
     if (this.lastGreeneryActionNumber !== undefined) {
       result.lastGreeneryActionNumber = this.lastGreeneryActionNumber;
     }
+    if (this.nextResearchKeepMax !== undefined) {
+      result.nextResearchKeepMax = this.nextResearchKeepMax;
+    }
     result.deltaProject = this.deltaProjectData;
     result.epsilonDample = this.epsilonDampleData;
     return result;
@@ -1919,6 +1928,7 @@ export class Player implements IPlayer {
     player.heat = d.heat;
     player.lastCardPlayed = d.lastCardPlayed;
     player.lastGreeneryActionNumber = d.lastGreeneryActionNumber;
+    player.nextResearchKeepMax = d.nextResearchKeepMax;
     player.standardProjectsThisGeneration = new Set(d.standardProjectsThisGeneration);
     player.megaCredits = d.megaCredits;
     player.needsToDraft = d.needsToDraft;

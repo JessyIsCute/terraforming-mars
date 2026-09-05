@@ -101,6 +101,7 @@ export interface IPlayer {
   actionsTakenThisRound: number;
   lastCardPlayed: CardName | undefined;
   lastGreeneryActionNumber: number | undefined;
+  nextResearchKeepMax: number | undefined;
   pendingInitialActions: Array<ICorporationCard>;
 
   // Cards

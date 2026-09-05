@@ -40,7 +40,7 @@ describe('CardCorporationLogo', () => {
     expect(wrapper.text()).to.eq('PRISTAR');
   });
 
-  it('renders The Syndicate bespoke logo, with THE/SYN stacked and DICATE vertical', () => {
+  it('renders The Syndicate bespoke logo, with THE/SYN/DICATE stacked horizontally', () => {
     const wrapper = shallowMount(CardCorporationLogo, {
       ...globalConfig,
       props: {

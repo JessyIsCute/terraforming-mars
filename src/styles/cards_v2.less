@@ -162,9 +162,8 @@
     .card-nereid-biosystems-logo .word-2 .systems {
       color: #ff9800;
     }
-    // "THE" stacks over "SYN" on the left; "DICATE" runs vertically bottom-to-top beside
-    // them, like a spine label etched sideways into the card. Kept small since it's tall
-    // enough to run behind the rest of the card content once the page scrolls.
+    // "THE" / "SYN" / "DICATE" stacked as three horizontal lines, "SYN"+"DICATE"
+    // reading as "SYNDICATE" top to bottom.
     .card-the-syndicate-logo {
       position: absolute;
       top: 10px;
@@ -173,11 +172,6 @@
       font-family: Georgia, 'Times New Roman', serif;
       font-weight: bold;
       text-transform: none;
-      display: flex;
-      align-items: flex-start;
-      gap: 4px;
-    }
-    .card-the-syndicate-logo .stack {
       display: flex;
       flex-direction: column;
       line-height: 1;
@@ -196,10 +190,8 @@
       margin-top: 2px;
     }
     .card-the-syndicate-logo .word-2 {
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
       color: #8b0000;
-      font-size: 10px;
+      font-size: 13px;
       letter-spacing: 1px;
       margin-top: 2px;
       text-shadow: -1px 0 #1a0000, 0 1px #1a0000, 1px 0 #1a0000, 0 -1px #1a0000, 3px 2px 4px grey;

@@ -75,6 +75,7 @@ import {OrbitalLaboratories} from './OrbitalLaboratories';
 import {OumuamuaTypeObjectSurvey} from './OumuamuaTypeObjectSurvey';
 import {OzoneGenerators} from './OzoneGenerators';
 import {PersonalAgenda} from './PersonalAgenda';
+import {PlanetPr} from './PlanetPr';
 import {Polaris} from './Polaris';
 import {Pollinators} from './Pollinators';
 import {PowerPlant} from './PowerPlant';
@@ -196,7 +197,7 @@ export const PATHFINDERS_CARD_MANIFEST = new ModuleManifest({
   },
   corporationCards: {
     [CardName.POLARIS]: {Factory: Polaris},
-    // [CardName.PLANET_PR]: {Factory: planetpr},
+    [CardName.PLANET_PR]: {Factory: PlanetPr},
     [CardName.AMBIENT]: {Factory: Ambient, compatibility: 'venus'},
     [CardName.RINGCOM]: {Factory: Ringcom},
     [CardName.CHIMERA]: {Factory: Chimera},

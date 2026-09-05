@@ -649,6 +649,12 @@ export enum CardName {
   VENUS_VENTURES = 'Venus Ventures',
   NEREID_BIOSYSTEMS = 'Nereid Biosystems',
   THE_SYNDICATE = 'The Syndicate',
+  EVERGREEN_FOREST = 'Evergreen Forest',
+  IDEA_BUDGETING = 'Idea Budgeting',
+  FIRST_MISSION_TO_GANYMEDE = 'First Mission to Ganymede',
+  SLUMS = 'Slums',
+  STARTING_TOWN = 'Starting Town',
+  LONELY_TOWN = 'Lonely Town',
 
   // Formerly the separate Teco fan expansion, merged into Sillyfication.
   MOON_COW = 'Moon Cow',
@@ -985,7 +991,7 @@ export enum CardName {
   THE_NEW_SPACE_RACE = 'The New Space Race',
 
   POLARIS = 'Polaris',
-  PLANET_PR = 'planet pr',
+  PLANET_PR = 'Planet PR',
   AMBIENT = 'Ambient',
   RINGCOM = 'Ringcom',
   CHIMERA = 'Chimera',

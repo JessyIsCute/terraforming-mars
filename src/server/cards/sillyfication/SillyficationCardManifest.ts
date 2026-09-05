@@ -66,6 +66,12 @@ import {Critterworld} from './Critterworld';
 import {NereidBiosystems} from './NereidBiosystems';
 import {TheSyndicate} from './TheSyndicate';
 import {EpsilonDample} from './EpsilonDample';
+import {EvergreenForest} from './EvergreenForest';
+import {IdeaBudgeting} from './IdeaBudgeting';
+import {FirstMissionToGanymede} from './FirstMissionToGanymede';
+import {Slums} from './Slums';
+import {StartingTown} from './StartingTown';
+import {LonelyTown} from './LonelyTown';
 
 // Formerly the separate "Teco" fan expansion (icon: a "T" in a circle), merged into Sillyfication.
 import {MoonCow} from './MoonCow';
@@ -185,6 +191,12 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.MUSICAL_CHAIRS]: {Factory: MusicalChairs},
     [CardName.PRELUDE_CLONING]: {Factory: PreludeCloning, compatibility: 'prelude'},
     [CardName.PROJECT_IMITATORS]: {Factory: ProjectImitators},
+    [CardName.EVERGREEN_FOREST]: {Factory: EvergreenForest, compatibility: 'turmoil'},
+    [CardName.IDEA_BUDGETING]: {Factory: IdeaBudgeting},
+    [CardName.FIRST_MISSION_TO_GANYMEDE]: {Factory: FirstMissionToGanymede},
+    [CardName.SLUMS]: {Factory: Slums},
+    [CardName.STARTING_TOWN]: {Factory: StartingTown},
+    [CardName.LONELY_TOWN]: {Factory: LonelyTown},
     // Formerly Teco
     [CardName.MOON_COW]: {Factory: MoonCow, compatibility: 'moon'},
     [CardName.UNDERGROUND_WORMS]: {Factory: UndergroundWorms, compatibility: 'underworld'},

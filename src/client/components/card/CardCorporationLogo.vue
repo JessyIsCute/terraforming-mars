@@ -300,7 +300,8 @@
       </template>
       <template v-else-if="title === CardName.THE_SYNDICATE">
         <div class="card-the-syndicate-logo">
-          <span class="stack"><span class="word-1">THE</span><span class="word-1b">SYN</span></span>
+          <span class="word-1">THE</span>
+          <span class="word-1b">SYN</span>
           <span class="word-2">DICATE</span>
         </div>
       </template>
