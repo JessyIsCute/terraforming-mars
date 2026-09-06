@@ -26,6 +26,7 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
           b.megacredits(35).nbsp.cards(1, {secondaryTag: Tag.JOVIAN}).nbsp.cards(1, {secondaryTag: Tag.MICROBE}).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
+            ce.br;
             ce.effect('Your Jovian tags also count as microbe tags.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.tag(Tag.MICROBE);
             });

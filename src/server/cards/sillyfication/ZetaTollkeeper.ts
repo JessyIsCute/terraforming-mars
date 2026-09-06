@@ -2,6 +2,7 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {CorporationCard} from '../corporation/CorporationCard';
 import {ICorporationCard} from '../corporation/ICorporationCard';
+import {Size} from '../../../common/cards/render/Size';
 
 /** Turns the shared Delta Project prelude action into an all-or-nothing "collect
  * everything" button for its owner - at the price of an extra toll (1 unit of any standard
@@ -25,6 +26,8 @@ export class ZetaTollkeeper extends CorporationCard implements ICorporationCard 
         renderData: CardRenderer.builder((b) => {
           b.megacredits(72).nbsp.production((pb) => pb.minus().megacredits(3)).br;
           b.corpBox('effect', (eb) => {
+            eb.vSpace(Size.LARGE);
+            eb.br;
             eb.effect('When doing the Delta Project action, it costs 1 additional standard resource of your choice - but you gain the reward of every earlier step too, not just the one you land on.', (e1) => {
               e1.wild(1).startEffect.plate('Delta track').asterix();
             });

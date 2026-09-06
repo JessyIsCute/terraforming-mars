@@ -37,6 +37,8 @@ export class EpsilonDample extends CorporationCard implements ICorporationCard, 
         renderData: CardRenderer.builder((b) => {
           b.megacredits(29).nbsp.steel(9, {digit}).nbsp.energy(3, {digit}).br;
           b.corpBox('effect-action', (cea) => {
+            cea.vSpace(Size.LARGE);
+            cea.br;
             cea.effect('You have 1 special Delta Project marker.', (eb) => {
               eb.empty().startEffect.plate('Delta track', {size: Size.SMALL});
             });

@@ -29,6 +29,8 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
         renderData: CardRenderer.builder((b) => {
           b.megacredits(32).nbsp.steel(2, {digit}).nbsp.titanium(1, {digit}).br;
           b.corpBox('effect', (ce) => {
+            ce.vSpace(Size.LARGE);
+            ce.br;
             ce.effect('When you raise a planetary track 1 or more steps, raise it 1 additional step, including this time.', (eb) => {
               eb.planetaryTrack().startEffect.planetaryTrack();
             });
