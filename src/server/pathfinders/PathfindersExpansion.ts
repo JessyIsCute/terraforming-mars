@@ -2,7 +2,7 @@ import {AddResourcesToCard} from '../deferredActions/AddResourcesToCard';
 import {CardName} from '../../common/cards/CardName';
 import {IGame} from '../IGame';
 import {ICard} from '../cards/ICard';
-import {PathfindersData, PLANETARY_TAGS, PlanetaryTag, isPlanetaryTag} from './PathfindersData';
+import {PathfindersData, PlanetaryTag, isPlanetaryTag} from './PathfindersData';
 import {PlaceCityTile} from '../deferredActions/PlaceCityTile';
 import {PlaceGreeneryTile} from '../deferredActions/PlaceGreeneryTile';
 import {PlaceMoonMineTile} from '../moon/PlaceMoonMineTile';
@@ -21,6 +21,7 @@ import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuild
 import {GlobalEventName} from '../../common/turmoil/globalEvents/GlobalEventName';
 import {Priority} from '../deferredActions/Priority';
 import {message} from '../logs/MessageBuilder';
+import {PlanetPr} from '../cards/pathfinders/PlanetPr';
 
 export class PathfindersExpansion {
   private constructor() {
@@ -41,10 +42,18 @@ export class PathfindersExpansion {
     if (player.game.gameOptions.pathfindersExpansion === false) {
       return;
     }
+    // Planet PR: playing two cards with the same planetary tag back to back raises that
+    // track 1 additional step on the second one.
+    const planetPr = player.tableau.get(CardName.PLANET_PR) as PlanetPr | undefined;
     const tags = card.tags;
     tags.forEach((tag) => {
-      if (isPlanetaryTag(tag)) {
-        PathfindersExpansion.raiseTrack(tag, player);
+      if (!isPlanetaryTag(tag)) {
+        return;
+      }
+      const steps = planetPr !== undefined && planetPr.lastPlanetaryTag === tag ? 2 : 1;
+      PathfindersExpansion.raiseTrack(tag, player, steps);
+      if (planetPr !== undefined) {
+        planetPr.lastPlanetaryTag = tag;
       }
     });
   }
@@ -70,11 +79,6 @@ export class PathfindersExpansion {
   }
 
   public static raiseTrack(tag: PlanetaryTag, player: IPlayer, steps: number = 1): void {
-    // Planet PR: any track raise of 1+ steps goes 1 step further, including the raise
-    // triggered by playing Planet PR itself (it's already in the tableau by this point).
-    if (steps >= 1 && player.tableau.has(CardName.PLANET_PR)) {
-      steps += 1;
-    }
     PathfindersExpansion.raiseTrackEssense(tag, player, player.game, steps, true);
   }
 
@@ -283,54 +287,6 @@ export class PathfindersExpansion {
       player.stock.add(Resource.TITANIUM, 1, {log: true});
       break;
     }
-  }
-
-  /**
-   * Planet PR's other passive: at the start of every generation, whichever planetary
-   * track is currently furthest along (and hasn't already reached its end) drops back 3
-   * steps, clamped to 0. Does nothing if there's no unique leader, if no player in the
-   * game has this corporation, or if the leading track is already at position 0.
-   */
-  public static applyPlanetPrTrackDecay(game: IGame): void {
-    const owner = game.players.find((p) => p.tableau.has(CardName.PLANET_PR));
-    if (owner === undefined) {
-      return;
-    }
-    const data = game.pathfindersData;
-    if (data === undefined) {
-      return;
-    }
-
-    let leadingTag: PlanetaryTag | undefined;
-    let leadingPos = -1;
-    let tied = false;
-
-    for (const tag of PLANETARY_TAGS) {
-      const pos = data[tag];
-      const track = PLANETARY_TRACKS[tag];
-      if (pos < 0 || track === undefined) {
-        continue; // Not used this game.
-      }
-      if (pos >= track.spaces.length - 1) {
-        continue; // Already at the end.
-      }
-      if (pos > leadingPos) {
-        leadingPos = pos;
-        leadingTag = tag;
-        tied = false;
-      } else if (pos === leadingPos) {
-        tied = true;
-      }
-    }
-
-    if (leadingTag === undefined || tied || leadingPos <= 0) {
-      return;
-    }
-
-    const newPos = Math.max(0, leadingPos - 3);
-    const tag = leadingTag;
-    data[tag] = newPos;
-    game.log('${0}\'s Planet PR lowers the ${1} planetary track ${2} step(s)', (b) => b.player(owner).string(tag).number(leadingPos - newPos));
   }
 
   private static playersWithMostTags(tag: Tag, players: Array<IPlayer>, activePlayer: IPlayer | undefined): Array<IPlayer> {

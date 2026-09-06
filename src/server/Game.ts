@@ -938,7 +938,6 @@ export class Game implements IGame, Logger {
       }
     });
     DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(this);
-    PathfindersExpansion.applyPlanetPrTrackDecay(this);
 
     if (this.gameOptions.draftVariant) {
       this.gotoDraftPhase();

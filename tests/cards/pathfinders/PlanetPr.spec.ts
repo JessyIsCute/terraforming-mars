@@ -8,7 +8,7 @@ import {PathfindersExpansion} from '../../../src/server/pathfinders/PathfindersE
 import {OrOptions} from '../../../src/server/inputs/OrOptions';
 import {Tag} from '../../../src/common/cards/Tag';
 import {cast} from '../../../src/common/utils/utils';
-import {runAllActions} from '../../TestingUtils';
+import {fakeCard, runAllActions} from '../../TestingUtils';
 
 describe('PlanetPr', () => {
   let card: PlanetPr;
@@ -36,7 +36,7 @@ describe('PlanetPr', () => {
     expect(freshPlayer.titanium).to.eq(1);
   });
 
-  it('initialAction declares a tag, raises its track by 2 (1 base + 1 Planet PR bonus), and draws a matching card', () => {
+  it('initialAction declares a tag and draws a matching card', () => {
     const cardsBefore = player.cardsInHand.length;
 
     card.initialAction(player);
@@ -49,15 +49,46 @@ describe('PlanetPr', () => {
     runAllActions(game);
 
     expect(card.tags).deep.eq([Tag.MARS]);
-    expect(game.pathfindersData!.mars).to.eq(2);
     expect(player.cardsInHand.length).to.eq(cardsBefore + 1);
     expect(player.cardsInHand[player.cardsInHand.length - 1].tags).to.include(Tag.MARS);
   });
 
+  it('a single planetary tag play raises the track by just 1 step', () => {
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]}));
+
+    expect(game.pathfindersData!.mars).to.eq(1);
+    expect(card.lastPlanetaryTag).to.eq(Tag.MARS);
+  });
+
+  it('two of the same planetary tag in a row raises the track 1 extra step on the second one', () => {
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]}));
+    expect(game.pathfindersData!.mars).to.eq(1);
+
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]}));
+    expect(game.pathfindersData!.mars).to.eq(3); // +2 instead of +1
+  });
+
+  it('a different tag in between breaks the streak - no bonus', () => {
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]})); // mars: +1
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]})); // earth: +1
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]})); // mars: +1 again, no bonus (Earth broke the streak)
+
+    expect(game.pathfindersData!.mars).to.eq(2);
+    expect(game.pathfindersData!.earth).to.eq(1);
+  });
+
+  it('does not grant the bonus for a player without Planet PR', () => {
+    const [otherGame, otherPlayer] = testGame(1, {pathfindersExpansion: true});
+
+    PathfindersExpansion.onCardPlayed(otherPlayer, fakeCard({tags: [Tag.MARS]}));
+    PathfindersExpansion.onCardPlayed(otherPlayer, fakeCard({tags: [Tag.MARS]}));
+
+    expect(otherGame.pathfindersData!.mars).to.eq(2); // plain 1 + 1, no bonus
+  });
+
   it('grants 2 M€ when triggering the Earth track bonus (space 3, nothing crossed before it)', () => {
     player.megaCredits = 0;
-    // 0 -> 3 (1 requested + 1 Planet PR step): crosses only space 3, which has a risingPlayer reward.
-    PathfindersExpansion.raiseTrack(Tag.EARTH, player, 2);
+    PathfindersExpansion.raiseTrack(Tag.EARTH, player, 3);
 
     expect(game.pathfindersData!.earth).to.eq(3);
     expect(player.megaCredits).to.eq(2);
@@ -66,10 +97,10 @@ describe('PlanetPr', () => {
   it('grants 1 steel when triggering the Mars track bonus (space 5, starting past space 2)', () => {
     game.pathfindersData!.mars = 3;
     player.steel = 0;
-    // 3 -> 5 (1 requested + 1 Planet PR step): crosses only space 5, which grants 1 steel via
-    // its own "everyone" reward (solo game: everyone is just this player) plus 1 more from the
-    // Planet PR bonus (steel_production, the other reward there, doesn't touch steel stock).
-    PathfindersExpansion.raiseTrack(Tag.MARS, player, 1);
+    // Space 5 grants 1 steel via its own "everyone" reward (solo game: everyone is just
+    // this player) plus 1 more from the Planet PR bonus (steel_production, the other
+    // reward there, doesn't touch steel stock).
+    PathfindersExpansion.raiseTrack(Tag.MARS, player, 2);
 
     expect(game.pathfindersData!.mars).to.eq(5);
     expect(player.steel).to.eq(2);
@@ -78,98 +109,18 @@ describe('PlanetPr', () => {
   it('grants 1 titanium when triggering the Jovian track bonus (space 5, starting past space 2)', () => {
     game.pathfindersData!.jovian = 3;
     player.titanium = 0;
-    // 3 -> 5 (1 requested + 1 Planet PR step): crosses only space 5, which has a risingPlayer reward.
-    PathfindersExpansion.raiseTrack(Tag.JOVIAN, player, 1);
+    PathfindersExpansion.raiseTrack(Tag.JOVIAN, player, 2);
 
     expect(game.pathfindersData!.jovian).to.eq(5);
     expect(player.titanium).to.eq(1);
   });
 
-  it('does not grant a bonus when the (bonus-extended) raise lands on an empty space', () => {
+  it('does not grant a bonus when the raise lands on an empty space', () => {
     game.pathfindersData!.mars = 2;
     player.steel = 0;
-    // 2 -> 4 (1 requested + 1 Planet PR step): spaces 3 and 4 carry no rewards at all.
-    PathfindersExpansion.raiseTrack(Tag.MARS, player, 1);
+    PathfindersExpansion.raiseTrack(Tag.MARS, player, 2);
 
     expect(game.pathfindersData!.mars).to.eq(4);
     expect(player.steel).to.eq(0);
-  });
-
-  it('does not add an extra step or grant a bonus for a player without Planet PR', () => {
-    const [otherGame, otherPlayer] = testGame(1, {pathfindersExpansion: true});
-    otherGame.pathfindersData!.mars = 2;
-    otherPlayer.steel = 0;
-    // No Planet PR: a plain 2-step raise from 2 lands on 4, same empty spaces as above.
-    PathfindersExpansion.raiseTrack(Tag.MARS, otherPlayer, 2);
-
-    expect(otherGame.pathfindersData!.mars).to.eq(4);
-    expect(otherPlayer.steel).to.eq(0);
-  });
-
-  describe('applyPlanetPrTrackDecay', () => {
-    it('lowers the sole leading track by 3, clamped at 0', () => {
-      game.pathfindersData!.mars = 5;
-      game.pathfindersData!.earth = 2;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.mars).to.eq(2);
-      expect(game.pathfindersData!.earth).to.eq(2);
-    });
-
-    it('clamps at 0 instead of going negative', () => {
-      game.pathfindersData!.mars = 2;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.mars).to.eq(0);
-    });
-
-    it('does nothing when there is a tie for the lead', () => {
-      game.pathfindersData!.mars = 5;
-      game.pathfindersData!.earth = 5;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.mars).to.eq(5);
-      expect(game.pathfindersData!.earth).to.eq(5);
-    });
-
-    it('does nothing when the leading track is already at position 0', () => {
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.mars).to.eq(0);
-      expect(game.pathfindersData!.earth).to.eq(0);
-    });
-
-    it('skips a track that has already reached its end', () => {
-      game.pathfindersData!.jovian = 14; // Jovian's track ends at 14.
-      game.pathfindersData!.earth = 5;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.jovian).to.eq(14); // untouched - already finished
-      expect(game.pathfindersData!.earth).to.eq(2); // this is the real leader
-    });
-
-    it('skips a track unused this game (-1)', () => {
-      // No Moon expansion in this test's setup, so moon stays at -1.
-      expect(game.pathfindersData!.moon).to.eq(-1);
-      game.pathfindersData!.earth = 5;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(game);
-
-      expect(game.pathfindersData!.moon).to.eq(-1);
-      expect(game.pathfindersData!.earth).to.eq(2);
-    });
-
-    it('does nothing when no player has Planet PR', () => {
-      const [otherGame] = testGame(1, {pathfindersExpansion: true});
-      otherGame.pathfindersData!.mars = 5;
-
-      PathfindersExpansion.applyPlanetPrTrackDecay(otherGame);
-
-      expect(otherGame.pathfindersData!.mars).to.eq(5);
-    });
   });
 });

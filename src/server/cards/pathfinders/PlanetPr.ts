@@ -11,8 +11,13 @@ import {DrawCards} from '../../deferredActions/DrawCards';
 import {CardResource} from '../../../common/CardResource';
 import {Size} from '../../../common/cards/render/Size';
 import {digit} from '../Options';
+import {PlanetaryTag} from '../../pathfinders/PathfindersData';
 
 export class PlanetPr extends CorporationCard implements ICorporationCard, ICloneTagCard {
+  /** The planetary tag of the last card played that carried one - tracked so
+   * PathfindersExpansion.onCardPlayed can tell when two in a row match. */
+  public lastPlanetaryTag: PlanetaryTag | undefined = undefined;
+
   constructor() {
     super({
       name: CardName.PLANET_PR,
@@ -31,8 +36,8 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;
-            ce.effect('When you raise a planetary track 1 or more steps, raise it 1 additional step, including this time.', (eb) => {
-              eb.planetaryTrack().startEffect.planetaryTrack();
+            ce.effect('Each time you play two cards with the same planetary tag in a row, raise that track 1 additional step on the second one.', (eb) => {
+              eb.wild(1, {size: Size.SMALL}).nbsp.wild(1, {size: Size.SMALL}).startEffect.planetaryTrack().plus(Size.SMALL).text('1', {size: Size.SMALL});
             });
             ce.br;
             ce.effect('Whenever you trigger the Venus track\'s bonus, also gain 1 floater.', (eb) => {
@@ -47,10 +52,6 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
             });
             ce.effect('Whenever you trigger the Jovian track\'s bonus, also gain 1 titanium.', (eb) => {
               eb.tag(Tag.JOVIAN, {size: Size.SMALL}).startEffect.titanium(1, {size: Size.SMALL});
-            });
-            ce.br;
-            ce.effect('At the start of each generation, whichever planetary track is furthest along (and hasn\'t finished) drops back 3 steps.', (eb) => {
-              eb.planetaryTrack().startEffect.planetaryTrack().minus().text('3');
             });
           });
         }),
