@@ -35,7 +35,7 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
   },
   projectCards: {
     [CardName.LUNAR_BEAM_BETTER_MARS]: {Factory: LunarBeamBetterMars},
-    [CardName.LUNA_METROPOLIS_BETTER_MARS]: {Factory: LunaMetropolisBetterMars, compatibility: 'venus'},
+    [CardName.LUNA_METROPOLIS_BETTER_MARS]: {Factory: LunaMetropolisBetterMars, compatibility: ['venus', 'moon']},
     [CardName.LUNAR_EXPORTS_BETTER_MARS]: {Factory: LunarExportsBetterMars, compatibility: 'colonies'},
     [CardName.EOS_CHASMA_NATIONAL_PARK_BETTER_MARS]: {Factory: EosChasmaNationalParkBetterMars},
     [CardName.IMMIGRATION_SHUTTLES_BETTER_MARS]: {Factory: ImmigrationShuttlesBetterMars},

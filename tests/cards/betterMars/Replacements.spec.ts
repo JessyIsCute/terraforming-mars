@@ -99,6 +99,7 @@ describe('BetterMars replacement cards', () => {
       turmoilExtension: true,
       promoCardsOption: true,
       betterMarsExpansion: true,
+      moonExpansion: true,
     };
     const cards = new GameCards(gameOptions);
     const pool = [
@@ -110,6 +111,26 @@ describe('BetterMars replacement cards', () => {
       expect(pool, `${base} removed`).to.not.contain(base);
       expect(pool, `${replacement} present`).to.contain(replacement);
     }
+  });
+
+  it('Luna Metropolis:bm also requires the Moon expansion, since it counts Moon tags', () => {
+    // Its bonus scales with Moon tags, so it needs the Moon expansion to be anything
+    // but a fixed, non-scaling +1 M€ from its own tag - Venus alone isn't enough.
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      preludeExtension: true,
+      venusNextExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.not.contain(CardName.LUNA_METROPOLIS_BETTER_MARS);
+    // Note: the base card doesn't come back in this configuration either - BetterMars
+    // unconditionally removes it once enabled, regardless of the replacement's own
+    // compatibility. A pre-existing limitation of cardsToRemove, not new here.
+    expect(pool).to.not.contain(CardName.LUNA_METROPOLIS);
   });
 
   it('with BetterMars off, the base cards are untouched', () => {
