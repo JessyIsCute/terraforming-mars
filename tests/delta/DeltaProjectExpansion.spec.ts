@@ -728,26 +728,59 @@ describe('DeltaProjectExpansion', () => {
       player.playedCards.push(fakeCard({name: CardName.ZETA_TOLLKEEPER}));
     });
 
-    it('costs 1 extra energy on top of the usual per-step cost - minimum 2 to move at all', () => {
+    it('does not affect getValidAdvanceSteps by itself - the toll is a separate input', () => {
       playAllDeltaTrackTags(player);
-      player.energy = 1;
-      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([]);
-
       player.energy = 2;
-      expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1]);
-
-      player.energy = 3;
       expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1, 2]);
     });
 
-    it('deducts steps plus the 1 energy surcharge', () => {
+    it('buildAdvanceInput asks for a toll resource before the step choice', () => {
       playAllDeltaTrackTags(player);
-      player.energy = 3;
+      player.energy = 2;
+      player.megaCredits = 5;
+      player.steel = 0;
+      player.titanium = 0;
+      player.plants = 0;
+      player.heat = 0;
 
-      DeltaProjectExpansion.advance(player, 2);
+      const toll = cast(DeltaProjectExpansion.buildAdvanceInput(player), OrOptions);
+      // Only resources the player actually has are offered.
+      expect(toll.options.map((o) => o.title)).deep.eq(['Pay 1 megacredits', 'Pay 1 energy']);
 
-      expect(player.deltaProjectData!.position).eq(2);
+      toll.options[0].cb(); // pay with megacredits - energy is untouched
+      expect(player.megaCredits).eq(4);
+      expect(player.energy).eq(2);
+    });
+
+    it('paying the toll in energy leaves less of it for the steps that follow', () => {
+      playAllDeltaTrackTags(player);
+      player.energy = 2;
+      player.megaCredits = 0;
+      player.steel = 0;
+      player.titanium = 0;
+      player.plants = 0;
+      player.heat = 0;
+
+      const toll = cast(DeltaProjectExpansion.buildAdvanceInput(player), OrOptions);
+      expect(toll.options.map((o) => o.title)).deep.eq(['Pay 1 energy']);
+
+      const stepInput = cast(toll.options[0].cb(), DeltaProjectInput);
+      expect(player.energy).eq(1);
+      // Only 1 energy left - only a single step is affordable now.
+      expect(stepInput.validSteps).deep.eq([1]);
+
+      stepInput.cb(1);
+      expect(player.deltaProjectData!.position).eq(1);
       expect(player.energy).eq(0);
+    });
+
+    it('a non-Tollkeeper player skips the toll entirely', () => {
+      [game, player, player2] = testGame(2, {deltaProjectExpansion: true});
+      playAllDeltaTrackTags(player);
+      player.energy = 2;
+
+      const stepInput = cast(DeltaProjectExpansion.buildAdvanceInput(player), DeltaProjectInput);
+      expect(stepInput.validSteps).deep.eq([1, 2]);
     });
 
     it('grants every reward from position 1 up to the landing position, not just newly passed ones', () => {

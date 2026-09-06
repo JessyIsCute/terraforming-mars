@@ -19,10 +19,11 @@ describe('ZetaTollkeeper', () => {
     expect(card.tags).to.deep.eq([]);
   });
 
-  it('starts with 40 M€', () => {
+  it('starts with 72 M€ and -3 M€ production', () => {
     player.playCorporationCard(card);
     runAllActions(game);
 
-    expect(player.megaCredits).eq(40);
+    expect(player.megaCredits).eq(72);
+    expect(player.production.megacredits).eq(-3);
   });
 });
