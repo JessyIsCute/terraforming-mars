@@ -36,7 +36,7 @@ export class TheSyndicate extends ActiveCorporationCard {
             cea.effect('When you play a card with a negative VP icon, including this, gain 1 corruption and place a delegate.', (eb) => {
               eb.vpIcon().asterix().startEffect.corruption(1).nbsp.delegates(1);
             });
-            b.br;
+            cea.br;
             cea.action('Spend 1 corruption to permanently add 1 delegate to your reserve.', (ab) => {
               ab.corruption(1).startAction.delegates(1);
             });

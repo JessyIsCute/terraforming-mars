@@ -40,6 +40,7 @@ export class EpsilonDample extends CorporationCard implements ICorporationCard, 
             cea.effect('You have 1 special Delta Project marker.', (eb) => {
               eb.empty().startEffect.plate('Delta track', {size: Size.SMALL});
             });
+            cea.br;
             cea.action('Move the special marker forward or backward on the Delta Project track. It locks in place once it reaches a VP spot.', (ab) => {
               ab.text('X', {size: Size.SMALL}).energy(1, {size: Size.SMALL}).startAction.text('±X', {size: Size.SMALL}).plate('Delta track', {size: Size.SMALL});
             });
