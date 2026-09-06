@@ -4,7 +4,7 @@ import {GameModule, GAME_MODULES} from '@/common/cards/GameModule';
 import {SearchIndex} from '@/client/components/cardlist/SearchIndex';
 import {CardResource} from '@/common/CardResource';
 
-export type TypeOption = CardType | 'colonyTiles' | 'globalEvents' | 'milestones' | 'awards' | 'agendas';
+export type TypeOption = CardType | 'colonyTiles' | 'globalEvents' | 'milestones' | 'awards' | 'agendas' | 'mutationCards';
 export type TagOption = Tag | 'none';
 export type ResourceOption = CardResource | 'none';
 
@@ -60,6 +60,7 @@ const TYPE_ABBREVIATIONS = {
   milestones: 'm',
   awards: 'a',
   agendas: 't',
+  mutationCards: 'M',
 } satisfies Record<TypeOption, string>;
 
 const TAG_ABBREVIATIONS = {
@@ -122,6 +123,7 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       awards: true,
       ceo: true,
       agendas: true,
+      mutationCards: true,
     },
     tags: {
       building: true,

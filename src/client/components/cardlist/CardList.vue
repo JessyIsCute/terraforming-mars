@@ -63,6 +63,7 @@
             <label :for="`${type}-cardType-checkbox`" class="expansion-button">
                 <span v-if="type === 'colonyTiles'" v-i18n>Colony Tiles</span>
                 <span v-else-if="type === 'globalEvents'" v-i18n>Global Events</span>
+                <span v-else-if="type === 'mutationCards'" v-i18n>Mutation Cards</span>
                 <span v-else v-i18n>{{type}}</span>
             </label>
           </span>
@@ -183,6 +184,15 @@
         </div>
       </section>
 
+      <section v-show="visibleMutationNames.length > 0">
+        <h2 v-i18n>Mutation Cards</h2>
+        <div class="player_home_colony_cont">
+          <div class="player_home_colony" v-for="mutationName in visibleMutationNames" :key="mutationName" v-memo="[mutationName]">
+            <MutationCard :mutation="mutationName" />
+          </div>
+        </div>
+      </section>
+
       <div class="free-floating-preferences-icon">
         <div v-show="scrolled" class="sidebar_item card-list-scroll-top" title="Scroll to top" @click="scrollToTop()">
           <div class="card-list-scroll-top-arrow">↑</div>
@@ -218,6 +228,7 @@ import {FundedAwardModel} from '@/common/models/FundedAwardModel';
 import {TypeOption, CardListModel, hashToModel, modelToHash, ResourceOption, TagOption} from '@/client/components/cardlist/CardListModel';
 import {getAward, getMilestone} from '@/client/MilestoneAwardManifest';
 import {BonusId, BONUS_IDS, PolicyId, POLICY_IDS, agendaIdDescription} from '@/common/turmoil/Types';
+import {MutationName} from '@/common/mutationmarkets/MutationName';
 import Card from '@/client/components/card/Card.vue';
 import Colony from '@/client/components/colonies/Colony.vue';
 import GlobalEvent from '@/client/components/turmoil/GlobalEvent.vue';
@@ -226,6 +237,7 @@ import LanguageIcon from '@/client/components/LanguageIcon.vue';
 import Milestone from '@/client/components/Milestone.vue';
 import Award from '@/client/components/Award.vue';
 import TurmoilAgendaContainer from '@/client/components/cardlist/TurmoilAgendaContainer.vue';
+import MutationCard from '@/client/components/mutationmarkets/MutationCard.vue';
 import {CardResource} from '@/common/CardResource';
 import {cardResourceCSS} from '../common/cardResources';
 import {setDocumentTitle} from '@/client/utils/documentTitle';
@@ -245,6 +257,7 @@ export default defineComponent({
     Milestone,
     Award,
     TurmoilAgendaContainer,
+    MutationCard,
     PreferencesIcon,
     LanguageIcon,
   },
@@ -286,6 +299,7 @@ export default defineComponent({
         'milestones',
         'awards',
         'agendas',
+        'mutationCards',
       ];
     },
     allTags(): Array<TagOption> {
@@ -305,6 +319,9 @@ export default defineComponent({
     },
     allAwardNames(): ReadonlyArray<AwardName> {
       return awardNames.toSorted();
+    },
+    allMutationNames(): ReadonlyArray<MutationName> {
+      return Object.values(MutationName).toSorted();
     },
     allAgendaIds(): ReadonlyArray<PolicyId | BonusId> {
       const ids = (POLICY_IDS as ReadonlyArray<PolicyId | BonusId>).concat(BONUS_IDS);
@@ -360,6 +377,12 @@ export default defineComponent({
         return [];
       }
       return this.allAgendaIds.filter((id) => this.include(id, 'agenda'));
+    },
+    visibleMutationNames(): Array<MutationName> {
+      if (!this.types.mutationCards || !this.expansions.mutationMarkets) {
+        return [];
+      }
+      return this.allMutationNames.filter((m) => this.include(m, 'mutation'));
     },
     agendaIdDescription(): typeof agendaIdDescription {
       return agendaIdDescription;
@@ -434,7 +457,7 @@ export default defineComponent({
     getAllColonyNames() {
       return OFFICIAL_COLONY_NAMES.concat(COMMUNITY_COLONY_NAMES).concat(PATHFINDERS_COLONY_NAMES);
     },
-    include(name: string, type: 'card' | 'globalEvent' | 'colony' | 'ma' | 'agenda') {
+    include(name: string, type: 'card' | 'globalEvent' | 'colony' | 'ma' | 'agenda' | 'mutation') {
       const normalized = this.filterText.toLocaleUpperCase();
       if (normalized.length === 0) {
         return true;

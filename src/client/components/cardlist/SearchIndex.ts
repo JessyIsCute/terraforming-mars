@@ -11,6 +11,9 @@ import {copyAndClear} from '@/common/utils/utils';
 import {awardNames} from '@/common/ma/AwardName';
 import {milestoneNames} from '@/common/ma/MilestoneName';
 import {agendaIdDescription, BONUS_IDS, POLICY_IDS} from '@/common/turmoil/Types';
+import {MutationName} from '@/common/mutationmarkets/MutationName';
+import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
+import {describeMutationRequirement, describeMutationReward, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
 
 export class SearchIndex {
   private searchIndex: Map<string, Array<string>>;
@@ -65,6 +68,16 @@ export class SearchIndex {
       this.add(awardName);
       this.add(getAward(awardName).description);
       this.store('ma', awardName);
+    }
+
+    for (const mutationName of Object.values(MutationName)) {
+      const definition = MUTATION_DEFINITIONS[mutationName];
+      this.add(mutationName);
+      this.add(definition.prefix);
+      this.add(describeMutationRequirement(definition.requirement));
+      this.add(describeMutationReward(definition.reward));
+      this.add(describeMutationEffect(definition.effect));
+      this.store('mutation', mutationName);
     }
 
     for (const id of BONUS_IDS) {
