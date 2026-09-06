@@ -34,7 +34,7 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.SELF_SUFFICIENT_SETTLEMENT_BETTER_MARS]: {Factory: SelfSufficientSettlementBetterMars, compatibility: 'prelude'},
   },
   projectCards: {
-    [CardName.LUNAR_BEAM_BETTER_MARS]: {Factory: LunarBeamBetterMars},
+    [CardName.LUNAR_BEAM_BETTER_MARS]: {Factory: LunarBeamBetterMars, compatibility: 'moon'},
     [CardName.LUNA_METROPOLIS_BETTER_MARS]: {Factory: LunaMetropolisBetterMars, compatibility: ['venus', 'moon']},
     [CardName.LUNAR_EXPORTS_BETTER_MARS]: {Factory: LunarExportsBetterMars, compatibility: 'colonies'},
     [CardName.EOS_CHASMA_NATIONAL_PARK_BETTER_MARS]: {Factory: EosChasmaNationalParkBetterMars},
@@ -50,12 +50,6 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.MEAT_INDUSTRY_BETTER_MARS]: {Factory: MeatIndustryBetterMars},
   },
   cardsToRemove: [
-    CardName.LUNAR_BEAM,
-    CardName.LUNA_METROPOLIS,
-    CardName.LUNAR_EXPORTS,
-    CardName.PRISTAR,
-    CardName.EARLY_SETTLEMENT,
-    CardName.SELF_SUFFICIENT_SETTLEMENT,
     CardName.EOS_CHASMA_NATIONAL_PARK,
     CardName.IMMIGRATION_SHUTTLES,
     CardName.MARTIAN_RAILS,
@@ -65,7 +59,20 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     CardName.MARS_UNIVERSITY,
     CardName.PROTECTED_HABITATS,
     CardName.TROPICAL_RESORT,
-    CardName.MARTIAN_MEDIA_CENTER,
     CardName.MEAT_INDUSTRY,
   ],
+  // These replacements each need an extra expansion on top of BetterMars itself (Moon,
+  // Venus, Colonies, Turmoil, or Prelude). The base card only actually gets swapped out
+  // once its replacement clears that extra requirement too - otherwise the base card
+  // stays, so a game without (say) the Moon expansion still has a normal Earth-tag Lunar
+  // Beam instead of neither version.
+  conditionalCardsToRemove: new Map([
+    [CardName.LUNAR_BEAM, CardName.LUNAR_BEAM_BETTER_MARS],
+    [CardName.LUNA_METROPOLIS, CardName.LUNA_METROPOLIS_BETTER_MARS],
+    [CardName.LUNAR_EXPORTS, CardName.LUNAR_EXPORTS_BETTER_MARS],
+    [CardName.PRISTAR, CardName.PRISTAR_BETTER_MARS],
+    [CardName.EARLY_SETTLEMENT, CardName.EARLY_SETTLEMENT_BETTER_MARS],
+    [CardName.SELF_SUFFICIENT_SETTLEMENT, CardName.SELF_SUFFICIENT_SETTLEMENT_BETTER_MARS],
+    [CardName.MARTIAN_MEDIA_CENTER, CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS],
+  ]),
 });

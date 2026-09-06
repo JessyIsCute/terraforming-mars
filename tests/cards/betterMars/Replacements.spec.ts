@@ -127,10 +127,49 @@ describe('BetterMars replacement cards', () => {
     const cards = new GameCards(gameOptions);
     const pool = cards.getProjectCards().map(toName);
     expect(pool).to.not.contain(CardName.LUNA_METROPOLIS_BETTER_MARS);
-    // Note: the base card doesn't come back in this configuration either - BetterMars
-    // unconditionally removes it once enabled, regardless of the replacement's own
-    // compatibility. A pre-existing limitation of cardsToRemove, not new here.
-    expect(pool).to.not.contain(CardName.LUNA_METROPOLIS);
+    // The base (Earth-tag) card comes back instead of leaving neither version -
+    // conditionalCardsToRemove only swaps it out once the replacement actually clears
+    // its own compatibility check too.
+    expect(pool).to.contain(CardName.LUNA_METROPOLIS);
+  });
+
+  it('Lunar Beam:bm also requires the Moon expansion, since it swaps Earth for Moon', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: true,
+      moonExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.not.contain(CardName.LUNAR_BEAM_BETTER_MARS);
+    expect(pool).to.contain(CardName.LUNAR_BEAM);
+  });
+
+  it('Lunar Beam:bm replaces the base card once the Moon expansion is also on', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: true,
+      moonExpansion: true,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.contain(CardName.LUNAR_BEAM_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.LUNAR_BEAM);
+  });
+
+  it('Pristar:bm also requires Turmoil, since it only replaces the Turmoil-only base', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: true,
+      turmoilExtension: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getCorporationCards().map(toName);
+    expect(pool).to.not.contain(CardName.PRISTAR_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.PRISTAR); // Pristar itself also requires Turmoil
   });
 
   it('with BetterMars off, the base cards are untouched', () => {
