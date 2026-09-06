@@ -3,6 +3,7 @@ import {runAllActions, fakeCard} from '../../TestingUtils';
 import {RegolithEaters} from '../../../src/server/cards/base/RegolithEaters';
 import {Tardigrades} from '../../../src/server/cards/base/Tardigrades';
 import {ICard} from '../../../src/server/cards/ICard';
+import {NereidBiosystems} from '../../../src/server/cards/sillyfication/NereidBiosystems';
 import {OutpostOnEuropa} from '../../../src/server/cards/sillyfication/OutpostOnEuropa';
 import {IGame} from '../../../src/server/IGame';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
@@ -30,6 +31,38 @@ describe('OutpostOnEuropa', () => {
     expect(card.canPlay(player)).is.false;
     player.playedCards.push(fakeCard({tags: [Tag.MICROBE]}));
     expect(card.canPlay(player)).is.true;
+  });
+
+  it('Nereid Biosystems: a plain Jovian tag also satisfies the Microbe requirement', () => {
+    // Nereid itself already carries a real Microbe tag, so it isn't a clean before/after
+    // on its own - compare the raw Microbe count with and without an extra, otherwise
+    // Microbe-less, Jovian-tagged card to isolate the substitution specifically.
+    player.playedCards.push(new NereidBiosystems());
+    const beforeExtraJovian = player.tags.count(Tag.MICROBE, 'default');
+
+    player.playedCards.push(fakeCard({tags: [Tag.JOVIAN]}));
+    const afterExtraJovian = player.tags.count(Tag.MICROBE, 'default');
+
+    expect(afterExtraJovian).to.eq(beforeExtraJovian + 1);
+  });
+
+  it('Nereid Biosystems does not inflate the Jovian-counting effect - it only substitutes for Microbe', () => {
+    player.playedCards.push(new NereidBiosystems());
+    player.playedCards.push(fakeCard({tags: [Tag.JOVIAN]}));
+    const microbeCard = new RegolithEaters();
+    player.playedCards.push(microbeCard);
+
+    cast(card.play(player), undefined);
+    runAllActions(game);
+
+    // Nereid Biosystems is itself a microbe-resource card, so there's a choice now.
+    const action = cast(player.popWaitingFor(), SelectCard<ICard>);
+    action.cb([microbeCard]);
+
+    // 1 (this card) + 1 (Nereid's own Jovian tag) + 1 (the extra Jovian-tagged card) = 3 -
+    // Nereid's "Jovian counts as Microbe" only affects Microbe-tag counts, not
+    // Jovian-tag counts, so it shouldn't inflate this count at all.
+    expect(microbeCard.resourceCount).to.eq(3);
   });
 
   it('counts Jovian tags across all players, including its own', () => {
