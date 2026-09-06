@@ -123,6 +123,7 @@ export class ApiCreateGame extends Handler {
         modularMA: gameReq.modularMA,
         moonExpansion: gameReq.expansions.moon,
         moonStandardProjectVariant: gameReq.moonStandardProjectVariant,
+        mutationMarketsExpansion: gameReq.expansions.mutationMarkets,
         moonStandardProjectVariant1: gameReq.moonStandardProjectVariant1,
         pathfindersExpansion: gameReq.expansions.pathfinders,
         politicalAgendasExtension: gameReq.politicalAgendasExtension,
@@ -149,7 +150,6 @@ export class ApiCreateGame extends Handler {
         deltaProjectExpansion: gameReq.expansions.deltaProject,
         sillyficationExpansion: gameReq.expansions.sillyfication,
         betterMarsExpansion: gameReq.expansions.betterMars,
-        customCardsExpansion: gameReq.expansions.customCards,
         undoOption: gameReq.undoOption,
         venusNextExtension: gameReq.expansions.venus,
       };

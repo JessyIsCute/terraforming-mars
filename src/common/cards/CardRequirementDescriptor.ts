@@ -28,11 +28,19 @@ import {RequirementType} from './RequirementType';
 
 export type CardRequirementDescriptor = {
   tag?: Tag,
+  /** The number of distinct tag types the player has in play (wild/Odyssey/Chimera-aware; see `Tags.distinctCount`). */
+  uniqueTags?: number,
   oxygen?: number,
   temperature?: number,
   greeneries?: number,
   /** Whether the player's last action this game was placing a greenery tile. */
   greeneryLastAction?: boolean,
+  /** Count of cards (including events) the player has ever played costing 25 M€ or more. */
+  expensiveCardsPlayed?: number,
+  /** Count of cards (including events) the player has ever played costing less than 7 M€. */
+  cheapCardsPlayed?: number,
+  /** Length of the player's current same-generation run of cards (including events) each played for less than the previous one; resets each generation and on any non-decreasing play. */
+  cardCostStreak?: number,
   cities?: number,
   oceans?: number,
   production?: Resource,
@@ -75,6 +83,14 @@ export type CardRequirementDescriptor = {
 export function requirementType(descriptor: CardRequirementDescriptor): RequirementType {
   if (descriptor.tag !== undefined) {
     return RequirementType.TAG;
+  } else if (descriptor.uniqueTags !== undefined) {
+    return RequirementType.UNIQUE_TAGS;
+  } else if (descriptor.expensiveCardsPlayed !== undefined) {
+    return RequirementType.EXPENSIVE_CARDS_PLAYED;
+  } else if (descriptor.cheapCardsPlayed !== undefined) {
+    return RequirementType.CHEAP_CARDS_PLAYED;
+  } else if (descriptor.cardCostStreak !== undefined) {
+    return RequirementType.CARD_COST_STREAK;
   } else if (descriptor.oceans !== undefined) {
     return RequirementType.OCEANS;
   } else if (descriptor.oxygen !== undefined) {

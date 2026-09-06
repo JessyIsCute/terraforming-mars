@@ -12,8 +12,8 @@ import {CardName} from '../../common/cards/CardName';
 import {Tag} from '../../common/cards/Tag';
 import {asArray} from '../../common/utils/utils';
 import {isIStandardProjectCard} from '../cards/IStandardProjectCard';
-import {isCustomCardName, getCustomCardDefinition} from '../cards/CustomCardRegistry';
 import {NEUTRAL_COLONY_OWNER} from '../../common/Types';
+import {MutationEffects} from '../mutationmarkets/MutationEffects';
 
 export function cardsToModel(
   player: IPlayer,
@@ -79,20 +79,13 @@ export function cardsToModel(
     if (card.warnings.size > 0) {
       model.warnings = Array.from(card.warnings);
     }
-    // A Custom Card Maker card's name isn't in the client's compiled static manifest, so
-    // Card.vue can't resolve its face (cost/tags/icons/requirements) the normal way -- carry
-    // that data over the wire instead. See CustomCardModel's doc comment.
-    if (isCustomCardName(card.name)) {
-      model.customCard = {
-        type: card.type,
-        cost: card.cost,
-        tags: card.tags,
-        requirements: card.requirements,
-        metadata: card.metadata,
-        resourceType: card.resourceType,
-        module: 'customCards',
-        compatibility: getCustomCardDefinition(card.name)?.compatibility ?? [],
-      };
+    if (card.mutations !== undefined && card.mutations.length > 0) {
+      model.mutationAddedTag = card.mutations.find((m) => m.chosenTag !== undefined)?.chosenTag;
+      model.mutationHighlight = MutationEffects.highlightsFor(card);
+      const mutationVp = MutationEffects.victoryPointsBonus(card, player);
+      if (mutationVp !== 0) {
+        model.mutationVictoryPoints = mutationVp;
+      }
     }
     return model;
   });

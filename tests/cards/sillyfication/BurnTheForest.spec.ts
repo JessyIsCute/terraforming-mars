@@ -23,17 +23,18 @@ describe('BurnTheForest', () => {
     expect(card.getVictoryPoints(player)).to.eq(-1);
   });
 
-  it('replaces a greenery with the tile, keeping placement bonuses, and gains 3 heat production plus 9 heat', () => {
+  it('replaces a greenery with the tile, keeping placement bonuses, raises temperature 2 steps, and gains 6 heat', () => {
     const game = player.game;
     const space = game.board.getAvailableSpacesOnLand(player)[0];
     game.addGreenery(player, space);
     expect(card.canPlay(player)).is.true;
 
+    const temperatureBefore = game.getTemperature();
     const selectSpace = cast(card.play(player), SelectSpace);
     selectSpace.cb(space);
 
     expect(space.tile?.tileType).to.eq(TileType.GARBAGE_DUMP);
-    expect(player.production.heat).to.eq(3);
-    expect(player.heat).to.eq(9);
+    expect(game.getTemperature()).to.eq(temperatureBefore + 4);
+    expect(player.heat).to.eq(6);
   });
 });

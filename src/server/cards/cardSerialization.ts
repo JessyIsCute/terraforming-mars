@@ -50,6 +50,9 @@ export function serializeProjectCard(card: IProjectCard): SerializedCard {
   if (card.data !== undefined) {
     serialized.data = card.data;
   }
+  if (card.mutations !== undefined && card.mutations.length > 0) {
+    serialized.mutations = card.mutations;
+  }
   card.serialize?.(serialized);
   return serialized;
 }
@@ -73,6 +76,9 @@ export function deserializeProjectCard(element: SerializedCard): IProjectCard {
   }
   if (element.bonusResource !== undefined) {
     card.bonusResource = asArray(element.bonusResource);
+  }
+  if (element.mutations !== undefined) {
+    card.mutations = element.mutations;
   }
   card.deserialize?.(element);
   return card;

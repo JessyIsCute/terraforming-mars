@@ -4,7 +4,6 @@ import {GameId, ParticipantId} from '../../common/Types';
 import {SerializedGame} from '../SerializedGame';
 import {Session, SessionId} from '../auth/Session';
 import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
-import {CustomCardLibraryEntry, CustomCardEntryId, CustomCardStatus} from '../../common/cards/CustomCardLibraryEntry';
 
 export type GameIdLedger = {gameId: GameId, participantIds: Array<ParticipantId>}
 
@@ -159,15 +158,4 @@ export interface IDatabase {
     insertMapLibraryEntry(entry: MapLibraryEntry): Promise<void>;
     setMapLibraryEntryStatus(id: MapLibraryEntryId, status: MapLibraryStatus): Promise<void>;
     deleteMapLibraryEntry(id: MapLibraryEntryId): Promise<void>;
-
-    /**
-     * The custom card review queue shown on /cards: community-submitted playable cards.
-     */
-    listCustomCardLibraryEntries(): Promise<Array<CustomCardLibraryEntry>>;
-    getCustomCardLibraryEntry(id: CustomCardEntryId): Promise<CustomCardLibraryEntry | undefined>;
-    insertCustomCardLibraryEntry(entry: CustomCardLibraryEntry): Promise<void>;
-    setCustomCardLibraryEntryStatus(id: CustomCardEntryId, status: CustomCardStatus): Promise<void>;
-    /** Replaces the whole entry -- used by the admin set-behavior action, which mutates `definition` in place. */
-    updateCustomCardLibraryEntry(id: CustomCardEntryId, entry: CustomCardLibraryEntry): Promise<void>;
-    deleteCustomCardLibraryEntry(id: CustomCardEntryId): Promise<void>;
 }

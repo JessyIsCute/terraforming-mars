@@ -3,6 +3,7 @@ import {Resource} from '../common/Resource';
 import {Tag} from '../common/cards/Tag';
 import {OneOrArray} from '../common/utils/types';
 import {JSONValue} from '../common/Types';
+import {AppliedMutation} from '../common/mutationmarkets/AppliedMutation';
 
 export type SerializedCard = {
   allTags?: Array<Tag>; // For Aridor
@@ -15,6 +16,7 @@ export type SerializedCard = {
   opgActionIsActive?: boolean; // For CEO Cards.
   resourceCount?: number;
   targetCards?: Array<SerializedRobotCard>;
+  mutations?: Array<AppliedMutation>; // For MutationMarkets
 }
 
 export type SerializedRobotCard = {

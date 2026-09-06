@@ -28,6 +28,8 @@ import {AdditionalProjectCosts} from '../../common/cards/Types';
 import {GlobalParameter} from '../../common/GlobalParameter';
 import {Warning} from '../../common/cards/Warning';
 import {Resource} from '@/common/Resource';
+import {MutationEffects} from '../mutationmarkets/MutationEffects';
+import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 
 const NO_WARNINGS: ReadonlySet<Warning> = new Set();
 
@@ -194,9 +196,14 @@ export abstract class Card implements ICard {
   public get type() {
     return this.properties.type;
   }
-  public get cost() {
+  public get baseCost() {
     return this.properties.cost === undefined ? 0 : this.properties.cost;
   }
+  public get cost(): number {
+    return MutationEffects.applyCost(this, this.baseCost);
+  }
+  /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
+  public mutations: Array<AppliedMutation> | undefined;
   public get initialActionText() {
     return this.properties.initialActionText || this.properties.firstAction?.text;
   }
@@ -221,8 +228,8 @@ export abstract class Card implements ICard {
   public get startingMegaCredits() {
     return this.properties.startingMegaCredits === undefined ? 0 : this.properties.startingMegaCredits;
   }
-  public get tags() {
-    return this.properties.tags === undefined ? [] : this.properties.tags;
+  public get tags(): Array<Tag> {
+    return MutationEffects.applyTags(this, this.properties.tags === undefined ? [] : this.properties.tags);
   }
   public get cardDiscount() {
     return this.properties.cardDiscount;

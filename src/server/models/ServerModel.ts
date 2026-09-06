@@ -21,6 +21,7 @@ import {SpectatorModel} from '../../common/models/SpectatorModel';
 import {GameModel} from '../../common/models/GameModel';
 import {Turmoil} from '../turmoil/Turmoil';
 import {createPathfindersModel} from './PathfindersModel';
+import {createMutationMarketModel} from './MutationMarketModel';
 import {MoonModel} from '../../common/models/MoonModel';
 import {CardName} from '../../common/cards/CardName';
 import {AwardScorer} from '../awards/AwardScorer';
@@ -70,6 +71,7 @@ export class Server {
       lastSoloGeneration: game.lastSoloGeneration(),
       milestones: this.getMilestones(game),
       moon: this.getMoonModel(game),
+      mutationMarket: createMutationMarketModel(game),
       name: game.name,
       oceans: game.board.getOceanSpaces().length,
       oxygenLevel: game.getOxygenLevel(),
@@ -439,7 +441,7 @@ export class Server {
         deltaProject: options.deltaProjectExpansion,
         sillyfication: options.sillyficationExpansion,
         betterMars: options.betterMarsExpansion,
-        customCards: options.customCardsExpansion,
+        mutationMarkets: options.mutationMarketsExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

@@ -8,6 +8,10 @@ export enum RequirementType {
     GREENERY_LAST_ACTION = 'Greenery last action',
     CITIES = 'City',
     TAG = 'tag',
+    UNIQUE_TAGS = 'Unique tags',
+    EXPENSIVE_CARDS_PLAYED = 'Expensive cards played',
+    CHEAP_CARDS_PLAYED = 'Cheap cards played',
+    CARD_COST_STREAK = 'Card cost streak',
     PRODUCTION = 'production',
     REMOVED_PLANTS = 'Removed plants',
 

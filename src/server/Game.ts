@@ -69,6 +69,8 @@ import {IGame, Score} from './IGame';
 import {MarsBoard} from './boards/MarsBoard';
 import {UnderworldData} from './underworld/UnderworldData';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
+import {MutationMarkets} from './mutationmarkets/MutationMarkets';
+import {MutationMarketData} from './mutationmarkets/MutationMarketData';
 import {DeltaProjectExpansion} from './delta/DeltaProjectExpansion';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
@@ -160,6 +162,7 @@ export class Game implements IGame, Logger {
   public moonData: MoonData | undefined;
   public pathfindersData: PathfindersData | undefined;
   public underworldData: UnderworldData = UnderworldExpansion.initializeGameWithoutUnderworld();
+  public mutationMarketData: MutationMarketData | undefined;
   public inTurmoil: boolean = false;
 
   // Card-specific data
@@ -286,7 +289,7 @@ export class Game implements IGame, Logger {
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
-        customCards: partialOptions.customCardsExpansion ?? false,
+        mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -367,6 +370,10 @@ export class Game implements IGame, Logger {
     // Must configure this before solo placement.
     if (gameOptions.underworldExpansion) {
       game.underworldData = UnderworldExpansion.initialize(rng);
+    }
+
+    if (gameOptions.mutationMarketsExpansion) {
+      game.mutationMarketData = MutationMarkets.initialize(game);
     }
 
     // and 2 neutral cities and forests on board
@@ -532,6 +539,9 @@ export class Game implements IGame, Logger {
     };
     if (this.aresData !== undefined) {
       result.aresData = this.aresData;
+    }
+    if (this.mutationMarketData !== undefined) {
+      result.mutationMarketData = MutationMarkets.serialize(this.mutationMarketData);
     }
     if (this.clonedGamedId !== undefined) {
       result.clonedGamedId = this.clonedGamedId;
@@ -854,6 +864,7 @@ export class Game implements IGame, Logger {
 
     this.endGenerationForColonies();
     UnderworldExpansion.endGeneration(this);
+    MutationMarkets.onGenerationEnd(this);
 
     Turmoil.ifTurmoil(this, (turmoil) => {
       // this.phase = Phase.TURMOIL;
@@ -912,6 +923,10 @@ export class Game implements IGame, Logger {
         player.preservationProgram = true;
       }
       player.trThisGeneration = 0;
+      // MutationMarkets: Nested Mutation's cost-streak requirement only counts a run of
+      // cards played within the same generation.
+      player.cardCostStreak = 0;
+      player.previousPlayedCardCost = undefined;
       player.actionsTakenAtGenerationStart = player.actionsTakenThisGame;
       // Little Dutch Boy's blockade only lasts for the generation it was placed in.
       if (player.deltaProjectData) {
@@ -1209,6 +1224,7 @@ export class Game implements IGame, Logger {
     player.actionsTakenThisGame++;
     player.actionsTakenThisRound = 0;
 
+    MutationMarkets.resolveIfReturned(this, player);
     player.takeAction();
   }
 
@@ -1832,6 +1848,9 @@ export class Game implements IGame, Logger {
 
     if (d.underworldData !== undefined) {
       game.underworldData = d.underworldData;
+    }
+    if (d.mutationMarketData !== undefined && gameOptions.mutationMarketsExpansion === true) {
+      game.mutationMarketData = MutationMarkets.deserialize(d.mutationMarketData);
     }
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);

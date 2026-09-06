@@ -3,6 +3,7 @@ import {Blockhouse} from '../../../src/server/cards/sillyfication/Blockhouse';
 import {CorporateStronghold} from '../../../src/server/cards/base/CorporateStronghold';
 import {SmeltingPods} from '../../../src/server/cards/sillyfication/SmeltingPods';
 import {CityStandardProject} from '../../../src/server/cards/base/standardProjects/CityStandardProject';
+import {CardName} from '../../../src/common/cards/CardName';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {Payment} from '../../../src/common/inputs/Payment';
@@ -52,5 +53,34 @@ describe('Blockhouse', () => {
     // At the boosted value (4 each = 20) this would cover the cost of 15; at the
     // un-boosted value (2 each = 10) it should not.
     expect(() => player.checkPaymentAndPlayCard(buildingCard, Payment.of({steel: 5}))).to.throw();
+  });
+
+  it('makes the City standard project actable when only the boosted steel value covers its cost', () => {
+    const sp = new CityStandardProject();
+    player.steel = 7; // 7*2=14 (unboosted) is short of the 25 cost; 7*4=28 (boosted) covers it.
+    player.megaCredits = 0;
+
+    expect(sp.canAct(player)).is.false;
+
+    player.playedCards.push(card);
+    expect(sp.canAct(player)).is.true;
+  });
+
+  it('actually pays out at the boosted rate when playing the City standard project', () => {
+    player.playedCards.push(card);
+    player.steel = 7;
+    player.megaCredits = 0;
+
+    const spOption = player.getStandardProjectOption();
+    expect(spOption.cards.some((c) => c.name === CardName.CITY_STANDARD_PROJECT)).is.true;
+
+    const productionBefore = player.production.megacredits;
+    spOption.process({type: 'projectCard', card: CardName.CITY_STANDARD_PROJECT, payment: Payment.of({steel: 7})});
+
+    // The payment (7 steel, deducted synchronously in payAndExecute) and the production
+    // bump happen immediately; placing the city tile itself is a deferred action not
+    // resolved here.
+    expect(player.steel).to.eq(0);
+    expect(player.production.megacredits).to.eq(productionBefore + 1);
   });
 });

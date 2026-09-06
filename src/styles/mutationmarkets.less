@@ -1,0 +1,101 @@
+// MutationMarkets: the 3-row (mutation / project / mutation) board, and the green
+// "mutated" glow applied to a won card's changed stats wherever it's later rendered.
+
+@mm-card-width: 240px;
+
+.mutation-market {
+  margin: 20px 0;
+}
+
+.mutation-market-row {
+  display: grid;
+  grid-template-columns: repeat(6, @mm-card-width);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.mutation-market-project-slot {
+  position: relative;
+  overflow: hidden;
+}
+
+.mutation-market-mutation-slot {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom right, #cfd8dc, #90a4ae);
+  border-radius: 6px;
+  padding: 8px;
+  min-height: 60px;
+  .raised-bevel(3px);
+}
+
+.mutation-market-mutation-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.mutation-market-mutation-detail {
+  font-size: 12px;
+  color: #263238;
+}
+
+.mutation-market-inactive-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 30, 30, 0.55);
+  filter: grayscale(1);
+}
+
+.mutation-market-auction-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 12px;
+  color: white;
+  background: #37474f;
+  z-index: 2;
+}
+
+// Entrance animations: mutation cards slide in from the left, project cards from the right.
+@keyframes mutation-slide-in-left {
+  from { transform: translateX(-120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes mutation-slide-in-right {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.mutation-market-slot--entering-left {
+  animation: mutation-slide-in-left 0.6s ease-out;
+}
+.mutation-market-slot--entering-right {
+  animation: mutation-slide-in-right 0.6s ease-out;
+}
+
+// The green "mutated" glow, applied to a won card's changed stats wherever the card
+// renders (market, hand, tableau) via Card.vue's mutationHighlight/mutationAddedTag/
+// mutationVictoryPoints bindings.
+@keyframes mutation-glow {
+  0%, 100% { color: #1b5e20; }
+  50% { color: #69f0ae; }
+}
+.mutation-glow {
+  animation: mutation-glow 2s ease-in-out infinite;
+}
+.mutation-cost-glow .card-cost {
+  animation: mutation-glow 2s ease-in-out infinite;
+}
+.mutation-tag-glow {
+  display: inline-block;
+  animation: mutation-tag-glow 2s ease-in-out infinite;
+}
+@keyframes mutation-tag-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px #1b5e20); }
+  50% { filter: drop-shadow(0 0 6px #69f0ae); }
+}
+.mutation-vp-badge {
+  font-weight: bold;
+}

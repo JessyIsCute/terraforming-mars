@@ -21,7 +21,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   deltaProject: `${WIKI}/Delta-Project`,
   sillyfication: `${WIKI}/Community`,
   betterMars: `${WIKI}/Community`,
-  customCards: `${WIKI}/Community`,
+  mutationMarkets: `${WIKI}/Community`,
 };
 
 export const WIKI_URLS = {

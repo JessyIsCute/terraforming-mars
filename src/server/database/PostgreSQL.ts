@@ -16,11 +16,10 @@ import {parseInterned} from './parseInterned';
 import {LogMessage} from '@/common/logs/LogMessage';
 import {compressToBrotli, decompressFromBrotli} from './compression';
 import {MapLibraryEntry, MapLibraryEntryId, MapLibraryStatus} from '../../common/boards/MapLibraryEntry';
-import {CustomCardLibraryEntry, CustomCardEntryId, CustomCardStatus} from '../../common/cards/CustomCardLibraryEntry';
 
 type StoredSerializedGame = Omit<SerializedGame, 'gameOptions' | 'gameLog'> & {logLength: number};
 
-export const POSTGRESQL_TABLES = ['game', 'games', 'game_results', 'participants', 'completed_game', 'session', 'map_library', 'custom_card_library'] as const;
+export const POSTGRESQL_TABLES = ['game', 'games', 'game_results', 'participants', 'completed_game', 'session', 'map_library'] as const;
 
 const POSTGRES_TRIM_COUNT = stringToNumber(process.env.POSTGRES_TRIM_COUNT, 10);
 const DB_COMPRESS_ON_WRITE = stringToBoolean(process.env.DB_COMPRESS_ON_WRITE, false);
@@ -159,23 +158,12 @@ export class PostgreSQL implements IDatabase {
       created_time timestamp default now() not null,
       PRIMARY KEY (id));
 
-    /* The public custom card review queue shown on /cards. */
-    CREATE TABLE IF NOT EXISTS custom_card_library(
-      id varchar not null,
-      definition text not null,
-      share_code text not null,
-      submitted_by varchar not null,
-      status varchar not null,
-      created_time timestamp default now() not null,
-      PRIMARY KEY (id));
-
     CREATE INDEX IF NOT EXISTS games_i1 on games(save_id);
     CREATE INDEX IF NOT EXISTS games_i2 on games(created_time);
     CREATE INDEX IF NOT EXISTS participants_idx_ids on participants USING GIN (participants);
     CREATE INDEX IF NOT EXISTS completed_game_idx_completed_time on completed_game(completed_time);
     CREATE INDEX IF NOT EXISTS session_idx_expiration_time on session(expiration_time);
     CREATE INDEX IF NOT EXISTS map_library_idx_created_time on map_library(created_time);
-    CREATE INDEX IF NOT EXISTS custom_card_library_idx_created_time on custom_card_library(created_time);
     `;
     await this.client.query(sql);
 
@@ -614,47 +602,6 @@ export class PostgreSQL implements IDatabase {
       description: row.description,
       submittedBy: row.submitted_by,
       origin: row.origin,
-      status: row.status,
-      createdAt: row.created_time.getTime(),
-    };
-  }
-
-  public async listCustomCardLibraryEntries(): Promise<Array<CustomCardLibraryEntry>> {
-    const res = await this.client.query('SELECT * FROM custom_card_library ORDER BY created_time DESC');
-    return res.rows.map((row) => this.rowToCustomCardLibraryEntry(row));
-  }
-
-  public async getCustomCardLibraryEntry(id: CustomCardEntryId): Promise<CustomCardLibraryEntry | undefined> {
-    const res = await this.client.query('SELECT * FROM custom_card_library WHERE id = $1', [id]);
-    return res.rows.length === 0 ? undefined : this.rowToCustomCardLibraryEntry(res.rows[0]);
-  }
-
-  public async insertCustomCardLibraryEntry(entry: CustomCardLibraryEntry): Promise<void> {
-    await this.client.query(
-      'INSERT INTO custom_card_library (id, definition, share_code, submitted_by, status, created_time) VALUES($1, $2, $3, $4, $5, $6)',
-      [entry.id, JSON.stringify(entry.definition), entry.shareCode, entry.submittedBy, entry.status, new Date(entry.createdAt)]);
-  }
-
-  public async setCustomCardLibraryEntryStatus(id: CustomCardEntryId, status: CustomCardStatus): Promise<void> {
-    await this.client.query('UPDATE custom_card_library SET status = $1 WHERE id = $2', [status, id]);
-  }
-
-  public async updateCustomCardLibraryEntry(id: CustomCardEntryId, entry: CustomCardLibraryEntry): Promise<void> {
-    await this.client.query(
-      'UPDATE custom_card_library SET definition = $1, share_code = $2, submitted_by = $3, status = $4 WHERE id = $5',
-      [JSON.stringify(entry.definition), entry.shareCode, entry.submittedBy, entry.status, id]);
-  }
-
-  public async deleteCustomCardLibraryEntry(id: CustomCardEntryId): Promise<void> {
-    await this.client.query('DELETE FROM custom_card_library WHERE id = $1', [id]);
-  }
-
-  private rowToCustomCardLibraryEntry(row: any): CustomCardLibraryEntry {
-    return {
-      id: row.id,
-      definition: JSON.parse(row.definition),
-      shareCode: row.share_code,
-      submittedBy: row.submitted_by,
       status: row.status,
       createdAt: row.created_time.getTime(),
     };

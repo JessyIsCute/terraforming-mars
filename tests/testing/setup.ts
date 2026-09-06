@@ -34,13 +34,6 @@ const FAKE_DATABASE: IDatabase = {
   insertMapLibraryEntry: () => Promise.resolve(),
   setMapLibraryEntryStatus: () => Promise.resolve(),
   deleteMapLibraryEntry: () => Promise.resolve(),
-
-  listCustomCardLibraryEntries: () => Promise.resolve([]),
-  getCustomCardLibraryEntry: () => Promise.resolve(undefined),
-  insertCustomCardLibraryEntry: () => Promise.resolve(),
-  setCustomCardLibraryEntryStatus: () => Promise.resolve(),
-  updateCustomCardLibraryEntry: () => Promise.resolve(),
-  deleteCustomCardLibraryEntry: () => Promise.resolve(),
 };
 
 let databaseUnderTest: IDatabase = FAKE_DATABASE;

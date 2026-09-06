@@ -18,6 +18,7 @@ import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescr
 import {OneOrArray} from '../../common/utils/types';
 import {JSONValue} from '../../common/Types';
 import {IStandardProjectCard} from './IStandardProjectCard';
+import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {Warning} from '../../common/cards/Warning';
 import {Resource} from '../../common/Resource';
 import {Units} from '../../common/Units';
@@ -198,6 +199,10 @@ export interface ICard {
   onDelegateSent?(cardOwner: IPlayer, delegateOwner: IPlayer): void;
 
   readonly cost?: number; /** Used with IProjectCard and PreludeCard. */
+  /** The printed cost, before any MutationMarkets cost effect is folded in. Same as `cost` for an unmutated card. */
+  readonly baseCost?: number;
+  /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
+  mutations?: Array<AppliedMutation>;
   readonly type: CardType;
   readonly requirements: ReadonlyArray<CardRequirementDescriptor>;
   readonly metadata: CardMetadata;

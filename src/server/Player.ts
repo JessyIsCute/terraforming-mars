@@ -28,6 +28,8 @@ import {Priority} from './deferredActions/Priority';
 import {SelectPaymentDeferred} from './deferredActions/SelectPaymentDeferred';
 import {SelectProjectCardToPlay} from './inputs/SelectProjectCardToPlay';
 import {SelectOption} from './inputs/SelectOption';
+import {SelectAmount} from './inputs/SelectAmount';
+import {MutationMarkets} from './mutationmarkets/MutationMarkets';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -163,6 +165,13 @@ export class Player implements IPlayer {
   public removingPlayers: Array<PlayerId> = [];
   // Warmonger
   public warmongerCards: number = 0;
+  // MutationMarkets: Gigantic Undertakings / Mini Mutation requirements
+  public expensiveCardsPlayed: number = 0;
+  public cheapCardsPlayed: number = 0;
+  // MutationMarkets: Nested Mutation requirement -- length of the current same-generation
+  // run of cards each played for less than the previous one; reset each generation.
+  public cardCostStreak: number = 0;
+  public previousPlayedCardCost: number | undefined = undefined;
   // For Playwrights corp.
   // removedFromPlayCards is a bit of a misname: it's a temporary storage for
   // cards that provide 'next card' discounts. This will clear between turns.
@@ -885,6 +894,18 @@ export class Player implements IPlayer {
     if (selectedCard.type !== CardType.PROXY) {
       this.lastCardPlayed = selectedCard.name;
       this.game.log('${0} played ${1}', (b) => b.player(this).card(selectedCard));
+      if (selectedCard.cost >= 25) {
+        this.expensiveCardsPlayed++;
+      }
+      if (selectedCard.cost < 7) {
+        this.cheapCardsPlayed++;
+      }
+      if (this.previousPlayedCardCost !== undefined && selectedCard.cost < this.previousPlayedCardCost) {
+        this.cardCostStreak++;
+      } else {
+        this.cardCostStreak = 1;
+      }
+      this.previousPlayedCardCost = selectedCard.cost;
     }
 
     // Play the card
@@ -914,6 +935,13 @@ export class Player implements IPlayer {
       } else if (preludeCardIndex !== -1) {
         this.preludeCardsInHand.splice(preludeCardIndex, 1);
       }
+    }
+
+    // Nested Mutation: must run after the removal above -- a copy granted here shares
+    // the same CardName as `selectedCard`, and the removal step matches by name, so
+    // granting it any earlier would have it immediately stripped back out of hand.
+    if (selectedCard.type !== CardType.PROXY) {
+      MutationMarkets.maybeGrantNestedCopy(this, selectedCard);
     }
 
     switch (cardAction) {
@@ -1663,6 +1691,27 @@ export class Player implements IPlayer {
       action.options.push(coloniesTradeAction);
     }
 
+    // MutationMarkets: bid on a market project card
+    const biddableSlots = MutationMarkets.biddableSlots(this.game, this);
+    if (biddableSlots.length > 0 && this.game.mutationMarketData !== undefined) {
+      const marketData = this.game.mutationMarketData;
+      const bidOptions = new OrOptions().setTitle('Bid on a MutationMarkets card');
+      for (const slotIndex of biddableSlots) {
+        const card = marketData.projectSlots[slotIndex];
+        if (card === undefined) {
+          continue;
+        }
+        const nextBid = MutationMarkets.nextBidFor(marketData, slotIndex);
+        const existingEscrow = marketData.projectAuctions[slotIndex]?.escrow[this.id] ?? 0;
+        bidOptions.options.push(new SelectAmount(`Bid on ${card.name}`, 'Bid', nextBid, this.megaCredits + existingEscrow)
+          .andThen((amount) => {
+            MutationMarkets.placeBid(this.game, this, slotIndex, amount);
+            return undefined;
+          }));
+      }
+      action.options.push(bidOptions);
+    }
+
     // Add delegates
     Turmoil.ifTurmoil(this.game, (turmoil) => {
       const input = turmoil.getSendDelegateInput(this);
@@ -1867,6 +1916,10 @@ export class Player implements IPlayer {
       // Lawsuit
       removingPlayers: this.removingPlayers,
       warmongerCards: this.warmongerCards,
+      expensiveCardsPlayed: this.expensiveCardsPlayed,
+      cheapCardsPlayed: this.cheapCardsPlayed,
+      cardCostStreak: this.cardCostStreak,
+      previousPlayedCardCost: this.previousPlayedCardCost,
       // Playwrights
       removedFromPlayCards: this.removedFromPlayCards.map(toName),
       // Standard Technology: Underworld
@@ -1945,6 +1998,10 @@ export class Player implements IPlayer {
     }));
     player.removingPlayers = d.removingPlayers;
     player.warmongerCards = d.warmongerCards ?? 0;
+    player.expensiveCardsPlayed = d.expensiveCardsPlayed ?? 0;
+    player.cheapCardsPlayed = d.cheapCardsPlayed ?? 0;
+    player.cardCostStreak = d.cardCostStreak ?? 0;
+    player.previousPlayedCardCost = d.previousPlayedCardCost;
     player.tags.extraScienceTags = d.scienceTagCount;
     player.tags.extraPlantTags = d.plantTagCount;
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;

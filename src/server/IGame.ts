@@ -32,6 +32,7 @@ import {Tile} from './Tile';
 import {Logger} from './logs/Logger';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {UnderworldData} from './underworld/UnderworldData';
+import {MutationMarketData} from './mutationmarkets/MutationMarketData';
 import {OrOptions} from './inputs/OrOptions';
 import {IStandardProjectCard} from './cards/IStandardProjectCard';
 
@@ -89,6 +90,7 @@ export interface IGame extends Logger {
   moonData: MoonData | undefined;
   pathfindersData: PathfindersData | undefined;
   underworldData: UnderworldData;
+  mutationMarketData: MutationMarketData | undefined;
 
   // Card-specific data
 

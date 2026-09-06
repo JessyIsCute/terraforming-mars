@@ -35,6 +35,11 @@
 
   <DeltaProjectBoard v-if="game.gameOptions.expansions.deltaProject" :players="players"/>
 
+  <template v-if="game.mutationMarket">
+    <a class="hotkey-target"></a>
+    <MutationMarket :market="game.mutationMarket"/>
+  </template>
+
   <div v-if="players.length > 1" class="player_home_block--milestones-and-awards">
     <a class="hotkey-target"></a>
     <Milestones :milestones="game.milestones" />
@@ -55,6 +60,7 @@ import Awards from '@/client/components/Awards.vue';
 import Turmoil from '@/client/components/turmoil/Turmoil.vue';
 import MoonBoard from '@/client/components/moon/MoonBoard.vue';
 import PlanetaryTracks from '@/client/components/pathfinders/PlanetaryTracks.vue';
+import MutationMarket from '@/client/components/mutationmarkets/MutationMarket.vue';
 import {TileView} from './board/TileView';
 import {scrollToSpace} from '@/client/utils/boardScroll';
 
@@ -83,6 +89,7 @@ export default defineComponent({
     Turmoil,
     MoonBoard,
     PlanetaryTracks,
+    MutationMarket,
   },
   methods: {
     highlightSpace(spaceId: SpaceId) {
