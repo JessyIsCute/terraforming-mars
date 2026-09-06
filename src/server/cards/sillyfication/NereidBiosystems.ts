@@ -29,9 +29,11 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
             ce.effect('Your Jovian tags also count as microbe tags.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.tag(Tag.MICROBE);
             });
+            ce.br;
             ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
             });
+            ce.br;
             ce.effect('When paying for a card with a Jovian tag, microbes here may be used as 2 M€ each.', (eb) => {
               eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE).equals().megacredits(2);
             });

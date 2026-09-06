@@ -35,6 +35,7 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
             cea.effect('When you add an animal to another card, add an animal to this card.', (eb) => {
               eb.resource(CardResource.ANIMAL, {all}).asterix().startEffect.resource(CardResource.ANIMAL);
             });
+            cea.br;
             cea.action('Remove 1 animal from any of your cards to gain 1 M€ for every 2 animals on this card.', (ab) => {
               ab.resource(CardResource.ANIMAL).startAction.megacredits(1).slash().resource(CardResource.ANIMAL, {amount: 2});
             });

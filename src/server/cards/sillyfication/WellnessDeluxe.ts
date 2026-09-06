@@ -41,6 +41,7 @@ export class WellnessDeluxe extends CorporationCard implements ICorporationCard 
               eb.oceans(1, {size: Size.SMALL}).colon().production((pb) => pb.heat(1)).nbsp;
               eb.oceans(1, {size: Size.SMALL, all}).startEffect.heat(2, {digit});
             });
+            ce.br;
             ce.effect('When you raise the temperature, gain 1 M€.', (eb) => {
               eb.temperature(1).startEffect;
               eb.megacredits(1);
