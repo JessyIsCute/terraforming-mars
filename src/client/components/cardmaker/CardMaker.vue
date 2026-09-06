@@ -46,11 +46,13 @@
         </fieldset>
 
         <fieldset class="card-maker-fieldset">
-          <legend>{{ 'Tags (max ' + MAX_CUSTOM_CARD_TAGS + ')' }}</legend>
-          <label v-for="t in pickableTags" :key="t" class="card-maker-check">
-            <input type="checkbox" :value="t" v-model="tags" :disabled="!tags.includes(t) && tags.length >= MAX_CUSTOM_CARD_TAGS">
-            <span>{{ t }}</span>
-          </label>
+          <legend>{{ 'Tags (max ' + MAX_CUSTOM_CARD_TAGS + ' total -- duplicates allowed)' }}</legend>
+          <div v-for="t in pickableTags" :key="t" class="card-maker-tag-stepper">
+            <span class="card-maker-tag-stepper-label">{{ t }}</span>
+            <button type="button" @click="removeTag(t)" :disabled="tagCount(t) === 0" title="Remove one">−</button>
+            <span class="card-maker-tag-stepper-count">{{ tagCount(t) }}</span>
+            <button type="button" @click="addTag(t)" :disabled="tags.length >= MAX_CUSTOM_CARD_TAGS" title="Add one">+</button>
+          </div>
         </fieldset>
 
         <fieldset class="card-maker-fieldset">
@@ -183,17 +185,26 @@
 
         <fieldset class="card-maker-fieldset">
           <legend>{{ 'Icons (max ' + MAX_CUSTOM_CARD_RENDER_ROWS + ' rows of ' + MAX_CUSTOM_CARD_RENDER_ITEMS_PER_ROW + ')' }}</legend>
+          <p class="card-maker-note" v-i18n>Drag an icon by its ⠿ handle to reorder it within a row, or drop it on another row to move it there.</p>
           <div v-for="(row, ri) in rows" :key="ri" class="card-maker-row">
             <div class="card-maker-row-header">
               <strong>{{ 'Row ' + (ri + 1) }}</strong>
               <button type="button" @click="removeRow(ri)" title="Remove row">✕ row</button>
             </div>
-            <div class="card-maker-row-items">
-              <span v-for="(item, ii) in row" :key="ii" class="card-maker-chip">
+            <div class="card-maker-row-items" @dragover.prevent @drop="onChipDrop(ri, row.length)">
+              <span
+                v-for="(item, ii) in row" :key="ii" class="card-maker-chip"
+                draggable="true"
+                @dragstart="onChipDragStart(ri, ii)"
+                @dragend="onChipDragEnd"
+                @dragover.prevent
+                @drop.stop="onChipDrop(ri, ii)"
+              >
+                <span class="card-maker-chip-handle" title="Drag to reorder">⠿</span>
                 {{ itemLabel(item) }}
                 <button type="button" @click="row.splice(ii, 1)" title="Remove icon">✕</button>
               </span>
-              <span v-if="row.length === 0" class="card-maker-note">{{ '(empty row)' }}</span>
+              <span v-if="row.length === 0" class="card-maker-note">{{ '(empty row -- drag icons here)' }}</span>
             </div>
             <div class="card-maker-add-item">
               <select v-model="rowDrafts[ri].kind">
@@ -284,7 +295,9 @@
 
       <div class="card-maker-preview">
         <h3 v-i18n>Preview</h3>
-        <Card :card="previewCardModel" :key="previewKey" auto-tall/>
+        <div class="card-maker-preview-zoom">
+          <Card :card="previewCardModel" :key="previewKey" auto-tall/>
+        </div>
       </div>
     </div>
   </div>
@@ -344,6 +357,22 @@ const CURATED_SYMBOL_TYPES: ReadonlyArray<CardRenderSymbolType> = [
   CardRenderSymbolType.EQUALS, CardRenderSymbolType.ASTERIX, CardRenderSymbolType.EMPTY, CardRenderSymbolType.NBSP,
 ];
 const CURATED_TILE_TYPES: ReadonlyArray<TileType> = [TileType.CITY, TileType.GREENERY, TileType.OCEAN];
+// Mirrors CardRenderSymbol.ts's server-side factory: these symbols are drawn as a graphic
+// (isIcon:true) rather than their literal text (e.g. an arrow icon, not the string "->").
+// Getting this wrong is exactly the "arrow renders as both the graphic AND weird text" bug.
+const SYMBOL_IS_ICON: ReadonlySet<CardRenderSymbolType> = new Set([
+  CardRenderSymbolType.PLUS, CardRenderSymbolType.MINUS, CardRenderSymbolType.ARROW, CardRenderSymbolType.NBSP,
+]);
+const SYMBOL_IS_SUPERSCRIPT: ReadonlySet<CardRenderSymbolType> = new Set([
+  CardRenderSymbolType.BRACKET_OPEN, CardRenderSymbolType.BRACKET_CLOSE,
+]);
+// Tags that only make sense alongside a specific expansion -- adding one of these for the
+// first time auto-enables that expansion's compatibility checkbox (never auto-disables it).
+const TAG_IMPLIES_EXPANSION: Partial<Record<Tag, Expansion>> = {
+  [Tag.CRIME]: 'underworld',
+  [Tag.MOON]: 'moon',
+  [Tag.MARS]: 'pathfinders',
+};
 const SIZES: ReadonlyArray<Size> = [Size.TINY, Size.SMALL, Size.MEDIUM, Size.LARGE];
 const ALL_CARD_RESOURCES: ReadonlyArray<CardResource> = Object.values(CardResource);
 const PLACEMENT_TYPES: ReadonlyArray<string> = ['land', 'ocean', 'greenery', 'city'];
@@ -434,6 +463,7 @@ export default defineComponent({
 
       rows: [[]] as Array<Array<ComposerItem>>,
       rowDrafts: [blankDraft()] as Array<ComposerDraft>,
+      dragSource: null as {row: number, index: number} | null,
 
       loadInput: '',
       loadError: '',
@@ -636,6 +666,55 @@ export default defineComponent({
       default: return 20;
       }
     },
+    tagCount(t: Tag): number {
+      return this.tags.filter((x) => x === t).length;
+    },
+    addTag(t: Tag): void {
+      if (this.tags.length >= MAX_CUSTOM_CARD_TAGS) {
+        return;
+      }
+      const isFirst = !this.tags.includes(t);
+      this.tags.push(t);
+      if (isFirst) {
+        const requiredExpansion = TAG_IMPLIES_EXPANSION[t];
+        if (requiredExpansion !== undefined && !this.compatibility.includes(requiredExpansion)) {
+          this.compatibility.push(requiredExpansion);
+        }
+      }
+    },
+    removeTag(t: Tag): void {
+      const idx = this.tags.indexOf(t);
+      if (idx >= 0) {
+        this.tags.splice(idx, 1);
+      }
+    },
+    onChipDragStart(row: number, index: number): void {
+      this.dragSource = {row, index};
+    },
+    onChipDragEnd(): void {
+      this.dragSource = null;
+    },
+    onChipDrop(targetRow: number, targetIndex: number): void {
+      const source = this.dragSource;
+      this.dragSource = null;
+      if (source === null || (source.row === targetRow && source.index === targetIndex)) {
+        return;
+      }
+      const sourceArr = this.rows[source.row];
+      const destArr = this.rows[targetRow];
+      if (sourceArr === undefined || destArr === undefined) {
+        return;
+      }
+      if (source.row !== targetRow && destArr.length >= MAX_CUSTOM_CARD_RENDER_ITEMS_PER_ROW) {
+        return; // Destination row is full -- leave the dragged icon where it was.
+      }
+      const [moved] = sourceArr.splice(source.index, 1);
+      let insertIndex = targetIndex;
+      if (source.row === targetRow && source.index < targetIndex) {
+        insertIndex -= 1; // The splice above already shifted everything after it down by one.
+      }
+      destArr.splice(Math.min(Math.max(insertIndex, 0), destArr.length), 0, moved);
+    },
     nonZeroUnits(units: Record<Resource, number | undefined>): Record<string, number> | undefined {
       const out: Record<string, number> = {};
       for (const r of ALL_RESOURCES) {
@@ -650,8 +729,16 @@ export default defineComponent({
       switch (item.kind) {
       case 'text':
         return item.text;
-      case 'symbol':
-        return {is: 'symbol', type: item.type, size: item.size} as ICardRenderSymbol;
+      case 'symbol': {
+        const out: ICardRenderSymbol = {is: 'symbol', type: item.type, size: item.size};
+        if (SYMBOL_IS_ICON.has(item.type)) {
+          out.isIcon = true;
+        }
+        if (SYMBOL_IS_SUPERSCRIPT.has(item.type)) {
+          out.isSuperscript = true;
+        }
+        return out;
+      }
       case 'tile':
         return {is: 'tile', tile: item.tile} as ICardRenderTile;
       case 'item': {
@@ -950,10 +1037,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   }
 
   .card-maker-preview {
-    flex: 1;
-    min-width: 260px;
+    flex: 3;
+    min-width: 620px;
     position: sticky;
     top: 12px;
+  }
+  .card-maker-preview-zoom {
+    // The real Card component renders at its normal (small) size; blow it up so the preview
+    // dominates the screen while editing. `zoom` (not `transform: scale`) reserves real layout
+    // space for the enlarged card, matching the pattern MutationMarket.vue already uses.
+    zoom: 2.5;
+    width: fit-content;
   }
 
   fieldset.card-maker-fieldset {
@@ -987,6 +1081,28 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     align-items: center;
     gap: 4px;
     font-size: 12px;
+  }
+
+  .card-maker-tag-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    padding: 2px 0;
+    button {
+      width: 22px;
+      height: 22px;
+      line-height: 1;
+      padding: 0;
+    }
+  }
+  .card-maker-tag-stepper-label {
+    flex: 1;
+  }
+  .card-maker-tag-stepper-count {
+    min-width: 16px;
+    text-align: center;
+    font-weight: bold;
   }
 
   .card-maker-note {
@@ -1043,6 +1159,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     border-radius: 10px;
     padding: 2px 8px;
     font-size: 11px;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  .card-maker-chip-handle {
+    color: #777;
+    font-size: 12px;
   }
   .card-maker-add-item {
     display: flex;

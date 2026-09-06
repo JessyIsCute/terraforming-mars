@@ -42,6 +42,21 @@ describe('curatedCardRenderData', () => {
     expect(isCuratedRenderData(renderData)).is.true;
   });
 
+  it('accepts a symbol with isIcon:true (an arrow rendered as a graphic, not "->" text)', () => {
+    const renderData = {is: 'root', rows: [[{is: 'symbol', type: CardRenderSymbolType.ARROW, size: Size.SMALL, isIcon: true}]]};
+    expect(isCuratedRenderData(renderData)).is.true;
+  });
+
+  it('accepts a symbol with isSuperscript:true (e.g. a raised bracket)', () => {
+    const renderData = {is: 'root', rows: [[{is: 'symbol', type: CardRenderSymbolType.BRACKET_OPEN, isSuperscript: true}]]};
+    expect(isCuratedRenderData(renderData)).is.true;
+  });
+
+  it('rejects isIcon set to a non-true value', () => {
+    const renderData = {is: 'root', rows: [[{is: 'symbol', type: CardRenderSymbolType.ARROW, isIcon: false}]]};
+    expect(isCuratedRenderData(renderData)).is.false;
+  });
+
   it('accepts a curated tile', () => {
     const renderData = {is: 'root', rows: [[{is: 'tile', tile: TileType.GREENERY}]]};
     expect(isCuratedRenderData(renderData)).is.true;

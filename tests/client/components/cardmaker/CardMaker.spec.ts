@@ -7,6 +7,7 @@ import {blankCustomCard} from '@/common/cards/CustomCardDefinition';
 import {CardType} from '@/common/cards/CardType';
 import {Tag} from '@/common/cards/Tag';
 import {CardRenderItemType} from '@/common/cards/render/CardRenderItemType';
+import {CardRenderSymbolType} from '@/common/cards/render/CardRenderSymbolType';
 import {ICardRenderItem} from '@/common/cards/render/Types';
 import {CustomCardLibraryEntry} from '@/common/cards/CustomCardLibraryEntry';
 
@@ -36,6 +37,64 @@ describe('CardMaker', () => {
     expect(decoded.cardName).eq('My Card');
     expect(decoded.cost).eq(12);
     expect(decoded.tags).deep.eq([Tag.SPACE]);
+  });
+
+  it('addTag allows the same tag more than once, up to the cap', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.SPACE);
+    vm.addTag(Tag.SPACE);
+    await wrapper.vm.$nextTick();
+    expect(vm.tags).to.deep.eq([Tag.SPACE, Tag.SPACE]);
+    expect(vm.tagCount(Tag.SPACE)).eq(2);
+  });
+
+  it('removeTag removes only one instance of a duplicated tag', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.SPACE);
+    vm.addTag(Tag.SPACE);
+    vm.removeTag(Tag.SPACE);
+    await wrapper.vm.$nextTick();
+    expect(vm.tags).to.deep.eq([Tag.SPACE]);
+  });
+
+  it('addTag stops at MAX_CUSTOM_CARD_TAGS even for a single repeated tag', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    for (let i = 0; i < 10; i++) {
+      vm.addTag(Tag.SPACE);
+    }
+    expect(vm.tags.length).eq(vm.MAX_CUSTOM_CARD_TAGS);
+  });
+
+  it('adding the Crime tag for the first time auto-enables Underworld compatibility', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    expect(vm.compatibility).to.deep.eq([]);
+    vm.addTag(Tag.CRIME);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.include('underworld');
+  });
+
+  it('adding the Moon tag auto-enables Moon compatibility, and Mars auto-enables Pathfinders', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.MOON);
+    vm.addTag(Tag.MARS);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.include('moon');
+    expect(vm.compatibility).to.include('pathfinders');
+  });
+
+  it('does not duplicate an auto-enabled compatibility on a second copy of the tag, and does not remove it when the tag is removed', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.CRIME);
+    vm.addTag(Tag.CRIME);
+    vm.removeTag(Tag.CRIME);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility.filter((e: string) => e === 'underworld')).to.deep.eq(['underworld']);
   });
 
   it('a curated stock effect becomes part of the behavior', async () => {
@@ -84,6 +143,69 @@ describe('CardMaker', () => {
     await wrapper.vm.$nextTick();
 
     expect(vm.renderData.rows).to.deep.eq([['max 4']]);
+  });
+
+  it('an added arrow symbol renders as the graphic (isIcon:true), not the literal "->" text', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.rowDrafts[0].kind = 'symbol';
+    vm.rowDrafts[0].symbolType = CardRenderSymbolType.ARROW;
+    vm.addItemToRow(0);
+    await wrapper.vm.$nextTick();
+
+    expect(vm.renderData.rows[0][0]).to.deep.eq({is: 'symbol', type: CardRenderSymbolType.ARROW, size: 'M', isIcon: true});
+  });
+
+  it('an added OR symbol has no isIcon (it legitimately renders as literal "OR" text)', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.rowDrafts[0].kind = 'symbol';
+    vm.rowDrafts[0].symbolType = CardRenderSymbolType.OR;
+    vm.addItemToRow(0);
+    await wrapper.vm.$nextTick();
+
+    expect(vm.renderData.rows[0][0]).to.deep.eq({is: 'symbol', type: CardRenderSymbolType.OR, size: 'M'});
+  });
+
+  it('reorders icons within a row via drag and drop', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.rows[0] = [{kind: 'text', text: 'a'}, {kind: 'text', text: 'b'}, {kind: 'text', text: 'c'}];
+    vm.onChipDragStart(0, 0); // drag "a"
+    vm.onChipDrop(0, 2); // ...to before index 2 ("c")
+    await wrapper.vm.$nextTick();
+
+    expect(vm.rows[0].map((i: any) => i.text)).to.deep.eq(['b', 'a', 'c']);
+    expect(vm.dragSource).to.be.null;
+  });
+
+  it('moves an icon into a different row via drag and drop', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addRow(); // rowDrafts must stay in sync with rows, so grow it via the real method
+    vm.rows[0] = [{kind: 'text', text: 'a'}];
+    vm.rows[1] = [{kind: 'text', text: 'b'}];
+    vm.onChipDragStart(0, 0); // drag "a" out of row 0
+    vm.onChipDrop(1, 1); // ...append to end of row 1
+    await wrapper.vm.$nextTick();
+
+    expect(vm.rows[0]).to.deep.eq([]);
+    expect(vm.rows[1].map((i: any) => i.text)).to.deep.eq(['b', 'a']);
+  });
+
+  it('drag and drop does nothing dropping into an already-full different row', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const fullRow = new Array(vm.MAX_CUSTOM_CARD_RENDER_ITEMS_PER_ROW).fill(0).map((_, i) => ({kind: 'text', text: `x${i}`}));
+    vm.addRow();
+    vm.rows[0] = [{kind: 'text', text: 'a'}];
+    vm.rows[1] = fullRow;
+    vm.onChipDragStart(0, 0);
+    vm.onChipDrop(1, 0);
+    await wrapper.vm.$nextTick();
+
+    expect(vm.rows[0].map((i: any) => i.text)).to.deep.eq(['a']);
+    expect(vm.rows[1].length).eq(vm.MAX_CUSTOM_CARD_RENDER_ITEMS_PER_ROW);
   });
 
   it('adding a row is capped at MAX_CUSTOM_CARD_RENDER_ROWS', async () => {

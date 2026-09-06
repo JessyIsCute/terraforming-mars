@@ -70,7 +70,7 @@ const TAGS: ReadonlySet<Tag> = new Set(ALL_TAGS);
 const RESOURCES: ReadonlySet<string> = new Set(Object.values(CardResource));
 
 const ITEM_KEYS: ReadonlySet<string> = new Set(['is', 'type', 'amount', 'size', 'showDigit', 'amountInside', 'tag', 'resource']);
-const SYMBOL_KEYS: ReadonlySet<string> = new Set(['is', 'type', 'size']);
+const SYMBOL_KEYS: ReadonlySet<string> = new Set(['is', 'type', 'size', 'isIcon', 'isSuperscript']);
 const TILE_KEYS: ReadonlySet<string> = new Set(['is', 'tile']);
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -122,6 +122,12 @@ function isValidSymbol(value: Record<string, unknown>): boolean {
     return false;
   }
   if (typeof value.type !== 'string' || !SYMBOL_TYPES.has(value.type)) {
+    return false;
+  }
+  if (value.isIcon !== undefined && value.isIcon !== true) {
+    return false;
+  }
+  if (value.isSuperscript !== undefined && value.isSuperscript !== true) {
     return false;
   }
   return isValidSize(value.size);
