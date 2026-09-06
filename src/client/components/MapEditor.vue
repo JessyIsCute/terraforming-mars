@@ -128,7 +128,7 @@
                 :key="i"
                 class="map-editor-hex-bonus"
                 :class="'board-space-bonus--' + bonusCss(item.bonus)"
-              ><b v-if="item.count > 1" class="map-editor-hex-bonus-count">{{ item.count }}</b></i>
+              ><b v-if="item.bonus === SpaceBonus.MEGACREDITS" class="map-editor-hex-bonus-count">{{ item.count }}</b></i>
             </span>
           </button>
         </div>
@@ -309,6 +309,9 @@ export default defineComponent({
   computed: {
     BoardName(): typeof BoardName {
       return BoardName;
+    },
+    SpaceBonus(): typeof SpaceBonus {
+      return SpaceBonus;
     },
     trackKeys(): Array<'temperature' | 'oxygen' | 'venus'> {
       return ['temperature', 'oxygen', 'venus'];
@@ -714,20 +717,20 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     background-position: center !important;
     background-size: contain !important;
   }
+  // Sits directly on top of the coin icon (matching Bonus.vue's board-space-bonus-count),
+  // rather than as a corner badge.
   .map-editor-hex-bonus-count {
     position: absolute;
-    right: -3px;
-    bottom: -3px;
-    min-width: 8px;
-    padding: 0 1px;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 8px;
-    line-height: 8px;
+    line-height: 1;
     font-style: normal;
     font-weight: bold;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.75);
-    border-radius: 5px;
-    text-align: center;
+    color: black;
+    text-shadow: 0 0 2px white, 0 0 2px white;
   }
 
   .map-editor-warnings {

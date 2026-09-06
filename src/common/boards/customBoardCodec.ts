@@ -12,6 +12,7 @@ import {
 import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig, ParameterBonus, ParameterTrack} from '../GlobalParameterConfig';
 import {milestoneNames, MilestoneName} from '../ma/MilestoneName';
 import {awardNames, AwardName} from '../ma/AwardName';
+import {bytesToBase64url, base64urlToBytes} from '../utils/base64url';
 
 const PREFIX = 'TMB3';
 const FORMAT_VERSION = 3;
@@ -91,49 +92,6 @@ class ByteReader {
   atEnd(): boolean {
     return this.pos >= this.bytes.length;
   }
-}
-
-// --- base64url (no padding), dependency-free ---------------------------------------------
-
-const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-
-function bytesToBase64url(bytes: Uint8Array): string {
-  let out = '';
-  for (let i = 0; i < bytes.length; i += 3) {
-    const b0 = bytes[i];
-    const b1 = i + 1 < bytes.length ? bytes[i + 1] : 0;
-    const b2 = i + 2 < bytes.length ? bytes[i + 2] : 0;
-    const triple = (b0 << 16) | (b1 << 8) | b2;
-    out += B64[(triple >> 18) & 63] + B64[(triple >> 12) & 63];
-    if (i + 1 < bytes.length) {
-      out += B64[(triple >> 6) & 63];
-    }
-    if (i + 2 < bytes.length) {
-      out += B64[triple & 63];
-    }
-  }
-  return out;
-}
-
-function base64urlToBytes(s: string): Uint8Array {
-  const bytes: Array<number> = [];
-  for (let i = 0; i < s.length; i += 4) {
-    const c0 = B64.indexOf(s[i]);
-    const c1 = B64.indexOf(s[i + 1]);
-    const c2 = i + 2 < s.length ? B64.indexOf(s[i + 2]) : -1;
-    const c3 = i + 3 < s.length ? B64.indexOf(s[i + 3]) : -1;
-    if (c0 < 0 || c1 < 0) {
-      throw new CustomBoardCodecError('Invalid character in map code');
-    }
-    bytes.push((c0 << 2) | (c1 >> 4));
-    if (c2 >= 0) {
-      bytes.push(((c1 & 15) << 4) | (c2 >> 2));
-    }
-    if (c3 >= 0) {
-      bytes.push(((c2 & 3) << 6) | c3);
-    }
-  }
-  return Uint8Array.from(bytes);
 }
 
 // --- track encode/decode --------------------------------------------------------------------
@@ -260,7 +218,13 @@ export function decodeCustomBoard(code: string): CustomBoardDefinition {
   if (!trimmed.startsWith(PREFIX)) {
     throw new CustomBoardCodecError(`Map code must start with ${PREFIX}`);
   }
-  const r = new ByteReader(base64urlToBytes(trimmed.slice(PREFIX.length)));
+  let bytes: Uint8Array;
+  try {
+    bytes = base64urlToBytes(trimmed.slice(PREFIX.length));
+  } catch (e) {
+    throw new CustomBoardCodecError('Invalid character in map code');
+  }
+  const r = new ByteReader(bytes);
 
   const formatVersion = r.u8();
   if (formatVersion !== FORMAT_VERSION) {

@@ -7,6 +7,8 @@ import {SessionId} from '../auth/Session';
 import {GameLoader} from '../database/GameLoader';
 import {ApiCloneableGame} from '../routes/ApiCloneableGame';
 import {ApiCreateGame} from '../routes/ApiCreateGame';
+import {ApiCustomCardLibrary} from '../routes/ApiCustomCardLibrary';
+import {ApiCustomCardLibraryReview} from '../routes/ApiCustomCardLibraryReview';
 import {ApiGame} from '../routes/ApiGame';
 import {ApiGameHistory} from '../routes/ApiGameHistory';
 import {ApiGameLogs} from '../routes/ApiGameLogs';
@@ -107,6 +109,9 @@ const handlers: Map<string, IHandler> = new Map(
     [paths.API_WAITING_FOR, ApiWaitingFor.INSTANCE],
     [paths.AUTOPASS, Autopass.INSTANCE],
     [paths.CARDS, ServeApp.INSTANCE],
+    [paths.CUSTOM_CARD_MAKER, ServeApp.INSTANCE],
+    [paths.API_CUSTOM_CARD_LIBRARY, ApiCustomCardLibrary.INSTANCE],
+    [paths.API_CUSTOM_CARD_LIBRARY_REVIEW, ApiCustomCardLibraryReview.INSTANCE],
     [paths.END_GAME_LOG, EndGameLog.INSTANCE],
     ['favicon.ico', ServeAsset.INSTANCE],
     [paths.GAME, GameHandler.INSTANCE],

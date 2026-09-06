@@ -6,7 +6,7 @@ import MutationMarketMutationSlot from '@/client/components/mutationmarkets/Muta
 import {MutationMarketMutationSlotModel} from '@/common/models/MutationMarketModel';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 
-function slotFor(mutation: MutationName, active = true): MutationMarketMutationSlotModel {
+function slotFor(mutation: MutationName, active = true): NonNullable<MutationMarketMutationSlotModel> {
   return {mutation, active, minimumBid: 2};
 }
 

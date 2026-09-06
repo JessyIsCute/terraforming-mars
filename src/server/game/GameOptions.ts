@@ -47,6 +47,7 @@ export type GameOptions = {
   deltaProjectExpansion: boolean;
   sillyficationExpansion: boolean;
   betterMarsExpansion: boolean;
+  customCardsExpansion: boolean;
   mutationMarketsExpansion: boolean;
 
   expansions: Record<Expansion, boolean>,
@@ -124,6 +125,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     deltaProject: false,
     sillyfication: false,
     betterMars: false,
+    customCards: false,
     mutationMarkets: false,
   },
   fastModeOption: false,
@@ -158,6 +160,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   deltaProjectExpansion: false,
   sillyficationExpansion: false,
   betterMarsExpansion: false,
+  customCardsExpansion: false,
   mutationMarketsExpansion: false,
   undoOption: false,
   venusNextExtension: false,
