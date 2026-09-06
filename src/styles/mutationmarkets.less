@@ -1,7 +1,7 @@
 // MutationMarkets: the 3-row (mutation / project / mutation) board, and the green
 // "mutated" glow applied to a won card's changed stats wherever it's later rendered.
 
-@mm-card-width: 240px;
+@mm-card-width: 120px;
 
 .mutation-market {
   margin: 20px 0;
@@ -10,33 +10,99 @@
 .mutation-market-row {
   display: grid;
   grid-template-columns: repeat(6, @mm-card-width);
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+// Project cards are shown at half scale with all hover/interaction disabled -- this is a
+// read-only preview of the market, not a hand of playable cards. `zoom` (not `transform:
+// scale`, which repaints but doesn't reflow) shrinks both the paint AND the layout box
+// together, so the grid cell doesn't need separately-computed dimensions.
+.mutation-market-card-scale-wrapper {
+  zoom: 0.5;
+  pointer-events: none;
 }
 
 .mutation-market-project-slot {
   position: relative;
-  overflow: hidden;
+}
+
+.mutation-market-preview-badges {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.mutation-market-preview-badge {
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+  background: #0d1f14;
+  border-radius: 8px;
+  padding: 1px 6px;
 }
 
 .mutation-market-mutation-slot {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(to bottom right, #cfd8dc, #90a4ae);
+  background: linear-gradient(-60deg, #142a1c 10%, #1f4a2e, #142a1c 90%);
   border-radius: 6px;
-  padding: 8px;
-  min-height: 60px;
+  padding: 8px 8px 6px 8px;
+  min-height: 64px;
+  color: #eafff0;
   .raised-bevel(3px);
+}
+
+.mutation-market-mutation-label {
+  position: absolute;
+  text-transform: uppercase;
+  top: 4px;
+  left: 4px;
+  margin: 0;
+  padding: 0 8px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: #06180d;
+  box-shadow: @outline-shadow;
+  background: linear-gradient(-60deg, #1b5e20 10%, #69f0ae, #1b5e20 90%);
+  border-radius: 12px 2px 2px 2px;
+  .raised-bevel();
 }
 
 .mutation-market-mutation-name {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
+  margin-top: 16px;
+  color: #ffffff;
 }
 
 .mutation-market-mutation-detail {
-  font-size: 12px;
-  color: #263238;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 10px;
+  color: #cfe8d6;
+  margin-top: 2px;
+}
+
+.mutation-market-mutation-footer {
+  font-size: 9px;
+  color: #9fc7ab;
+  margin-top: 3px;
+}
+
+// The two positions of the offset row that only ever half-overlap a real project slot
+// (the other half would need a slot past the edge of the board, which doesn't exist) --
+// rendered as pure void rather than the grey "inactive but visible" treatment used for a
+// full mutation card that merely touches a preview slot.
+.mutation-market-void {
+  position: absolute;
+  inset: 0;
+  background: #000;
 }
 
 .mutation-market-inactive-overlay {
@@ -75,9 +141,10 @@
   animation: mutation-slide-in-right 0.6s ease-out;
 }
 
-// The green "mutated" glow, applied to a won card's changed stats wherever the card
-// renders (market, hand, tableau) via Card.vue's mutationHighlight/mutationAddedTag/
-// mutationVictoryPoints bindings.
+// The green "mutated" glow, applied both to a mutation card's own description of what it
+// does, and (via Card.vue's mutationHighlight/mutationAddedTag/mutationVictoryPoints
+// bindings) to a won card's changed stats wherever it's later rendered (market, hand,
+// tableau).
 @keyframes mutation-glow {
   0%, 100% { color: #1b5e20; }
   50% { color: #69f0ae; }

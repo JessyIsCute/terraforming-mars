@@ -1,7 +1,14 @@
 <template>
   <div class="mutation-market-project-slot" :class="entranceClass">
     <template v-if="marketSlot !== undefined">
-      <Card :card="marketSlot.card" :autoTall="true" />
+      <div class="mutation-market-card-scale-wrapper">
+        <Card :card="marketSlot.card" :autoTall="true" />
+      </div>
+      <div v-if="marketSlot.coveringMutations.length > 0" class="mutation-market-preview-badges">
+        <div v-for="mutation in marketSlot.coveringMutations" :key="mutation" class="mutation-market-preview-badge mutation-glow">
+          {{ mutation }}
+        </div>
+      </div>
       <div v-if="marketSlot.auction !== undefined" class="mutation-market-auction-badge" :class="`board-cube--${marketSlot.auction.highBidderColor}`">
         {{ marketSlot.auction.highBid }} M€
       </div>

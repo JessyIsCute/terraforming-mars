@@ -18,6 +18,10 @@ describe('ColdBlooded', () => {
     expect(card.canPlay(player)).is.false;
   });
 
+  it('costs 15 M€', () => {
+    expect(card.cost).to.eq(15);
+  });
+
   it('gains animals equal to the temperature steps you raise', () => {
     card.onGlobalParameterIncrease(player, GlobalParameter.TEMPERATURE, 2);
     expect(card.resourceCount).to.eq(2);

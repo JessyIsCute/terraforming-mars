@@ -73,6 +73,17 @@ export interface ICard {
    * Describes the M€ discount `player` could apply to playing `card`.
    */
   getStandardProjectDiscount?(player: IPlayer, card: IStandardProjectCard): number;
+  /**
+   * Extra M€ `activePlayer` must pay to play `card`, imposed by this card belonging to
+   * `cardOwner` - an opponent's tax/tariff effect (e.g. Blockhouse), unlike
+   * `getCardDiscount` which only ever benefits the acting player's own plays. Only called
+   * for cards belonging to players other than the one computing their own cost.
+   */
+  getOpponentCardCostIncrease?(cardOwner: IPlayer, activePlayer: IPlayer, card: IProjectCard): number;
+  /**
+   * The standard-project analog of `getOpponentCardCostIncrease`.
+   */
+  getOpponentStandardProjectCostIncrease?(cardOwner: IPlayer, activePlayer: IPlayer, standardProject: IStandardProjectCard): number;
 
   /**
    * The +/- bonus applied to global parameter requirements, e.g. Adaptation Technology.

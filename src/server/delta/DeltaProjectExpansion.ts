@@ -3,7 +3,7 @@ import {IPlayer} from '../IPlayer';
 import {DeltaProjectPlayerModel} from '../../common/models/DeltaProjectPlayerModel';
 import {CardName} from '../../common/cards/CardName';
 import {Tag} from '../../common/cards/Tag';
-import {Resource} from '../../common/Resource';
+import {ALL_RESOURCES, Resource} from '../../common/Resource';
 import {SelectOption} from '../inputs/SelectOption';
 import {SelectCard} from '../inputs/SelectCard';
 import {OrOptions} from '../inputs/OrOptions';
@@ -12,6 +12,8 @@ import {DrawCards} from '../deferredActions/DrawCards';
 import {AddResourcesToCard} from '../deferredActions/AddResourcesToCard';
 import {CardResource} from '../../common/CardResource';
 import {IActionCard, ICard, isIActionCard, isIHasCheckLoops} from '../cards/ICard';
+import {PlayerInput} from '../PlayerInput';
+import {DeltaProjectInput} from './DeltaProjectInput';
 
 /**
  * The ordered tags for each track position (1-indexed).
@@ -145,12 +147,8 @@ export class DeltaProjectExpansion {
       return [];
     }
 
-    // Zeta Tollkeeper: the Delta Project action costs a flat 1 extra energy on top of the
-    // usual 1-per-step (minimum 2 to move at all). Epsilon Dample's marker is unaffected.
-    const surcharge = marker === 'primary' && player.tableau.has(CardName.ZETA_TOLLKEEPER) ? 1 : 0;
-
     const result: number[] = [];
-    const maxByEnergy = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player) - surcharge, MAX_TRACK_POSITION - currentPos);
+    const maxByEnergy = Math.min(DeltaProjectExpansion.availableEnergyForDelta(player), MAX_TRACK_POSITION - currentPos);
 
     for (let steps = 1; steps <= maxByEnergy; steps++) {
       const newPos = currentPos + steps;
@@ -233,9 +231,8 @@ export class DeltaProjectExpansion {
     const currentPos = progress.position;
     const newPos = currentPos + steps;
     const isTollkeeper = player.tableau.has(CardName.ZETA_TOLLKEEPER);
-    const surcharge = isTollkeeper ? 1 : 0;
 
-    DeltaProjectExpansion.deductEnergyForDelta(player, steps + surcharge);
+    DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
 
     // Zeta Tollkeeper: gain every step's reward from the very start of the track, not just
@@ -255,11 +252,43 @@ export class DeltaProjectExpansion {
     }
     DeltaProjectExpansion.notifyMovement(player, steps, true);
 
-    if (isTollkeeper) {
-      player.game.log('${0} spent ${1} energy (including the Zeta Tollkeeper surcharge) to advance ${2} step(s) on the Delta Project track', (b) => b.player(player).number(steps + surcharge).number(steps));
-    } else {
-      player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
+    player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
+  }
+
+  /**
+   * Builds the player input for using the Delta Project prelude action. Normally that's
+   * just the step-selection input, but Zeta Tollkeeper's owner must first pay a toll of 1
+   * unit of any standard resource of their choice - paid before the step choice is built,
+   * so the steps on offer always reflect whatever the player has left afterward (e.g.
+   * paying the toll in energy leaves less of it for the steps themselves).
+   */
+  public static buildAdvanceInput(player: IPlayer): PlayerInput | undefined {
+    if (!player.tableau.has(CardName.ZETA_TOLLKEEPER)) {
+      return DeltaProjectExpansion.buildStepInput(player);
     }
+
+    const toll = new OrOptions().setTitle('Select a resource to pay the Zeta Tollkeeper toll');
+    for (const resource of ALL_RESOURCES) {
+      if (player.stock.get(resource) < 1) {
+        continue;
+      }
+      toll.options.push(new SelectOption(`Pay 1 ${resource}`, 'Pay').andThen(() => {
+        player.stock.deduct(resource, 1, {log: true});
+        return DeltaProjectExpansion.buildStepInput(player);
+      }));
+    }
+    return toll;
+  }
+
+  private static buildStepInput(player: IPlayer): PlayerInput | undefined {
+    const validSteps = DeltaProjectExpansion.getValidAdvanceSteps(player);
+    if (validSteps.length === 0) {
+      return undefined;
+    }
+    return new DeltaProjectInput(validSteps).andThen((amount) => {
+      DeltaProjectExpansion.advance(player, amount);
+      return undefined;
+    });
   }
 
   /** Advance Epsilon Dample's second marker. Grants the landing position's reward every

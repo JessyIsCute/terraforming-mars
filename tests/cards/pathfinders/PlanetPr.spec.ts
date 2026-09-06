@@ -25,6 +25,17 @@ describe('PlanetPr', () => {
     expect(card.tags).deep.eq([Tag.CLONE]);
   });
 
+  it('starts with 32 M€, 2 steel, and 1 titanium', () => {
+    const [freshGame, freshPlayer] = testGame(1, {pathfindersExpansion: true});
+    const freshCard = new PlanetPr();
+    freshPlayer.playCorporationCard(freshCard);
+    runAllActions(freshGame);
+
+    expect(freshPlayer.megaCredits).to.eq(32);
+    expect(freshPlayer.steel).to.eq(2);
+    expect(freshPlayer.titanium).to.eq(1);
+  });
+
   it('initialAction declares a tag, raises its track by 2 (1 base + 1 Planet PR bonus), and draws a matching card', () => {
     const cardsBefore = player.cardsInHand.length;
 
@@ -93,5 +104,72 @@ describe('PlanetPr', () => {
 
     expect(otherGame.pathfindersData!.mars).to.eq(4);
     expect(otherPlayer.steel).to.eq(0);
+  });
+
+  describe('applyPlanetPrTrackDecay', () => {
+    it('lowers the sole leading track by 3, clamped at 0', () => {
+      game.pathfindersData!.mars = 5;
+      game.pathfindersData!.earth = 2;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.mars).to.eq(2);
+      expect(game.pathfindersData!.earth).to.eq(2);
+    });
+
+    it('clamps at 0 instead of going negative', () => {
+      game.pathfindersData!.mars = 2;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.mars).to.eq(0);
+    });
+
+    it('does nothing when there is a tie for the lead', () => {
+      game.pathfindersData!.mars = 5;
+      game.pathfindersData!.earth = 5;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.mars).to.eq(5);
+      expect(game.pathfindersData!.earth).to.eq(5);
+    });
+
+    it('does nothing when the leading track is already at position 0', () => {
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.mars).to.eq(0);
+      expect(game.pathfindersData!.earth).to.eq(0);
+    });
+
+    it('skips a track that has already reached its end', () => {
+      game.pathfindersData!.jovian = 14; // Jovian's track ends at 14.
+      game.pathfindersData!.earth = 5;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.jovian).to.eq(14); // untouched - already finished
+      expect(game.pathfindersData!.earth).to.eq(2); // this is the real leader
+    });
+
+    it('skips a track unused this game (-1)', () => {
+      // No Moon expansion in this test's setup, so moon stays at -1.
+      expect(game.pathfindersData!.moon).to.eq(-1);
+      game.pathfindersData!.earth = 5;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(game);
+
+      expect(game.pathfindersData!.moon).to.eq(-1);
+      expect(game.pathfindersData!.earth).to.eq(2);
+    });
+
+    it('does nothing when no player has Planet PR', () => {
+      const [otherGame] = testGame(1, {pathfindersExpansion: true});
+      otherGame.pathfindersData!.mars = 5;
+
+      PathfindersExpansion.applyPlanetPrTrackDecay(otherGame);
+
+      expect(otherGame.pathfindersData!.mars).to.eq(5);
+    });
   });
 });

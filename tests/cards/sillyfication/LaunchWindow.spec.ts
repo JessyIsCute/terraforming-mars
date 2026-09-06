@@ -15,10 +15,14 @@ describe('LaunchWindow', () => {
     [/* game */, player] = testGame(2);
   });
 
-  it('discounts the next space card by 15 M€', () => {
+  it('discounts the next space card by 16 M€', () => {
     player.lastCardPlayed = CardName.LAUNCH_WINDOW;
-    expect(card.getCardDiscount(player, new BigAsteroid())).to.eq(15); // space tag
+    expect(card.getCardDiscount(player, new BigAsteroid())).to.eq(16); // space tag
     expect(card.getCardDiscount(player, new MicroCredits())).to.eq(0); // no space tag
+  });
+
+  it('costs 11 M€', () => {
+    expect(card.cost).to.eq(11);
   });
 
   it('no discount unless it was the last card played', () => {

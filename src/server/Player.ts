@@ -764,6 +764,17 @@ export class Player implements IPlayer {
       cost -= 2;
     }
 
+    // Tax effects from an opponent's card (e.g. Blockhouse), unlike getCardDiscount which
+    // only ever benefits the acting player's own plays.
+    for (const opponent of this.game.players) {
+      if (opponent === this) {
+        continue;
+      }
+      for (const playedCard of opponent.tableau) {
+        cost += playedCard.getOpponentCardCostIncrease?.(opponent, this, card) ?? 0;
+      }
+    }
+
     return Math.max(cost, 0);
   }
 

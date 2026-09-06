@@ -14,7 +14,7 @@ export class ColdBlooded extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.COLD_BLOODED,
       tags: [Tag.ANIMAL],
-      cost: 11,
+      cost: 15,
 
       requirements: {oxygen: 5},
 
