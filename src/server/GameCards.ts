@@ -185,9 +185,14 @@ export class GameCards {
 
   /* Remove cards that are replaced by new versions in other manifests */
   private filterReplacedCards<T extends ICard>(cards: Array<T>): Array<T> {
+    const presentNames = new Set(cards.map((card) => card.name));
     return cards.filter((card) => {
       for (const manifest of this.moduleManifests) {
         if (manifest.cardsToRemove.has(card.name)) {
+          return false;
+        }
+        const replacement = manifest.conditionalCardsToRemove.get(card.name);
+        if (replacement !== undefined && presentNames.has(replacement)) {
           return false;
         }
       }
