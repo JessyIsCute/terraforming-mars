@@ -10,19 +10,24 @@ import {ICloneTagCard} from './ICloneTagCard';
 import {DrawCards} from '../../deferredActions/DrawCards';
 import {CardResource} from '../../../common/CardResource';
 import {Size} from '../../../common/cards/render/Size';
+import {digit} from '../Options';
 
 export class PlanetPr extends CorporationCard implements ICorporationCard, ICloneTagCard {
   constructor() {
     super({
       name: CardName.PLANET_PR,
-      startingMegaCredits: 40,
+      startingMegaCredits: 32,
       initialActionText: 'Choose a planet tag, then draw a card with that tag',
+
+      behavior: {
+        stock: {steel: 2, titanium: 1},
+      },
 
       metadata: {
         cardNumber: 'Pf00', // Renumber
-        description: 'You start with 40 M€.',
+        description: 'You start with 32 M€, 2 steel, and 1 titanium.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(40).br;
+          b.megacredits(32).nbsp.steel(2, {digit}).nbsp.titanium(1, {digit}).br;
           b.corpBox('effect', (ce) => {
             ce.effect('When you raise a planetary track 1 or more steps, raise it 1 additional step, including this time.', (eb) => {
               eb.planetaryTrack().startEffect.planetaryTrack();

@@ -25,6 +25,17 @@ describe('PlanetPr', () => {
     expect(card.tags).deep.eq([Tag.CLONE]);
   });
 
+  it('starts with 32 M€, 2 steel, and 1 titanium', () => {
+    const [freshGame, freshPlayer] = testGame(1, {pathfindersExpansion: true});
+    const freshCard = new PlanetPr();
+    freshPlayer.playCorporationCard(freshCard);
+    runAllActions(freshGame);
+
+    expect(freshPlayer.megaCredits).to.eq(32);
+    expect(freshPlayer.steel).to.eq(2);
+    expect(freshPlayer.titanium).to.eq(1);
+  });
+
   it('initialAction declares a tag, raises its track by 2 (1 base + 1 Planet PR bonus), and draws a matching card', () => {
     const cardsBefore = player.cardsInHand.length;
 
