@@ -45,11 +45,35 @@ describe('MutationMarketMutationSlot', () => {
     expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.true;
   });
 
+  it('renders requirement, reward, and effect text', () => {
+    const wrapper = shallowMount(MutationMarketMutationSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(MutationName.TAG_DIVERSIFIER), gridColumn: '1 / span 2'},
+    });
+    expect(wrapper.text()).to.contain('Needs: 5 unique tags');
+    expect(wrapper.text()).to.contain('Reward: +1 TR');
+    expect(wrapper.text()).to.contain('Gains a random new tag');
+  });
+
+  it('renders as void, with no content, for a half-card position', () => {
+    const wrapper = shallowMount(MutationMarketMutationSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(MutationName.TAG_DIVERSIFIER), gridColumn: '1 / span 1', isVoid: true},
+    });
+    expect(wrapper.find('.mutation-market-void').exists()).to.be.true;
+    expect(wrapper.text()).to.eq('');
+  });
+
   it('renders a per-player progress counter when the server provides one', () => {
     const wrapper = shallowMount(MutationMarketMutationSlot, {
       ...globalConfig,
       props: {
-        marketSlot: {...slotFor(MutationName.TAG_DIVERSIFIER), playerProgress: [{color: 'red', score: 3}, {color: 'blue', score: 0}]},
+        marketSlot: {
+          mutation: MutationName.TAG_DIVERSIFIER,
+          active: true,
+          minimumBid: 2,
+          playerProgress: [{color: 'red', score: 3}, {color: 'blue', score: 0}],
+        },
         gridColumn: '1 / span 2',
       },
     });

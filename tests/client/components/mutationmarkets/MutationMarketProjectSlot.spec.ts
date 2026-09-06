@@ -5,11 +5,13 @@ import {globalConfig} from '../getLocalVue';
 import MutationMarketProjectSlot from '@/client/components/mutationmarkets/MutationMarketProjectSlot.vue';
 import {MutationMarketProjectSlotModel} from '@/common/models/MutationMarketModel';
 import {CardName} from '@/common/cards/CardName';
+import {MutationName} from '@/common/mutationmarkets/MutationName';
 
 function slotFor(name: CardName, overrides: Partial<MutationMarketProjectSlotModel & object> = {}): MutationMarketProjectSlotModel {
   return {
     card: {name},
     active: true,
+    coveringMutations: [],
     ...overrides,
   };
 }
@@ -36,6 +38,32 @@ describe('MutationMarketProjectSlot', () => {
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {active: false})},
     });
     expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.true;
+  });
+
+  it('previews one covering mutation for a singly-covered slot', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutations: [MutationName.MINI_MUTATION]})},
+    });
+    const badges = wrapper.findAll('.mutation-market-preview-badge');
+    expect(badges).to.have.lengthOf(1);
+    expect(badges[0].text()).to.eq(MutationName.MINI_MUTATION);
+  });
+
+  it('previews both covering mutations for a doubly-covered slot', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutations: [MutationName.TAG_DIVERSIFIER, MutationName.MINI_MUTATION]})},
+    });
+    expect(wrapper.findAll('.mutation-market-preview-badge')).to.have.lengthOf(2);
+  });
+
+  it('shows no preview badges when nothing covers the slot', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER)},
+    });
+    expect(wrapper.find('.mutation-market-preview-badges').exists()).to.be.false;
   });
 
   it('shows the current high bid when an auction is open', () => {

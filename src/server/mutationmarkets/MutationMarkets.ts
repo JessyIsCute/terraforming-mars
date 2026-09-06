@@ -332,7 +332,7 @@ export class MutationMarkets {
   }
 
   /** The active mutations (from either row) covering `slotIndex`. */
-  private static coveringMutations(data: MutationMarketData, slotIndex: number): Array<MutationName> {
+  public static coveringMutations(data: MutationMarketData, slotIndex: number): Array<MutationName> {
     const result: Array<MutationName> = [];
     for (const row of ['alignedRow', 'offsetRow'] as const) {
       const slots = data[row];

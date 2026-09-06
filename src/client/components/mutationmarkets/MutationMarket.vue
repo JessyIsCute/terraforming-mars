@@ -5,7 +5,8 @@
         v-for="(slot, index) in topRow"
         :key="index"
         :marketSlot="slot"
-        :gridColumn="mutationGridColumn(index, topRow.length)" />
+        :gridColumn="mutationGridColumn(index, topRow.length)"
+        :isVoid="isVoidPosition(index, topRow.length)" />
     </div>
     <div class="mutation-market-row mutation-market-project-row">
       <MutationMarketProjectSlot
@@ -18,7 +19,8 @@
         v-for="(slot, index) in bottomRow"
         :key="index"
         :marketSlot="slot"
-        :gridColumn="mutationGridColumn(index, bottomRow.length)" />
+        :gridColumn="mutationGridColumn(index, bottomRow.length)"
+        :isVoid="isVoidPosition(index, bottomRow.length)" />
     </div>
   </div>
 </template>
@@ -74,6 +76,13 @@ export default defineComponent({
       case 3: return '6 / span 1';
       default: throw new Error(`invalid offset row index ${index}`);
       }
+    },
+    // The offset row's positions 0 and 3 only ever half-overlap a real project slot (the
+    // other half would need a slot past the edge of the board). Mirrors
+    // MutationMarkets.linkedProjectSlots returning `undefined` for one side at those
+    // two positions.
+    isVoidPosition(index: number, rowLength: number): boolean {
+      return rowLength === 4 && (index === 0 || index === 3);
     },
   },
 });
