@@ -83,4 +83,44 @@ describe('Blockhouse', () => {
     expect(player.steel).to.eq(0);
     expect(player.production.megacredits).to.eq(productionBefore + 1);
   });
+
+  it('makes a City-tagged card cost 3 M€ more for an opponent', () => {
+    const [, owner, opponent] = testGame(2);
+    owner.playedCards.push(card);
+    const cityCard = new CorporateStronghold(); // City+Building, cost 11
+
+    expect(opponent.getCardCost(cityCard)).to.eq(14);
+  });
+
+  it('does not tax the Blockhouse owner\'s own City-tagged plays', () => {
+    const [, owner] = testGame(2);
+    owner.playedCards.push(card);
+    const cityCard = new CorporateStronghold();
+
+    expect(owner.getCardCost(cityCard)).to.eq(11);
+  });
+
+  it('does not tax a non-City card for an opponent', () => {
+    const [, owner, opponent] = testGame(2);
+    owner.playedCards.push(card);
+    const buildingCard = new SmeltingPods(); // Building only, cost 15
+
+    expect(opponent.getCardCost(buildingCard)).to.eq(15);
+  });
+
+  it('makes the City standard project cost 3 M€ more for an opponent', () => {
+    const [, owner, opponent] = testGame(2);
+    owner.playedCards.push(card);
+    const sp = new CityStandardProject();
+
+    expect(sp.getAdjustedCost(opponent)).to.eq(28);
+  });
+
+  it('does not tax the Blockhouse owner\'s own City standard project use', () => {
+    const [, owner] = testGame(2);
+    owner.playedCards.push(card);
+    const sp = new CityStandardProject();
+
+    expect(sp.getAdjustedCost(owner)).to.eq(25);
+  });
 });
