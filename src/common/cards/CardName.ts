@@ -639,6 +639,7 @@ export enum CardName {
   GUERRILLA_GARDENING = 'Guerrilla Gardening',
   SLASH_AND_BURN = 'Slash and Burn',
   COLONY_SALE = 'Colony Sale',
+  OUTPOST_ON_EUROPA = 'Outpost on Europa',
   NEPOTISM = 'Nepotism',
   ROTATING_HANDS = 'Rotating Hands',
   SHOW_AND_TELL = 'Show and Tell',
