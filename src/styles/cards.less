@@ -1121,6 +1121,24 @@ input[type="radio"]:checked+.filterDiv::after {
   background-image: url(./assets/tags/mars.png);
 }
 
+// MutationMarkets: a dark green "M" on a light green circle. CSS-only, no image asset --
+// works in both the .expansion-icon (25px) and .create-game-expansion-icon (30px) boxes.
+.expansion-icon-mutationMarkets {
+  background-image: none;
+  background-color: #a5d6a7;
+  border-radius: 50%;
+  text-align: center;
+
+  &::before {
+    content: "M";
+    font-weight: bold;
+    font-family: Prototype, sans-serif;
+    color: #1b5e20;
+    font-size: 20px;
+    line-height: 1.35;
+  }
+}
+
 .card-standard-project {
   height: 155px;
   width: 235px;
