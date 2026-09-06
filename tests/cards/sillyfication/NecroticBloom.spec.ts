@@ -32,11 +32,24 @@ describe('NecroticBloom', () => {
     expect(card.resourceCount).to.eq(2);
   });
 
-  it('ignores the owner and non plant/microbe tags', () => {
+  it('gains a microbe when its own owner plays a plant or microbe tag too', () => {
     player.playCard(new Tardigrades());
     runAllActions(game);
-    expect(card.resourceCount).to.eq(0);
+    expect(card.resourceCount).to.eq(1);
+  });
 
+  it('triggers off an opponent playing their own Necrotic Bloom, since it has a Microbe tag itself', () => {
+    const opponentsCard = new NecroticBloom();
+    player2.playCard(opponentsCard);
+    runAllActions(game);
+
+    // Both copies see the play: the newly played one triggers the first (already-played)
+    // one, and also gains a microbe for its own owner in the same dispatch.
+    expect(card.resourceCount).to.eq(1);
+    expect(opponentsCard.resourceCount).to.eq(1);
+  });
+
+  it('ignores non plant/microbe tags', () => {
     player2.playCard(new AICentral());
     runAllActions(game);
     expect(card.resourceCount).to.eq(0);

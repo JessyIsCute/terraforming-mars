@@ -28,7 +28,7 @@ export class NecroticBloom extends ActionCard implements IProjectCard {
       metadata: {
         cardNumber: 'X51',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When any opponent plays a plant or microbe tag, add 1 microbe to this card.', (eb) => {
+          b.effect('When any player plays a plant or microbe tag, including yourself and this, add 1 microbe to this card.', (eb) => {
             eb.tag(Tag.PLANT, {all}).slash().tag(Tag.MICROBE, {all}).startEffect.resource(CardResource.MICROBE);
           }).br;
           b.action('Remove 3 microbes here to increase your plant production 1 step.', (eb) => {
@@ -41,9 +41,6 @@ export class NecroticBloom extends ActionCard implements IProjectCard {
   }
 
   public onCardPlayedByAnyPlayer(cardOwner: IPlayer, card: ICard, activePlayer: IPlayer) {
-    if (activePlayer.id === cardOwner.id) {
-      return;
-    }
     if (activePlayer.tags.cardHasTag(card, Tag.PLANT) || activePlayer.tags.cardHasTag(card, Tag.MICROBE)) {
       cardOwner.addResourceTo(this, {qty: 1, log: true});
     }
