@@ -289,6 +289,7 @@ export class Game implements IGame, Logger {
         deltaProject: partialOptions.deltaProjectExpansion ?? false,
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
+        customCards: partialOptions.customCardsExpansion ?? false,
         mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
       };
     }

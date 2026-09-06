@@ -441,6 +441,7 @@ export class Server {
         deltaProject: options.deltaProjectExpansion,
         sillyfication: options.sillyficationExpansion,
         betterMars: options.betterMarsExpansion,
+        customCards: options.customCardsExpansion,
         mutationMarkets: options.mutationMarketsExpansion,
       },
       fastModeOption: options.fastModeOption,

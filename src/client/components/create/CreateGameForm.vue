@@ -188,6 +188,12 @@
                                 <span v-i18n>BetterMars</span>&nbsp;<span title="A fan expansion: Mars-flavoured card variants">(&#945;)</span>
                             </label>
 
+                            <input type="checkbox" name="customCards" id="customCards-checkbox" v-model="expansions.customCards">
+                            <label for="customCards-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-customCards"></div>
+                                <span v-i18n>Custom Cards</span>&nbsp;<span title="Community-submitted cards, approved on /cards">(&#945;)</span>
+                            </label>
+
                             <input type="checkbox" name="mutationMarkets" id="mutationMarkets-checkbox" v-model="expansions.mutationMarkets">
                             <label for="mutationMarkets-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-mutationMarkets"></div>
