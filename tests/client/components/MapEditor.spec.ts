@@ -136,6 +136,19 @@ describe('MapEditor', () => {
     expect(bonusIcons[0].find('.map-editor-hex-bonus-count').text()).to.eq('2');
   });
 
+  it('shows "1" on the coin for a single M€ placement bonus too (the icon itself is blank)', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const hex = () => wrapper.findAll('.map-editor-hex')[0];
+
+    vm.tool = 'bonus:' + 6; // MEGACREDITS
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+
+    const bonusIcons = hex().findAll('.map-editor-hex-bonus');
+    expect(bonusIcons[0].find('.map-editor-hex-bonus-count').text()).to.eq('1');
+  });
+
   it('paints terrain with the real board sprite classes', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;

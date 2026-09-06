@@ -5,7 +5,7 @@
       :key="idx"
       :class="getClass(idx + 1, item)"
       :style="getStyle(idx)"
-    ><b v-if="item.count > 1" class="board-space-bonus-count">{{ item.count }}</b></i>
+    ><b v-if="item.bonus === MEGACREDITS" class="board-space-bonus-count">{{ item.count }}</b></i>
   </div>
 </template>
 
@@ -55,6 +55,7 @@ export default defineComponent({
     },
   },
   computed: {
+    MEGACREDITS: () => SpaceBonus.MEGACREDITS,
     items(): Array<GroupedSpaceBonus> {
       return groupSpaceBonuses(this.bonus);
     },

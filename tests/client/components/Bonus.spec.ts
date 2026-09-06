@@ -40,14 +40,14 @@ describe('Bonus', () => {
     expect(wrapper.find('.board-space-bonus-count').text()).to.eq('3');
   });
 
-  it('does not show a count badge for a single M€ bonus', () => {
+  it('shows "1" on the coin for a single M€ bonus too (the icon itself is blank)', () => {
     const wrapper = shallowMount(Bonus, {
       ...globalConfig,
       props: {
         bonus: [SpaceBonus.MEGACREDITS],
       },
     });
-    expect(wrapper.find('.board-space-bonus-count').exists()).to.be.false;
+    expect(wrapper.find('.board-space-bonus-count').text()).to.eq('1');
   });
 
   it('keeps every bonus on the tile (computed grid) once there are more than 3', () => {

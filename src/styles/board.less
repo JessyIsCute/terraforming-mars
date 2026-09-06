@@ -122,21 +122,26 @@
   }
 }
 
+// Sits directly on top of the coin icon (like a card's own "amount inside" M€ rendering --
+// see .money in cards.less) rather than as a corner badge, so the count reads as part of the
+// coin itself.
 .board-space-bonus-count {
   position: absolute;
-  right: -3px;
-  bottom: -3px;
-  min-width: 9px;
-  padding: 0 1px;
-  font-size: 9px;
-  line-height: 9px;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
   font-style: normal;
   font-weight: bold;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.75);
-  border-radius: 5px;
-  text-align: center;
+  color: black;
+  text-shadow: 0 0 2px white, 0 0 2px white;
   pointer-events: none;
+}
+
+.board-space-bonus--compact .board-space-bonus-count {
+  font-size: 8px;
 }
 
 .board-space-bonus--plant {
@@ -249,7 +254,10 @@
 }
 
 .board-space-bonus--megacredit {
-  background: url(./assets/misc/1mc.png) no-repeat;
+  // The blank coin (no baked-in digit) -- same asset card icons use for their own "amount
+  // inside" rendering (.money in cards.less) -- since board-space-bonus-count always overlays
+  // the real count on top, for any number of stacked M€ bonuses, not just 1 or 2.
+  background: url(./assets/resources/megacredit.png) no-repeat;
   background-size: 16px;
 }
 
