@@ -32,6 +32,7 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
           b.megacredits(36).nbsp.resource(CardResource.ANIMAL, {amount: 8, digit}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
+            cea.br;
             cea.effect('When you add an animal to another card, add an animal to this card.', (eb) => {
               eb.resource(CardResource.ANIMAL, {all}).asterix().startEffect.resource(CardResource.ANIMAL);
             });
