@@ -22,4 +22,11 @@ describe('Venuphile', () => {
     expect(card.getCardDiscount(player, venusCard)).to.eq(3);
     expect(card.getCardDiscount(player, otherCard)).to.eq(0);
   });
+
+  it('caps the discount at 5 M€', () => {
+    player.tagsForTest = {venus: 8};
+    const venusCard = {tags: [Tag.VENUS]} as any;
+
+    expect(card.getCardDiscount(player, venusCard)).to.eq(5);
+  });
 });

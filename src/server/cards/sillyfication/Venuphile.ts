@@ -18,7 +18,7 @@ export class Venuphile extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T03',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a Venus tag, you pay 1 M€ less for each Venus tag you have.', (eb) => {
+          b.effect('When you play a Venus tag, you pay 1 M€ less for each Venus tag you have, to a maximum of 5 M€.', (eb) => {
             eb.tag(Tag.VENUS).startEffect.megacredits(1).slash().tag(Tag.VENUS);
           });
         }),
@@ -30,6 +30,6 @@ export class Venuphile extends Card implements IProjectCard {
     if (!card.tags.includes(Tag.VENUS)) {
       return 0;
     }
-    return player.tags.count(Tag.VENUS);
+    return Math.min(player.tags.count(Tag.VENUS), 5);
   }
 }
