@@ -7,6 +7,7 @@ import {ICard, IActionCard, isIActionCard} from '../../ICard';
 import {OrOptions} from '../../../inputs/OrOptions';
 import {SelectOption} from '../../../inputs/SelectOption';
 import {ConglomeratesExpansion} from '../../../conglomerates/ConglomeratesExpansion';
+import {Resource} from '../../../../common/Resource';
 
 export class FacilitySharing extends StandardActionCard {
   constructor() {
@@ -15,7 +16,7 @@ export class FacilitySharing extends StandardActionCard {
       metadata: {
         cardNumber: 'TA2',
         renderData: CardRenderer.builder((b) => {
-          b.standardProject('Use one of your teammate\'s unused, non-corporation action cards as if it were yours.', (eb) => {
+          b.standardProject('Use one of your teammate\'s unused, non-corporation action cards as if it were yours. (Full Access Cooperation lets this reach their corporation\'s action too.)', (eb) => {
             eb.empty().startAction.text('Cost: 1 Coordination');
           });
         }),
@@ -28,9 +29,11 @@ export class FacilitySharing extends StandardActionCard {
   }
 
   private sharableCards(player: IPlayer, teammate: IPlayer): Array<ICard & IActionCard> {
+    const allowCorporation = teammate.tableau.has(CardName.FULL_ACCESS_COOPERATION);
     const result: Array<ICard & IActionCard> = [];
     for (const card of teammate.tableau) {
-      if (card.type !== CardType.ACTIVE) {
+      const eligibleType = card.type === CardType.ACTIVE || (allowCorporation && card.type === CardType.CORPORATION);
+      if (!eligibleType) {
         continue;
       }
       if (teammate.actionsThisGeneration.has(card.name)) {
@@ -61,6 +64,9 @@ export class FacilitySharing extends StandardActionCard {
             const result = card.action(player);
             teammate.actionsThisGeneration.add(card.name);
             player.game.log('${0} used ${1}\'s ${2} through Facility Sharing', (b) => b.player(player).player(teammate).card(card));
+            if (teammate.tableau.has(CardName.FULL_ACCESS_COOPERATION)) {
+              teammate.stock.add(Resource.MEGACREDITS, 2, {log: true, from: {player}});
+            }
             ConglomeratesExpansion.increaseTeamActionCost(player, 'facilitySharing');
             return result;
           }),
