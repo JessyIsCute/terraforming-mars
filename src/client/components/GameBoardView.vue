@@ -47,8 +47,8 @@
 
   <div v-if="players.length > 1" class="player_home_block--milestones-and-awards">
     <a class="hotkey-target"></a>
-    <Milestones :milestones="game.milestones" />
-    <Awards :awards="game.awards" />
+    <Milestones :milestones="game.milestones" :conglomeratesExpansion="game.gameOptions.expansions.conglomerates" />
+    <Awards :awards="game.awards" :conglomeratesExpansion="game.gameOptions.expansions.conglomerates" />
   </div>
 </template>
 

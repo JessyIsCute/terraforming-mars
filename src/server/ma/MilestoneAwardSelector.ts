@@ -1,7 +1,7 @@
 import {awardManifest} from '../awards/Awards';
 import {BoardName} from '../../common/boards/BoardName';
 import {GameOptions} from '../game/GameOptions';
-import {milestoneManifest} from '../milestones/Milestones';
+import {CONGLOMERATES_MILESTONE_MAP, milestoneManifest} from '../milestones/Milestones';
 import {RandomMAOptionType} from '../../common/ma/RandomMAOptionType';
 import {inplaceShuffle} from '../utils/shuffle';
 import {UnseededRandom} from '../../common/utils/Random';
@@ -117,6 +117,11 @@ export function chooseMilestonesAndAwards(gameOptions: GameOptions): DrawnMilest
     throw new Error('Unknown milestone/award type: ' + gameOptions.randomMA);
   }
 
+  if (gameOptions.conglomeratesExpansion) {
+    drawnMilestonesAndAwards.milestones = drawnMilestonesAndAwards.milestones.map(
+      (name) => CONGLOMERATES_MILESTONE_MAP[name] ?? name);
+  }
+
   return drawnMilestonesAndAwards;
 }
 
@@ -127,8 +132,16 @@ export function chooseMilestonesAndAwards(gameOptions: GameOptions): DrawnMilest
  *
  * exported for tests
  */
+const CONGLOMERATES_MILESTONE_VARIANT_NAMES = new Set<MilestoneName>(Object.values(CONGLOMERATES_MILESTONE_MAP));
+
 export function getCandidates(gameOptions: GameOptions): [Array<MilestoneName>, Array<AwardName>] {
   function include<T extends string>(name: T, manifest: MAManifest<T, any>): boolean {
+    // Conglomerates-scaled milestone variants are only ever reached by swapping in for a
+    // board's fixed slot (see chooseMilestonesAndAwards below) -- never independently drawn.
+    if (CONGLOMERATES_MILESTONE_VARIANT_NAMES.has(name as MilestoneName)) {
+      return false;
+    }
+
     // Never include deprecated MAs in random candidates.  They generally have "more official" versions that will be
     // considered for inclusion.
     if (manifest.all[name].deprecated) {

@@ -4,7 +4,7 @@ import {globalConfig} from './getLocalVue';
 import Milestones from '@/client/components/Milestones.vue';
 import {ClaimedMilestoneModel} from '@/common/models/ClaimedMilestoneModel';
 import Milestone from '@/client/components/Milestone.vue';
-import {Preferences} from '@/client/utils/PreferencesManager';
+import {Preferences, PreferencesManager} from '@/client/utils/PreferencesManager';
 
 describe('Milestones', () => {
   const mockMilestone: ClaimedMilestoneModel = {
@@ -65,5 +65,19 @@ describe('Milestones', () => {
     expect(
       milestone.findAllComponents(Milestone).every((milestoneWrapper) => !milestoneWrapper.isVisible()),
     ).to.be.true;
+  });
+
+  it('shows the Conglomerates-scaled claim cost (12) when the expansion is on', () => {
+    const wrapper = mount(Milestones, {
+      ...globalConfig,
+      props: {
+        milestones: [],
+        preferences: {...PreferencesManager.INSTANCE.values(), learner_mode: true} as Readonly<Preferences>,
+        conglomeratesExpansion: true,
+      },
+    });
+
+    const prices = wrapper.findAll('.milestone-award-price').map((priceWrapper) => parseInt(priceWrapper.text()));
+    expect(prices).to.deep.eq([12, 12, 12]);
   });
 });

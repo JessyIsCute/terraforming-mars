@@ -3,6 +3,7 @@ import {testGame} from '../TestGame';
 import {TestPlayer} from '../TestPlayer';
 import {IGame} from '../../src/server/IGame';
 import {Terraformer} from '../../src/server/milestones/Terraformer';
+import {milestoneManifest} from '../../src/server/milestones/Milestones';
 import {Banker} from '../../src/server/awards/Banker';
 import {Resource} from '../../src/common/Resource';
 import {OrOptions} from '../../src/server/inputs/OrOptions';
@@ -55,6 +56,19 @@ describe('Conglomerates milestones and awards', () => {
       expect(player2.getVictoryPoints().milestones).to.eq(0); // other team does not
     });
 
+    it('the Terraformer53 variant shows the real scaled number and claims exactly like Terraformer', () => {
+      const variant = milestoneManifest.createOrThrow('Terraformer53');
+      expect(variant.description).to.eq('Have a terraform rating of 53 (or 39 with Turmoil.)');
+
+      player1.setTerraformRating(30);
+      player3.setTerraformRating(22); // combined 52, just short
+      expect(variant.canClaim(player1)).is.false;
+
+      player3.setTerraformRating(23); // combined 53
+      expect(variant.canClaim(player1)).is.true;
+      expect(variant.getScore(player1)).to.eq(player1.terraformRating);
+    });
+
     it('gives the claimer 1 Coordination when actually claimed', () => {
       player1.conglomeratesData.coordination = 5;
       player1.megaCredits = 20;
@@ -65,7 +79,8 @@ describe('Conglomerates milestones and awards', () => {
       claimMilestoneAction.options[0].cb();
       runAllActions(game);
 
-      expect(game.claimedMilestones.some((cm) => cm.milestone.name === 'Terraformer' && cm.player === player1)).is.true;
+      // The default Tharsis board's Terraformer slot is swapped for its scaled sibling.
+      expect(game.claimedMilestones.some((cm) => cm.milestone.name === 'Terraformer53' && cm.player === player1)).is.true;
       expect(player1.conglomeratesData.coordination).to.eq(6);
     });
   });

@@ -70,6 +70,66 @@ import {Tycoon10} from './modular/Tycoon10';
 import {Trader} from './modular/Trader';
 import {Tactician4} from './modular/Tactician4';
 import {Briber} from './Briber';
+import {conglomeratesVariant} from './conglomerates/ConglomeratesMilestoneVariant';
+
+/**
+ * Maps each board milestone to its Conglomerates-scaled sibling (1.5x threshold, rounded up),
+ * swapped in for the board's slot only when the Conglomerates expansion is on -- see
+ * MilestoneAwardSelector.ts. Deliberately absent, each for its own reason (same documented-gap
+ * treatment as Merchant/Briber elsewhere in this module):
+ *  - `Minimalist` (Amazonis): a maximum (not minimum) threshold -- scaling it up would make it
+ *    easier, not harder.
+ *  - `Generalist` (Elysium): its score is a 0-6 count of "productions increased at all," hard
+ *    capped at 6 by the number of production types that exist -- a scaled threshold above 6
+ *    could never be met by anyone.
+ *  - `Planetologist` (Terra Cimmeria Nova): same issue -- its score is explicitly clamped to a
+ *    maximum of 6 in `getScore` (2 Earth + 2 Venus + 2 Jovian tags, capped), so a threshold
+ *    above 6 is unreachable.
+ */
+export const CONGLOMERATES_MILESTONE_MAP: Partial<Record<MilestoneName, MilestoneName>> = {
+  'Agronomist': 'Agronomist6',
+  'Architect': 'Architect5',
+  'Builder': 'Builder12',
+  'C. Forester': 'C. Forester5',
+  'Capitalist': 'Capitalist96',
+  'Coastguard': 'Coastguard5',
+  'Colonizer': 'Colonizer6',
+  'Diversifier': 'Diversifier12',
+  'Ecologist': 'Ecologist6',
+  'Economizer': 'Economizer8',
+  'Energizer': 'Energizer9',
+  'Engineer': 'Engineer15',
+  'Farmer': 'Farmer8',
+  'Firestarter': 'Firestarter30',
+  'Forester': 'Forester6',
+  'Fundraiser': 'Fundraiser18',
+  'Gambler': 'Gambler3',
+  'Gardener': 'Gardener5',
+  'Geologist': 'Geologist5',
+  'Irrigator': 'Irrigator6',
+  'Land Specialist': 'Land Specialist5',
+  'Legend': 'Legend8',
+  'Martian': 'Martian6',
+  'Mayor': 'Mayor5',
+  'Pioneer': 'Pioneer5',
+  'Planner': 'Planner24',
+  'Polar Explorer': 'Polar Explorer5',
+  'Researcher': 'Researcher6',
+  'Rim Settler': 'Rim Settler5',
+  'Smith': 'Smith9',
+  'Spacefarer': 'Spacefarer9',
+  'Specialist': 'Specialist15',
+  'T. Collector': 'T. Collector5',
+  'Tactician': 'Tactician8',
+  'Terra Pioneer': 'Terra Pioneer8',
+  'Terraformer': 'Terraformer53',
+  'Terran': 'Terran9',
+  'Tradesman': 'Tradesman5',
+  'Tropicalist': 'Tropicalist5',
+  'Tycoon': 'Tycoon23',
+  'V. Electrician': 'V. Electrician6',
+  'V. Spacefarer': 'V. Spacefarer6',
+};
 
 export const milestoneManifest: MAManifest<MilestoneName, IMilestone> = {
   all: {
@@ -144,6 +204,52 @@ export const milestoneManifest: MAManifest<MilestoneName, IMilestone> = {
     'Tycoon10': {Factory: Tycoon10, random: 'modular'},
     'V. Electrician': {Factory: VElectrician},
     'V. Spacefarer': {Factory: VSpacefarer},
+
+    // Conglomerates-scaled variants. Never drawn randomly (no `random` field, and explicitly
+    // excluded in MilestoneAwardSelector.getCandidates) -- only ever reached via
+    // CONGLOMERATES_MILESTONE_MAP swapping in for a board's fixed slot.
+    'Agronomist6': {Factory: conglomeratesVariant('Agronomist6', 'Have 6 plant tags in play', () => new Agronomist()), compatibility: 'conglomerates'},
+    'Architect5': {Factory: conglomeratesVariant('Architect5', 'Have 5 city tags in play', () => new Architect()), compatibility: 'conglomerates'},
+    'Builder12': {Factory: conglomeratesVariant('Builder12', 'Have 12 building tags in play', () => new Builder()), compatibility: 'conglomerates'},
+    'C. Forester5': {Factory: conglomeratesVariant('C. Forester5', 'Have 5 plant production', () => new CForester()), compatibility: 'conglomerates'},
+    'Capitalist96': {Factory: conglomeratesVariant('Capitalist96', 'Have 96 M€', () => new Capitalist()), compatibility: 'conglomerates'},
+    'Coastguard5': {Factory: conglomeratesVariant('Coastguard5', 'Own 5 tiles adjacent to oceans', () => new Coastguard()), compatibility: 'conglomerates'},
+    'Colonizer6': {Factory: conglomeratesVariant('Colonizer6', 'Have 6 colonies', () => new Colonizer()), compatibility: 'conglomerates'},
+    'Diversifier12': {Factory: conglomeratesVariant('Diversifier12', 'Have 12 different tags in play', () => new Diversifier()), compatibility: 'conglomerates'},
+    'Ecologist6': {Factory: conglomeratesVariant('Ecologist6', 'Have 6 bio tags in play (plant, microbe and animal tags count as bio tags)', () => new Ecologist()), compatibility: 'conglomerates'},
+    'Economizer8': {Factory: conglomeratesVariant('Economizer8', 'Have 8 heat production', () => new Economizer()), compatibility: 'conglomerates'},
+    'Energizer9': {Factory: conglomeratesVariant('Energizer9', 'Have 9 energy production', () => new Energizer()), compatibility: 'conglomerates'},
+    'Engineer15': {Factory: conglomeratesVariant('Engineer15', 'Have a total of 15 energy and heat production', () => new Engineer()), compatibility: 'conglomerates'},
+    'Farmer8': {Factory: conglomeratesVariant('Farmer8', 'Have 8 animal and microbe resources on your cards', () => new Farmer()), compatibility: 'conglomerates'},
+    'Firestarter30': {Factory: conglomeratesVariant('Firestarter30', 'Have 30 heat', () => new Firestarter()), compatibility: 'conglomerates'},
+    'Forester6': {Factory: conglomeratesVariant('Forester6', 'Have 6 plant production', () => new Forester()), compatibility: 'conglomerates'},
+    'Fundraiser18': {Factory: conglomeratesVariant('Fundraiser18', 'Have 18 M€ production', () => new Fundraiser()), compatibility: 'conglomerates'},
+    'Gambler3': {Factory: conglomeratesVariant('Gambler3', 'Fund 3 awards', () => new Gambler()), compatibility: 'conglomerates'},
+    'Gardener5': {Factory: conglomeratesVariant('Gardener5', 'Own 5 greenery tiles', () => new Gardener()), compatibility: 'conglomerates'},
+    'Geologist5': {Factory: conglomeratesVariant('Geologist5', 'Own 5 tiles ON or ADJACENT to volcanic areas', () => new Geologist()), compatibility: 'conglomerates'},
+    'Irrigator6': {Factory: conglomeratesVariant('Irrigator6', 'Own 6 tiles adjacent to oceans', () => new Irrigator()), compatibility: 'conglomerates'},
+    'Land Specialist5': {Factory: conglomeratesVariant('Land Specialist5', 'Own 5 special (normally, brown) tiles', () => new LandSpecialist()), compatibility: 'conglomerates'},
+    'Legend8': {Factory: conglomeratesVariant('Legend8', 'Have 8 cards in your event pile', () => new Legend()), compatibility: 'conglomerates'},
+    'Martian6': {Factory: conglomeratesVariant('Martian6', 'Have 6 Mars tags in play', () => new Martian()), compatibility: 'conglomerates'},
+    'Mayor5': {Factory: conglomeratesVariant('Mayor5', 'Own 5 city tiles', () => new Mayor()), compatibility: 'conglomerates'},
+    'Pioneer5': {Factory: conglomeratesVariant('Pioneer5', 'Have 5 colonies', () => new Pioneer()), compatibility: 'conglomerates'},
+    'Planner24': {Factory: conglomeratesVariant('Planner24', 'Have 24 cards in your hand', () => new Planner()), compatibility: 'conglomerates'},
+    'Polar Explorer5': {Factory: conglomeratesVariant('Polar Explorer5', 'Own 5 tiles on the two bottom rows', () => new PolarExplorer()), compatibility: 'conglomerates'},
+    'Researcher6': {Factory: conglomeratesVariant('Researcher6', 'Have 6 science tags in play', () => new Researcher()), compatibility: 'conglomerates'},
+    'Rim Settler5': {Factory: conglomeratesVariant('Rim Settler5', 'Have 5 Jovian tags in play', () => new RimSettler()), compatibility: 'conglomerates'},
+    'Smith9': {Factory: conglomeratesVariant('Smith9', 'Have a total of 9 steel and titanium production', () => new Smith()), compatibility: 'conglomerates'},
+    'Spacefarer9': {Factory: conglomeratesVariant('Spacefarer9', 'Have 9 space tags in play', () => new Spacefarer()), compatibility: 'conglomerates'},
+    'Specialist15': {Factory: conglomeratesVariant('Specialist15', 'Have 15 in production of any resource', () => new Specialist()), compatibility: 'conglomerates'},
+    'T. Collector5': {Factory: conglomeratesVariant('T. Collector5', 'Have 5 sets of automated (green), active (blue) and event (red) project cards in play', () => new Collector()), compatibility: 'conglomerates'},
+    'Tactician8': {Factory: conglomeratesVariant('Tactician8', 'Have 8 cards with requirements in play', () => new Tactician()), compatibility: 'conglomerates'},
+    'Terra Pioneer8': {Factory: conglomeratesVariant('Terra Pioneer8', 'Own 8 tiles on Mars', () => new TerraPioneer()), compatibility: 'conglomerates'},
+    'Terraformer53': {Factory: conglomeratesVariant('Terraformer53', 'Have a terraform rating of 53 (or 39 with Turmoil.)', () => new Terraformer()), compatibility: 'conglomerates'},
+    'Terran9': {Factory: conglomeratesVariant('Terran9', 'Have 9 Earth tags in play', () => new Terran()), compatibility: 'conglomerates'},
+    'Tradesman5': {Factory: conglomeratesVariant('Tradesman5', 'Have 5 different types of non-standard resources', () => new Tradesman()), compatibility: 'conglomerates'},
+    'Tropicalist5': {Factory: conglomeratesVariant('Tropicalist5', 'Own 5 tiles in the middle 3 equatorial rows', () => new Tropicalist()), compatibility: 'conglomerates'},
+    'Tycoon23': {Factory: conglomeratesVariant('Tycoon23', 'Have 23 project cards in play (not events.)', () => new Tycoon()), compatibility: 'conglomerates'},
+    'V. Electrician6': {Factory: conglomeratesVariant('V. Electrician6', 'Have 6 power tags in play', () => new VElectrician()), compatibility: 'conglomerates'},
+    'V. Spacefarer6': {Factory: conglomeratesVariant('V. Spacefarer6', 'Have 6 space tags in play', () => new VSpacefarer()), compatibility: 'conglomerates'},
   },
   boards: {
     [BoardName.THARSIS]: ['Terraformer', 'Mayor', 'Gardener', 'Builder', 'Planner'],

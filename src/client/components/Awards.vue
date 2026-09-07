@@ -69,6 +69,11 @@ export default defineComponent({
       type: Object as () => Readonly<Preferences>,
       default: () => PreferencesManager.INSTANCE.values(),
     },
+    // Conglomerates raises the funding cost's base from 8 to 12 -- see Game.getAwardFundingCost().
+    conglomeratesExpansion: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -92,7 +97,8 @@ export default defineComponent({
       return this.awards.filter(isFunded);
     },
     availableAwardSpots(): number[] {
-      return AWARD_COSTS.slice(this.fundedAwards.length);
+      const costs = this.conglomeratesExpansion ? AWARD_COSTS.map((cost) => cost + 4) : AWARD_COSTS;
+      return costs.slice(this.fundedAwards.length);
     },
     isLearnerModeOn(): boolean {
       return this.preferences.learner_mode;

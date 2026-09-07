@@ -230,6 +230,22 @@ describe('Awards', () => {
     });
   });
 
+  it('shows Conglomerates-scaled spot prices (12/18/24) when the expansion is on', () => {
+    const wrapper = shallowMount(Awards, {
+      ...globalConfig,
+      props: {
+        awards: [],
+        preferences: learnerModeOn,
+        conglomeratesExpansion: true,
+      },
+    });
+
+    const prices = wrapper.findAll('[data-test=spot-price]')
+      .map((priceWrapper) => parseInt(priceWrapper.text()));
+
+    expect(prices).to.be.deep.eq([12, 18, 24]);
+  });
+
   it('shows award descriptions on click', async () => {
     const awards = [
       createAward({id: 1, funded: true}),
