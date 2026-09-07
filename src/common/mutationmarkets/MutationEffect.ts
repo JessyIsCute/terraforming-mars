@@ -1,3 +1,5 @@
+import {Resource} from '../Resource';
+
 /**
  * The permanent, ongoing effect a mutation applies to the project card it covers, once won.
  *
@@ -28,4 +30,18 @@ export type MutationEffect =
    * not this effect kind) so playing IT does not spawn yet another copy -- no infinite
    * nesting dolls.
    */
-  | {kind: 'nestedCopy', percent: number, minAbsDelta: number, maxAbsDelta: number};
+  | {kind: 'nestedCopy', percent: number, minAbsDelta: number, maxAbsDelta: number}
+  /** The first time the won card is played, the owner gains a flat amount of `resource`. */
+  | {kind: 'grantResourceOnPlay', resource: Resource, amount: number}
+  /** The first time the won card is played, the owner's `resource` production goes up by `amount`. */
+  | {kind: 'grantProductionOnPlay', resource: Resource, amount: number}
+  /**
+   * Flips the won card between Automated and Event (whichever it printed as). Doesn't
+   * cause it to be discarded -- Event cards stay in the tableau exactly like Automated
+   * ones in this engine. If the won card is actually Active (so flipping it to Event
+   * would silently drop its repeatable action), the flip doesn't happen; instead, the
+   * first time it's played, the owner gets a flat M€ rebate instead (the same "can't
+   * apply here, so pay a rebate" fallback any future mutation can reuse via
+   * `MutationEffects.rebateAmount`).
+   */
+  | {kind: 'convertType'};

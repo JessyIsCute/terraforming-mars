@@ -5,7 +5,6 @@
     <div class="mutation-market-mutation-detail">
       <span>Prefix: "{{ definition.prefix }}"</span>
       <span>Needs: {{ requirementText }}</span>
-      <span>Reward: {{ rewardText }}</span>
       <span v-if="effectText" class="mutation-glow">{{ effectText }}</span>
     </div>
     <div class="mutation-market-mutation-footer">Min bid: {{ definition.minimumBid }} M€ &middot; {{ definition.steps }} step{{ definition.steps > 1 ? 's' : '' }}</div>
@@ -18,7 +17,7 @@ import {defineComponent, PropType} from 'vue';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 import {MutationDefinition} from '@/common/mutationmarkets/MutationDefinition';
 import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
-import {describeMutationRequirement, describeMutationReward, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
+import {describeMutationRequirement, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
 
 export default defineComponent({
   name: 'MutationCard',
@@ -34,9 +33,6 @@ export default defineComponent({
     },
     requirementText(): string {
       return describeMutationRequirement(this.definition.requirement);
-    },
-    rewardText(): string {
-      return describeMutationReward(this.definition.reward);
     },
     effectText(): string {
       return describeMutationEffect(this.definition.effect);

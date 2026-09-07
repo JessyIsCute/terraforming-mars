@@ -2,6 +2,8 @@ import {ICard} from '../cards/ICard';
 import {IPlayer} from '../IPlayer';
 import {Tag} from '../../common/cards/Tag';
 import {ALL_TAGS} from '../../common/cards/Tag';
+import {CardName} from '../../common/cards/CardName';
+import {CardType} from '../../common/cards/CardType';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../common/mutationmarkets/MutationDefinitions';
@@ -79,7 +81,6 @@ export class MutationEffects {
     }
     let bonus = 0;
     for (const applied of card.mutations) {
-      bonus += applied.oneTimeVictoryPointsGranted ?? 0;
       const effect = MUTATION_DEFINITIONS[applied.mutation].effect;
       if (effect.kind === 'costPercent' && effect.vpPerAbsDelta !== undefined) {
         const delta = Math.abs(MutationEffects.costDelta(effect, card.baseCost));
@@ -87,6 +88,45 @@ export class MutationEffects {
       }
     }
     return bonus;
+  }
+
+  /** The card's name prefixed by every applied mutation's prefix, e.g. "Gigantic Asteroid Mining". */
+  public static displayName(mutationNames: ReadonlyArray<MutationName>, cardName: CardName): string {
+    return [...mutationNames.map((m) => MUTATION_DEFINITIONS[m].prefix), cardName].join(' ');
+  }
+
+  /**
+   * Flips Automated <-> Event for a `convertType`-mutated card. Active (or any other
+   * printed type) passes through unchanged -- flipping an Active card to Event would
+   * silently drop its repeatable action, so `convertType`'s effect just doesn't apply to
+   * the type there (see `onPlayRebate` for the compensating M€ rebate that fires instead).
+   */
+  public static applyType(card: ICard, baseType: CardType): CardType {
+    if (card.mutations === undefined || card.mutations.length === 0) {
+      return baseType;
+    }
+    const hasConvertType = card.mutations.some((applied) => MUTATION_DEFINITIONS[applied.mutation].effect.kind === 'convertType');
+    if (!hasConvertType) {
+      return baseType;
+    }
+    if (baseType === CardType.AUTOMATED) {
+      return CardType.EVENT;
+    }
+    if (baseType === CardType.EVENT) {
+      return CardType.AUTOMATED;
+    }
+    return baseType;
+  }
+
+  /**
+   * A flat M€ rebate for when a mutation's effect can't apply to the card it landed on
+   * (currently: `convertType` on an Active card). Reuses the same clamp formula as a
+   * cost discount so the amount stays proportionate to the card without a separate
+   * balance knob. General-purpose: any future mutation with a similarly ungrantable case
+   * can call this too.
+   */
+  public static rebateAmount(baseCost: number): number {
+    return MutationEffects.costDelta({percent: 30, minAbsDelta: 3, maxAbsDelta: 12}, baseCost);
   }
 
   /**
@@ -115,9 +155,6 @@ export class MutationEffects {
       }
       if (applied.bakedCostDelta !== undefined) {
         highlight.cost = true;
-      }
-      if (applied.oneTimeVictoryPointsGranted !== undefined) {
-        highlight.vp = true;
       }
     }
     return highlight;

@@ -56,6 +56,21 @@ describe('CardVictoryPoints', () => {
     expect((wrapper.findComponent('[data-test=item]') as VueWrapper<any>).props().item.type).eq('tag');
     expect((wrapper.findComponent('[data-test=item]') as VueWrapper<any>).props().item.tag).eq('science');
   });
+  it('folds a mutation bonus into the plain number and glows', async () => {
+    await wrapper.setProps({victoryPoints: 2, bonus: 1});
+    expect(wrapper.text()).to.eq('3');
+    expect(wrapper.find('.mutation-glow').exists()).to.be.true;
+  });
+  it('does not glow the plain number with no bonus', async () => {
+    await wrapper.setProps({victoryPoints: 2, bonus: 0});
+    expect(wrapper.text()).to.eq('2');
+    expect(wrapper.find('.mutation-glow').exists()).to.be.false;
+  });
+  it('folds a mutation bonus into the dynamic-formula plain-points case and glows', async () => {
+    await wrapper.setProps({...prop({points: 5, target: 0}), bonus: 1});
+    expect(wrapper.text()).to.eq('6');
+    expect(wrapper.find('.mutation-glow').exists()).to.be.true;
+  });
 
 
   function prop(vps: RecursivePartial<CardRenderDynamicVictoryPoints>) {

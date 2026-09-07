@@ -6,8 +6,10 @@ export type MutationMarketProjectSlotModel = {
   card: CardModel;
   active: boolean;
   auction?: {highBid: number, highBidderColor: Color};
-  /** The mutation(s) currently covering this slot -- what a winning bidder who qualifies would get applied. */
-  coveringMutations: ReadonlyArray<MutationName>;
+  /** Covering mutation(s) whose row is currently physically above the project row. */
+  coveringMutationsAbove: ReadonlyArray<MutationName>;
+  /** Covering mutation(s) whose row is currently physically below the project row. */
+  coveringMutationsBelow: ReadonlyArray<MutationName>;
 } | undefined;
 
 export type MutationMarketMutationSlotModel = {

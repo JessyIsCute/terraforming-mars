@@ -45,13 +45,12 @@ describe('MutationMarketMutationSlot', () => {
     expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.true;
   });
 
-  it('renders requirement, reward, and effect text', () => {
+  it('renders requirement and effect text', () => {
     const wrapper = shallowMount(MutationMarketMutationSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(MutationName.TAG_DIVERSIFIER), gridColumn: '1 / span 2'},
     });
     expect(wrapper.text()).to.contain('Needs: 5 unique tags');
-    expect(wrapper.text()).to.contain('Reward: +1 TR');
     expect(wrapper.text()).to.contain('Gains a random new tag');
   });
 

@@ -43,11 +43,14 @@ function projectSlotModel(game: IGame, data: MutationMarketData, card: IProjectC
     highBidderColor: game.getPlayerById(auction.highBidder).color,
   };
 
+  const {above, below} = MutationMarkets.coveringMutationsByRow(data, index);
+
   return {
     card: model,
     active: MutationMarkets.isProjectSlotActive(index),
     auction: auctionModel,
-    coveringMutations,
+    coveringMutationsAbove: above,
+    coveringMutationsBelow: below,
   };
 }
 
@@ -74,6 +77,8 @@ function previewCardModel(game: IGame, card: IProjectCard, coveringMutations: Re
   } as ICard;
   model.calculatedCost = MutationEffects.applyCost(preview, baseCost);
   model.mutationHighlight = MutationEffects.highlightsFor(preview);
+  model.mutationDisplayName = MutationEffects.displayName(coveringMutations, card.name);
+  model.mutationNames = coveringMutations;
   const vp = MutationEffects.victoryPointsBonus(preview, game.players[0]);
   if (vp !== 0) {
     model.mutationVictoryPoints = vp;

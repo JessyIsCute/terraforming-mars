@@ -1,20 +1,18 @@
 import {MutationName} from './MutationName';
 import {MutationDefinition} from './MutationDefinition';
 import {Tag} from '../cards/Tag';
+import {Resource} from '../Resource';
 
 /**
- * The mutation card manifest. Seven mutations are authored with real specs and a real
- * ongoing card effect: TAG_DIVERSIFIER ("Diverse"), GIGANTIC_UNDERTAKINGS ("Gigantic"),
- * MINI_MUTATION ("Mini"), CITY_PLANNER ("Planned"), HEAT_BANKER ("Thermal"),
- * SCIENCE_PATRON ("Sponsored"), and NESTED_MUTATION ("Nested"). The rest are still Phase 1
- * placeholders (`effect: {kind: 'none'}`) exercising the data shape, pending real specs.
+ * The mutation card manifest. All 12 mutations have a real ongoing card effect --
+ * winning an auction gets you the card with that effect applied, nothing more (there's
+ * no separate one-time payout).
  */
 export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
   [MutationName.TAG_DIVERSIFIER]: {
     name: MutationName.TAG_DIVERSIFIER,
     prefix: 'Diverse',
     requirement: {uniqueTags: 5},
-    reward: {tr: 1},
     minimumBid: 1,
     steps: 1,
     effect: {kind: 'addRandomTag'},
@@ -24,7 +22,6 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     prefix: 'Gigantic',
     // 2+ cards costing 25 M€ or more played, including events.
     requirement: {expensiveCardsPlayed: 2},
-    reward: {victoryPoints: 1},
     minimumBid: 2,
     steps: 2,
     // Cost +50% (clamped to +3..+12), and +1 VP for every 3 M€ of that increase.
@@ -35,7 +32,6 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     prefix: 'Mini',
     // 7+ cards costing less than 7 M€ played, including events.
     requirement: {cheapCardsPlayed: 7},
-    reward: {cards: 1},
     minimumBid: 1,
     steps: 1,
     // Cost -30% (clamped to -3..-12).
@@ -45,7 +41,6 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     name: MutationName.CITY_PLANNER,
     prefix: 'Planned',
     requirement: {cities: 3},
-    reward: {megacredits: 6},
     minimumBid: 2,
     steps: 1,
     // Cost -25% (clamped to -2..-8): a well-planned city build comes in under budget.
@@ -55,25 +50,24 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     name: MutationName.GREENERY_KEEPER,
     prefix: 'Verdant',
     requirement: {greeneries: 2},
-    reward: {tr: 1},
     minimumBid: 1,
     steps: 2,
-    effect: {kind: 'none'},
+    // A well-tended greenery keeps giving: +2 plants the first time it's played.
+    effect: {kind: 'grantResourceOnPlay', resource: Resource.PLANTS, amount: 2},
   },
   [MutationName.OCEAN_SURVEYOR]: {
     name: MutationName.OCEAN_SURVEYOR,
     prefix: 'Tidal',
     requirement: {oceans: 4},
-    reward: {cards: 2},
     minimumBid: 1,
     steps: 1,
-    effect: {kind: 'none'},
+    // Tidal survey work uncovers a geothermal vent: +1 heat production on play.
+    effect: {kind: 'grantProductionOnPlay', resource: Resource.HEAT, amount: 1},
   },
   [MutationName.HEAT_BANKER]: {
     name: MutationName.HEAT_BANKER,
     prefix: 'Thermal',
     requirement: {tag: Tag.POWER, count: 3},
-    reward: {megacredits: 4},
     minimumBid: 1,
     steps: 2,
     // Cost +25% (clamped to +2..+8), and +1 VP for every 4 M€ of that increase: a
@@ -84,16 +78,15 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     name: MutationName.STEEL_BARON,
     prefix: 'Reinforced',
     requirement: {tag: Tag.BUILDING, count: 4},
-    reward: {tr: 1},
     minimumBid: 2,
     steps: 1,
-    effect: {kind: 'none'},
+    // On-theme: +1 steel production the first time it's played.
+    effect: {kind: 'grantProductionOnPlay', resource: Resource.STEEL, amount: 1},
   },
   [MutationName.SCIENCE_PATRON]: {
     name: MutationName.SCIENCE_PATRON,
     prefix: 'Sponsored',
     requirement: {tag: Tag.SCIENCE, count: 3},
-    reward: {cards: 1},
     minimumBid: 1,
     steps: 1,
     // A research patron funds a second line of inquiry: adds one random tag the card
@@ -104,35 +97,34 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     name: MutationName.ANIMAL_WARDEN,
     prefix: 'Sheltered',
     requirement: {tag: Tag.ANIMAL, count: 2},
-    reward: {megacredits: 3},
     minimumBid: 1,
     steps: 2,
-    effect: {kind: 'none'},
+    // A sheltered habitat: +1 plant the first time it's played.
+    effect: {kind: 'grantResourceOnPlay', resource: Resource.PLANTS, amount: 1},
   },
   [MutationName.BUILDING_MOGUL]: {
     name: MutationName.BUILDING_MOGUL,
     prefix: 'Monumental',
     requirement: {tag: Tag.BUILDING, count: 6},
-    reward: {tr: 2},
     minimumBid: 2,
     steps: 1,
-    effect: {kind: 'none'},
+    // A project so significant it changes the nature of the work: flips Automated <-> Event.
+    effect: {kind: 'convertType'},
   },
   [MutationName.SPACE_VISIONARY]: {
     name: MutationName.SPACE_VISIONARY,
     prefix: 'Orbital',
     requirement: {tag: Tag.SPACE, count: 4},
-    reward: {megacredits: 5},
     minimumBid: 1,
     steps: 2,
-    effect: {kind: 'none'},
+    // On-theme: +2 titanium the first time it's played.
+    effect: {kind: 'grantResourceOnPlay', resource: Resource.TITANIUM, amount: 2},
   },
   [MutationName.NESTED_MUTATION]: {
     name: MutationName.NESTED_MUTATION,
     prefix: 'Nested',
     // 3 cards (including events) played this generation, each cheaper than the last.
     requirement: {cardCostStreak: 3},
-    reward: {tr: 1},
     minimumBid: 2,
     steps: 2,
     // Doesn't touch this card's own cost/tags/VP; the first time it's *played*, the

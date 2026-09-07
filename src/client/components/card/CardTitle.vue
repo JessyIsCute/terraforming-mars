@@ -3,8 +3,9 @@
     <div v-if="isPrelude()" class="prelude-label">prelude</div>
     <div v-if="isCorporation()" class="corporation-label">corporation</div>
     <div v-if="isCeo()" class="ceo-label">CEO</div>
+    <div v-if="mutated" class="mutated-label">Mutated</div>
     <CardCorporationLogo v-if="isCorporation()" :title="title"/>
-    <div v-else ref="title" :class="getClasses()">{{ titleWithoutSuffix }}</div>
+    <div v-else ref="title" :class="getClasses()">{{ displayTitleWithoutSuffix }}</div>
   </div>
 </template>
 
@@ -32,6 +33,17 @@ export default defineComponent({
       type: String as () => CardType,
       required: true,
     },
+    // MutationMarkets: overrides the displayed title (e.g. "Gigantic Asteroid Mining")
+    // without touching `title` itself, which stays the real CardName -- CardCorporationLogo
+    // and other consumers below still need the exact name.
+    displayTitle: {
+      type: String,
+      default: undefined,
+    },
+    mutated: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     CardCorporationLogo,
@@ -43,6 +55,9 @@ export default defineComponent({
     // Re-fit if the title prop changes on a reused instance. Card lists are keyed
     // by name today, so this is insurance against an unkeyed or index-keyed list.
     title() {
+      this.fitTitle();
+    },
+    displayTitle() {
       this.fitTitle();
     },
   },
@@ -94,8 +109,8 @@ export default defineComponent({
     },
   },
   computed: {
-    titleWithoutSuffix(): string {
-      return this.title.split(':')[0];
+    displayTitleWithoutSuffix(): string {
+      return (this.displayTitle ?? this.title).split(':')[0];
     },
     typedRefs(): Refs {
       return this.$refs as unknown as Refs;

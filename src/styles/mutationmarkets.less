@@ -1,7 +1,7 @@
 // MutationMarkets: the 3-row (mutation / project / mutation) board, and the green
 // "mutated" glow applied to a won card's changed stats wherever it's later rendered.
 
-@mm-card-width: 120px;
+@mm-card-width: 180px;
 
 .mutation-market {
   margin: 20px 0;
@@ -10,16 +10,16 @@
 .mutation-market-row {
   display: grid;
   grid-template-columns: repeat(6, @mm-card-width);
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
-// Project cards are shown at half scale with all hover/interaction disabled -- this is a
-// read-only preview of the market, not a hand of playable cards. `zoom` (not `transform:
+// Project cards are shown at reduced scale with all hover/interaction disabled -- this is
+// a read-only preview of the market, not a hand of playable cards. `zoom` (not `transform:
 // scale`, which repaints but doesn't reflow) shrinks both the paint AND the layout box
 // together, so the grid cell doesn't need separately-computed dimensions.
 .mutation-market-card-scale-wrapper {
-  zoom: 0.5;
+  zoom: 0.75;
   pointer-events: none;
 }
 
@@ -29,76 +29,87 @@
 
 .mutation-market-preview-badges {
   display: flex;
-  gap: 4px;
-  margin-top: 2px;
+  gap: 6px;
+  margin-top: 3px;
   flex-wrap: wrap;
 }
 
+// Badges for a mutation covering this slot from the row physically above it; shown above
+// the card instead of below, mirroring the source row's side (see MutationMarket.vue).
+.mutation-market-preview-badges--above {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0;
+  margin-bottom: 3px;
+}
+
 .mutation-market-preview-badge {
-  font-size: 10px;
+  font-size: 15px;
   font-weight: bold;
   white-space: nowrap;
   background: #0d1f14;
-  border-radius: 8px;
-  padding: 1px 6px;
+  border-radius: 12px;
+  padding: 2px 9px;
 }
 
 .mutation-market-mutation-slot {
   position: relative;
   overflow: hidden;
   background: linear-gradient(-60deg, #142a1c 10%, #1f4a2e, #142a1c 90%);
-  border-radius: 6px;
-  padding: 8px 8px 6px 8px;
-  min-height: 64px;
+  border-radius: 9px;
+  padding: 12px 12px 9px 12px;
+  min-height: 96px;
   color: #eafff0;
   .raised-bevel(3px);
 }
 
 // Used outside the market grid (e.g. the /cards list), where nothing else constrains width.
 .mutation-card-standalone {
-  width: 260px;
+  width: 320px;
   display: inline-block;
 }
 
 .mutation-market-mutation-label {
   position: absolute;
   text-transform: uppercase;
-  top: 4px;
-  left: 4px;
+  top: 6px;
+  left: 6px;
   margin: 0;
-  padding: 0 8px;
-  height: 16px;
-  line-height: 16px;
+  padding: 0 12px;
+  height: 24px;
+  line-height: 24px;
   text-align: center;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: bold;
   color: #06180d;
   box-shadow: @outline-shadow;
   background: linear-gradient(-60deg, #1b5e20 10%, #69f0ae, #1b5e20 90%);
-  border-radius: 12px 2px 2px 2px;
+  border-radius: 18px 3px 3px 3px;
   .raised-bevel();
 }
 
 .mutation-market-mutation-name {
   font-weight: bold;
-  font-size: 12px;
-  margin-top: 16px;
+  font-size: 18px;
+  margin-top: 24px;
   color: #ffffff;
 }
 
 .mutation-market-mutation-detail {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  font-size: 10px;
+  gap: 2px;
+  font-size: 15px;
   color: #cfe8d6;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .mutation-market-mutation-footer {
-  font-size: 9px;
+  font-size: 13px;
   color: #9fc7ab;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 // The two positions of the offset row that only ever half-overlap a real project slot
@@ -120,12 +131,12 @@
 
 .mutation-market-auction-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  top: 6px;
+  right: 6px;
+  padding: 3px 12px;
+  border-radius: 15px;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 18px;
   color: white;
   background: #37474f;
   z-index: 2;
@@ -158,7 +169,10 @@
 .mutation-glow {
   animation: mutation-glow 2s ease-in-out infinite;
 }
-.mutation-cost-glow .card-cost {
+// The discounted/surcharged number (CardCost.vue's `newCost`, oddly rendered in a div
+// classed `.card-old-cost`) is the price actually in effect -- glow that, not the
+// original printed price next to it.
+.mutation-cost-glow .card-old-cost {
   animation: mutation-glow 2s ease-in-out infinite;
 }
 .mutation-tag-glow {
@@ -168,7 +182,4 @@
 @keyframes mutation-tag-glow {
   0%, 100% { filter: drop-shadow(0 0 2px #1b5e20); }
   50% { filter: drop-shadow(0 0 6px #69f0ae); }
-}
-.mutation-vp-badge {
-  font-weight: bold;
 }

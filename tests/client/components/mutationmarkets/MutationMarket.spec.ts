@@ -12,10 +12,10 @@ function fakeMarket(offsetRowIsTop: boolean): MutationMarketModel {
   return {
     projectSlots: [
       undefined,
-      {card: {name: CardName.PLANT_EATER}, active: true, coveringMutations: []},
-      {card: {name: CardName.ASTEROID}, active: true, coveringMutations: []},
-      {card: {name: CardName.BIG_ASTEROID}, active: true, coveringMutations: []},
-      {card: {name: CardName.ICE_ASTEROID}, active: true, coveringMutations: []},
+      {card: {name: CardName.PLANT_EATER}, active: true, coveringMutationsAbove: [], coveringMutationsBelow: []},
+      {card: {name: CardName.ASTEROID}, active: true, coveringMutationsAbove: [], coveringMutationsBelow: []},
+      {card: {name: CardName.BIG_ASTEROID}, active: true, coveringMutationsAbove: [], coveringMutationsBelow: []},
+      {card: {name: CardName.ICE_ASTEROID}, active: true, coveringMutationsAbove: [], coveringMutationsBelow: []},
       undefined,
     ],
     alignedRow: [

@@ -3,12 +3,15 @@ import {IPlayer} from '../IPlayer';
 import {ICard} from '../cards/ICard';
 import {IProjectCard} from '../cards/IProjectCard';
 import {CardName} from '../../common/cards/CardName';
+import {CardType} from '../../common/cards/CardType';
 import {Color} from '../../common/Color';
 import {PlayerId} from '../../common/Types';
 import {Resource} from '../../common/Resource';
 import {newProjectCard} from '../createCard';
+import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../common/mutationmarkets/MutationDefinitions';
+import {MutationEffect} from '../../common/mutationmarkets/MutationEffect';
 import {MutationEffects} from './MutationEffects';
 import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescriptor';
 import {CardRequirements} from '../cards/requirements/CardRequirements';
@@ -181,32 +184,53 @@ export class MutationMarkets {
   }
 
   /**
-   * Nested Mutation: called when `card` is played. Grants a fresh, separately-discounted
-   * copy of it to `player`'s hand for each qualifying `nestedCopy` mutation applied to it.
-   * A copy carries only a baked-in cost delta (`AppliedMutation.bakedCostDelta`), not the
-   * `nestedCopy` effect itself, so playing the copy doesn't spawn yet another one.
+   * Called when `card` is played. Applies every "on play" mutation effect currently
+   * applied to it: Nested Mutation's discounted copy, a flat resource/production grant,
+   * and (only for `convertType` landing on an Active card, where the type flip itself
+   * doesn't apply -- see `MutationEffects.applyType`) the M€ rebate fallback.
    */
-  public static maybeGrantNestedCopy(player: IPlayer, card: ICard): void {
+  public static applyOnPlayEffects(player: IPlayer, card: ICard): void {
     if (card.mutations === undefined) {
       return;
     }
     for (const applied of card.mutations) {
-      if (applied.bakedCostDelta !== undefined) {
-        continue;
-      }
       const effect = MUTATION_DEFINITIONS[applied.mutation].effect;
-      if (effect.kind !== 'nestedCopy') {
-        continue;
+      switch (effect.kind) {
+      case 'nestedCopy':
+        MutationMarkets.grantNestedCopy(player, card, applied, effect);
+        break;
+      case 'grantResourceOnPlay':
+        player.stock.add(effect.resource, effect.amount, {log: true});
+        break;
+      case 'grantProductionOnPlay':
+        player.production.add(effect.resource, effect.amount, {log: true});
+        break;
+      case 'convertType':
+        if (card.baseType === CardType.ACTIVE) {
+          player.stock.add(Resource.MEGACREDITS, MutationEffects.rebateAmount(card.baseCost ?? 0), {log: true});
+        }
+        break;
       }
-      const copy = newProjectCard(card.name);
-      if (copy === undefined) {
-        continue;
-      }
-      const delta = MutationEffects.nestedCopyDelta(copy.baseCost ?? 0, effect);
-      copy.mutations = [{mutation: applied.mutation, bakedCostDelta: delta}];
-      player.cardsInHand.push(copy);
-      player.game.log('${0} received a discounted copy of ${1} from Nested Mutation', (b) => b.player(player).card(copy));
     }
+  }
+
+  /**
+   * Nested Mutation: grants a fresh, separately-discounted copy of `card` to `player`'s
+   * hand. A copy carries only a baked-in cost delta (`AppliedMutation.bakedCostDelta`),
+   * not the `nestedCopy` effect itself, so playing the copy doesn't spawn yet another one.
+   */
+  private static grantNestedCopy(player: IPlayer, card: ICard, applied: AppliedMutation, effect: Extract<MutationEffect, {kind: 'nestedCopy'}>): void {
+    if (applied.bakedCostDelta !== undefined) {
+      return;
+    }
+    const copy = newProjectCard(card.name);
+    if (copy === undefined) {
+      return;
+    }
+    const delta = MutationEffects.nestedCopyDelta(copy.baseCost ?? 0, effect);
+    copy.mutations = [{mutation: applied.mutation, bakedCostDelta: delta}];
+    player.cardsInHand.push(copy);
+    player.game.log('${0} received a discounted copy of ${1} from Nested Mutation', (b) => b.player(player).card(copy));
   }
 
   /**
@@ -298,7 +322,7 @@ export class MutationMarkets {
     MutationMarkets.claimProjectSlot(game, slotIndex);
   }
 
-  /** Refunds every losing bidder, applies whichever covering mutations the winner qualifies for, grants rewards, and hands the card over. */
+  /** Refunds every losing bidder, applies whichever covering mutations the winner qualifies for, and hands the card over -- that's the entire prize, there's no separate reward. */
   private static settleAuction(game: IGame, data: MutationMarketData, slotIndex: number, auction: OpenAuction, card: IProjectCard): void {
     const winner = MutationMarkets.playerById(game, auction.highBidder);
     for (const playerId of Object.keys(auction.escrow) as Array<PlayerId>) {
@@ -311,19 +335,6 @@ export class MutationMarkets {
       (mutation) => CardRequirements.compile([MUTATION_DEFINITIONS[mutation].requirement]).satisfies(winner, card));
     for (const mutation of qualifyingMutations) {
       const applied = MutationEffects.apply(card, mutation, game.rng);
-      const reward = MUTATION_DEFINITIONS[mutation].reward;
-      if (reward.tr !== undefined) {
-        winner.increaseTerraformRating(reward.tr, {log: true});
-      }
-      if (reward.megacredits !== undefined) {
-        winner.stock.add(Resource.MEGACREDITS, reward.megacredits, {log: true});
-      }
-      if (reward.cards !== undefined) {
-        winner.drawCard(reward.cards);
-      }
-      if (reward.victoryPoints !== undefined) {
-        applied.oneTimeVictoryPointsGranted = reward.victoryPoints;
-      }
       card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
     }
 
@@ -333,17 +344,37 @@ export class MutationMarkets {
 
   /** The active mutations (from either row) covering `slotIndex`. */
   public static coveringMutations(data: MutationMarketData, slotIndex: number): Array<MutationName> {
+    return [
+      ...MutationMarkets.coveringMutationsForRow(data, 'alignedRow', slotIndex),
+      ...MutationMarkets.coveringMutationsForRow(data, 'offsetRow', slotIndex),
+    ];
+  }
+
+  /**
+   * Same list as `coveringMutations`, split by which physical row (above/below the
+   * project row) each one currently occupies -- `alignedRow`/`offsetRow` swap which is
+   * physically "top" each generation (`data.offsetRowIsTop`), so the market UI needs this
+   * mapped to "above"/"below", not the raw row name.
+   */
+  public static coveringMutationsByRow(data: MutationMarketData, slotIndex: number): {above: Array<MutationName>, below: Array<MutationName>} {
+    const aboveRow: MutationRow = data.offsetRowIsTop ? 'offsetRow' : 'alignedRow';
+    const belowRow: MutationRow = data.offsetRowIsTop ? 'alignedRow' : 'offsetRow';
+    return {
+      above: MutationMarkets.coveringMutationsForRow(data, aboveRow, slotIndex),
+      below: MutationMarkets.coveringMutationsForRow(data, belowRow, slotIndex),
+    };
+  }
+
+  private static coveringMutationsForRow(data: MutationMarketData, row: MutationRow, slotIndex: number): Array<MutationName> {
+    const slots = data[row];
     const result: Array<MutationName> = [];
-    for (const row of ['alignedRow', 'offsetRow'] as const) {
-      const slots = data[row];
-      for (let index = 0; index < slots.length; index++) {
-        const slot = slots[index];
-        if (slot === undefined || !MutationMarkets.isMutationSlotActive(row, index, data)) {
-          continue;
-        }
-        if (MutationMarkets.linkedProjectSlots(row, index).includes(slotIndex)) {
-          result.push(slot.mutation);
-        }
+    for (let index = 0; index < slots.length; index++) {
+      const slot = slots[index];
+      if (slot === undefined || !MutationMarkets.isMutationSlotActive(row, index, data)) {
+        continue;
+      }
+      if (MutationMarkets.linkedProjectSlots(row, index).includes(slotIndex)) {
+        result.push(slot.mutation);
       }
     }
     return result;

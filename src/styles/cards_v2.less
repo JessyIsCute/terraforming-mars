@@ -2897,6 +2897,27 @@
       border-radius: 14px 2px 2px 2px;
       .raised-bevel();
     }
+    // MutationMarkets: same geometry as prelude/ceo labels above -- never coexists with
+    // either, since a market-mutated card is always a plain project card (Automated/
+    // Active/Event), never a Prelude/CEO/Corporation.
+    .mutated-label {
+      position: absolute;
+      text-transform: uppercase;
+      top: 15px;
+      left: 4px;
+      margin: 0px;
+      width: 80px;
+      height: 20px;
+      line-height: 22px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #06180d;
+      box-shadow: @outline-shadow;
+      background: linear-gradient(-60deg, #1b5e20 10%, #69f0ae, #1b5e20 90%);
+      border-radius: 14px 2px 2px 2px;
+      .raised-bevel();
+    }
   }
   .card-expansion {
     position: absolute;

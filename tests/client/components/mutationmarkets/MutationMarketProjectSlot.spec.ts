@@ -11,7 +11,8 @@ function slotFor(name: CardName, overrides: Partial<MutationMarketProjectSlotMod
   return {
     card: {name},
     active: true,
-    coveringMutations: [],
+    coveringMutationsAbove: [],
+    coveringMutationsBelow: [],
     ...overrides,
   };
 }
@@ -40,20 +41,33 @@ describe('MutationMarketProjectSlot', () => {
     expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.true;
   });
 
-  it('previews one covering mutation for a singly-covered slot', () => {
+  it('previews a mutation covering from below the project row', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
-      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutations: [MutationName.MINI_MUTATION]})},
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutationsBelow: [MutationName.MINI_MUTATION]})},
     });
     const badges = wrapper.findAll('.mutation-market-preview-badge');
     expect(badges).to.have.lengthOf(1);
     expect(badges[0].text()).to.eq(MutationName.MINI_MUTATION);
+    expect(wrapper.find('.mutation-market-preview-badges--above').exists()).to.be.false;
   });
 
-  it('previews both covering mutations for a doubly-covered slot', () => {
+  it('previews a mutation covering from above the project row, positioned separately', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
-      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutations: [MutationName.TAG_DIVERSIFIER, MutationName.MINI_MUTATION]})},
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutationsAbove: [MutationName.TAG_DIVERSIFIER]})},
+    });
+    expect(wrapper.find('.mutation-market-preview-badges--above').exists()).to.be.true;
+    expect(wrapper.find('.mutation-market-preview-badges--above').text()).to.eq(MutationName.TAG_DIVERSIFIER);
+  });
+
+  it('previews both covering mutations for a doubly-covered slot, one from each side', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {
+        coveringMutationsAbove: [MutationName.TAG_DIVERSIFIER],
+        coveringMutationsBelow: [MutationName.MINI_MUTATION],
+      })},
     });
     expect(wrapper.findAll('.mutation-market-preview-badge')).to.have.lengthOf(2);
   });

@@ -1,5 +1,4 @@
 import {CardRequirementDescriptor} from '../cards/CardRequirementDescriptor';
-import {MutationReward} from './MutationDefinition';
 import {MutationEffect} from './MutationEffect';
 
 function capitalize(s: string): string {
@@ -38,24 +37,6 @@ export function describeMutationRequirement(descriptor: CardRequirementDescripto
   return 'Unknown requirement';
 }
 
-/** A short, human-readable summary of a mutation's one-time auction-win reward. */
-export function describeMutationReward(reward: MutationReward): string {
-  const parts: Array<string> = [];
-  if (reward.tr !== undefined) {
-    parts.push(`+${reward.tr} TR`);
-  }
-  if (reward.megacredits !== undefined) {
-    parts.push(`+${reward.megacredits} M€`);
-  }
-  if (reward.cards !== undefined) {
-    parts.push(`+${reward.cards} card${reward.cards > 1 ? 's' : ''}`);
-  }
-  if (reward.victoryPoints !== undefined) {
-    parts.push(`+${reward.victoryPoints} VP`);
-  }
-  return parts.join(', ');
-}
-
 /** A short, human-readable summary of the permanent effect a mutation applies to the card it's won on. */
 export function describeMutationEffect(effect: MutationEffect): string {
   switch (effect.kind) {
@@ -70,5 +51,11 @@ export function describeMutationEffect(effect: MutationEffect): string {
   }
   case 'nestedCopy':
     return `Playing it grants a ${Math.abs(effect.percent)}% cheaper copy`;
+  case 'grantResourceOnPlay':
+    return `Gain ${effect.amount} ${capitalize(effect.resource)} on play`;
+  case 'grantProductionOnPlay':
+    return `+${effect.amount} ${capitalize(effect.resource)} production on play`;
+  case 'convertType':
+    return 'Becomes an Event (or Automated) card; an Active card gets a M€ rebate on play instead';
   }
 }

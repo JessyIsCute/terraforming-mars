@@ -96,8 +96,11 @@ export function cardsToModel(
       };
     }
     if (card.mutations !== undefined && card.mutations.length > 0) {
+      const mutationNames = card.mutations.map((m) => m.mutation);
+      model.mutationNames = mutationNames;
       model.mutationAddedTag = card.mutations.find((m) => m.chosenTag !== undefined)?.chosenTag;
       model.mutationHighlight = MutationEffects.highlightsFor(card);
+      model.mutationDisplayName = MutationEffects.displayName(mutationNames, card.name);
       const mutationVp = MutationEffects.victoryPointsBonus(card, player);
       if (mutationVp !== 0) {
         model.mutationVictoryPoints = mutationVp;

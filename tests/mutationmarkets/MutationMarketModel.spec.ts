@@ -17,22 +17,27 @@ describe('createMutationMarketModel', () => {
     expect(createMutationMarketModel(offGame)).is.undefined;
   });
 
-  it('reports the active covering mutations for each project slot', () => {
+  it('reports the active covering mutations for each project slot, split by physical row', () => {
     const data = game.mutationMarketData!;
+    data.offsetRowIsTop = false; // aligned row is physically "above", offset row "below".
     data.alignedRow = [undefined, {mutation: MutationName.TAG_DIVERSIFIER}, undefined];
     data.offsetRow = [undefined, {mutation: MutationName.GIGANTIC_UNDERTAKINGS}, {mutation: MutationName.MINI_MUTATION}, undefined];
 
     const model = createMutationMarketModel(game)!;
 
     // slot 0/5: inactive previews, no card-covering info needed either way.
-    // slot 1: only offsetRow[1] (Gigantic) covers it -- alignedRow[0] touches slot 0, inactive.
-    expect(model.projectSlots[1]!.coveringMutations).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
-    // slot 2: alignedRow[1] (Tag Diversifier) AND offsetRow[1] (Gigantic) both cover it.
-    expect(model.projectSlots[2]!.coveringMutations).to.have.members([MutationName.TAG_DIVERSIFIER, MutationName.GIGANTIC_UNDERTAKINGS]);
-    // slot 3: alignedRow[1] (Tag Diversifier) AND offsetRow[2] (Mini Mutation).
-    expect(model.projectSlots[3]!.coveringMutations).to.have.members([MutationName.TAG_DIVERSIFIER, MutationName.MINI_MUTATION]);
-    // slot 4: only offsetRow[2] (Mini Mutation) -- alignedRow[2] touches slot 5, inactive.
-    expect(model.projectSlots[4]!.coveringMutations).to.deep.eq([MutationName.MINI_MUTATION]);
+    // slot 1: only offsetRow[1] (Gigantic, below) covers it -- alignedRow[0] touches slot 0, inactive.
+    expect(model.projectSlots[1]!.coveringMutationsAbove).to.deep.eq([]);
+    expect(model.projectSlots[1]!.coveringMutationsBelow).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
+    // slot 2: alignedRow[1] (Tag Diversifier, above) AND offsetRow[1] (Gigantic, below).
+    expect(model.projectSlots[2]!.coveringMutationsAbove).to.deep.eq([MutationName.TAG_DIVERSIFIER]);
+    expect(model.projectSlots[2]!.coveringMutationsBelow).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
+    // slot 3: alignedRow[1] (Tag Diversifier, above) AND offsetRow[2] (Mini Mutation, below).
+    expect(model.projectSlots[3]!.coveringMutationsAbove).to.deep.eq([MutationName.TAG_DIVERSIFIER]);
+    expect(model.projectSlots[3]!.coveringMutationsBelow).to.deep.eq([MutationName.MINI_MUTATION]);
+    // slot 4: only offsetRow[2] (Mini Mutation, below) -- alignedRow[2] touches slot 5, inactive.
+    expect(model.projectSlots[4]!.coveringMutationsAbove).to.deep.eq([]);
+    expect(model.projectSlots[4]!.coveringMutationsBelow).to.deep.eq([MutationName.MINI_MUTATION]);
   });
 
   it('previews the combined effect of both covering mutations on a doubly-covered slot', () => {

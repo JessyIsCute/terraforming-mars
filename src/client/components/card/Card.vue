@@ -8,17 +8,20 @@
               <CardTags :tags="tags" />
               <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
           </div>
-          <CardTitle :title="card.name" :type="cardType"/>
+          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.mutationDisplayName" :mutated="card.mutationDisplayName !== undefined"/>
           <CardContent
               :metadata="cardMetadata"
               :requirements="cardRequirements"
               :isCorporation="isCorporationCard"
-              :bottomPadding="bottomPadding" />
+              :bottomPadding="bottomPadding"
+              :mutationText="mutationEffectText" />
       </div>
       <CardExpansion :expansion="cardExpansion" :isCorporation="isCorporationCard" :isResourceCard="isResourceCard" :compatibility="cardCompatibility" />
       <CardResourceCounter v-if="hasResourceType" :amount="resourceAmount" :type="resourceType" />
-      <CardVictoryPoints v-if="cardMetadata.victoryPoints" :victoryPoints="cardMetadata.victoryPoints" />
-      <div v-if="card.mutationVictoryPoints" class="mutation-vp-badge mutation-glow">+{{ card.mutationVictoryPoints }}</div>
+      <CardVictoryPoints
+        v-if="cardMetadata.victoryPoints !== undefined || card.mutationVictoryPoints"
+        :victoryPoints="cardMetadata.victoryPoints"
+        :bonus="card.mutationVictoryPoints ?? 0" />
       <CardExtraContent :card="card" />
       <slot></slot>
   </div>
@@ -50,6 +53,8 @@ import {buildClientCardFromCustom} from '@/client/cards/CustomCardAdapter';
 import {Color} from '@/common/Color';
 import {CardRequirementDescriptor} from '@/common/cards/CardRequirementDescriptor';
 import {GameModule} from '@/common/cards/GameModule';
+import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
+import {describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
 
 
 export default defineComponent({
@@ -148,6 +153,12 @@ export default defineComponent({
     mutationHighlight(): CardModel['mutationHighlight'] {
       return this.card.mutationHighlight;
     },
+    mutationEffectText(): string {
+      return (this.card.mutationNames ?? [])
+        .map((name) => describeMutationEffect(MUTATION_DEFINITIONS[name].effect))
+        .filter((text) => text !== '')
+        .join('; ');
+    },
     cardType(): CardType {
       return this.cardInstance.type;
     },
@@ -205,7 +216,7 @@ export default defineComponent({
       return this.cardInstance.resourceType ?? CardResource.RESOURCE_CUBE;
     },
     bottomPadding(): string {
-      if (this.cardMetadata.victoryPoints !== undefined) {
+      if (this.cardMetadata.victoryPoints !== undefined || this.card.mutationVictoryPoints) {
         return 'long';
       }
       if (this.hasResourceType) {

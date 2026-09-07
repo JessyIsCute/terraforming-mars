@@ -9,6 +9,7 @@ import {Warning} from '../cards/Warning';
 import {GameModule, Expansion} from '../cards/GameModule';
 import {CardMetadata} from '../cards/CardMetadata';
 import {CardRequirementDescriptor} from '../cards/CardRequirementDescriptor';
+import {MutationName} from '../mutationmarkets/MutationName';
 
 /**
  * The face-of-card data `Card.vue` needs but can't find in the client's compiled static
@@ -47,6 +48,8 @@ export interface CardModel {
     standardProjectCanPayWith?: StandardProjectCanPayWith; // Set for standard projects; undefined for regular project cards
     customCard?: CustomCardModel; // Set only for a Custom Card Maker card -- see CustomCardModel's doc comment.
     mutationAddedTag?: Tag; // MutationMarkets: an extra tag granted by a mutation (e.g. Tag Diversifier), not part of the card's static tag list
-    mutationHighlight?: {tag?: boolean, cost?: boolean, vp?: boolean}; // MutationMarkets: which parts of the card get the mutated-green glow
+    mutationHighlight?: {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean}; // MutationMarkets: which parts of the card get the mutated-green glow
     mutationVictoryPoints?: number; // MutationMarkets: extra VP granted by mutations, on top of the card's own printed VP formula
+    mutationDisplayName?: string; // MutationMarkets: the card's name prefixed by every applied mutation's prefix, e.g. "Gigantic Asteroid Mining"
+    mutationNames?: ReadonlyArray<MutationName>; // MutationMarkets: which mutation(s) are applied (won cards) or would apply (market preview), so the client can describe their effect(s) in the card's own description area
 }

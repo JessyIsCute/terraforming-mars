@@ -7,6 +7,7 @@ import {FakeLocalStorage} from '../FakeLocalStorage';
 import {CardType} from '@/common/cards/CardType';
 import {CustomCardModel} from '@/common/models/CardModel';
 import {ICardRenderRoot} from '@/common/cards/render/Types';
+import {MutationName} from '@/common/mutationmarkets/MutationName';
 
 describe('Card', () => {
   let localStorage: FakeLocalStorage;
@@ -48,6 +49,35 @@ describe('Card', () => {
     });
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.text()).to.contain('My Custom Card');
+  });
+
+  it('renders a mutated card\'s display name, Mutated ribbon, and glowing effect description', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          mutationDisplayName: 'Verdant Adapted Lichen',
+          mutationNames: [MutationName.GREENERY_KEEPER],
+        },
+      },
+    });
+    expect(wrapper.text()).to.contain('Verdant Adapted Lichen');
+    expect(wrapper.find('.mutated-label').exists()).to.be.true;
+    const description = wrapper.find('.mutation-glow.card-description');
+    expect(description.exists()).to.be.true;
+    expect(description.text()).to.eq('Gain 2 Plants on play');
+  });
+
+  it('renders an unmutated card with no Mutated ribbon or extra description', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {name: CardName.ADAPTED_LICHEN},
+      },
+    });
+    expect(wrapper.find('.mutated-label').exists()).to.be.false;
+    expect(wrapper.find('.mutation-glow.card-description').exists()).to.be.false;
   });
 
   it('throws if a card is neither in the static manifest nor carries customCard fallback data', () => {

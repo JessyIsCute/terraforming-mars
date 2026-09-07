@@ -1,5 +1,5 @@
 <template>
-  <div v-if="typeof victoryPoints !== 'number'" :class="classes">
+  <div v-if="victoryPoints !== undefined && typeof victoryPoints !== 'number'" :class="classes">
     <template v-if="victoryPoints.targetOneOrMore">
        <!-- This is the Search for Life special case. -->
       <div class="card-points-item-first">
@@ -20,7 +20,7 @@
     </template>
     <div v-if="victoryPoints.asterisk === true">*</div>
   </div>
-  <div v-else class="card-points card-points-big">{{ victoryPoints }}</div>
+  <div v-else :class="numberClasses">{{ totalNumber }}</div>
 </template>
 
 <script lang="ts">
@@ -38,7 +38,14 @@ export default defineComponent({
   props: {
     victoryPoints: {
       type: [Number, Object as () => CardRenderDynamicVictoryPoints],
-      required: true,
+      default: undefined,
+    },
+    // MutationMarkets: extra VP a mutation grants on top of the card's own printed
+    // formula. Folded into the displayed number (not shown as a separate badge) so the
+    // VP shown is always the card's actual current value; glows when non-zero.
+    bonus: {
+      type: Number,
+      default: 0,
     },
   },
   components: {
@@ -46,25 +53,27 @@ export default defineComponent({
   },
   computed: {
     classes(): string {
-      if (typeof this.victoryPoints === 'number') {
+      if (this.victoryPoints === undefined || typeof this.victoryPoints === 'number') {
         return '';
-      } else {
-        const classes: string[] = ['card-points'];
-        if (this.victoryPoints.vermin) {
-          classes.push('card-points-normal');
-          classes.push('card-points-vermin');
-          classes.push('red-outline');
-        } else if (this.victoryPoints.anyPlayer) {
-          classes.push('card-points-big');
-          classes.push('red-outline');
-        } else {
-          classes.push('card-points-normal');
-        }
-        return classes.join(' ');
       }
+      const classes: string[] = ['card-points'];
+      if (this.victoryPoints.vermin) {
+        classes.push('card-points-normal');
+        classes.push('card-points-vermin');
+        classes.push('red-outline');
+      } else if (this.victoryPoints.anyPlayer) {
+        classes.push('card-points-big');
+        classes.push('red-outline');
+      } else {
+        classes.push('card-points-normal');
+      }
+      if (this.bonus > 0) {
+        classes.push('mutation-glow');
+      }
+      return classes.join(' ');
     },
     points(): string {
-      if (typeof this.victoryPoints === 'number') {
+      if (this.victoryPoints === undefined || typeof this.victoryPoints === 'number') {
         return '';
       }
       const vps = this.victoryPoints;
@@ -72,7 +81,7 @@ export default defineComponent({
         return '?';
       }
       if (vps.item === undefined) {
-        return `${vps.points}`;
+        return `${vps.points + this.bonus}`;
       }
       if (vps.target === vps.points || vps.target === 1) {
         return `${vps.points}/`;
@@ -83,6 +92,19 @@ export default defineComponent({
         }
       }
       return `${vps.points}/${vps.target}`;
+    },
+    // The plain-number branch (no dynamic formula): printed VP (if any) plus the
+    // mutation bonus (if any) -- the card's one true current VP value.
+    totalNumber(): number {
+      const base = typeof this.victoryPoints === 'number' ? this.victoryPoints : 0;
+      return base + this.bonus;
+    },
+    numberClasses(): string {
+      const classes = ['card-points', 'card-points-big'];
+      if (this.bonus > 0) {
+        classes.push('mutation-glow');
+      }
+      return classes.join(' ');
     },
     animal(): ICardRenderItem {
       return {is: 'item', type: CardRenderItemType.RESOURCE, resource: CardResource.ANIMAL, size: Size.SMALL, amount: 1};

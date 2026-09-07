@@ -6,7 +6,6 @@
       <div class="mutation-market-mutation-name">{{ marketSlot.mutation }}</div>
       <div class="mutation-market-mutation-detail">
         <span>Needs: {{ requirementText }}</span>
-        <span>Reward: {{ rewardText }}</span>
         <span v-if="effectText" class="mutation-glow">{{ effectText }}</span>
       </div>
       <div v-if="marketSlot.playerProgress" class="ma-scores player_home_block--milestones-and-awards-scores">
@@ -31,7 +30,7 @@
 import {defineComponent, PropType} from 'vue';
 import {MutationMarketMutationSlotModel} from '@/common/models/MutationMarketModel';
 import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
-import {describeMutationRequirement, describeMutationReward, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
+import {describeMutationRequirement, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
 import {Color} from '@/common/Color';
 import {playerSymbol} from '@/client/utils/playerSymbol';
 
@@ -72,9 +71,6 @@ export default defineComponent({
     },
     requirementText(): string {
       return this.marketSlot === undefined ? '' : describeMutationRequirement(MUTATION_DEFINITIONS[this.marketSlot.mutation].requirement);
-    },
-    rewardText(): string {
-      return this.marketSlot === undefined ? '' : describeMutationReward(MUTATION_DEFINITIONS[this.marketSlot.mutation].reward);
     },
     effectText(): string {
       return this.marketSlot === undefined ? '' : describeMutationEffect(MUTATION_DEFINITIONS[this.marketSlot.mutation].effect);

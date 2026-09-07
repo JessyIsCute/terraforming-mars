@@ -115,9 +115,8 @@ describe('MutationMarkets bidding', () => {
     expect(data.projectAuctions[3]!.highBidder).to.eq(player2.id);
   });
 
-  it('resolution refunds losers, grants the reward, applies the qualifying mutation, and delivers the card', () => {
+  it('resolution refunds losers, applies the qualifying mutation, and delivers the card (no separate reward)', () => {
     const player2StartingMc = player2.megaCredits;
-    const playerStartingTr = player.terraformRating;
     MutationMarkets.placeBid(game, player2, 3, 4); // player2 loses
     MutationMarkets.placeBid(game, player, 3, 5); // player wins -- qualifies only for Tag Diversifier here
 
@@ -127,7 +126,6 @@ describe('MutationMarkets bidding', () => {
     expect(player.cardsInHand).to.include(cardC);
     expect(cardC.mutations).has.lengthOf(1);
     expect(cardC.mutations![0].mutation).to.eq(MutationName.TAG_DIVERSIFIER);
-    expect(player.terraformRating).to.eq(playerStartingTr + 1); // Tag Diversifier grants +1 TR
   });
 
   it('a winner qualifying for both covering mutations gets both applied', () => {

@@ -18,7 +18,7 @@ describe('Nested Mutation', () => {
     const card = fakeCard({name: CardName.PLANT_EATER, cost: 10, mutations: [{mutation: MutationName.NESTED_MUTATION}]});
 
     expect(player.cardsInHand).has.lengthOf(0);
-    MutationMarkets.maybeGrantNestedCopy(player, card);
+    MutationMarkets.applyOnPlayEffects(player, card);
 
     expect(player.cardsInHand).has.lengthOf(1);
     const copy = player.cardsInHand[0];
@@ -30,7 +30,7 @@ describe('Nested Mutation', () => {
 
   it('does not grant a copy for a card with no Nested Mutation applied', () => {
     const card = fakeCard({name: CardName.PLANT_EATER, cost: 10});
-    MutationMarkets.maybeGrantNestedCopy(player, card);
+    MutationMarkets.applyOnPlayEffects(player, card);
     expect(player.cardsInHand).has.lengthOf(0);
   });
 
@@ -40,7 +40,7 @@ describe('Nested Mutation', () => {
       cost: 6,
       mutations: [{mutation: MutationName.NESTED_MUTATION, bakedCostDelta: -4}],
     });
-    MutationMarkets.maybeGrantNestedCopy(player, spawnedCopy);
+    MutationMarkets.applyOnPlayEffects(player, spawnedCopy);
     expect(player.cardsInHand).has.lengthOf(0);
   });
 

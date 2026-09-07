@@ -948,11 +948,12 @@ export class Player implements IPlayer {
       }
     }
 
-    // Nested Mutation: must run after the removal above -- a copy granted here shares
-    // the same CardName as `selectedCard`, and the removal step matches by name, so
-    // granting it any earlier would have it immediately stripped back out of hand.
+    // MutationMarkets on-play effects: must run after the removal above -- a Nested
+    // Mutation copy granted here shares the same CardName as `selectedCard`, and the
+    // removal step matches by name, so granting it any earlier would have it immediately
+    // stripped back out of hand.
     if (selectedCard.type !== CardType.PROXY) {
-      MutationMarkets.maybeGrantNestedCopy(this, selectedCard);
+      MutationMarkets.applyOnPlayEffects(this, selectedCard);
     }
 
     switch (cardAction) {

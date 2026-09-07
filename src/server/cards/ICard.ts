@@ -214,6 +214,8 @@ export interface ICard {
   readonly baseCost?: number;
   /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
   mutations?: Array<AppliedMutation>;
+  /** The printed type, before any MutationMarkets `convertType` effect is folded in. Same as `type` for an unmutated card. */
+  readonly baseType?: CardType;
   readonly type: CardType;
   readonly requirements: ReadonlyArray<CardRequirementDescriptor>;
   readonly metadata: CardMetadata;

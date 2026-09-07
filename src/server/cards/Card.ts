@@ -193,8 +193,11 @@ export abstract class Card implements ICard {
   public get cardCost() {
     return this.properties.cardCost;
   }
-  public get type() {
+  public get baseType() {
     return this.properties.type;
+  }
+  public get type(): CardType {
+    return MutationEffects.applyType(this, this.baseType);
   }
   public get baseCost() {
     return this.properties.cost === undefined ? 0 : this.properties.cost;

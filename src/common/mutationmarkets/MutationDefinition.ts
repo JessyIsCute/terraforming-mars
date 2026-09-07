@@ -2,18 +2,6 @@ import {MutationName} from './MutationName';
 import {CardRequirementDescriptor} from '../cards/CardRequirementDescriptor';
 import {MutationEffect} from './MutationEffect';
 
-/**
- * A mutation's one-time payout, granted once when an auction it covers resolves in a
- * qualifying player's favor. Kept intentionally small for Phase 1 (the market skeleton) --
- * evaluating/granting these is Phase 3 work.
- */
-export type MutationReward = {
-  tr?: number,
-  megacredits?: number,
-  cards?: number,
-  victoryPoints?: number,
-};
-
 export type MutationDefinition = {
   name: MutationName,
   /**
@@ -28,11 +16,13 @@ export type MutationDefinition = {
    * requirement-parsing code.
    */
   requirement: CardRequirementDescriptor,
-  reward: MutationReward,
   /** The minimum opening bid on a project card this mutation covers. */
   minimumBid: number,
   /** How many pair-positions this mutation's row shifts by at generation end, while active. */
   steps: 1 | 2,
-  /** The permanent effect applied to the won card. */
+  /**
+   * The permanent effect applied to the won card. Winning an auction gets you the card
+   * with this applied -- nothing else; there's no separate one-time payout.
+   */
   effect: MutationEffect,
 };

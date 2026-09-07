@@ -13,7 +13,7 @@ describe('MutationCard', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders the mutation name, prefix, requirement, reward, and effect', () => {
+  it('renders the mutation name, prefix, requirement, and effect', () => {
     const wrapper = shallowMount(MutationCard, {
       ...globalConfig,
       props: {mutation: MutationName.TAG_DIVERSIFIER},
@@ -21,7 +21,6 @@ describe('MutationCard', () => {
     expect(wrapper.text()).to.contain('Tag Diversifier');
     expect(wrapper.text()).to.contain('Diverse');
     expect(wrapper.text()).to.contain('Needs: 5 unique tags');
-    expect(wrapper.text()).to.contain('Reward: +1 TR');
     expect(wrapper.text()).to.contain('Gains a random new tag');
   });
 

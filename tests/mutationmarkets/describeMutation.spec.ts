@@ -1,5 +1,6 @@
 import {expect} from 'chai';
-import {describeMutationRequirement, describeMutationReward, describeMutationEffect} from '../../src/common/mutationmarkets/describeMutation';
+import {describeMutationRequirement, describeMutationEffect} from '../../src/common/mutationmarkets/describeMutation';
+import {Resource} from '../../src/common/Resource';
 import {Tag} from '../../src/common/cards/Tag';
 
 describe('describeMutation', () => {
@@ -12,18 +13,14 @@ describe('describeMutation', () => {
     expect(describeMutationRequirement({tag: Tag.SCIENCE, count: 3})).to.eq('3 Science tags');
   });
 
-  it('describes rewards', () => {
-    expect(describeMutationReward({tr: 1})).to.eq('+1 TR');
-    expect(describeMutationReward({cards: 1})).to.eq('+1 card');
-    expect(describeMutationReward({cards: 2})).to.eq('+2 cards');
-    expect(describeMutationReward({tr: 1, victoryPoints: 2})).to.eq('+1 TR, +2 VP');
-  });
-
   it('describes effects', () => {
     expect(describeMutationEffect({kind: 'none'})).to.eq('');
     expect(describeMutationEffect({kind: 'addRandomTag'})).to.eq('Gains a random new tag');
     expect(describeMutationEffect({kind: 'costPercent', percent: -30, minAbsDelta: 3, maxAbsDelta: 12})).to.eq('Cost -30%');
     expect(describeMutationEffect({kind: 'costPercent', percent: 50, minAbsDelta: 3, maxAbsDelta: 12, vpPerAbsDelta: 3})).to.eq('Cost +50%, gains VP');
     expect(describeMutationEffect({kind: 'nestedCopy', percent: -40, minAbsDelta: 3, maxAbsDelta: 12})).to.eq('Playing it grants a 40% cheaper copy');
+    expect(describeMutationEffect({kind: 'grantResourceOnPlay', resource: Resource.PLANTS, amount: 2})).to.eq('Gain 2 Plants on play');
+    expect(describeMutationEffect({kind: 'grantProductionOnPlay', resource: Resource.STEEL, amount: 1})).to.eq('+1 Steel production on play');
+    expect(describeMutationEffect({kind: 'convertType'})).to.eq('Becomes an Event (or Automated) card; an Active card gets a M€ rebate on play instead');
   });
 });
