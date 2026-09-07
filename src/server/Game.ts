@@ -382,7 +382,7 @@ export class Game implements IGame, Logger {
     }
 
     if (gameOptions.conglomeratesExpansion) {
-      game.conglomerates = ConglomeratesExpansion.initialize(players);
+      game.conglomerates = ConglomeratesExpansion.initialize(players, gameOptions.conglomeratesTeamAssignments);
       players.forEach((player) => ConglomeratesExpansion.gainCoordination(player, 1));
     }
 

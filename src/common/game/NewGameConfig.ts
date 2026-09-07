@@ -16,6 +16,8 @@ export interface NewPlayerModel {
   beginner: boolean;
   handicap: number;
   first: boolean;
+  /** Conglomerates only: which team this player is on. Players sharing a value are teammates. */
+  team?: number;
 }
 
 export type EscapeVelocityOptions = {

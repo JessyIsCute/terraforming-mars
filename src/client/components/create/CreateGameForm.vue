@@ -518,6 +518,14 @@
                                                 </div>
                                               </template>
                                           </div>
+                                          <div v-if="expansions.conglomerates" class="form-group">
+                                              <label class="form-label">
+                                                  <span v-i18n>Team</span>
+                                                  <select class="form-select form-inline" v-model.number="newPlayer.team">
+                                                      <option v-for="team in conglomeratesTeamNumbers()" :key="team" :value="team">{{ $t('Team') }} {{ team + 1 }}</option>
+                                                  </select>
+                                              </label>
+                                          </div>
                                           <div>
                                               <!-- <template v-if="beginnerOption"> -->
                                                   <label v-if="isBeginnerToggleEnabled()" class="form-switch form-inline create-game-beginner-option-label">
@@ -741,6 +749,14 @@ export default defineComponent({
     playersCount(value: number) {
       if (value === 1) {
         this.expansions.corpera = true;
+      }
+      if (this.expansions.conglomerates) {
+        this.recomputeConglomeratesTeams();
+      }
+    },
+    'expansions.conglomerates': function(value: boolean) {
+      if (value === true) {
+        this.recomputeConglomeratesTeams();
       }
     },
   },
@@ -1005,6 +1021,21 @@ export default defineComponent({
     getPlayers(): Array<NewPlayerModel> {
       return this.players.slice(0, this.playersCount);
     },
+    conglomeratesTeamCount(): number {
+      return Math.max(1, Math.floor(this.playersCount / 2));
+    },
+    conglomeratesTeamNumbers(): Array<number> {
+      return Array.from({length: this.conglomeratesTeamCount()}, (_, i) => i);
+    },
+    // Default pairing: matches the server's table-order fallback (seats 0&2 vs 1&3 for 4
+    // players) so a user who never touches the team selector gets identical behavior to
+    // before this UI existed.
+    recomputeConglomeratesTeams() {
+      const half = this.conglomeratesTeamCount();
+      this.getPlayers().forEach((player, index) => {
+        player.team = index % half;
+      });
+    },
     isRandomMAEnabled(): boolean {
       return this.randomMA !== RandomMAOptionType.NONE;
     },
@@ -1142,6 +1173,24 @@ export default defineComponent({
           } else {
             usedColors.add(color);
           }
+        }
+      }
+
+      if (this.expansions.conglomerates) {
+        if (this.playersCount < 2 || this.playersCount % 2 !== 0) {
+          alert(this.$t('Conglomerates requires an even number of players, split into teams of 2'));
+          return undefined;
+        }
+        const teamSizes = new Map<number, number>();
+        for (const player of players) {
+          const team = player.team ?? 0;
+          teamSizes.set(team, (teamSizes.get(team) ?? 0) + 1);
+        }
+        const expectedTeams = this.conglomeratesTeamCount();
+        const balanced = teamSizes.size === expectedTeams && [...teamSizes.values()].every((size) => size === 2);
+        if (!balanced) {
+          alert(this.$t('Each Conglomerates team must have exactly 2 players'));
+          return undefined;
         }
       }
 

@@ -29,12 +29,30 @@ export class ConglomeratesExpansion {
   }
 
   /**
-   * Pairs players into teams. There's no team-assignment UI yet, so players
-   * are paired by table order: with 4 players, seats 0&2 form one team and
-   * seats 1&3 form the other. An odd player out (relevant only outside 2v2,
-   * which isn't supported yet) is left teamless.
+   * Pairs players into teams. `teamAssignments`, when given, is one team-index per player
+   * (same order as `players`), chosen by the user on the Create Game screen -- players
+   * sharing an index become a team. When absent (or the wrong length, e.g. an older saved
+   * settings JSON or a non-UI API caller), falls back to pairing by table order: with 4
+   * players, seats 0&2 form one team and seats 1&3 form the other. An odd player out (or a
+   * team-index used by only one player) is left teamless.
    */
-  public static initialize(players: ReadonlyArray<IPlayer>): ConglomeratesData {
+  public static initialize(players: ReadonlyArray<IPlayer>, teamAssignments?: ReadonlyArray<number>): ConglomeratesData {
+    if (teamAssignments !== undefined && teamAssignments.length === players.length) {
+      const groups = new Map<number, Array<PlayerId>>();
+      players.forEach((player, idx) => {
+        const team = teamAssignments[idx];
+        const group = groups.get(team) ?? [];
+        group.push(player.id);
+        groups.set(team, group);
+      });
+      const teams: Array<ConglomeratesTeam> = [...groups.values()].map((playerIds) => ({
+        playerIds,
+        teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
+        bonusVictoryPoints: 0,
+      }));
+      return {teams};
+    }
+
     const teams: Array<ConglomeratesTeam> = [];
     const half = Math.floor(players.length / 2);
     for (let i = 0; i < half; i++) {

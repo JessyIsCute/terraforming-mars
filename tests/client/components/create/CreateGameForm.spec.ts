@@ -198,6 +198,67 @@ describe('CreateGameForm', () => {
     expect((wrapper.vm as any).uploading).eq(false);
   });
 
+  it('auto-assigns Conglomerates teams by table order when the expansion is toggled on', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.players.slice(0, 4).map((p: any) => p.team)).to.deep.eq([0, 1, 0, 1]);
+  });
+
+  it('recomputes Conglomerates teams when the player count changes', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    vm.playersCount = 6;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.players.slice(0, 6).map((p: any) => p.team)).to.deep.eq([0, 1, 2, 0, 1, 2]);
+  });
+
+  it('blocks game creation when Conglomerates teams are unbalanced', async () => {
+    const originalAlert = global.alert;
+    const alerts: Array<string> = [];
+    global.alert = ((message: string) => alerts.push(message)) as typeof alert;
+
+    try {
+      const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+      const vm = wrapper.vm as any;
+      vm.playersCount = 4;
+      vm.expansions.conglomerates = true;
+      await wrapper.vm.$nextTick();
+      // Break the balanced default: put three players on team 0.
+      vm.players[1].team = 0;
+
+      const config = await vm.serializeSettings();
+
+      expect(config).to.be.undefined;
+      expect(alerts).to.deep.eq(['Each Conglomerates team must have exactly 2 players']);
+    } finally {
+      global.alert = originalAlert;
+    }
+  });
+
+  it('allows game creation when Conglomerates teams are balanced', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+    vm.randomFirstPlayer = false;
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    const config = await vm.serializeSettings();
+
+    expect(config).to.not.be.undefined;
+    expect(config.players.map((p: any) => p.team)).to.deep.eq([0, 1, 0, 1]);
+  });
+
   it('saves current settings before creating a game', async () => {
     const originalFetch = global.fetch;
     const originalAlert = global.alert;

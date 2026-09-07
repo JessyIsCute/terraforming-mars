@@ -108,6 +108,7 @@ export class ApiCreateGame extends Handler {
         coloniesExtension: gameReq.expansions.colonies,
         communityCardsOption: gameReq.expansions.community,
         conglomeratesExpansion: gameReq.expansions.conglomerates,
+        conglomeratesTeamAssignments: gameReq.expansions.conglomerates ? gameReq.players.map((p) => p.team ?? 0) : undefined,
         expansions: gameReq.expansions,
         ceosDraftVariant: gameReq.ceosDraftVariant,
         corporateEra: gameReq.expansions.corpera,
