@@ -9,18 +9,17 @@
       <div class="mutation-market-card-scale-wrapper">
         <Card :card="marketSlot.card" :autoTall="true" />
       </div>
+      <div v-if="marketSlot.auction !== undefined" class="mutation-market-auction-badge" :class="`board-cube--${marketSlot.auction.highBidderColor}`">
+        {{ marketSlot.auction.highBid }} M€
+      </div>
+      <div v-else-if="marketSlot.active" class="mutation-market-minimum-bid">
+        <span class="mutation-market-minimum-bid-coin">{{ marketSlot.minimumBid }}</span>
+      </div>
       <div v-if="marketSlot.coveringMutationsBelow.length > 0" class="mutation-market-preview-badges">
         <div v-for="mutation in marketSlot.coveringMutationsBelow" :key="mutation" class="mutation-market-preview-badge mutation-glow">
           {{ mutation }}
         </div>
       </div>
-      <div v-if="marketSlot.auction !== undefined" class="mutation-market-auction-badge" :class="`board-cube--${marketSlot.auction.highBidderColor}`">
-        {{ marketSlot.auction.highBid }} M€
-      </div>
-      <div v-else-if="marketSlot.active" class="mutation-market-minimum-bid-badge">
-        Min bid: {{ marketSlot.minimumBid }} M€
-      </div>
-      <div v-if="!marketSlot.active" class="mutation-market-inactive-overlay"></div>
     </template>
   </div>
 </template>

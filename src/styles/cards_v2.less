@@ -2897,16 +2897,20 @@
       border-radius: 14px 2px 2px 2px;
       .raised-bevel();
     }
-    // MutationMarkets: same geometry as prelude/ceo labels above -- never coexists with
-    // either, since a market-mutated card is always a plain project card (Automated/
-    // Active/Event), never a Prelude/CEO/Corporation.
+    // MutationMarkets: unlike prelude/ceo labels, this never coexists with either of
+    // them, but it DOES always coexist with the M€ cost circle -- a market-mutated card
+    // is always a plain project card (Automated/Active/Event), and those are exactly the
+    // types that show the cost circle (Prelude/CEO/Corporation don't). The cost circle
+    // occupies roughly the top-left 40x40px (accounting for `.card-cost-and-tags`'s -10px
+    // negative margins), so this is shifted right to clear it instead of reusing prelude/
+    // ceo's left:4px.
     .mutated-label {
       position: absolute;
       text-transform: uppercase;
       top: 15px;
-      left: 4px;
+      left: 48px;
       margin: 0px;
-      width: 80px;
+      width: 64px;
       height: 20px;
       line-height: 22px;
       text-align: center;

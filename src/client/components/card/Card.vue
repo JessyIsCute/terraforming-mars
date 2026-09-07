@@ -55,6 +55,8 @@ import {CardRequirementDescriptor} from '@/common/cards/CardRequirementDescripto
 import {GameModule} from '@/common/cards/GameModule';
 import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
 import {describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
+import {MutationEffect} from '@/common/mutationmarkets/MutationEffect';
+import {mergeMutationGrantIntoRenderData} from '@/client/utils/mergeMutationGrantIntoRenderData';
 
 
 export default defineComponent({
@@ -153,9 +155,34 @@ export default defineComponent({
     mutationHighlight(): CardModel['mutationHighlight'] {
       return this.card.mutationHighlight;
     },
+    // For each applied mutation, either fold its effect into the card's own renderData
+    // (a resource/production grant that matches an icon the card already shows -- see
+    // mergeMutationGrantIntoRenderData) or fall back to a separate description line.
+    // costPercent needs neither: its cost/VP change is already visible via the glowing
+    // cost number and VP badge (mutationHighlight.cost/vp) -- it's still described
+    // normally in the market/catalog view, via describeMutationEffect there directly.
+    mutationEffectMerge(): {renderData: CardMetadata['renderData'], remainingEffects: Array<MutationEffect>} {
+      let renderData: CardMetadata['renderData'];
+      const remainingEffects: Array<MutationEffect> = [];
+      for (const name of this.card.mutationNames ?? []) {
+        const effect = MUTATION_DEFINITIONS[name].effect;
+        if (effect.kind === 'costPercent') {
+          continue;
+        }
+        if (effect.kind === 'grantResourceOnPlay' || effect.kind === 'grantProductionOnPlay') {
+          const merged = mergeMutationGrantIntoRenderData(renderData ?? this.cardInstance.metadata.renderData, effect);
+          if (merged !== undefined) {
+            renderData = merged;
+            continue;
+          }
+        }
+        remainingEffects.push(effect);
+      }
+      return {renderData, remainingEffects};
+    },
     mutationEffectText(): string {
-      return (this.card.mutationNames ?? [])
-        .map((name) => describeMutationEffect(MUTATION_DEFINITIONS[name].effect))
+      return this.mutationEffectMerge.remainingEffects
+        .map((effect) => describeMutationEffect(effect))
         .filter((text) => text !== '')
         .join('; ');
     },
@@ -187,7 +214,11 @@ export default defineComponent({
       return classes.join(' ');
     },
     cardMetadata(): CardMetadata {
-      return this.cardInstance.metadata;
+      const {renderData} = this.mutationEffectMerge;
+      if (renderData === undefined) {
+        return this.cardInstance.metadata;
+      }
+      return {...this.cardInstance.metadata, renderData};
     },
     cardRequirements(): ReadonlyArray<CardRequirementDescriptor> | undefined {
       return this.cardInstance.requirements;

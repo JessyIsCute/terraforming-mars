@@ -1,6 +1,6 @@
 <template>
   <div class="card-item-container">
-    <div class="card-res-amount" v-if="item.showDigit">{{ amountAbs }}</div>
+    <div class="card-res-amount" :class="{'mutation-glow': item.mutationGlow}" v-if="item.showDigit">{{ amountAbs }}</div>
     <div :class="componentClasses" v-for="index in itemsToShow" v-html="itemHtmlContent" :key="index"></div>
     <div class="card-over" v-if="item.over !== undefined">over {{item.over}}</div>
   </div>
@@ -53,6 +53,13 @@ export default defineComponent({
       }
 
       classes.push(...this.componentClassArray);
+
+      // MutationMarkets: a resource/production grant merged into this icon (see
+      // mergeMutationGrantIntoRenderData) -- glow it so the change reads as "modified by
+      // a mutation", the same way the cost/VP/tag glows work elsewhere on the card.
+      if (this.item.mutationGlow) {
+        classes.push('mutation-icon-glow');
+      }
 
       if (this.item.secondaryTag === AltSecondaryTag.NO_PLANETARY_TAG) {
         classes.push('tag-clone');
