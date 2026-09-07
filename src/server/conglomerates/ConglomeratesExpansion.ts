@@ -1,6 +1,14 @@
 import {IPlayer} from '../IPlayer';
+import {IGame} from '../IGame';
+import {PlayerId} from '../../common/Types';
 import {ConglomeratesData, ConglomeratesTeam, TeamActionCosts} from './ConglomeratesData';
 import {ConglomeratesPlayerData} from '../../common/conglomerates/ConglomeratesPlayerData';
+import {AwardScorer} from '../awards/AwardScorer';
+import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuilder';
+import {sum} from '../../common/utils/utils';
+
+const MILESTONE_TEAM_VP = 8;
+const AWARD_TEAM_VP = 8;
 
 export const TEAM_ACTION_BASE_COSTS: TeamActionCosts = {
   givePatent: 2,
@@ -38,7 +46,8 @@ export class ConglomeratesExpansion {
   }
 
   public static getTeam(player: IPlayer): ConglomeratesTeam | undefined {
-    return player.game.conglomerates.teams.find((team) => team.playerIds.includes(player.id));
+    // player.game is unset for some bare, gameless test players -- treat that as teamless.
+    return player.game?.conglomerates?.teams.find((team) => team.playerIds.includes(player.id));
   }
 
   public static teammates(player: IPlayer): ReadonlyArray<IPlayer> {
@@ -77,5 +86,78 @@ export class ConglomeratesExpansion {
       return;
     }
     team.teamActionCosts[action] += 1;
+  }
+
+  /** `player`'s team, as player ids including `player`. A teamless player is their own team of one. */
+  public static teamPlayerIds(player: IPlayer): ReadonlyArray<PlayerId> {
+    return this.getTeam(player)?.playerIds ?? [player.id];
+  }
+
+  /**
+   * Groups every player in the game into a team (playerIds), pairing teamless players
+   * into solo teams of one so award ranking still works for them.
+   */
+  private static allTeamGroups(game: IGame): Array<ReadonlyArray<PlayerId>> {
+    const grouped = new Set<PlayerId>();
+    const groups: Array<ReadonlyArray<PlayerId>> = [];
+    for (const player of game.players) {
+      if (grouped.has(player.id)) {
+        continue;
+      }
+      const ids = this.teamPlayerIds(player);
+      ids.forEach((id) => grouped.add(id));
+      groups.push(ids);
+    }
+    return groups;
+  }
+
+  /**
+   * A milestone/award threshold check, scaled 1.5x (rounded up) and evaluated against the
+   * combined score of `player`'s whole team, when Conglomerates is on and `player` has a
+   * teammate. Otherwise, behaves like the unscaled single-player check.
+   */
+  public static meetsTeamThreshold(player: IPlayer, threshold: number, getScore: (player: IPlayer) => number): boolean {
+    // A team can only exist inside a real game, so checking teammates first (which tolerates a
+    // gameless player) avoids dereferencing player.game before we know it's actually set.
+    const teammates = player.teammates();
+    if (teammates.length === 0 || !player.game.gameOptions.conglomeratesExpansion) {
+      return getScore(player) >= threshold;
+    }
+    const combined = getScore(player) + sum(teammates.map(getScore));
+    return combined >= Math.ceil(threshold * 1.5);
+  }
+
+  /**
+   * Replaces the base game's per-player milestone/award VP for a Conglomerates game: each
+   * claimed milestone pays 8 VP to the claimer's whole team (not just the claimer), and each
+   * funded award pays 8 VP win-take-all to whichever team has the highest combined score
+   * (ties all win). The Coordination reward for claiming/funding is granted separately, at
+   * the point of claiming/funding -- this only covers the VP side of the reward.
+   */
+  public static calculateVictoryPoints(player: IPlayer, builder: VictoryPointsBreakdownBuilder) {
+    const game = player.game;
+    if (game.isSoloMode()) {
+      return;
+    }
+    const myTeam = this.teamPlayerIds(player);
+
+    for (const claimed of game.claimedMilestones) {
+      if (claimed.player !== undefined && myTeam.includes(claimed.player.id)) {
+        builder.setVictoryPoints('milestones', MILESTONE_TEAM_VP, 'Team claimed ${0} milestone', [claimed.milestone.name]);
+      }
+    }
+
+    for (const fundedAward of game.fundedAwards) {
+      const scorer = new AwardScorer(game, fundedAward.award);
+      const teamScores = this.allTeamGroups(game).map((playerIds) => ({
+        playerIds,
+        score: sum(playerIds.map((id) => scorer.get(game.getPlayerById(id)))),
+      }));
+      const topScore = Math.max(...teamScores.map((t) => t.score));
+      const wonByMyTeam = teamScores.some((t) => t.score === topScore && t.playerIds.includes(player.id));
+      if (wonByMyTeam) {
+        builder.setVictoryPoints('awards', AWARD_TEAM_VP, 'Team won ${0} award (funded by ${1})', [fundedAward.award.name, fundedAward.player.name]);
+      }
+    }
   }
 }

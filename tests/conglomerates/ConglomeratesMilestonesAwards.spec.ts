@@ -1,0 +1,128 @@
+import {expect} from 'chai';
+import {testGame} from '../TestGame';
+import {TestPlayer} from '../TestPlayer';
+import {IGame} from '../../src/server/IGame';
+import {Terraformer} from '../../src/server/milestones/Terraformer';
+import {Banker} from '../../src/server/awards/Banker';
+import {Resource} from '../../src/common/Resource';
+import {OrOptions} from '../../src/server/inputs/OrOptions';
+import {cast} from '../../src/common/utils/utils';
+import {runAllActions} from '../TestingUtils';
+
+describe('Conglomerates milestones and awards', () => {
+  let game: IGame;
+  let player1: TestPlayer;
+  let player2: TestPlayer;
+  let player3: TestPlayer;
+  let player4: TestPlayer;
+
+  beforeEach(() => {
+    // Phase 1 pairs by table order: player1&player3 are a team, player2&player4 are a team.
+    [game, player1, player2, player3, player4] = testGame(4, {conglomeratesExpansion: true});
+  });
+
+  describe('milestones', () => {
+    it('costs 12 MC to claim, up from the base game\'s 8', () => {
+      expect(player1.milestoneCost()).to.eq(12);
+    });
+
+    it('scales the threshold 1.5x rounded up and combines the whole team\'s score', () => {
+      const milestone = new Terraformer();
+      // Base threshold 35 -> ceil(52.5) = 53.
+      player1.setTerraformRating(30);
+      player3.setTerraformRating(22); // combined 52, just short
+      expect(milestone.canClaim(player1)).is.false;
+
+      player3.setTerraformRating(23); // combined 53
+      expect(milestone.canClaim(player1)).is.true;
+    });
+
+    it('does not scale or combine for a teamless player', () => {
+      const [, solo] = testGame(4);
+      const milestone = new Terraformer();
+      solo.setTerraformRating(35);
+      expect(milestone.canClaim(solo)).is.true;
+      solo.setTerraformRating(34);
+      expect(milestone.canClaim(solo)).is.false;
+    });
+
+    it('pays 8 VP to the whole team, not 5 to just the claimer', () => {
+      const milestone = new Terraformer();
+      game.claimedMilestones.push({player: player1, milestone});
+
+      expect(player1.getVictoryPoints().milestones).to.eq(8);
+      expect(player3.getVictoryPoints().milestones).to.eq(8); // teammate sees it too
+      expect(player2.getVictoryPoints().milestones).to.eq(0); // other team does not
+    });
+
+    it('gives the claimer 1 Coordination when actually claimed', () => {
+      player1.conglomeratesData.coordination = 5;
+      player1.megaCredits = 20;
+      player1.setTerraformRating(53); // solo already meets the (unscaled-for-solo) claim bar
+
+      const actions = cast(player1.getActions(), OrOptions);
+      const claimMilestoneAction = cast(actions.options.find((option) => option.title === 'Claim a milestone'), OrOptions);
+      claimMilestoneAction.options[0].cb();
+      runAllActions(game);
+
+      expect(game.claimedMilestones.some((cm) => cm.milestone.name === 'Terraformer' && cm.player === player1)).is.true;
+      expect(player1.conglomeratesData.coordination).to.eq(6);
+    });
+  });
+
+  describe('awards', () => {
+    it('costs 12/18/24 to fund, up from the base game\'s 8/14/20', () => {
+      expect(game.getAwardFundingCost()).to.eq(12);
+      game.fundAward(player1, new Banker());
+      expect(game.getAwardFundingCost()).to.eq(18);
+    });
+
+    it('pays 8 VP win-take-all to the team with the best combined score', () => {
+      const award = new Banker();
+      game.fundAward(player1, award);
+
+      // player1 & player3's team: 4 + 3 = 7 combined M€ production.
+      player1.production.add(Resource.MEGACREDITS, 4);
+      player3.production.add(Resource.MEGACREDITS, 3);
+      // player2 & player4's team: 2 + 2 = 4 combined.
+      player2.production.add(Resource.MEGACREDITS, 2);
+      player4.production.add(Resource.MEGACREDITS, 2);
+
+      expect(player1.getVictoryPoints().awards).to.eq(8);
+      expect(player3.getVictoryPoints().awards).to.eq(8);
+      expect(player2.getVictoryPoints().awards).to.eq(0);
+      expect(player4.getVictoryPoints().awards).to.eq(0);
+    });
+
+    it('splits the 8 VP to both teams on a tie', () => {
+      const award = new Banker();
+      game.fundAward(player1, award);
+
+      player1.production.add(Resource.MEGACREDITS, 3);
+      player3.production.add(Resource.MEGACREDITS, 3);
+      player2.production.add(Resource.MEGACREDITS, 3);
+      player4.production.add(Resource.MEGACREDITS, 3);
+
+      expect(player1.getVictoryPoints().awards).to.eq(8);
+      expect(player2.getVictoryPoints().awards).to.eq(8);
+    });
+
+    it('gives the funder 1 Coordination when actually funded', () => {
+      player1.conglomeratesData.coordination = 5;
+      player1.megaCredits = 30;
+      game.awards = [new Banker()];
+
+      const actions = cast(player1.getActions(), OrOptions);
+      const fundAwardAction = cast(
+        actions.options.find((option): option is OrOptions =>
+          option instanceof OrOptions && option.options[0]?.title === 'Banker'),
+        OrOptions,
+      );
+      fundAwardAction.options[0].cb();
+      runAllActions(game);
+
+      expect(game.hasBeenFunded(new Banker())).is.true;
+      expect(player1.conglomeratesData.coordination).to.eq(6);
+    });
+  });
+});

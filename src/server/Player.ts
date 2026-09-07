@@ -1174,6 +1174,9 @@ export class Player implements IPlayer {
       if (vanAllen !== undefined) {
         vanAllen.stock.add(Resource.MEGACREDITS, 3, {log: true, from: {card: CardName.VANALLEN}});
       }
+      if (this.game.gameOptions.conglomeratesExpansion) {
+        ConglomeratesExpansion.gainCoordination(this, 1, {log: true});
+      }
     };
 
     if (this.playedCards.has(CardName.VANALLEN)) {
@@ -1201,7 +1204,8 @@ export class Player implements IPlayer {
     if (this.playedCards.has(CardName.VANALLEN) || this.playedCards.has(CardName.NIRGAL_ENTERPRISES)) {
       return 0;
     }
-    return this.isStagedProtestsActive() ? MILESTONE_COST + 8 : MILESTONE_COST;
+    const base = this.game.gameOptions.conglomeratesExpansion ? Math.ceil(MILESTONE_COST * 1.5) : MILESTONE_COST;
+    return this.isStagedProtestsActive() ? base + 8 : base;
   }
 
   // Public for tests.
@@ -1217,6 +1221,9 @@ export class Player implements IPlayer {
     return new SelectOption(award.name, 'Fund - ' + '(' + award.name + ')').andThen(() => {
       this.game.defer(new SelectPaymentDeferred(this, this.awardFundingCost(), {title: 'Select how to pay for award'}));
       this.game.fundAward(this, award);
+      if (this.game.gameOptions.conglomeratesExpansion) {
+        ConglomeratesExpansion.gainCoordination(this, 1, {log: true});
+      }
       return undefined;
     });
   }

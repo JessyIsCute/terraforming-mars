@@ -662,7 +662,8 @@ export class Game implements IGame, Logger {
   }
 
   public getAwardFundingCost(): number {
-    return 8 + (6 * this.fundedAwards.length);
+    const base = this.gameOptions.conglomeratesExpansion ? 12 : 8;
+    return base + (6 * this.fundedAwards.length);
   }
 
   public fundAward(player: IPlayer, award: IAward): void {

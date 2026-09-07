@@ -10,6 +10,7 @@ import {FundedAward} from '../awards/FundedAward';
 import {AwardScorer} from '../awards/AwardScorer';
 import {CardName} from '../../common/cards/CardName';
 import {MutationEffects} from '../mutationmarkets/MutationEffects';
+import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 
 export function calculateVictoryPoints(player: IPlayer) {
   const builder = new VictoryPointsBreakdownBuilder();
@@ -44,13 +45,15 @@ export function calculateVictoryPoints(player: IPlayer) {
   // Victory points from TR
   builder.setVictoryPoints('terraformRating', player.terraformRating);
 
-  // Victory points from awards
-  giveAwards(player, builder);
-
-  // Victory points from milestones
-  for (const milestone of player.game.claimedMilestones) {
-    if (milestone.player !== undefined && milestone.player.id === player.id) {
-      builder.setVictoryPoints('milestones', 5, 'Claimed ${0} milestone', [milestone.milestone.name]);
+  // Victory points from awards and milestones
+  if (player.game.gameOptions.conglomeratesExpansion) {
+    ConglomeratesExpansion.calculateVictoryPoints(player, builder);
+  } else {
+    giveAwards(player, builder);
+    for (const milestone of player.game.claimedMilestones) {
+      if (milestone.player !== undefined && milestone.player.id === player.id) {
+        builder.setVictoryPoints('milestones', 5, 'Claimed ${0} milestone', [milestone.milestone.name]);
+      }
     }
   }
 
