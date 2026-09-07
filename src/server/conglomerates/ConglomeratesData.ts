@@ -9,6 +9,8 @@ export type TeamActionCosts = {
 export type ConglomeratesTeam = {
   playerIds: Array<PlayerId>;
   teamActionCosts: TeamActionCosts;
+  /** VP not attributed to an individual player, e.g. from winning a Turmoil ruling. */
+  bonusVictoryPoints: number;
 }
 
 export type ConglomeratesData = {

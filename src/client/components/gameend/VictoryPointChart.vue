@@ -27,6 +27,8 @@ const COLOR_CODES: Record<Color, string> = {
   // Not actual player colors
   ['neutral']: '',
   ['bronze']: '',
+  ['white']: '',
+  ['gray']: '',
 };
 
 interface ChartDataSet {

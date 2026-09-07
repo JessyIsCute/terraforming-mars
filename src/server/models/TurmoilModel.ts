@@ -4,6 +4,7 @@ import {IGame} from '../IGame';
 import {PoliticalAgendas} from '../turmoil/PoliticalAgendas';
 import {Delegate, Turmoil} from '../turmoil/Turmoil';
 import {DelegatesModel, PartyModel, PoliticalAgendasModel, TurmoilModel} from '../../common/models/TurmoilModel';
+import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 
 export function getTurmoilModel(game: IGame): TurmoilModel | undefined {
   return Turmoil.ifTurmoilElse(game, (turmoil) => {
@@ -91,6 +92,9 @@ function getParties(game: IGame): Array<PartyModel> {
     () => []);
 }
 
-function delegateColor(delegate: Delegate) {
-  return delegate === 'NEUTRAL' ? 'neutral' : delegate.color;
+function delegateColor(delegate: Delegate): Color {
+  if (delegate === 'NEUTRAL') {
+    return 'neutral';
+  }
+  return ConglomeratesExpansion.teamDisplayColor(delegate) ?? delegate.color;
 }

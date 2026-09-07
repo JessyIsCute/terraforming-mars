@@ -8,6 +8,8 @@ import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuild
 import {sum} from '../../common/utils/utils';
 import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictoryPointsBreakdown';
 import {ConglomeratesTeamModel} from '../../common/models/ConglomeratesModel';
+import {IParty} from '../turmoil/parties/IParty';
+import {Color, CONGLOMERATES_TEAM_COLORS} from '../../common/Color';
 
 const MILESTONE_TEAM_VP = 8;
 const AWARD_TEAM_VP = 8;
@@ -38,6 +40,7 @@ export class ConglomeratesExpansion {
       teams.push({
         playerIds: [players[i].id, players[i + half].id],
         teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
+        bonusVictoryPoints: 0,
       });
     }
     return {teams};
@@ -185,15 +188,15 @@ export class ConglomeratesExpansion {
    * milestones/awards categories subtracted out -- those are already the *team's* full
    * milestone/award VP, identically duplicated onto every member's own breakdown by
    * `calculateVictoryPoints` above, so summing members' raw totals would double-count them),
-   * plus the team's milestone and award VP counted once, plus a `bonuses` category reserved
-   * for future team-only VP sources (e.g. the Turmoil ruling bonus, not yet implemented).
+   * plus the team's milestone and award VP counted once, plus `bonuses` -- VP not attributed
+   * to an individual player, such as winning a Turmoil ruling (see `rewardRulingTeam`).
    */
   public static calculateTeamVictoryPoints(game: IGame, team: ConglomeratesTeam): TeamVictoryPointsBreakdown {
     const memberBreakdowns = team.playerIds.map((id) => game.getPlayerById(id).getVictoryPoints());
     const players = sum(memberBreakdowns.map((vp) => vp.total - vp.milestones - vp.awards));
     const milestones = memberBreakdowns[0]?.milestones ?? 0;
     const awards = memberBreakdowns[0]?.awards ?? 0;
-    const bonuses = 0;
+    const bonuses = team.bonusVictoryPoints ?? 0;
     return {
       players,
       milestones,
@@ -201,6 +204,60 @@ export class ConglomeratesExpansion {
       bonuses,
       total: players + milestones + awards + bonuses,
     };
+  }
+
+  /**
+   * Called when `party` becomes the new ruling party (Turmoil.setRulingParty, before its
+   * delegates are returned to reserve). Groups the party's delegates by team; if exactly one
+   * team holds a strict plurality (more than any other single team, ties excluded), that team
+   * "won the ruling": both members gain 1 Coordination, and the team gains 1 VP (`bonuses`).
+   */
+  public static rewardRulingTeam(game: IGame, party: IParty) {
+    const teamDelegateCounts = new Map<ConglomeratesTeam, number>();
+    party.delegates.forEachMultiplicity((count, delegate) => {
+      if (delegate === 'NEUTRAL') {
+        return;
+      }
+      const team = this.getTeam(delegate);
+      if (team === undefined) {
+        return;
+      }
+      teamDelegateCounts.set(team, (teamDelegateCounts.get(team) ?? 0) + count);
+    });
+    if (teamDelegateCounts.size === 0) {
+      return;
+    }
+
+    const sorted = [...teamDelegateCounts.entries()].sort((a, b) => b[1] - a[1]);
+    const topCount = sorted[0][1];
+    if (sorted.length > 1 && sorted[1][1] === topCount) {
+      // Tied for the lead -- no team clearly won the ruling.
+      return;
+    }
+    const [winningTeam] = sorted[0];
+
+    winningTeam.bonusVictoryPoints = (winningTeam.bonusVictoryPoints ?? 0) + 1;
+    game.log('A team won the ${0} ruling, gaining 1 Coordination each and 1 team VP', (b) => b.partyName(party.name));
+    for (const playerId of winningTeam.playerIds) {
+      this.gainCoordination(game.getPlayerById(playerId), 1, {log: true});
+    }
+  }
+
+  /**
+   * The shared delegate color for `player`'s team in Turmoil (see `CONGLOMERATES_TEAM_COLORS`
+   * in `common/Color.ts`), or undefined if `player` is teamless or their team's index has no
+   * reserved color (more teams than reserved colors -- not supported beyond 2v2 yet).
+   */
+  public static teamDisplayColor(player: IPlayer): Color | undefined {
+    const teams = player.game?.conglomerates?.teams;
+    if (teams === undefined) {
+      return undefined;
+    }
+    const index = teams.findIndex((team) => team.playerIds.includes(player.id));
+    if (index === -1) {
+      return undefined;
+    }
+    return CONGLOMERATES_TEAM_COLORS[index];
   }
 
   public static getTeamModels(game: IGame): Array<ConglomeratesTeamModel> {

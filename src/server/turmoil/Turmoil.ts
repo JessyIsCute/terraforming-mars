@@ -22,6 +22,7 @@ import {IPolicy, policyDescription} from './Policy';
 import {PlayerId} from '../../common/Types';
 import {ChoosePolicyBonus} from '../deferredActions/ChoosePolicyBonus';
 import {toID} from '../../common/utils/utils';
+import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 
 export type NeutralPlayer = 'NEUTRAL';
 export type Delegate = IPlayer | NeutralPlayer;
@@ -333,6 +334,9 @@ export class Turmoil {
     // Behold the Emperor Hook prevents changing the ruling party.
     if (game.beholdTheEmperor !== true) {
       this.rulingParty = this.dominantParty;
+      if (game.gameOptions.conglomeratesExpansion) {
+        ConglomeratesExpansion.rewardRulingTeam(game, this.rulingParty);
+      }
     }
 
     let newChairman = this.rulingParty.partyLeader || 'NEUTRAL';
