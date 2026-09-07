@@ -1760,17 +1760,68 @@
     background-image: url(./assets/underworld/corruption.png);
   }
 
-  // Conglomerates: no art asset, so a CSS-only blue square with a handshake emoji --
-  // matches the shape other resource icons use here (.card-resource-base is a plain square).
+  // Conglomerates: no art assets, so CSS-only icons -- squares matching the shape other
+  // resource icons use here (.card-resource-base is a plain square).
   .card-resource-coordination {
     background-image: none;
-    background-color: #2f6fed;
+    background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
+    border: 1px solid black;
+    box-sizing: border-box;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    // Inner fill, inset from the bevel ring above: same bright-top/dark-bottom
+    // treatment as the ring, one shade lighter/darker, echoing the beveled look
+    // of the real resource token art.
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      background: linear-gradient(to bottom, #4a78e0 50%, #081b40 50%);
+      z-index: 0;
+    }
 
     &::before {
       content: "🤝";
+      position: relative;
+      z-index: 1;
+      top: -2px;
       font-size: 18px;
-      line-height: 30px;
+      line-height: 28px;
+    }
+  }
+
+  // A teammate: a meeple glyph on a dark tile with a green ring, so "teammate : X" reads as
+  // "your teammate gets X".
+  .card-resource-teammate {
+    background-image: none;
+    background-color: #222;
+    border: 2px solid #2ecc71;
+    box-sizing: border-box;
+    text-align: center;
+
+    &::before {
+      content: "♟";
+      color: white;
+      font-size: 20px;
+      line-height: 26px;
+    }
+  }
+
+  // A card with a usable action (e.g. what Facility Sharing borrows), distinct from a plain
+  // "cards" icon.
+  .card-resource-action-card {
+    background-image: none;
+    background-color: #1c6fd8;
+    border: 1px solid black;
+    box-sizing: border-box;
+    text-align: center;
+
+    &::before {
+      content: "⚡";
+      font-size: 18px;
+      line-height: 28px;
     }
   }
 

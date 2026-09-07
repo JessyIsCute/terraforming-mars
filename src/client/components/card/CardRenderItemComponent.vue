@@ -266,6 +266,10 @@ export default defineComponent({
         return [cardResource, 'card-resource-corruption'];
       case CardRenderItemType.COORDINATION:
         return [cardResource, 'card-resource-coordination'];
+      case CardRenderItemType.TEAMMATE:
+        return [cardResource, 'card-resource-teammate'];
+      case CardRenderItemType.ACTION_CARD:
+        return [cardResource, 'card-resource-action-card'];
       case CardRenderItemType.RESOURCE:
         return [cardResource, this.resourceClass, this.resourceSizeClass];
       case CardRenderItemType.TAG:

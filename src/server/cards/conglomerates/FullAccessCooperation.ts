@@ -14,8 +14,10 @@ export class FullAccessCooperation extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'CG2',
         renderData: CardRenderer.builder((b) => {
-          b.text('Facility Sharing may also use your corporation\'s action.').br;
-          b.text('When another player uses one of your action cards, gain').megacredits(2);
+          b.corporation().colon().actionCard().asterix().br;
+          b.effect(undefined, (eb) => {
+            eb.teammate().actionCard().startEffect.megacredits(2).asterix();
+          });
         }),
         description: 'Facility Sharing can also use your corporation\'s action. When another player uses one of your action cards (including your corporation, with this card in play), gain 2 M€.',
       },

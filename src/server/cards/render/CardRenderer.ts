@@ -448,6 +448,18 @@ abstract class Builder<T> {
     return this._appendToRow(item);
   }
 
+  /** A teammate (Conglomerates): a meeple-style icon, so "X : Y" reads as "your teammate gets Y". */
+  public teammate(count: number = 1, options?: ItemOptions) {
+    const item = new CardRenderItem(CardRenderItemType.TEAMMATE, count, options);
+    return this._appendToRow(item);
+  }
+
+  /** An action card (Conglomerates): stands in for "a card with a usable action", e.g. Facility Sharing. */
+  public actionCard(count: number = 1, options?: ItemOptions) {
+    const item = new CardRenderItem(CardRenderItemType.ACTION_CARD, count, options);
+    return this._appendToRow(item);
+  }
+
   public undergroundResources(count: number = 1, options?: ItemOptions) {
     const item = new CardRenderItem(CardRenderItemType.UNDERGROUND_RESOURCES, count, options);
     return this._appendToRow(item);

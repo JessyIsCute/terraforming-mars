@@ -22,9 +22,7 @@ export class Selfish extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'CG1',
         renderData: CardRenderer.builder((b) => {
-          b.effect(undefined, (eb) => {
-            eb.coordination(1).startAction.production((pb) => pb.megacredits(4));
-          });
+          b.minus().coordination(1).nbsp.production((pb) => pb.megacredits(4));
         }),
         description: 'Spend 1 Coordination. Increase your M€ production 4 steps.',
       },
