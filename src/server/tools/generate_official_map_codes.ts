@@ -1,11 +1,13 @@
 // Generates src/common/boards/officialMapLibrary.ts: a derived CustomBoardDefinition/TMB code
-// for every official board, used ONLY by the Map Library's listing/preview UI. Actual gameplay
-// for official boards is untouched -- "Play this map" on an official library row deep-links into
-// Create Game with the real BoardName, never through this derived code (see the Map Library
-// plan's "Open design question" for the rationale).
+// for every built-in board -- official (Tharsis/Hellas/Elysium) and fan-made-but-bespoke-classed
+// (Hollandia, Arabia Terra, etc.) alike -- used ONLY by the Map Library's listing/preview UI.
+// Actual gameplay is untouched either way: "Play this map" on a built-in library row deep-links
+// into Create Game with the real BoardName, never through this derived code (see the Map Library
+// plan's "Open design question" for the rationale, and MapLibraryRow.vue's play() for how a row
+// is recognized as built-in regardless of its official/fanmade origin tag).
 //
-// This is a one-time, manually-run generator, not part of the build or server boot. Official
-// board layouts change essentially never; re-run this by hand (`npx tsx
+// This is a one-time, manually-run generator, not part of the build or server boot. Board
+// layouts change essentially never; re-run this by hand (`npx tsx
 // src/server/tools/generate_official_map_codes.ts`) and commit the refreshed output on the rare
 // occasion one does.
 import {strict as assert} from 'assert';
@@ -65,9 +67,17 @@ function buildDefinition(boardName: BoardName, seed: number): CustomBoardDefinit
   };
 }
 
-function generate(): Array<{boardName: BoardName, code: string}> {
+// The game's own, sole source of truth for "official" (Fryxgames-published) vs. fan/community
+// board: ApiCreateGame.boardOptions(RandomBoardOption.OFFICIAL) hardcodes exactly these three.
+// Every other BoardName is a fan-made board that happens to have a full bespoke board class (as
+// opposed to a community member's arbitrary CustomBoardDefinition/TMB code) -- still worth
+// generating a derived code for (so its Map Library row gets a real preview and deep-links to
+// its real BoardName for gameplay, same as an official one), just tagged 'fanmade' instead.
+const OFFICIAL_BOARD_NAMES: ReadonlySet<BoardName> = new Set([BoardName.THARSIS, BoardName.HELLAS, BoardName.ELYSIUM]);
+
+function generate(): Array<{boardName: BoardName, code: string, official: boolean}> {
   const boardNames = Object.values(BoardName).filter((name) => name !== BoardName.CUSTOM);
-  const results: Array<{boardName: BoardName, code: string}> = [];
+  const results: Array<{boardName: BoardName, code: string, official: boolean}> = [];
 
   for (const boardName of boardNames) {
     const def = buildDefinition(boardName, 0);
@@ -86,33 +96,45 @@ function generate(): Array<{boardName: BoardName, code: string}> {
       console.log(`${boardName}: ${warnings.join(' ')}`);
     }
 
-    results.push({boardName, code});
+    results.push({boardName, code, official: OFFICIAL_BOARD_NAMES.has(boardName)});
   }
   return results;
 }
 
 function main() {
   const results = generate();
+  const official = results.filter((r) => r.official);
+  const fan = results.filter((r) => !r.official);
 
   const lines: Array<string> = [];
   lines.push('// GENERATED FILE -- do not hand-edit.');
   lines.push('// Regenerate with: npx tsx src/server/tools/generate_official_map_codes.ts');
   lines.push('//');
-  lines.push('// Derived CustomBoardDefinition/TMB codes for every official board, used only by the Map');
-  lines.push("// Library's listing/preview UI. See generate_official_map_codes.ts for how these are built");
-  lines.push('// and why official gameplay never routes through them.');
+  lines.push('// Derived CustomBoardDefinition/TMB codes for every built-in board (official and fan-made');
+  lines.push('// alike -- see OFFICIAL_BOARD_NAMES in generate_official_map_codes.ts for which is which),');
+  lines.push("// used only by the Map Library's listing/preview UI. See generate_official_map_codes.ts for");
+  lines.push('// how these are built and why gameplay never routes through the derived code itself.');
   lines.push("import {BoardName} from './BoardName';");
   lines.push("import {isMapLibraryEntryId, MapLibraryEntryId} from './MapLibraryEntry';");
   lines.push("import {safeCast} from '../Types';");
   lines.push('');
   lines.push('export const OFFICIAL_MAP_LIBRARY_BOARDS: ReadonlyArray<{boardName: BoardName, code: string}> = [');
-  for (const {boardName, code} of results) {
+  for (const {boardName, code} of official) {
     lines.push(`  {boardName: BoardName.${enumKeyFor(boardName)}, code: '${code}'},`);
   }
   lines.push('];');
   lines.push('');
-  lines.push('// Stable, deterministic id -- re-running the seeder is idempotent, and an admin who');
-  lines.push('// deletes an official row will not have it silently resurrected until the next boot.');
+  lines.push('// Fan-made boards with a full bespoke board class (unlike a community CustomBoardDefinition');
+  lines.push('// submission) -- still real, "approved" Map Library entries, just not Fryxgames-official.');
+  lines.push('export const FAN_MAP_LIBRARY_BOARDS: ReadonlyArray<{boardName: BoardName, code: string}> = [');
+  for (const {boardName, code} of fan) {
+    lines.push(`  {boardName: BoardName.${enumKeyFor(boardName)}, code: '${code}'},`);
+  }
+  lines.push('];');
+  lines.push('');
+  lines.push('// Stable, deterministic id shared by both lists above -- re-running the seeder is');
+  lines.push('// idempotent, and an admin who deletes a built-in row will not have it silently');
+  lines.push('// resurrected until the next boot.');
   lines.push('export function officialMapLibraryId(boardName: BoardName): MapLibraryEntryId {');
   lines.push('  const slug = boardName.toLowerCase().replace(/[^a-z0-9]+/g, \'-\').replace(/(^-|-$)/g, \'\');');
   lines.push('  return safeCast(`m-official-${slug}`, isMapLibraryEntryId);');
@@ -121,7 +143,7 @@ function main() {
 
   const outPath = path.resolve(__dirname, '../../common/boards/officialMapLibrary.ts');
   writeFileSync(outPath, lines.join('\n'));
-  console.log(`Wrote ${results.length} official board codes to ${outPath}`);
+  console.log(`Wrote ${official.length} official + ${fan.length} fan-made board codes to ${outPath}`);
 }
 
 function enumKeyFor(boardName: BoardName): string {
