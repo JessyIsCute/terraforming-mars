@@ -88,9 +88,9 @@ const LAYOUT_STORAGE_KEY = 'mapLibraryLayout';
 
 function loadStoredLayout(): Layout {
   try {
-    return window.localStorage?.getItem(LAYOUT_STORAGE_KEY) === 'list' ? 'list' : 'grid';
+    return window.localStorage?.getItem(LAYOUT_STORAGE_KEY) === 'grid' ? 'grid' : 'list';
   } catch (e) {
-    return 'grid';
+    return 'list';
   }
 }
 

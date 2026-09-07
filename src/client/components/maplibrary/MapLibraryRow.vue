@@ -47,10 +47,11 @@ type DataModel = {
 // Sized well above MapThumbnail's own default -- the map itself is the point of a library card.
 const THUMBNAIL_WIDTH = 500;
 const THUMBNAIL_HEIGHT = 410;
-// MapLibrary.vue's "List" layout: one card per row, so the thumbnail can go a lot bigger.
-// Same aspect ratio as the grid size above (500:410).
-const LARGE_THUMBNAIL_WIDTH = 900;
-const LARGE_THUMBNAIL_HEIGHT = 738;
+// MapLibrary.vue's "List" layout (now the default): one card per row, so the thumbnail can go
+// a lot bigger. Same aspect ratio as the grid size above (500:410), scaled down 20% from an
+// earlier, too-large 900x738.
+const LARGE_THUMBNAIL_WIDTH = 720;
+const LARGE_THUMBNAIL_HEIGHT = 590;
 
 export default defineComponent({
   name: 'MapLibraryRow',
