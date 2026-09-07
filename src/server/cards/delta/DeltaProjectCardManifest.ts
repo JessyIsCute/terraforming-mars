@@ -15,7 +15,11 @@ import {StormSurgeBarrier} from './StormSurgeBarrier';
 export const DELTA_PROJECT_CARD_MANIFEST = new ModuleManifest({
   module: 'deltaProject',
   preludeCards: {
-    [CardName.DELTA_PROJECT]: {Factory: DeltaProject},
+    // Force-dealt directly to every player in Game.ts (`new DeltaProject()`), not drawn
+    // from the shared prelude pool - instantiate: false keeps it out of
+    // GameCards.getPreludeCards() (and so out of the real preludeDeck), while this entry
+    // still lets other deltaProject-compatible cards find it registered here.
+    [CardName.DELTA_PROJECT]: {Factory: DeltaProject, instantiate: false},
   },
   projectCards: {
     [CardName.QUANTUM_RESEARCH]: {Factory: QuantumResearch},

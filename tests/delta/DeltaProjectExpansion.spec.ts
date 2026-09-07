@@ -17,6 +17,8 @@ import {SpaceRelay} from '../../src/server/cards/pathfinders/SpaceRelay';
 import {RegolithEaters} from '../../src/server/cards/base/RegolithEaters';
 import {VictoryPointsBreakdownBuilder} from '../../src/server/game/VictoryPointsBreakdownBuilder';
 import {Game} from '../../src/server/Game';
+import {GameCards} from '../../src/server/GameCards';
+import {DEFAULT_GAME_OPTIONS} from '../../src/server/game/GameOptions';
 import {cast} from '@/common/utils/utils';
 import {IPlayer} from '@/server/IPlayer';
 
@@ -489,6 +491,15 @@ describe('DeltaProjectExpansion', () => {
     it('is not present when expansion is disabled', () => {
       const [/* game */, p] = testGame(1);
       expect(p.preludeCardsInHand.some((c) => c.name === CardName.DELTA_PROJECT)).is.false;
+    });
+
+    it('is not drawable from the normal prelude pool - it is only ever force-dealt', () => {
+      // Regression: it used to also sit in the shared prelude deck, so besides every
+      // player getting it for free, it could also be drawn (and end up duplicated, or
+      // taking up a slot meant for a real prelude) through the normal prelude draft.
+      const gameCards = new GameCards({...DEFAULT_GAME_OPTIONS, preludeExtension: true, deltaProjectExpansion: true});
+      const pool = gameCards.getPreludeCards();
+      expect(pool.some((c) => c.name === CardName.DELTA_PROJECT)).is.false;
     });
 
     it('canAct returns false with no energy', () => {
