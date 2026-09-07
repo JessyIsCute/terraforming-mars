@@ -264,6 +264,8 @@ export default defineComponent({
         return [this.item.isSuperscript ? 'card-excavation--superscript' : 'card-excavation'];
       case CardRenderItemType.CORRUPTION:
         return [cardResource, 'card-resource-corruption'];
+      case CardRenderItemType.COORDINATION:
+        return [cardResource, 'card-resource-coordination'];
       case CardRenderItemType.RESOURCE:
         return [cardResource, this.resourceClass, this.resourceSizeClass];
       case CardRenderItemType.TAG:

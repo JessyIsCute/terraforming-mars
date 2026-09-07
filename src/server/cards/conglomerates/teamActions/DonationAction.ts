@@ -28,7 +28,7 @@ export class DonationAction extends StandardProjectCard {
         cardNumber: 'TA3',
         renderData: CardRenderer.builder((b) => {
           b.standardProject(`Send ${DONATION_MC} M€ and ${DONATION_RESOURCE_AMOUNT} of a standard resource to your teammate.`, (eb) => {
-            eb.empty().startAction.text('+1 Coordination cost');
+            eb.coordination(1).startAction.megacredits(DONATION_MC);
           });
         }),
       },
