@@ -20,6 +20,11 @@ export enum CardName {
   FACILITY_SHARING = 'Facility Sharing',
   TEAM_DONATION = 'Team Donation',
 
+  // Conglomerates cards:
+  SELFISH = 'Selfish',
+  FULL_ACCESS_COOPERATION = 'Full Access Cooperation',
+  HELP_REQUEST = 'Help Request',
+
   ACQUIRED_COMPANY = 'Acquired Company',
   ADAPTATION_TECHNOLOGY = 'Adaptation Technology',
   ADAPTED_LICHEN = 'Adapted Lichen',

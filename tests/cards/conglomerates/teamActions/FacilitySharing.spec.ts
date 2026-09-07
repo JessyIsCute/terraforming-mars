@@ -2,6 +2,8 @@ import {expect} from 'chai';
 import {FacilitySharing} from '../../../../src/server/cards/conglomerates/teamActions/FacilitySharing';
 import {Steelworks} from '../../../../src/server/cards/base/Steelworks';
 import {SpaceMirrors} from '../../../../src/server/cards/base/SpaceMirrors';
+import {UnitedNationsMarsInitiative} from '../../../../src/server/cards/corporation/UnitedNationsMarsInitiative';
+import {FullAccessCooperation} from '../../../../src/server/cards/conglomerates/FullAccessCooperation';
 import {IGame} from '../../../../src/server/IGame';
 import {testGame} from '../../../TestGame';
 import {TestPlayer} from '../../../TestPlayer';
@@ -77,5 +79,42 @@ describe('FacilitySharing', () => {
     // The unused Steelworks option was not consumed.
     expect(player.energy).to.eq(4);
     expect(teammate.actionsThisGeneration.has(steelworks.name)).is.false;
+  });
+
+  describe('with Full Access Cooperation', () => {
+    it('does not offer the teammate\'s corporation action without it', () => {
+      teammate.playedCards.push(new UnitedNationsMarsInitiative());
+      player.hasIncreasedTerraformRatingThisGeneration = true;
+      player.megaCredits = 3;
+
+      // Steelworks isn't sharable (player has no energy), so only the corp action would show.
+      expect(card.canAct(player)).is.false;
+    });
+
+    it('lets Facility Sharing reach the teammate\'s corporation action', () => {
+      teammate.playedCards.push(new UnitedNationsMarsInitiative());
+      teammate.playedCards.push(new FullAccessCooperation());
+      player.hasIncreasedTerraformRatingThisGeneration = true;
+      player.megaCredits = 3;
+
+      expect(card.canAct(player)).is.true;
+      // UnitedNationsMarsInitiative.action() defers the payment/TR increase and returns
+      // undefined itself, so a single sharable option collapses straight through to that.
+      expect(card.action(player)).is.undefined;
+      game.deferredActions.runNext();
+
+      expect(player.megaCredits).to.eq(0);
+      expect(player.terraformRating).to.eq(21);
+    });
+
+    it('gives the teammate 2 MC when their action card is used through Facility Sharing', () => {
+      teammate.playedCards.push(new FullAccessCooperation());
+      player.energy = 4;
+      const teammateMcBefore = teammate.megaCredits;
+
+      card.action(player);
+
+      expect(teammate.megaCredits).to.eq(teammateMcBefore + 2);
+    });
   });
 });
