@@ -106,12 +106,6 @@
   margin-top: 3px;
 }
 
-.mutation-market-mutation-footer {
-  font-size: 13px;
-  color: #9fc7ab;
-  margin-top: 4px;
-}
-
 // The two positions of the offset row that only ever half-overlap a real project slot
 // (the other half would need a slot past the edge of the board, which doesn't exist) --
 // rendered as pure void rather than the grey "inactive but visible" treatment used for a
@@ -139,6 +133,18 @@
   font-size: 18px;
   color: white;
   background: #37474f;
+  z-index: 2;
+}
+
+.mutation-market-minimum-bid-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 3px 12px;
+  border-radius: 15px;
+  font-size: 13px;
+  color: #cfe8d6;
+  background: rgba(55, 71, 79, 0.7);
   z-index: 2;
 }
 

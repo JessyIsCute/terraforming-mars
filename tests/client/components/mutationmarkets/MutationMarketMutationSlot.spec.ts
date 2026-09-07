@@ -7,7 +7,7 @@ import {MutationMarketMutationSlotModel} from '@/common/models/MutationMarketMod
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 
 function slotFor(mutation: MutationName, active = true): NonNullable<MutationMarketMutationSlotModel> {
-  return {mutation, active, minimumBid: 2};
+  return {mutation, active};
 }
 
 describe('MutationMarketMutationSlot', () => {
@@ -19,13 +19,12 @@ describe('MutationMarketMutationSlot', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders the mutation name, minimum bid, and steps when present', () => {
+  it('renders the mutation name', () => {
     const wrapper = shallowMount(MutationMarketMutationSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(MutationName.TAG_DIVERSIFIER), gridColumn: '1 / span 2'},
     });
     expect(wrapper.text()).to.contain('Tag Diversifier');
-    expect(wrapper.text()).to.contain('2');
     expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.false;
   });
 
@@ -70,7 +69,6 @@ describe('MutationMarketMutationSlot', () => {
         marketSlot: {
           mutation: MutationName.TAG_DIVERSIFIER,
           active: true,
-          minimumBid: 2,
           playerProgress: [{color: 'red', score: 3}, {color: 'blue', score: 0}],
         },
         gridColumn: '1 / span 2',

@@ -19,7 +19,6 @@
           <p class="ma-score" :class="`player_bg_color_${progress.color}`" v-text="progress.score"></p>
         </template>
       </div>
-      <div class="mutation-market-mutation-footer">Min bid: {{ marketSlot.minimumBid }} M€ &middot; {{ steps }} step{{ steps > 1 ? 's' : '' }}</div>
       <div v-if="!marketSlot.active" class="mutation-market-inactive-overlay"></div>
     </template>
   </div>
@@ -65,9 +64,6 @@ export default defineComponent({
   computed: {
     entranceClass(): string {
       return this.entering ? 'mutation-market-slot--entering-left' : '';
-    },
-    steps(): number {
-      return this.marketSlot === undefined ? 0 : MUTATION_DEFINITIONS[this.marketSlot.mutation].steps;
     },
     requirementText(): string {
       return this.marketSlot === undefined ? '' : describeMutationRequirement(MUTATION_DEFINITIONS[this.marketSlot.mutation].requirement);

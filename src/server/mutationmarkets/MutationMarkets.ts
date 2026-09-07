@@ -251,17 +251,25 @@ export class MutationMarkets {
     return game.players.map((player) => ({color: player.color, score: compiled.getScore(player, noCard)}));
   }
 
-  /** The higher of the covering (active) mutations' printed minimum bid. */
-  public static minimumBidFor(data: MutationMarketData, slotIndex: number): number {
-    const minimums = MutationMarkets.coveringMutations(data, slotIndex).map((mutation) => MUTATION_DEFINITIONS[mutation].minimumBid);
-    return minimums.length > 0 ? Math.max(...minimums) : 1;
+  /**
+   * A project slot's minimum bid is fixed by its position, not by which mutation(s)
+   * cover it -- descending left to right across the four active slots (2-5, 1-indexed).
+   * Slot 2 just picked up a newly-paired covering mutation, the priciest position (4);
+   * slot 5 is a freshly-dealt card entering active status for the first time, the
+   * cheapest (1).
+   */
+  private static readonly MINIMUM_BID_BY_PROJECT_SLOT: Readonly<Record<number, number>> = {1: 4, 2: 3, 3: 2, 4: 1};
+
+  /** The fixed minimum bid for `slotIndex` (only meaningful for the four active slots, 1-4). */
+  public static minimumBidFor(slotIndex: number): number {
+    return MutationMarkets.MINIMUM_BID_BY_PROJECT_SLOT[slotIndex] ?? 1;
   }
 
   /** The smallest bid that would currently win/open the auction on this slot. */
   public static nextBidFor(data: MutationMarketData, slotIndex: number): number {
     const auction = data.projectAuctions[slotIndex];
     const currentHigh = auction === undefined ? 0 : auction.escrow[auction.highBidder];
-    return Math.max(MutationMarkets.minimumBidFor(data, slotIndex), currentHigh + 1);
+    return Math.max(MutationMarkets.minimumBidFor(slotIndex), currentHigh + 1);
   }
 
   /**
@@ -388,26 +396,17 @@ export class MutationMarkets {
     return player;
   }
 
+  /** Mutation rows always shift one position to the right at generation end -- the exiting slot is discarded, and a fresh mutation enters from the left. */
   private static shiftRow(game: IGame, data: MutationMarketData, row: MutationRow): void {
     const slots = data[row];
-    const steps = slots.reduce((sum, _slot, index) => {
-      if (!MutationMarkets.isMutationSlotActive(row, index, data)) {
-        return sum;
-      }
-      const mutation = slots[index];
-      return sum + (mutation === undefined ? 0 : MUTATION_DEFINITIONS[mutation.mutation].steps);
-    }, 0);
-
-    for (let i = 0; i < steps; i++) {
-      const exiting = slots[slots.length - 1];
-      if (exiting !== undefined) {
-        data.mutationDiscardPile.push(exiting.mutation);
-      }
-      for (let j = slots.length - 1; j > 0; j--) {
-        slots[j] = slots[j - 1];
-      }
-      slots[0] = MutationMarkets.dealMutation(game, data);
+    const exiting = slots[slots.length - 1];
+    if (exiting !== undefined) {
+      data.mutationDiscardPile.push(exiting.mutation);
     }
+    for (let j = slots.length - 1; j > 0; j--) {
+      slots[j] = slots[j - 1];
+    }
+    slots[0] = MutationMarkets.dealMutation(game, data);
   }
 
   private static dataOrThrow(game: IGame): MutationMarketData {

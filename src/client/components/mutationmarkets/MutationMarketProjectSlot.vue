@@ -17,6 +17,9 @@
       <div v-if="marketSlot.auction !== undefined" class="mutation-market-auction-badge" :class="`board-cube--${marketSlot.auction.highBidderColor}`">
         {{ marketSlot.auction.highBid }} M€
       </div>
+      <div v-else-if="marketSlot.active" class="mutation-market-minimum-bid-badge">
+        Min bid: {{ marketSlot.minimumBid }} M€
+      </div>
       <div v-if="!marketSlot.active" class="mutation-market-inactive-overlay"></div>
     </template>
   </div>

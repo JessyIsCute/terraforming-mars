@@ -11,6 +11,7 @@ function slotFor(name: CardName, overrides: Partial<MutationMarketProjectSlotMod
   return {
     card: {name},
     active: true,
+    minimumBid: 4,
     coveringMutationsAbove: [],
     coveringMutationsBelow: [],
     ...overrides,
@@ -89,6 +90,26 @@ describe('MutationMarketProjectSlot', () => {
     expect(badge.exists()).to.be.true;
     expect(badge.text()).to.contain('5');
     expect(badge.classes()).to.include('board-cube--red');
+    expect(wrapper.find('.mutation-market-minimum-bid-badge').exists()).to.be.false;
+  });
+
+  it('shows the fixed minimum bid on an active slot with no auction yet', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {minimumBid: 3})},
+    });
+    const badge = wrapper.find('.mutation-market-minimum-bid-badge');
+    expect(badge.exists()).to.be.true;
+    expect(badge.text()).to.contain('3');
+    expect(wrapper.find('.mutation-market-auction-badge').exists()).to.be.false;
+  });
+
+  it('shows no minimum bid badge for an inactive preview slot', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: slotFor(CardName.PLANT_EATER, {active: false})},
+    });
+    expect(wrapper.find('.mutation-market-minimum-bid-badge').exists()).to.be.false;
   });
 
   it('plays and then clears the entrance animation when the card is replaced', async () => {

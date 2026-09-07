@@ -7,7 +7,6 @@
       <span>Needs: {{ requirementText }}</span>
       <span v-if="effectText" class="mutation-glow">{{ effectText }}</span>
     </div>
-    <div class="mutation-market-mutation-footer">Min bid: {{ definition.minimumBid }} M€ &middot; {{ definition.steps }} step{{ definition.steps > 1 ? 's' : '' }}</div>
   </div>
 </template>
 

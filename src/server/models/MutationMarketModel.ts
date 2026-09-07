@@ -48,6 +48,7 @@ function projectSlotModel(game: IGame, data: MutationMarketData, card: IProjectC
   return {
     card: model,
     active: MutationMarkets.isProjectSlotActive(index),
+    minimumBid: MutationMarkets.minimumBidFor(index),
     auction: auctionModel,
     coveringMutationsAbove: above,
     coveringMutationsBelow: below,
@@ -95,7 +96,6 @@ function mutationSlotModel(game: IGame, data: MutationMarketData, row: MutationR
   return {
     mutation: slot.mutation,
     active: MutationMarkets.isMutationSlotActive(row, index, data),
-    minimumBid: definition.minimumBid,
     playerProgress: MutationMarkets.playerProgressFor(game, definition.requirement),
   };
 }

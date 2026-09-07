@@ -16,10 +16,6 @@ export type MutationDefinition = {
    * requirement-parsing code.
    */
   requirement: CardRequirementDescriptor,
-  /** The minimum opening bid on a project card this mutation covers. */
-  minimumBid: number,
-  /** How many pair-positions this mutation's row shifts by at generation end, while active. */
-  steps: 1 | 2,
   /**
    * The permanent effect applied to the won card. Winning an auction gets you the card
    * with this applied -- nothing else; there's no separate one-time payout.

@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import {MutationMarkets} from '../../src/server/mutationmarkets/MutationMarkets';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
-import {MUTATION_DEFINITIONS} from '../../src/common/mutationmarkets/MutationDefinitions';
 import {Tag} from '../../src/common/cards/Tag';
 import {IGame} from '../../src/server/IGame';
 import {IProjectCard} from '../../src/server/cards/IProjectCard';
@@ -47,22 +46,21 @@ describe('MutationMarkets bidding', () => {
     expect(MutationMarkets.biddableSlots(game, player2)).to.have.members([1, 2, 3, 4]);
   });
 
-  it('minimumBidFor is the higher of the covering mutations\' minimums', () => {
-    const data = game.mutationMarketData!;
-    expect(MutationMarkets.minimumBidFor(data, 1)).to.eq(MUTATION_DEFINITIONS[MutationName.GIGANTIC_UNDERTAKINGS].minimumBid);
-    expect(MutationMarkets.minimumBidFor(data, 2)).to.eq(Math.max(
-      MUTATION_DEFINITIONS[MutationName.TAG_DIVERSIFIER].minimumBid,
-      MUTATION_DEFINITIONS[MutationName.GIGANTIC_UNDERTAKINGS].minimumBid));
+  it('minimumBidFor is fixed by slot position, descending 4,3,2,1 across active slots 1-4', () => {
+    expect(MutationMarkets.minimumBidFor(1)).to.eq(4);
+    expect(MutationMarkets.minimumBidFor(2)).to.eq(3);
+    expect(MutationMarkets.minimumBidFor(3)).to.eq(2);
+    expect(MutationMarkets.minimumBidFor(4)).to.eq(1);
   });
 
   it('placeBid escrows M€ and rejects a bid below the minimum/current high', () => {
     const startingMc = player.megaCredits;
-    expect(() => MutationMarkets.placeBid(game, player, 2, 1)).to.throw(); // below the minimum (2)
-    MutationMarkets.placeBid(game, player, 2, 2); // exactly the minimum
-    expect(player.megaCredits).to.eq(startingMc - 2);
+    expect(() => MutationMarkets.placeBid(game, player, 2, 2)).to.throw(); // below slot 2's minimum (3)
+    MutationMarkets.placeBid(game, player, 2, 3); // exactly the minimum
+    expect(player.megaCredits).to.eq(startingMc - 3);
     expect(game.mutationMarketData!.projectAuctions[2]!.highBidder).to.eq(player.id);
 
-    expect(() => MutationMarkets.placeBid(game, player2, 2, 2)).to.throw(); // must strictly exceed the current high
+    expect(() => MutationMarkets.placeBid(game, player2, 2, 3)).to.throw(); // must strictly exceed the current high
   });
 
   it('outbidding keeps the previous bidder\'s M€ escrowed (only refunded when the auction resolves)', () => {
@@ -82,11 +80,11 @@ describe('MutationMarkets bidding', () => {
 
   it('a same-player re-bid only charges the incremental difference', () => {
     const startingMc = player2.megaCredits;
-    MutationMarkets.placeBid(game, player2, 1, 2);
-    expect(player2.megaCredits).to.eq(startingMc - 2);
+    MutationMarkets.placeBid(game, player2, 1, 4); // slot 1's minimum
+    expect(player2.megaCredits).to.eq(startingMc - 4);
 
-    MutationMarkets.placeBid(game, player2, 1, 5);
-    expect(player2.megaCredits).to.eq(startingMc - 5); // only 3 more deducted, not 5 more
+    MutationMarkets.placeBid(game, player2, 1, 7);
+    expect(player2.megaCredits).to.eq(startingMc - 7); // only 3 more deducted, not 7 more
   });
 
   it('resolveIfReturned fires only once the table has gone all the way around untouched', () => {
@@ -133,7 +131,7 @@ describe('MutationMarkets bidding', () => {
     for (const tag of [Tag.SCIENCE, Tag.BUILDING, Tag.PLANT, Tag.ANIMAL, Tag.SPACE]) {
       player2.playedCards.push(fakeCard({tags: [tag]}));
     }
-    MutationMarkets.placeBid(game, player2, 2, 2);
+    MutationMarkets.placeBid(game, player2, 2, 3); // slot 2's minimum
     MutationMarkets.resolveAuction(game, 2);
 
     expect(player2.cardsInHand).to.include(cardB);

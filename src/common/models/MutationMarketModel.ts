@@ -5,6 +5,8 @@ import {MutationName} from '../mutationmarkets/MutationName';
 export type MutationMarketProjectSlotModel = {
   card: CardModel;
   active: boolean;
+  /** Fixed by this slot's position -- see MutationMarkets.minimumBidFor. Only meaningful while `active`. */
+  minimumBid: number;
   auction?: {highBid: number, highBidderColor: Color};
   /** Covering mutation(s) whose row is currently physically above the project row. */
   coveringMutationsAbove: ReadonlyArray<MutationName>;
@@ -15,7 +17,6 @@ export type MutationMarketProjectSlotModel = {
 export type MutationMarketMutationSlotModel = {
   mutation: MutationName;
   active: boolean;
-  minimumBid: number;
   /**
    * Each player's current numeric progress toward this mutation's requirement, mirroring
    * Milestones/Awards' public per-player score display. Omitted for requirement kinds

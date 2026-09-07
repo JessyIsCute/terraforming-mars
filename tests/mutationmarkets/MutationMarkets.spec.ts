@@ -82,22 +82,18 @@ describe('MutationMarkets', () => {
     expect(data.alignedRow[0]).is.not.undefined;
   });
 
-  it('onGenerationEnd shifts the project row by 3 and each mutation row by the summed steps of only its active mutations', () => {
+  it('onGenerationEnd shifts the project row by 3 and every mutation row by a fixed 1 position, regardless of active/inactive', () => {
     const data = game.mutationMarketData!;
     const projectNamesBefore = data.projectSlots.map((slot) => slot!.name);
 
-    // alignedRow: position 0 (inactive, touches slot 0) has steps 2 -- must not count.
-    // position 1 (active) has steps 1 -- the only contributor, so the row shifts by 1.
-    // position 2 (inactive, touches slot 5) has steps 1 -- must not count.
     data.alignedRow = [
-      {mutation: MutationName.GREENERY_KEEPER}, // steps 2, inactive
-      {mutation: MutationName.CITY_PLANNER}, // steps 1, active
-      {mutation: MutationName.SCIENCE_PATRON}, // steps 1, inactive
+      {mutation: MutationName.GREENERY_KEEPER}, // inactive (touches slot 0)
+      {mutation: MutationName.CITY_PLANNER}, // active
+      {mutation: MutationName.SCIENCE_PATRON}, // inactive (touches slot 5)
     ];
-    // offsetRow: only position 1 (active) is populated, with steps 1 -- the row shifts by 1.
     data.offsetRow = [
       undefined,
-      {mutation: MutationName.TAG_DIVERSIFIER}, // steps 1, active
+      {mutation: MutationName.TAG_DIVERSIFIER}, // active
       undefined,
       undefined,
     ];
@@ -114,14 +110,15 @@ describe('MutationMarkets', () => {
     expect(data.projectSlots[4]).is.not.undefined;
     expect(data.projectSlots[5]).is.not.undefined;
 
-    // alignedRow shifted by 1: GREENERY_KEEPER (steps 2, but inactive) is excluded from the
-    // sum, so only CITY_PLANNER's steps (1) counted -- a 1-step shift, not 2 or 3.
+    // alignedRow always shifts by exactly 1, active or not: the last slot (SCIENCE_PATRON,
+    // inactive) is discarded, everything slides right one, and a fresh mutation enters at 0.
     expect(data.alignedRow[0]!.mutation).to.eq(MutationName.OCEAN_SURVEYOR);
     expect(data.alignedRow[1]!.mutation).to.eq(MutationName.GREENERY_KEEPER);
     expect(data.alignedRow[2]!.mutation).to.eq(MutationName.CITY_PLANNER);
     expect(data.mutationDiscardPile).to.include(MutationName.SCIENCE_PATRON);
 
-    // offsetRow shifted by 1 (only TAG_DIVERSIFIER, steps 1, was active).
+    // offsetRow also always shifts by exactly 1: the last slot (empty) discards nothing,
+    // everything slides right one, and a fresh mutation enters at 0.
     expect(data.offsetRow[0]!.mutation).to.eq(MutationName.HEAT_BANKER);
     expect(data.offsetRow[1]).is.undefined;
     expect(data.offsetRow[2]!.mutation).to.eq(MutationName.TAG_DIVERSIFIER);

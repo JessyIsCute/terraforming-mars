@@ -55,6 +55,14 @@ describe('createMutationMarketModel', () => {
     expect(preview.mutationVictoryPoints).to.eq(2); // floor(7 / 3), Gigantic's vpPerAbsDelta
   });
 
+  it('reports the fixed, position-based minimum bid for each active project slot', () => {
+    const model = createMutationMarketModel(game)!;
+    expect(model.projectSlots[1]!.minimumBid).to.eq(4);
+    expect(model.projectSlots[2]!.minimumBid).to.eq(3);
+    expect(model.projectSlots[3]!.minimumBid).to.eq(2);
+    expect(model.projectSlots[4]!.minimumBid).to.eq(1);
+  });
+
   it('previews nothing extra for a slot no active mutation covers', () => {
     const data = game.mutationMarketData!;
     const card = data.projectSlots[1]!;
