@@ -1760,6 +1760,20 @@
     background-image: url(./assets/underworld/corruption.png);
   }
 
+  // Conglomerates: no art asset, so a CSS-only blue square with a handshake emoji --
+  // matches the shape other resource icons use here (.card-resource-base is a plain square).
+  .card-resource-coordination {
+    background-image: none;
+    background-color: #2f6fed;
+    text-align: center;
+
+    &::before {
+      content: "🤝";
+      font-size: 18px;
+      line-height: 30px;
+    }
+  }
+
   .card-neutral-delegate {
     .card-delegate();
     background-image: url(./assets/underworld/neutral-delegate.png) !important;
