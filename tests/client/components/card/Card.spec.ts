@@ -6,7 +6,8 @@ import {CardName} from '@/common/cards/CardName';
 import {FakeLocalStorage} from '../FakeLocalStorage';
 import {CardType} from '@/common/cards/CardType';
 import {CustomCardModel} from '@/common/models/CardModel';
-import {ICardRenderRoot} from '@/common/cards/render/Types';
+import {ICardRenderItem, ICardRenderRoot} from '@/common/cards/render/Types';
+import {CardRenderItemType} from '@/common/cards/render/CardRenderItemType';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 
 describe('Card', () => {
@@ -79,7 +80,7 @@ describe('Card', () => {
         description: 'Gain plants.',
         renderData: {
           is: 'root',
-          rows: [[{is: 'item', type: 'plants', amount: 1}]],
+          rows: [[{is: 'item', type: CardRenderItemType.PLANTS, amount: 1} as ICardRenderItem]],
         } as ICardRenderRoot,
       },
       module: 'customCards',

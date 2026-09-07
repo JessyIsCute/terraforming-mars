@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {mergeMutationGrantIntoRenderData, ResourceGrantEffect} from '@/client/utils/mergeMutationGrantIntoRenderData';
 import {CardRenderItemType} from '@/common/cards/render/CardRenderItemType';
-import {ICardRenderItem, ICardRenderRoot} from '@/common/cards/render/Types';
+import {ICardRenderEffect, ICardRenderItem, ICardRenderProductionBox, ICardRenderRoot} from '@/common/cards/render/Types';
 import {Resource} from '@/common/Resource';
 
 function plantsItem(amount: number): ICardRenderItem {
@@ -49,29 +49,34 @@ describe('mergeMutationGrantIntoRenderData', () => {
   });
 
   it('matches a production grant only against an item inside a production-box', () => {
-    const root: ICardRenderRoot = {is: 'root', rows: [[{is: 'production-box', rows: [[heatItem(1)]]}]]};
+    const box: ICardRenderProductionBox = {is: 'production-box', rows: [[heatItem(1)]]};
+    const root: ICardRenderRoot = {is: 'root', rows: [[box]]};
 
     const merged = mergeMutationGrantIntoRenderData(root, grantHeatProduction) as ICardRenderRoot;
 
     expect(merged).is.not.undefined;
-    const box = merged.rows[0][0] as {rows: Array<Array<ICardRenderItem>>};
-    expect(box.rows[0][0].amount).to.eq(2); // 1 + 1
-    expect(box.rows[0][0].mutationGlow).to.eq(true);
+    const mergedBox = merged.rows[0][0] as ICardRenderProductionBox;
+    const mergedItem = mergedBox.rows[0][0] as ICardRenderItem;
+    expect(mergedItem.amount).to.eq(2); // 1 + 1
+    expect(mergedItem.mutationGlow).to.eq(true);
   });
 
   it('does not match a one-time resource grant against an item inside a production-box', () => {
-    const root: ICardRenderRoot = {is: 'root', rows: [[{is: 'production-box', rows: [[plantsItem(1)]]}]]};
+    const box: ICardRenderProductionBox = {is: 'production-box', rows: [[plantsItem(1)]]};
+    const root: ICardRenderRoot = {is: 'root', rows: [[box]]};
 
     expect(mergeMutationGrantIntoRenderData(root, grantPlants)).is.undefined;
   });
 
   it('finds a matching item nested inside an effect box', () => {
-    const root: ICardRenderRoot = {is: 'root', rows: [[{is: 'effect', rows: [[plantsItem(1)]]}]]};
+    const effect: ICardRenderEffect = {is: 'effect', rows: [[plantsItem(1)]]};
+    const root: ICardRenderRoot = {is: 'root', rows: [[effect]]};
 
     const merged = mergeMutationGrantIntoRenderData(root, grantPlants) as ICardRenderRoot;
 
-    const effectBox = merged.rows[0][0] as {rows: Array<Array<ICardRenderItem>>};
-    expect(effectBox.rows[0][0].amount).to.eq(3);
+    const mergedEffect = merged.rows[0][0] as ICardRenderEffect;
+    const mergedItem = mergedEffect.rows[0][0] as ICardRenderItem;
+    expect(mergedItem.amount).to.eq(3);
   });
 
   it('returns undefined when renderData is undefined', () => {
