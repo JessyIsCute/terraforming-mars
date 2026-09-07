@@ -1154,6 +1154,18 @@ input[type="radio"]:checked+.filterDiv::after {
   }
 }
 
+// Conglomerates: a handshake emoji, same CSS-only trick as Sillyfication/MutationMarkets above.
+.expansion-icon-conglomerates {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🤝";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
 .card-standard-project {
   height: 155px;
   width: 235px;

@@ -23,6 +23,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   betterMars: `${WIKI}/Community`,
   customCards: `${WIKI}/Community`,
   mutationMarkets: `${WIKI}/Community`,
+  conglomerates: `${WIKI}/Community`,
 };
 
 export const WIKI_URLS = {

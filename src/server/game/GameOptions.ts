@@ -49,6 +49,7 @@ export type GameOptions = {
   betterMarsExpansion: boolean;
   customCardsExpansion: boolean;
   mutationMarketsExpansion: boolean;
+  conglomeratesExpansion: boolean;
 
   expansions: Record<Expansion, boolean>,
 
@@ -127,6 +128,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     betterMars: false,
     customCards: false,
     mutationMarkets: false,
+    conglomerates: false,
   },
   fastModeOption: false,
   includeFanMA: false,
@@ -162,6 +164,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   betterMarsExpansion: false,
   customCardsExpansion: false,
   mutationMarketsExpansion: false,
+  conglomeratesExpansion: false,
   undoOption: false,
   venusNextExtension: false,
   twoCorpsVariant: false,

@@ -234,6 +234,21 @@ each(@players, {
   .tag-count-icon();
 }
 
+// Conglomerates: a handshake emoji, CSS-only (no art asset), same trick used
+// for the expansion-select icon in cards.less.
+.tag-coordination-count {
+  .tag-count-icon();
+  background-image: none;
+  filter: none;
+  text-align: center;
+
+  &::before {
+    content: "🤝";
+    font-size: 22px;
+    line-height: 34px;
+  }
+}
+
 .player-board-blue-action-counter{
   margin-top: 8px;
 }

@@ -92,6 +92,7 @@ export class JSONProcessor {
       betterMars: json_constants.BETTER_MARS_EXPANSION,
       customCards: json_constants.CUSTOM_CARDS_EXPANSION,
       mutationMarkets: json_constants.MUTATION_MARKETS_EXPANSION,
+      conglomerates: json_constants.CONGLOMERATES_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

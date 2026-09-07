@@ -78,6 +78,8 @@ export class GlobalEventDealer {
       // Neither has a ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       customCards: gameOptions.customCardsExpansion,
       mutationMarkets: gameOptions.mutationMarketsExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      conglomerates: gameOptions.conglomeratesExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

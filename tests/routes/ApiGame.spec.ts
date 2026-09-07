@@ -71,6 +71,7 @@ describe('ApiGame', () => {
             'ceo': false,
             'colonies': false,
             'community': false,
+            'conglomerates': false,
             'corpera': true,
             'deltaProject': false,
             'moon': false,

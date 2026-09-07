@@ -14,6 +14,7 @@ import {SerializedMoonData} from './moon/SerializedMoonData';
 import {SerializedPathfindersData} from './pathfinders/SerializedPathfindersData';
 import {SerializedDeck} from './cards/SerializedDeck';
 import {UnderworldData} from './underworld/UnderworldData';
+import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {SerializedMutationMarketData} from './mutationmarkets/MutationMarketData';
 import {AwardName} from '../common/ma/AwardName';
 import {GlobalParameter} from '../common/GlobalParameter';
@@ -72,6 +73,7 @@ export type SerializedGame = {
     undoCount: number;
     underworldData: UnderworldData;
     mutationMarketData?: SerializedMutationMarketData;
+    conglomerates?: ConglomeratesData;
     venusScaleLevel: number;
     verminInEffect: boolean;
 }

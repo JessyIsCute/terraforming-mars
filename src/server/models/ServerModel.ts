@@ -259,6 +259,7 @@ export class Server {
       titaniumValue: player.getTitaniumValue(),
       tradesThisGeneration: player.colonies.usedTradeFleets,
       underworldData: player.underworldData,
+      conglomeratesData: player.conglomeratesData,
       victoryPointsBreakdown: {
         terraformRating: 0,
         milestones: 0,
@@ -443,6 +444,7 @@ export class Server {
         betterMars: options.betterMarsExpansion,
         customCards: options.customCardsExpansion,
         mutationMarkets: options.mutationMarketsExpansion,
+        conglomerates: options.conglomeratesExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

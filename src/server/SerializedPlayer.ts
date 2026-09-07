@@ -7,6 +7,7 @@ import {AlliedParty} from '../common/turmoil/Types';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {DiscordId} from './server/auth/discord';
 import {UnderworldPlayerData} from '../common/underworld/UnderworldPlayerData';
+import {ConglomeratesPlayerData} from '../common/conglomerates/ConglomeratesPlayerData';
 import {DeltaProjectPlayerModel} from '../common/models/DeltaProjectPlayerModel';
 
 interface DeprecatedFields {
@@ -86,6 +87,7 @@ export interface SerializedPlayer extends DeprecatedFields{
   trThisGeneration: number;
   turmoilPolicyActionUsed: boolean;
   underworldData: UnderworldPlayerData;
+  conglomeratesData?: ConglomeratesPlayerData;
   victoryPointsByGeneration: Array<number>;
   user?: DiscordId;
   warmongerCards: number;

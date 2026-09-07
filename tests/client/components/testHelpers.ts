@@ -151,6 +151,7 @@ export function fakePublicPlayerModel(overrides?: RecursivePartial<PublicPlayerM
     titaniumValue: 3,
     tradesThisGeneration: 0,
     underworldData: {corruption: 0, excavations: [], tokens: []},
+    conglomeratesData: {coordination: 0},
     victoryPointsBreakdown: {
       terraformRating: 20,
       milestones: 0,

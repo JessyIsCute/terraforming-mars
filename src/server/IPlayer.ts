@@ -27,6 +27,7 @@ import {Color} from '../common/Color';
 import {OrOptions} from './inputs/OrOptions';
 import {Stock} from './player/Stock';
 import {UnderworldPlayerData} from '../common/underworld/UnderworldPlayerData';
+import {ConglomeratesPlayerData} from '../common/conglomerates/ConglomeratesPlayerData';
 import {DeltaProjectPlayerModel} from '../common/models/DeltaProjectPlayerModel';
 import {AlliedParty} from '../common/turmoil/Types';
 import {IParty} from './turmoil/parties/IParty';
@@ -193,6 +194,8 @@ export interface IPlayer {
   totalDelegatesPlaced: number;
 
   underworldData: UnderworldPlayerData;
+  conglomeratesData: ConglomeratesPlayerData;
+  teammates(): ReadonlyArray<IPlayer>;
   deltaProjectData?: DeltaProjectPlayerModel;
   /** Epsilon Dample's second Delta Project marker. */
   epsilonDampleData?: DeltaProjectPlayerModel;

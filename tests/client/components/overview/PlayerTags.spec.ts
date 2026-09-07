@@ -62,6 +62,9 @@ describe('PlayerTags', () => {
       underworldData: {
         tokens: [],
       },
+      conglomeratesData: {
+        coordination: 0,
+      },
       victoryPointsBreakdown: {
         total: 1,
       },

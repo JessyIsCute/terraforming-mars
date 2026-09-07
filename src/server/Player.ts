@@ -43,6 +43,9 @@ import {MoonExpansion} from './moon/MoonExpansion';
 import {IStandardProjectCard} from './cards/IStandardProjectCard';
 import {ConvertPlants} from './cards/base/standardActions/ConvertPlants';
 import {ConvertHeat} from './cards/base/standardActions/ConvertHeat';
+import {GivePatent} from './cards/conglomerates/teamActions/GivePatent';
+import {FacilitySharing} from './cards/conglomerates/teamActions/FacilitySharing';
+import {DonationAction} from './cards/conglomerates/teamActions/DonationAction';
 import {KELVINISTS_POLICY_3} from './turmoil/parties/Kelvinists';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {LogHelper} from './LogHelper';
@@ -71,6 +74,8 @@ import {ChooseCards} from './deferredActions/ChooseCards';
 import {UnderworldPlayerData} from '../common/underworld/UnderworldPlayerData';
 import {DeltaProjectPlayerModel} from '../common/models/DeltaProjectPlayerModel';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
+import {ConglomeratesPlayerData} from '../common/conglomerates/ConglomeratesPlayerData';
+import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
 import {Counter} from './behavior/Counter';
 import {TRSource} from '../common/cards/TRSource';
 import {IParty} from './turmoil/parties/IParty';
@@ -179,6 +184,7 @@ export class Player implements IPlayer {
   public preservationProgram = false;
   public trThisGeneration = 0;
   public underworldData: UnderworldPlayerData = UnderworldExpansion.initializePlayer();
+  public conglomeratesData: ConglomeratesPlayerData = ConglomeratesExpansion.initializePlayer();
   public deltaProjectData?: DeltaProjectPlayerModel;
   public epsilonDampleData?: DeltaProjectPlayerModel;
   public standardProjectsThisGeneration: Set<CardName> = new Set();
@@ -615,6 +621,11 @@ export class Player implements IPlayer {
     return sum(this.getCardsWithResources(resource).map((card) => card.resourceCount));
   }
 
+  /** Conglomerates: the other player(s) on this player's team, or empty if teamless/not playing Conglomerates. */
+  public teammates(): ReadonlyArray<IPlayer> {
+    return ConglomeratesExpansion.teammates(this);
+  }
+
   public getPlayableActionCards(): Array<ICard & IActionCard> {
     const result: Array<ICard & IActionCard> = [];
     for (const card of this.tableau) {
@@ -650,6 +661,10 @@ export class Player implements IPlayer {
     this.plants += this.production.plants;
     this.energy += this.production.energy;
     this.heat += this.production.heat;
+
+    if (this.game.gameOptions.conglomeratesExpansion) {
+      ConglomeratesExpansion.gainCoordination(this, 2, {log: true});
+    }
 
     for (const card of this.tableau) {
       card.onProductionPhase?.(this);
@@ -1674,6 +1689,36 @@ export class Player implements IPlayer {
       }
     }
 
+    // Conglomerates team actions
+    if (this.game.gameOptions.conglomeratesExpansion && this.teammates().length > 0) {
+      const givePatent = new GivePatent();
+      if (givePatent.canAct(this)) {
+        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'givePatent');
+        action.options.push(
+          new SelectOption(`Give Patent: give a card to your teammate (${cost} Coordination)`, 'Give Patent').andThen(() => {
+            return givePatent.action(this);
+          }));
+      }
+
+      const facilitySharing = new FacilitySharing();
+      if (facilitySharing.canAct(this)) {
+        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'facilitySharing');
+        action.options.push(
+          new SelectOption(`Facility Sharing: use a teammate's action card (${cost} Coordination)`, 'Facility Sharing').andThen(() => {
+            return facilitySharing.action(this);
+          }));
+      }
+
+      const donationAction = new DonationAction();
+      if (donationAction.canAct(this)) {
+        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'donation');
+        action.options.push(
+          new SelectOption(`Donation: send M€ and resources to your teammate (${cost} Coordination)`, 'Donation').andThen(() => {
+            return donationAction.action(this);
+          }));
+      }
+    }
+
     // Turmoil
     const turmoilInput = TurmoilHandler.partyAction(this);
     if (turmoilInput !== undefined) {
@@ -1949,6 +1994,7 @@ export class Player implements IPlayer {
       victoryPointsByGeneration: this.victoryPointsByGeneration,
       totalDelegatesPlaced: this.totalDelegatesPlaced,
       underworldData: this.underworldData,
+      conglomeratesData: this.conglomeratesData,
       alliedParty: this._alliedParty,
       draftHand: this.draftHand.map(toName),
       autoPass: this.autopass,
@@ -2055,6 +2101,7 @@ export class Player implements IPlayer {
 
     player.timer = Timer.deserialize(d.timer);
     player.underworldData = d.underworldData;
+    player.conglomeratesData = d.conglomeratesData ?? ConglomeratesExpansion.initializePlayer();
 
     if (d.alliedParty !== undefined) {
       player._alliedParty = d.alliedParty;

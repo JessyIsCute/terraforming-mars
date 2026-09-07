@@ -69,6 +69,8 @@ import {IGame, Score} from './IGame';
 import {MarsBoard} from './boards/MarsBoard';
 import {UnderworldData} from './underworld/UnderworldData';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
+import {ConglomeratesData} from './conglomerates/ConglomeratesData';
+import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
 import {MutationMarketData} from './mutationmarkets/MutationMarketData';
 import {DeltaProjectExpansion} from './delta/DeltaProjectExpansion';
@@ -163,6 +165,7 @@ export class Game implements IGame, Logger {
   public pathfindersData: PathfindersData | undefined;
   public underworldData: UnderworldData = UnderworldExpansion.initializeGameWithoutUnderworld();
   public mutationMarketData: MutationMarketData | undefined;
+  public conglomerates: ConglomeratesData = ConglomeratesExpansion.initializeEmpty();
   public inTurmoil: boolean = false;
 
   // Card-specific data
@@ -291,6 +294,7 @@ export class Game implements IGame, Logger {
         betterMars: partialOptions.betterMarsExpansion ?? false,
         customCards: partialOptions.customCardsExpansion ?? false,
         mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
+        conglomerates: partialOptions.conglomeratesExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -375,6 +379,10 @@ export class Game implements IGame, Logger {
 
     if (gameOptions.mutationMarketsExpansion) {
       game.mutationMarketData = MutationMarkets.initialize(game);
+    }
+
+    if (gameOptions.conglomeratesExpansion) {
+      game.conglomerates = ConglomeratesExpansion.initialize(players);
     }
 
     // and 2 neutral cities and forests on board
@@ -534,6 +542,7 @@ export class Game implements IGame, Logger {
       temperature: this.temperature,
       tradeEmbargo: this.tradeEmbargo,
       underworldData: this.underworldData,
+      conglomerates: this.conglomerates,
       undoCount: this.undoCount,
       venusScaleLevel: this.venusScaleLevel,
       verminInEffect: this.verminInEffect,
@@ -1849,6 +1858,9 @@ export class Game implements IGame, Logger {
 
     if (d.underworldData !== undefined) {
       game.underworldData = d.underworldData;
+    }
+    if (d.conglomerates !== undefined) {
+      game.conglomerates = d.conglomerates;
     }
     if (d.mutationMarketData !== undefined && gameOptions.mutationMarketsExpansion === true) {
       game.mutationMarketData = MutationMarkets.deserialize(d.mutationMarketData);
