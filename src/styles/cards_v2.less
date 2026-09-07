@@ -1792,39 +1792,6 @@
     }
   }
 
-  // A teammate: a meeple glyph on a dark tile with a green ring, so "teammate : X" reads as
-  // "your teammate gets X".
-  .card-resource-teammate {
-    background-image: none;
-    background-color: #222;
-    border: 2px solid #2ecc71;
-    box-sizing: border-box;
-    text-align: center;
-
-    &::before {
-      content: "♟";
-      color: white;
-      font-size: 20px;
-      line-height: 26px;
-    }
-  }
-
-  // A card with a usable action (e.g. what Facility Sharing borrows), distinct from a plain
-  // "cards" icon.
-  .card-resource-action-card {
-    background-image: none;
-    background-color: #1c6fd8;
-    border: 1px solid black;
-    box-sizing: border-box;
-    text-align: center;
-
-    &::before {
-      content: "⚡";
-      font-size: 18px;
-      line-height: 28px;
-    }
-  }
-
   .card-neutral-delegate {
     .card-delegate();
     background-image: url(./assets/underworld/neutral-delegate.png) !important;

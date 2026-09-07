@@ -77,6 +77,11 @@ export default defineComponent({
         }
       }
 
+      // Conglomerates: this item belongs to, or goes to, a teammate.
+      if (this.item.teammate === true) {
+        classes.push('green-outline');
+      }
+
       // golden background
       if (this.item.isPlate) {
         classes.push('card-plate');
@@ -266,10 +271,6 @@ export default defineComponent({
         return [cardResource, 'card-resource-corruption'];
       case CardRenderItemType.COORDINATION:
         return [cardResource, 'card-resource-coordination'];
-      case CardRenderItemType.TEAMMATE:
-        return [cardResource, 'card-resource-teammate'];
-      case CardRenderItemType.ACTION_CARD:
-        return [cardResource, 'card-resource-action-card'];
       case CardRenderItemType.RESOURCE:
         return [cardResource, this.resourceClass, this.resourceSizeClass];
       case CardRenderItemType.TAG:

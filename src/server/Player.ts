@@ -661,6 +661,7 @@ export class Player implements IPlayer {
 
     if (this.game.gameOptions.conglomeratesExpansion) {
       ConglomeratesExpansion.gainCoordination(this, 2, {log: true});
+      ConglomeratesExpansion.resetTeamActionCosts(this);
     }
 
     for (const card of this.tableau) {

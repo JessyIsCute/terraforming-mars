@@ -16,7 +16,7 @@ export class HelpRequest extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'CG3',
         renderData: CardRenderer.builder((b) => {
-          b.teammate().colon().coordination(2);
+          b.coordination(2, {teammate: true});
         }),
         description: 'Give 2 Coordination to your teammate.',
       },

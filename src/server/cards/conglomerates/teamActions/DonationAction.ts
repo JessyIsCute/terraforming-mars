@@ -6,7 +6,6 @@ import {Resource} from '../../../../common/Resource';
 import {OrOptions} from '../../../inputs/OrOptions';
 import {SelectOption} from '../../../inputs/SelectOption';
 import {ConglomeratesExpansion} from '../../../conglomerates/ConglomeratesExpansion';
-import {all} from '../../Options';
 
 const DONATABLE_RESOURCES = [Resource.STEEL, Resource.TITANIUM, Resource.PLANTS, Resource.ENERGY, Resource.HEAT] as const;
 const DONATION_MC = 4;
@@ -30,8 +29,9 @@ export class DonationAction extends StandardProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.standardProject(
             `Send ${DONATION_MC} M€ and ${DONATION_RESOURCE_AMOUNT} of a standard resource to your teammate. ` +
-            'Increases this cost by 1 Coordination for you and your teammates for the rest of the game.', (eb) => {
-            eb.coordination(1).startAction.teammate().colon().megacredits(DONATION_MC).wild(DONATION_RESOURCE_AMOUNT, {all}).asterix();
+            'Increases this cost by 1 Coordination for you and your teammates for the rest of the generation.', (eb) => {
+            eb.coordination(1).megacredits(DONATION_MC).wild(DONATION_RESOURCE_AMOUNT).startAction
+              .megacredits(DONATION_MC, {teammate: true}).wild(DONATION_RESOURCE_AMOUNT, {teammate: true}).asterix();
           });
         }),
       },

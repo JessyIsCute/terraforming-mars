@@ -72,4 +72,13 @@ describe('ConglomeratesExpansion', () => {
     expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(3);
     expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(3);
   });
+
+  it('resets an escalated team action cost back to base at the start of the next generation', () => {
+    const [, player1, , player3] = testGame(4, {conglomeratesExpansion: true});
+    ConglomeratesExpansion.increaseTeamActionCost(player1, 'givePatent');
+    expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(3);
+    player1.runProductionPhase();
+    expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(2);
+    expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(2);
+  });
 });

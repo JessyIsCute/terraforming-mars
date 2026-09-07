@@ -80,8 +80,6 @@ export const CardRenderItemType = {
 
   // Conglomerates
   COORDINATION: 'coordination',
-  TEAMMATE: 'teammate',
-  ACTION_CARD: 'action-card',
 } as const;
 
 export type CardRenderItemType = typeof CardRenderItemType[keyof typeof CardRenderItemType];

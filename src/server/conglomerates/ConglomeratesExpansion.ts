@@ -102,13 +102,26 @@ export class ConglomeratesExpansion {
     return team?.teamActionCosts[action] ?? TEAM_ACTION_BASE_COSTS[action];
   }
 
-  /** Raises `action`'s cost by 1 for both members of `player`'s team, for the rest of the game. */
+  /** Raises `action`'s cost by 1 for both members of `player`'s team, for the rest of the generation. */
   public static increaseTeamActionCost(player: IPlayer, action: keyof TeamActionCosts) {
     const team = this.getTeam(player);
     if (team === undefined) {
       return;
     }
     team.teamActionCosts[action] += 1;
+  }
+
+  /**
+   * Resets `player`'s team's Team Action costs back to base at the start of a new
+   * generation's production phase. Called once per team member (harmless -- resetting to
+   * the same base values twice is a no-op), from `Player.finishProductionPhase()`.
+   */
+  public static resetTeamActionCosts(player: IPlayer) {
+    const team = this.getTeam(player);
+    if (team === undefined) {
+      return;
+    }
+    team.teamActionCosts = {...TEAM_ACTION_BASE_COSTS};
   }
 
   /** `player`'s team, as player ids including `player`. A teamless player is their own team of one. */
