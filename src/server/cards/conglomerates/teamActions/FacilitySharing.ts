@@ -1,4 +1,4 @@
-import {StandardActionCard} from '../../StandardActionCard';
+import {StandardProjectCard} from '../../StandardProjectCard';
 import {CardName} from '../../../../common/cards/CardName';
 import {CardType} from '../../../../common/cards/CardType';
 import {CardRenderer} from '../../render/CardRenderer';
@@ -9,10 +9,11 @@ import {SelectOption} from '../../../inputs/SelectOption';
 import {ConglomeratesExpansion} from '../../../conglomerates/ConglomeratesExpansion';
 import {Resource} from '../../../../common/Resource';
 
-export class FacilitySharing extends StandardActionCard {
+export class FacilitySharing extends StandardProjectCard {
   constructor() {
     super({
       name: CardName.FACILITY_SHARING,
+      cost: 0,
       metadata: {
         cardNumber: 'TA2',
         renderData: CardRenderer.builder((b) => {
@@ -46,20 +47,22 @@ export class FacilitySharing extends StandardActionCard {
     return result;
   }
 
-  public canAct(player: IPlayer): boolean {
+  public override canAct(player: IPlayer): boolean {
     if (player.conglomeratesData.coordination < this.currentCost(player)) {
       return false;
     }
-    return player.teammates().some((teammate) => this.sharableCards(player, teammate).length > 0);
+    if (!player.teammates().some((teammate) => this.sharableCards(player, teammate).length > 0)) {
+      return false;
+    }
+    return super.canAct(player);
   }
 
-  public action(player: IPlayer) {
+  actionEssence(player: IPlayer): void {
     const options: Array<SelectOption> = [];
     for (const teammate of player.teammates()) {
       for (const card of this.sharableCards(player, teammate)) {
         options.push(
           new SelectOption(card.name, 'Use').andThen(() => {
-            this.actionUsed(player);
             ConglomeratesExpansion.spendCoordination(player, this.currentCost(player), {log: true});
             const result = card.action(player);
             teammate.actionsThisGeneration.add(card.name);
@@ -73,6 +76,6 @@ export class FacilitySharing extends StandardActionCard {
         );
       }
     }
-    return new OrOptions(...options).setTitle('Select a teammate\'s facility to use').reduce();
+    player.defer(new OrOptions(...options).setTitle('Select a teammate\'s facility to use').reduce());
   }
 }

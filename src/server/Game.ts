@@ -1742,6 +1742,10 @@ export class Game implements IGame, Logger {
           return gameOptions.underworldExpansion === true;
         case CardName.COLLUSION_STANDARD_PROJECT:
           return gameOptions.underworldExpansion === true && gameOptions.turmoilExtension === true;
+        case CardName.GIVE_PATENT:
+        case CardName.FACILITY_SHARING:
+        case CardName.TEAM_DONATION:
+          return gameOptions.conglomeratesExpansion === true;
         default:
           return true;
         }

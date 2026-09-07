@@ -10,6 +10,8 @@ import {TestPlayer} from '../../../TestPlayer';
 import {cast} from '../../../../src/common/utils/utils';
 import {SelectOption} from '../../../../src/server/inputs/SelectOption';
 import {OrOptions} from '../../../../src/server/inputs/OrOptions';
+import {Payment} from '../../../../src/common/inputs/Payment';
+import {runAllActions} from '../../../TestingUtils';
 import {ConglomeratesExpansion} from '../../../../src/server/conglomerates/ConglomeratesExpansion';
 
 describe('FacilitySharing', () => {
@@ -25,6 +27,15 @@ describe('FacilitySharing', () => {
     steelworks = new Steelworks();
     teammate.playedCards.push(steelworks);
     player.conglomeratesData.coordination = 5;
+  });
+
+  function play(actor: TestPlayer) {
+    card.payAndExecute(actor, Payment.of({megacredits: 0}));
+    runAllActions(game);
+  }
+
+  it('is a free (0 M€) standard project', () => {
+    expect(card.cost).to.eq(0);
   });
 
   it('cannot act if the actor cannot pay the borrowed card\'s cost', () => {
@@ -50,7 +61,8 @@ describe('FacilitySharing', () => {
 
     // A single sharable card collapses straight to that card's own action (undefined here,
     // since Steelworks resolves immediately with no further input).
-    expect(card.action(player)).is.undefined;
+    play(player);
+    expect(player.popWaitingFor()).is.undefined;
 
     expect(player.energy).to.eq(0);
     expect(player.steel).to.eq(2);
@@ -66,12 +78,13 @@ describe('FacilitySharing', () => {
     const spaceMirrors = new SpaceMirrors();
     teammate.playedCards.push(spaceMirrors);
 
-    const result = cast(card.action(player), OrOptions);
+    play(player);
+    const result = cast(player.popWaitingFor(), OrOptions);
     expect(result.options).to.have.length(2);
 
     // Use Space Mirrors, the second offered option.
     cast(result.options[1], SelectOption).cb(undefined);
-    game.deferredActions.runNext();
+    runAllActions(game);
 
     expect(player.megaCredits).to.eq(0);
     expect(player.production.energy).to.eq(1);
@@ -98,10 +111,9 @@ describe('FacilitySharing', () => {
       player.megaCredits = 3;
 
       expect(card.canAct(player)).is.true;
-      // UnitedNationsMarsInitiative.action() defers the payment/TR increase and returns
-      // undefined itself, so a single sharable option collapses straight through to that.
-      expect(card.action(player)).is.undefined;
-      game.deferredActions.runNext();
+      // UnitedNationsMarsInitiative.action() defers the payment/TR increase itself, so a
+      // single sharable option collapses straight through to that deferred payment.
+      play(player);
 
       expect(player.megaCredits).to.eq(0);
       expect(player.terraformRating).to.eq(21);
@@ -112,7 +124,7 @@ describe('FacilitySharing', () => {
       player.energy = 4;
       const teammateMcBefore = teammate.megaCredits;
 
-      card.action(player);
+      play(player);
 
       expect(teammate.megaCredits).to.eq(teammateMcBefore + 2);
     });

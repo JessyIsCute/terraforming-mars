@@ -1,21 +1,29 @@
 import {expect} from 'chai';
 import {DonationAction} from '../../../../src/server/cards/conglomerates/teamActions/DonationAction';
+import {IGame} from '../../../../src/server/IGame';
 import {testGame} from '../../../TestGame';
 import {TestPlayer} from '../../../TestPlayer';
 import {cast} from '../../../../src/common/utils/utils';
 import {OrOptions} from '../../../../src/server/inputs/OrOptions';
+import {Payment} from '../../../../src/common/inputs/Payment';
+import {runAllActions} from '../../../TestingUtils';
 
 describe('DonationAction', () => {
   let card: DonationAction;
+  let game: IGame;
   let player: TestPlayer;
   let teammate: TestPlayer;
 
   beforeEach(() => {
     card = new DonationAction();
-    [, player, , teammate] = testGame(4, {conglomeratesExpansion: true});
+    [game, player, , teammate] = testGame(4, {conglomeratesExpansion: true});
     player.conglomeratesData.coordination = 5;
     player.megaCredits = 10;
     player.steel = 3;
+  });
+
+  it('costs 4 M€ as a standard project', () => {
+    expect(card.cost).to.eq(4);
   });
 
   it('cannot act without a teammate', () => {
@@ -45,7 +53,8 @@ describe('DonationAction', () => {
     expect(card.canAct(player)).is.true;
 
     // Only steel is donatable here, so the choice collapses straight to that action.
-    card.action(player);
+    card.payAndExecute(player, Payment.of({megacredits: 4}));
+    runAllActions(game);
 
     expect(player.megaCredits).to.eq(6);
     expect(player.steel).to.eq(1);
@@ -56,7 +65,10 @@ describe('DonationAction', () => {
 
   it('offers a choice when multiple resources are donatable', () => {
     player.titanium = 2;
-    const result = cast(card.action(player), OrOptions);
+    card.payAndExecute(player, Payment.of({megacredits: 4}));
+    runAllActions(game);
+
+    const result = cast(player.popWaitingFor(), OrOptions);
     expect(result.options).to.have.length(2);
   });
 });

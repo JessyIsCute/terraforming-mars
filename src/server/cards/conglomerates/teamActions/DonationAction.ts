@@ -1,4 +1,4 @@
-import {StandardActionCard} from '../../StandardActionCard';
+import {StandardProjectCard} from '../../StandardProjectCard';
 import {CardName} from '../../../../common/cards/CardName';
 import {CardRenderer} from '../../render/CardRenderer';
 import {IPlayer} from '../../../IPlayer';
@@ -19,15 +19,16 @@ const RESOURCE_LABEL: Record<typeof DONATABLE_RESOURCES[number], string> = {
   [Resource.HEAT]: 'heat',
 };
 
-export class DonationAction extends StandardActionCard {
+export class DonationAction extends StandardProjectCard {
   constructor() {
     super({
       name: CardName.TEAM_DONATION,
+      cost: DONATION_MC,
       metadata: {
         cardNumber: 'TA3',
         renderData: CardRenderer.builder((b) => {
           b.standardProject(`Send ${DONATION_MC} M€ and ${DONATION_RESOURCE_AMOUNT} of a standard resource to your teammate.`, (eb) => {
-            eb.empty().startAction.text('Cost: 1 Coordination');
+            eb.empty().startAction.text('+1 Coordination cost');
           });
         }),
       },
@@ -42,26 +43,24 @@ export class DonationAction extends StandardActionCard {
     return DONATABLE_RESOURCES.filter((resource) => player.stock.get(resource) >= DONATION_RESOURCE_AMOUNT);
   }
 
-  public canAct(player: IPlayer): boolean {
+  public override canAct(player: IPlayer): boolean {
     if (player.teammates().length === 0) {
       return false;
     }
     if (player.conglomeratesData.coordination < this.currentCost(player)) {
       return false;
     }
-    if (player.megaCredits < DONATION_MC) {
+    if (this.donatableResources(player).length === 0) {
       return false;
     }
-    return this.donatableResources(player).length > 0;
+    return super.canAct(player);
   }
 
-  public action(player: IPlayer) {
+  actionEssence(player: IPlayer): void {
     const teammate = player.teammates()[0];
     const options = this.donatableResources(player).map((resource) =>
       new SelectOption(`Send ${DONATION_RESOURCE_AMOUNT} ${RESOURCE_LABEL[resource]}`, 'Send').andThen(() => {
-        this.actionUsed(player);
         ConglomeratesExpansion.spendCoordination(player, this.currentCost(player), {log: true});
-        player.stock.deduct(Resource.MEGACREDITS, DONATION_MC, {log: true});
         player.stock.deduct(resource, DONATION_RESOURCE_AMOUNT, {log: true});
         teammate.stock.add(Resource.MEGACREDITS, DONATION_MC, {log: true, from: {player}});
         teammate.stock.add(resource, DONATION_RESOURCE_AMOUNT, {log: true, from: {player}});
@@ -69,6 +68,6 @@ export class DonationAction extends StandardActionCard {
         return undefined;
       }),
     );
-    return new OrOptions(...options).setTitle('Select a resource to send with your donation').reduce();
+    player.defer(new OrOptions(...options).setTitle('Select a resource to send with your donation').reduce());
   }
 }

@@ -43,9 +43,6 @@ import {MoonExpansion} from './moon/MoonExpansion';
 import {IStandardProjectCard} from './cards/IStandardProjectCard';
 import {ConvertPlants} from './cards/base/standardActions/ConvertPlants';
 import {ConvertHeat} from './cards/base/standardActions/ConvertHeat';
-import {GivePatent} from './cards/conglomerates/teamActions/GivePatent';
-import {FacilitySharing} from './cards/conglomerates/teamActions/FacilitySharing';
-import {DonationAction} from './cards/conglomerates/teamActions/DonationAction';
 import {KELVINISTS_POLICY_3} from './turmoil/parties/Kelvinists';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {LogHelper} from './LogHelper';
@@ -1693,36 +1690,6 @@ export class Player implements IPlayer {
           }
         }
         action.options.push(option);
-      }
-    }
-
-    // Conglomerates team actions
-    if (this.game.gameOptions.conglomeratesExpansion && this.teammates().length > 0) {
-      const givePatent = new GivePatent();
-      if (givePatent.canAct(this)) {
-        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'givePatent');
-        action.options.push(
-          new SelectOption(`Give Patent: give a card to your teammate (${cost} Coordination)`, 'Give Patent').andThen(() => {
-            return givePatent.action(this);
-          }));
-      }
-
-      const facilitySharing = new FacilitySharing();
-      if (facilitySharing.canAct(this)) {
-        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'facilitySharing');
-        action.options.push(
-          new SelectOption(`Facility Sharing: use a teammate's action card (${cost} Coordination)`, 'Facility Sharing').andThen(() => {
-            return facilitySharing.action(this);
-          }));
-      }
-
-      const donationAction = new DonationAction();
-      if (donationAction.canAct(this)) {
-        const cost = ConglomeratesExpansion.getTeamActionCost(this, 'donation');
-        action.options.push(
-          new SelectOption(`Donation: send M€ and resources to your teammate (${cost} Coordination)`, 'Donation').andThen(() => {
-            return donationAction.action(this);
-          }));
       }
     }
 
