@@ -1,8 +1,37 @@
 import {expect} from 'chai';
 import {testGame} from '../TestGame';
 import {ConglomeratesExpansion} from '../../src/server/conglomerates/ConglomeratesExpansion';
+import {CardName} from '../../src/common/cards/CardName';
 
 describe('ConglomeratesExpansion', () => {
+  describe('the 3 Team Action standard projects', () => {
+    const TEAM_ACTION_NAMES = [CardName.GIVE_PATENT, CardName.FACILITY_SHARING, CardName.TEAM_DONATION];
+
+    it('are not offered as standard projects when Conglomerates is off', () => {
+      const [game] = testGame(4);
+      const names = game.getStandardProjects().map((card) => card.name);
+      for (const name of TEAM_ACTION_NAMES) {
+        expect(names).to.not.include(name);
+      }
+    });
+
+    it('are offered as standard projects when Conglomerates is on', () => {
+      const [game] = testGame(4, {conglomeratesExpansion: true});
+      const names = game.getStandardProjects().map((card) => card.name);
+      for (const name of TEAM_ACTION_NAMES) {
+        expect(names).to.include(name);
+      }
+    });
+
+    it('are not offered in a player\'s action list when Conglomerates is off', () => {
+      const [, player1] = testGame(4);
+      const options = player1.getStandardProjectOption().cards.map((card) => card.name);
+      for (const name of TEAM_ACTION_NAMES) {
+        expect(options).to.not.include(name);
+      }
+    });
+  });
+
   it('pairs a 4-player game into two teams by table order', () => {
     const [, player1, player2, player3, player4] = testGame(4, {conglomeratesExpansion: true});
 
