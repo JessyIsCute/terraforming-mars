@@ -8,6 +8,7 @@ import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {digit, uppercase} from '../Options';
 import {ICorporationCard} from '../corporation/ICorporationCard';
+import {ConglomeratesExpansion} from '../../conglomerates/ConglomeratesExpansion';
 
 export class ArcadianCommunities extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
@@ -60,7 +61,7 @@ export class ArcadianCommunities extends CorporationCard implements ICorporation
         return false;
       }
       const adjacentSpaces = board.getAdjacentSpaces(space);
-      return adjacentSpaces.find((adj) => adj.player === player) !== undefined;
+      return adjacentSpaces.find((adj) => ConglomeratesExpansion.isTeammateOrSelf(player, adj.player)) !== undefined;
     });
       // Remove duplicates
     return spaces.filter((space, index) => spaces.indexOf(space) === index);

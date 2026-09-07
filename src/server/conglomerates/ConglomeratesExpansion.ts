@@ -62,6 +62,23 @@ export class ConglomeratesExpansion {
       .map((id) => player.game.getPlayerById(id));
   }
 
+  /**
+   * True when `spacePlayer` (the owner of a board space, or undefined for an unowned one) is
+   * `player` or one of their teammates. Used to extend "adjacent to your own tile"
+   * placement-legality checks (base-game greenery, Mining Area, Arcadian Communities, Kingdom
+   * of Tauraro) to a teammate's tiles -- never for adjacency-triggered bonus payouts, which
+   * only ever count the acting player's own tiles.
+   */
+  public static isTeammateOrSelf(player: IPlayer, spacePlayer: IPlayer | undefined): boolean {
+    if (spacePlayer === undefined) {
+      return false;
+    }
+    if (spacePlayer.id === player.id) {
+      return true;
+    }
+    return this.teammates(player).some((teammate) => teammate.id === spacePlayer.id);
+  }
+
   public static gainCoordination(player: IPlayer, count: number, options?: {log: boolean}) {
     player.conglomeratesData.coordination += count;
     if (options?.log === true) {

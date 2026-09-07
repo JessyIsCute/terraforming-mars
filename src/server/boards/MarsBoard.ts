@@ -11,6 +11,7 @@ import {oneWayDifference} from '../../common/utils/utils';
 import {Tile} from '../Tile';
 import {SpaceBonus} from '../../common/boards/SpaceBonus';
 import * as constants from '../../common/constants';
+import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 
 export class MarsBoard extends Board {
   private readonly edges: ReadonlyArray<Space>;
@@ -104,7 +105,7 @@ export class MarsBoard extends Board {
     if (player.tableau.has(CardName.KINGDOM_OF_TAURARO)) {
       const spacesNextToMySpaces = spacesOnLand.filter(
         (space) => this.getAdjacentSpaces(space).some(
-          (adj) => (adj.tile !== undefined && adj.player === player || adj.excavator?.id === player.id)));
+          (adj) => (adj.tile !== undefined && ConglomeratesExpansion.isTeammateOrSelf(player, adj.player) || adj.excavator?.id === player.id)));
 
       return (spacesNextToMySpaces.length > 0) ? spacesNextToMySpaces : spacesOnLand;
     }
@@ -169,7 +170,7 @@ export class MarsBoard extends Board {
     // to a tile the player already owns.
     const spacesForGreenery = availableLandSpaces.filter((space) => {
       return this.getAdjacentSpaces(space).some((adj) => {
-        return MarsBoard.hasRealTile(adj) && adj.player === player;
+        return MarsBoard.hasRealTile(adj) && ConglomeratesExpansion.isTeammateOrSelf(player, adj.player);
       });
     });
 
