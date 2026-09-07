@@ -167,7 +167,7 @@ export default defineComponent({
         if (this.item.cancelled === true) {
           return [cardResource, 'card-resource-wild', 'card-private-security'];
         } else {
-          return [cardResource, 'card-resource-wild'];
+          return [cardResource, 'card-resource-wild', this.resourceSizeClass];
         }
       case CardRenderItemType.ONE:
         return [cardResource, 'card-resource-one'];
@@ -270,7 +270,7 @@ export default defineComponent({
       case CardRenderItemType.CORRUPTION:
         return [cardResource, 'card-resource-corruption'];
       case CardRenderItemType.COORDINATION:
-        return [cardResource, 'card-resource-coordination'];
+        return [cardResource, 'card-resource-coordination', this.resourceSizeClass];
       case CardRenderItemType.RESOURCE:
         return [cardResource, this.resourceClass, this.resourceSizeClass];
       case CardRenderItemType.TAG:

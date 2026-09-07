@@ -17,8 +17,8 @@ export enum CardName {
 
   // Conglomerates team actions:
   GIVE_PATENT = 'Give Patent',
-  FACILITY_SHARING = 'Facility Sharing',
-  TEAM_DONATION = 'Team Donation',
+  FACILITY_SHARING = 'Facility Access',
+  TEAM_DONATION = 'Finance',
 
   // Conglomerates cards:
   SELFISH = 'Selfish',

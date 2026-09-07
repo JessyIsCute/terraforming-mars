@@ -21,6 +21,8 @@ export interface ICardRenderSymbol extends CardComponent {
   size: Size;
   isIcon?: true;
   isSuperscript?: true;
+  /** Conglomerates: an arrow representing a teammate's action being triggered -- rendered green. */
+  teammate?: true;
   readonly is: 'symbol';
 }
 

@@ -6,6 +6,7 @@ import {Resource} from '../../../../common/Resource';
 import {OrOptions} from '../../../inputs/OrOptions';
 import {SelectOption} from '../../../inputs/SelectOption';
 import {ConglomeratesExpansion} from '../../../conglomerates/ConglomeratesExpansion';
+import {Size} from '../../../../common/cards/render/Size';
 
 const DONATABLE_RESOURCES = [Resource.STEEL, Resource.TITANIUM, Resource.PLANTS, Resource.ENERGY, Resource.HEAT] as const;
 const DONATION_MC = 4;
@@ -30,8 +31,13 @@ export class DonationAction extends StandardProjectCard {
           b.standardProject(
             `Send ${DONATION_MC} M€ and ${DONATION_RESOURCE_AMOUNT} of a standard resource to your teammate. ` +
             'Increases this cost by 1 Coordination for you and your teammates for the rest of the generation.', (eb) => {
-            eb.coordination(1).megacredits(DONATION_MC).wild(DONATION_RESOURCE_AMOUNT).startAction
-              .megacredits(DONATION_MC, {teammate: true}).wild(DONATION_RESOURCE_AMOUNT, {teammate: true}).asterix();
+            eb.coordination(1, {size: Size.SMALL})
+              .megacredits(DONATION_MC, {size: Size.SMALL})
+              .wild(DONATION_RESOURCE_AMOUNT, {digit: true, size: Size.SMALL})
+              .startAction
+              .megacredits(DONATION_MC, {size: Size.SMALL, teammate: true})
+              .wild(DONATION_RESOURCE_AMOUNT, {digit: true, size: Size.SMALL, teammate: true})
+              .asterix();
           });
         }),
       },

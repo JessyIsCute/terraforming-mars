@@ -1790,6 +1790,13 @@
       font-size: 18px;
       line-height: 28px;
     }
+
+    // A smaller variant (Team Donation's compact icon row) needs its emoji scaled down too.
+    &.card-resource-size--S::before {
+      top: -1px;
+      font-size: 11px;
+      line-height: 16px;
+    }
   }
 
   .card-neutral-delegate {
@@ -2000,6 +2007,10 @@
     display: inline-block;
     background-repeat: no-repeat;
     background-position: 0px;
+  }
+  // Conglomerates: recolors the red arrow asset green, for "this triggers a teammate's action".
+  .card-arrow--teammate {
+    filter: hue-rotate(110deg) saturate(1.6);
   }
 
 

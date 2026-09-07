@@ -20,7 +20,7 @@ export class FacilitySharing extends StandardProjectCard {
           b.standardProject(
             'Use one of your teammate\'s unused action cards (not their corporation) as if it were yours. ' +
             'Increases this cost by 1 Coordination for you and your teammates for the rest of the generation.', (eb) => {
-            eb.coordination(1).startAction.cards(1, {teammate: true}).asterix();
+            eb.coordination(1).startAction.teammateArrow().asterix();
           });
         }),
       },

@@ -542,6 +542,11 @@ abstract class Builder<T> {
     return this._appendToRow(CardRenderSymbol.arrow(size));
   }
 
+  /** Conglomerates: an arrow rendered green, showing this step triggers a teammate's action. */
+  public teammateArrow(size: Size = Size.MEDIUM): this {
+    return this._appendToRow(CardRenderSymbol.arrow(size, true));
+  }
+
   public equals(size: Size = Size.MEDIUM): this {
     return this._appendToRow(CardRenderSymbol.equals(size));
   }
