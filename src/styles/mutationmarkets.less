@@ -14,12 +14,14 @@
   margin-bottom: 6px;
 }
 
-// A little more breathing room between the project cards themselves, and extra clearance
-// above the row so it doesn't crowd the mutation row physically on top of it this
-// generation -- slots with no coveringMutationsAbove badge would otherwise have no gap at
-// all above them, since that badge is the only other thing pushing the rows apart.
+// Extra clearance above the project row so it doesn't crowd the mutation row physically
+// on top of it this generation -- slots with no coveringMutationsAbove badge would
+// otherwise have no gap at all above them, since that badge is the only other thing
+// pushing the rows apart. Deliberately NOT touching this row's `gap` -- the mutation
+// rows above/below use grid-column spans (e.g. "1 / span 2") computed assuming the same
+// @mm-card-width + gap geometry as this row, so a different gap here would misalign
+// every mutation card against the project slots it's meant to cover.
 .mutation-market-project-row {
-  gap: 16px;
   margin-top: 10px;
 }
 
@@ -27,8 +29,15 @@
 // a read-only preview of the market, not a hand of playable cards. `zoom` (not `transform:
 // scale`, which repaints but doesn't reflow) shrinks both the paint AND the layout box
 // together, so the grid cell doesn't need separately-computed dimensions.
+//
+// The horizontal margin gives the cards themselves a little breathing room -- it's on
+// this wrapper rather than the grid's `gap` (see above) so it doesn't move the grid
+// column boundaries the mutation rows align against; it's on the wrapper rather than
+// `.mutation-market-project-slot` so it doesn't shift where that slot's own
+// absolutely-positioned children (the auction/minimum-bid badges) land, either.
 .mutation-market-card-scale-wrapper {
   zoom: 0.75;
+  margin: 0 10px;
   pointer-events: none;
 }
 
@@ -159,7 +168,6 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
   background-image: url(./assets/resources/megacredit.png);
   background-size: 30px;
   font-family: Prototype, sans-serif;
