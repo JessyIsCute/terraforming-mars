@@ -1,9 +1,10 @@
 // GENERATED FILE -- do not hand-edit.
 // Regenerate with: npx tsx src/server/tools/generate_official_map_codes.ts
 //
-// Derived CustomBoardDefinition/TMB codes for every official board, used only by the Map
-// Library's listing/preview UI. See generate_official_map_codes.ts for how these are built
-// and why official gameplay never routes through them.
+// Derived CustomBoardDefinition/TMB codes for every built-in board (official and fan-made
+// alike -- see OFFICIAL_BOARD_NAMES in generate_official_map_codes.ts for which is which),
+// used only by the Map Library's listing/preview UI. See generate_official_map_codes.ts for
+// how these are built and why gameplay never routes through the derived code itself.
 import {BoardName} from './BoardName';
 import {isMapLibraryEntryId, MapLibraryEntryId} from './MapLibraryEntry';
 import {safeCast} from '../Types';
@@ -12,6 +13,11 @@ export const OFFICIAL_MAP_LIBRARY_BOARDS: ReadonlyArray<{boardName: BoardName, c
   {boardName: BoardName.THARSIS, code: 'TMB3AwkHVGhhcnNpcwEDAQMDAREBAQEDEQEBAQEBAREBAQEBAQEDEQEhAwMDAQEBAQEBAQEDAwMBAQEBAQEBAQEBAQEBAQEBAQMCAQECAQEAAQMAAAEBAAAAAgMDAQMAAAAAAAEBAgIAAQIBAgECAgICAQIBAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgECAgICAQIBAgECAQIBAgECAAAAAAABAgACAQEAAQMBAwABAAEBAgEBAAACAAAFC1RlcnJhZm9ybWVyBU1heW9yCEdhcmRlbmVyB0J1aWxkZXIHUGxhbm5lcgUITGFuZGxvcmQJU2NpZW50aXN0BkJhbmtlcgpUaGVybWFsaXN0BU1pbmVyAAA'},
   {boardName: BoardName.HELLAS, code: 'TMB3AwkGSGVsbGFzAwEBAQEDAQEBAQEDAQEBAQEBAwEBAQEDAwEBAQEBAQMDAwEBAQEBAQMDAQMBAQEBAQEBAQEBAQEBAQEBAQICAgICAgICAgICAQECAgICAgICAQICAgEBAgECAQIBAgEBAQEAAgICAgIDAQIBAgEBAgEBAQEBAgECAQIBAwAAAgEBAAEDAwQEBAABAgEAAAEBAAAAAQEAAgAAAAABAwAAAQABAQEDAgQEAgQEAQABAAACBAQBBQIEBAAFC0RpdmVyc2lmaWVyCVRhY3RpY2lhbg5Qb2xhciBFeHBsb3JlcglFbmVyZ2l6ZXILUmltIFNldHRsZXIFCkN1bHRpdmF0b3IHTWFnbmF0ZQtTcGFjZSBCYXJvbglFeGNlbnRyaWMKQ29udHJhY3RvcgAA'},
   {boardName: BoardName.ELYSIUM, code: 'TMB3AwkHRWx5c2l1bQMDAwMBEQEBAwMBEQEBAQMDEQEBAQMBAwMBAQEBAwEBAQERAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAQABAwEBAQMBAAAAAAACAQECAAAAAQMAAQIAAwMDAwECAQIBAgICAgECAQIBAgICAQICAgICAgICAgICAgICAgMCAgICAgICAgICAgABAQECAQIBAgECAQIBAgABAAEBAAABAQAAAgEBAAAAAgEBAAEBAAEDAQMCAQEFCkdlbmVyYWxpc3QKU3BlY2lhbGlzdAlFY29sb2dpc3QGVHljb29uBkxlZ2VuZAUJQ2VsZWJyaXR5DUluZHVzdHJpYWxpc3QORGVzZXJ0IFNldHRsZXINRXN0YXRlIERlYWxlcgpCZW5lZmFjdG9yAAA'},
+];
+
+// Fan-made boards with a full bespoke board class (unlike a community CustomBoardDefinition
+// submission) -- still real, "approved" Map Library entries, just not Fryxgames-official.
+export const FAN_MAP_LIBRARY_BOARDS: ReadonlyArray<{boardName: BoardName, code: string}> = [
   {boardName: BoardName.UTOPIA_PLANITIA, code: 'TMB3AwkPVXRvcGlhIFBsYW5pdGlhAQEBAQEBAQEBAQEDAQEBAQEBAwEBAQMDAwEBAQEBAQEBAwEBAQMBAQEBAQEBAwMBAQEBAQMDAQEBAQEDAQAAAgkJAAAAAgEBAgkJAwkJAwAAAwICAgABAQAAAwMDAAIAAAICAwECAQICAgICAgIBAgECAQIAAAABAgECAgICAAACAgABAQIBAQICAgICAgAAAgEBAAEBAAACAgIAAAAAAgMDAAICAgIBAAICAgAAAgEBAQIBAgUPTGFuZCBTcGVjaWFsaXN0B1Bpb25lZXIJVHJhZGVzbWFuBVNtaXRoClJlc2VhcmNoZXIFCkVkZ2VkYW5jZXIISW52ZXN0b3IIQm90YW5pc3QMSW5jb3Jwb3JhdG9yC01ldHJvcG9saXN0AAA'},
   {boardName: BoardName.VASTITAS_BOREALIS_NOVA, code: 'TMB3AwkWVmFzdGl0YXMgQm9yZWFsaXMgTm92YQEBEQEBAQEBAQERAQMDAQEBAREBAwEBAQEBAQEDAQEDAwMBAQEBAwMDAQERAQMDAQEBAQEBAQEBAQEBAQEBAgABAQAAAgICAgICAAABAgEDAQMCAgICAgICAgIBAgAAAgEBAQACAgIBAgABAwECARAAAAECAgICARICAgICAgICAgICAwMCAwMAAQICBAQDBAQCAQMBAgIAAAEAAQEAAgQEAgICAQIAAQIAAQICAgEBAQECARAAAQMBAQEABQpBZ3Jvbm9taXN0DVYuIFNwYWNlZmFyZXIJR2VvbG9naXN0CEVuZ2luZWVyBkZhcm1lcgUJVHJhdmVsbGVyCkxhbmRzY2FwZXIKSGlnaGxhbmRlcghQcm9tb3RlcgpCbGFja3NtaXRoAAA'},
   {boardName: BoardName.TERRA_CIMMERIA_NOVA, code: 'TMB3AwkTVGVycmEgQ2ltbWVyaWEgTm92YQMBEQEDAwEBAQEDAQEBAQEBAREBAQEBAREBAQEBAQEBAQEDEQEBAQEBAQEBAQEBAQEDAwEBAQEDAwMDAQMAAQIBAQECAgICAgAAAAAAAgIBAQIAAAAAAAECAAEBAAEBAAIBAQACAAABAwAAAAEBAQEBAwACAQMAAgMDAAMAAQEAAQACAQEAAgEBAgICAQAAAwIBAQICAgECAgICAAECAQABAwICAgICAgICAgECAQIBAgECBQ1QbGFuZXRvbG9naXN0CUFyY2hpdGVjdApDb2FzdGd1YXJkC0MuIEZvcmVzdGVyCkZ1bmRyYWlzZXIFC0VsZWN0cmljaWFuB0ZvdW5kZXIFTW9ndWwMQS4gWm9vbG9naXN0CkZvcmVjYXN0ZXIAAA'},
@@ -22,8 +28,9 @@ export const OFFICIAL_MAP_LIBRARY_BOARDS: ReadonlyArray<{boardName: BoardName, c
   {boardName: BoardName.HOLLANDIA, code: 'TMB3AwkJSG9sbGFuZGlhAwEBAwkDAQEBCQkBAwEBCQkJAQEDAQEJCQkBAQEDAQEJCQkBAQEBAQEBAwMBAQEBAQMDAwEBAQMBAQEBAQEBAgICAQMBAAECAgICAgICAAEBAAABAwECAgECAAICAgABAwMBAQEBAgACAQIAAQAAAQEBAAABAgICAgAAAAECAAIBAgAAAgIBAAACAgICAAACAgIAAAIEBAMEBAQBAgECAAICAgICAgIEBAIAAgECAgMDAgICAAABAwAAAAA'},
 ];
 
-// Stable, deterministic id -- re-running the seeder is idempotent, and an admin who
-// deletes an official row will not have it silently resurrected until the next boot.
+// Stable, deterministic id shared by both lists above -- re-running the seeder is
+// idempotent, and an admin who deletes a built-in row will not have it silently
+// resurrected until the next boot.
 export function officialMapLibraryId(boardName: BoardName): MapLibraryEntryId {
   const slug = boardName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return safeCast(`m-official-${slug}`, isMapLibraryEntryId);

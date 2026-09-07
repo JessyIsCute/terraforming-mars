@@ -44,8 +44,8 @@ type DataModel = {
 };
 
 // Sized well above MapThumbnail's own default -- the map itself is the point of a library card.
-const THUMBNAIL_WIDTH = 460;
-const THUMBNAIL_HEIGHT = 380;
+const THUMBNAIL_WIDTH = 500;
+const THUMBNAIL_HEIGHT = 410;
 
 export default defineComponent({
   name: 'MapLibraryRow',
@@ -77,11 +77,14 @@ export default defineComponent({
   },
   methods: {
     play(): void {
-      if (this.entry.origin === 'official') {
-        const boardName = boardNameForOfficialMapLibraryId(this.entry.id);
-        if (boardName !== undefined) {
-          window.location.href = `${paths.NEW_GAME}?board=${encodeURIComponent(boardName)}`;
-        }
+      // A built-in board (official OR a fan board with its own bespoke class, e.g. Hollandia)
+      // deep-links to its real BoardName for gameplay, regardless of its official/fanmade
+      // library tag -- the tag is cosmetic labeling only. Only a genuine community submission
+      // (an arbitrary CustomBoardDefinition with no matching real board) falls through to the
+      // generic customBoardCode replay below.
+      const boardName = boardNameForOfficialMapLibraryId(this.entry.id);
+      if (boardName !== undefined) {
+        window.location.href = `${paths.NEW_GAME}?board=${encodeURIComponent(boardName)}`;
         return;
       }
       // Reproduces MapEditor.vue's play() hand-off verbatim -- CreateGameForm.vue's
@@ -126,8 +129,8 @@ export default defineComponent({
   background: #15131f;
 }
 .map-thumbnail--error {
-  width: 460px;
-  height: 380px;
+  width: 500px;
+  height: 410px;
   display: flex;
   align-items: center;
   justify-content: center;

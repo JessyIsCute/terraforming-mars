@@ -40,7 +40,7 @@ const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 6
 // Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
 // every side, so the heat/oxygen tracks painted just outside the diamond peek into the preview
 // instead of being cropped off flush with the hexes.
-const TRACK_MARGIN = 30;
+const TRACK_MARGIN = 44;
 
 export default defineComponent({
   name: 'MapThumbnail',
@@ -145,10 +145,17 @@ export default defineComponent({
   background: #15131f;
   border-radius: 4px;
   flex: 0 0 auto;
+  // The scaled hex diamond rarely matches the box's own aspect ratio exactly -- center it so
+  // the leftover space lands evenly on every side instead of piling up at the right/bottom
+  // edge (flexbox centers the *unscaled* layout box, so .map-thumbnail-inner's transform-origin
+  // below must stay at its center for the shrink to happen around that already-centered point).
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .map-thumbnail-inner {
   position: relative;
-  transform-origin: top left;
+  transform-origin: center;
 }
 .map-thumbnail-hex {
   position: absolute;

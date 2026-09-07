@@ -5,7 +5,7 @@ import MapLibraryRow from '@/client/components/maplibrary/MapLibraryRow.vue';
 import {MapLibraryEntry} from '@/common/boards/MapLibraryEntry';
 import {blankCustomBoard} from '@/common/boards/CustomBoardDefinition';
 import {encodeCustomBoard} from '@/common/boards/customBoardCodec';
-import {OFFICIAL_MAP_LIBRARY_BOARDS, officialMapLibraryId} from '@/common/boards/officialMapLibrary';
+import {OFFICIAL_MAP_LIBRARY_BOARDS, FAN_MAP_LIBRARY_BOARDS, officialMapLibraryId} from '@/common/boards/officialMapLibrary';
 import {BoardName} from '@/common/boards/BoardName';
 
 function fanmadeEntry(overrides: Partial<MapLibraryEntry> = {}): MapLibraryEntry {
@@ -132,5 +132,25 @@ describe('MapLibraryRow', () => {
     expect(location.href).to.not.contain('customBoard=1');
     expect(window.localStorage.getItem('customBoardCode')).eq('sentinel-should-not-change');
     expect(boardName).eq(BoardName.THARSIS);
+  });
+
+  it('playing a fan-made-but-built-in map (e.g. Hollandia) still navigates with ?board=, not customBoard=1', async () => {
+    // A built-in fan board has its own bespoke board class, unlike a genuine community
+    // submission -- its "origin" tag is cosmetic labeling only, so play() must still deep-link
+    // to the real BoardName for correct gameplay, exactly like an official board does.
+    const location = stubLocation();
+    const {boardName, code} = FAN_MAP_LIBRARY_BOARDS[0];
+    const fanBuiltInEntry: MapLibraryEntry = fanmadeEntry({
+      id: officialMapLibraryId(boardName),
+      code,
+      origin: 'fanmade',
+      status: 'approved',
+    });
+    window.localStorage.setItem('customBoardCode', 'sentinel-should-not-change');
+    const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry: fanBuiltInEntry}});
+    await wrapper.find('button.btn-primary').trigger('click');
+    expect(location.href).to.contain(`new-game?board=${encodeURIComponent(boardName)}`);
+    expect(location.href).to.not.contain('customBoard=1');
+    expect(window.localStorage.getItem('customBoardCode')).eq('sentinel-should-not-change');
   });
 });
