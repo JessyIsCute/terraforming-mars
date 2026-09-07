@@ -17,7 +17,7 @@ import {testGame} from '../../TestGame';
 const MOON_SWAPS: ReadonlyArray<[CardName, ReadonlyArray<Tag>]> = [
   [CardName.LUNAR_BEAM_BETTER_MARS, [Tag.MOON, Tag.POWER]],
   [CardName.LUNA_METROPOLIS_BETTER_MARS, [Tag.CITY, Tag.SPACE, Tag.MOON]],
-  [CardName.LUNAR_EXPORTS_BETTER_MARS, [Tag.EARTH, Tag.SPACE, Tag.MOON]],
+  [CardName.LUNAR_EXPORTS_BETTER_MARS, [Tag.SPACE, Tag.MOON]],
 ];
 
 const MARS_ADDS: ReadonlyArray<CardName> = [
@@ -63,7 +63,7 @@ describe('BetterMars replacement cards', () => {
     }
     expect(newCard(CardName.LUNAR_BEAM_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
     expect(newCard(CardName.LUNA_METROPOLIS_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
-    expect(newCard(CardName.LUNAR_EXPORTS_BETTER_MARS).tags).to.contain(Tag.EARTH);
+    expect(newCard(CardName.LUNAR_EXPORTS_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
   });
 
   it('mars-add cards gain a Mars tag on top of the original tags', () => {
@@ -157,6 +157,34 @@ describe('BetterMars replacement cards', () => {
     const pool = cards.getProjectCards().map(toName);
     expect(pool).to.contain(CardName.LUNAR_BEAM_BETTER_MARS);
     expect(pool).to.not.contain(CardName.LUNAR_BEAM);
+  });
+
+  it('Lunar Exports:bm also requires the Moon expansion, since it swaps Earth for Moon', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.not.contain(CardName.LUNAR_EXPORTS_BETTER_MARS);
+    expect(pool).to.contain(CardName.LUNAR_EXPORTS);
+  });
+
+  it('Lunar Exports:bm replaces the base card once the Moon expansion is also on', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: true,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.contain(CardName.LUNAR_EXPORTS_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.LUNAR_EXPORTS);
   });
 
   it('Pristar:bm also requires Turmoil, since it only replaces the Turmoil-only base', () => {
