@@ -743,6 +743,28 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: contain !important;
+
+    // The multi-layer/custom-sized bonus icons (Hellas's ocean tile + cost-badge combo, the
+    // temperature bonuses, colony) break under the uniform small-icon rules above: a single
+    // `background-size`/`background-position` value applies to *every* layer, so ocean's two
+    // stacked images both collapse onto the same centered/contain-fit spot, overlapping into a
+    // garbled blob instead of tile-icon-plus-cost-badge side by side. They already fit
+    // comfortably within the 46x51 hex on their own, so render them at their real board.less
+    // size instead of forcing the 13x13 box (see board.less for these exact values).
+    &.board-space-bonus--bonusocean {
+      width: 35px !important;
+      height: 24px !important;
+      background-position: left, 23px !important;
+      background-size: 21px, 12px !important;
+    }
+    &.board-space-bonus--bonustemperature,
+    &.board-space-bonus--bonustemperature4mc,
+    &.board-space-bonus--colony {
+      width: 36px !important;
+      height: 21px !important;
+      background-position: center !important;
+      background-size: 32px 21px !important;
+    }
   }
   // Sits directly on top of the coin icon (matching Bonus.vue's board-space-bonus-count),
   // rather than as a corner badge.

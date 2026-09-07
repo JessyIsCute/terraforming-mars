@@ -4,6 +4,9 @@ import {globalConfig} from '../getLocalVue';
 import MapThumbnail from '@/client/components/maplibrary/MapThumbnail.vue';
 import {blankCustomBoard} from '@/common/boards/CustomBoardDefinition';
 import {SpaceBonus} from '@/common/boards/SpaceBonus';
+import {BoardName} from '@/common/boards/BoardName';
+import {OFFICIAL_MAP_LIBRARY_BOARDS} from '@/common/boards/officialMapLibrary';
+import {decodeCustomBoard} from '@/common/boards/customBoardCodec';
 
 describe('MapThumbnail', () => {
   it('renders one hex per space', () => {
@@ -25,6 +28,25 @@ describe('MapThumbnail', () => {
     expect(wrapper.findAll('.map-thumbnail-hex-bonus').length).eq(2);
     expect(wrapper.find('.board-space-bonus--plant').exists()).is.true;
     expect(wrapper.find('.board-space-bonus--steel').exists()).is.true;
+  });
+
+  it('renders the double-wide ocean bonus icon (Hellas) with its own board-space-bonus--bonusocean class', () => {
+    // The CSS override that keeps this icon's two layers (tile + Hellas cost badge) from being
+    // squashed into the generic 13x13/contain small-icon box (which would collapse both layers
+    // onto the same centered spot, overlapping into a garbled blob) lives in MapThumbnail.vue's
+    // scoped stylesheet, not something jsdom resolves here -- this only guards that the correct
+    // class/markup reaches the DOM for that CSS rule to ever apply to.
+    const definition = blankCustomBoard(3, 'Ocean Bonus');
+    definition.spaces[0].bonus = [SpaceBonus.OCEAN];
+    const wrapper = mount(MapThumbnail, {...globalConfig, props: {definition}});
+    expect(wrapper.find('.board-space-bonus--bonusocean').exists()).is.true;
+  });
+
+  it("renders the real Hellas board's ocean placement bonus (regression guard for the garbled-icon bug)", () => {
+    const hellas = OFFICIAL_MAP_LIBRARY_BOARDS.find((b) => b.boardName === BoardName.HELLAS)!;
+    const definition = decodeCustomBoard(hellas.code);
+    const wrapper = mount(MapThumbnail, {...globalConfig, props: {definition}});
+    expect(wrapper.find('.board-space-bonus--bonusocean').exists()).is.true;
   });
 
   it('renders a Mars backdrop behind the hexes', () => {
