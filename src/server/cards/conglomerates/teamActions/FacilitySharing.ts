@@ -17,8 +17,8 @@ export class FacilitySharing extends StandardProjectCard {
       metadata: {
         cardNumber: 'TA2',
         renderData: CardRenderer.builder((b) => {
-          b.standardProject('Use one of your teammate\'s unused, non-corporation action cards as if it were yours. (Full Access Cooperation lets this reach their corporation\'s action too.)', (eb) => {
-            eb.empty().startAction.text('Cost: 1 Coordination');
+          b.standardProject('Use one of your teammate\'s unused action cards (not their corporation) as if it were yours.', (eb) => {
+            eb.text('1 Coordination').startAction.text('Use action');
           });
         }),
       },

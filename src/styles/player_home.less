@@ -234,17 +234,18 @@ each(@players, {
   .tag-count-icon();
 }
 
-// Conglomerates: a handshake emoji, CSS-only (no art asset), same trick used
-// for the expansion-select icon in cards.less.
+// Conglomerates: a square blue badge (matching the other resource icons' shape)
+// with a handshake emoji, CSS-only since there's no art asset for it.
 .tag-coordination-count {
   .tag-count-icon();
   background-image: none;
+  background-color: #2f6fed !important;
   filter: none;
   text-align: center;
 
   &::before {
     content: "🤝";
-    font-size: 22px;
+    font-size: 20px;
     line-height: 34px;
   }
 }
