@@ -17,6 +17,8 @@ import {ProtectedHabitatsBetterMars} from './ProtectedHabitatsBetterMars';
 import {TropicalResortBetterMars} from './TropicalResortBetterMars';
 import {MartianMediaCenterBetterMars} from './MartianMediaCenterBetterMars';
 import {MeatIndustryBetterMars} from './MeatIndustryBetterMars';
+import {LunarMiningBetterMars} from './LunarMiningBetterMars';
+import {LunaGovernorBetterMars} from './LunaGovernorBetterMars';
 
 /**
  * BetterMars: replaces a handful of official cards with tag-variant reworks
@@ -48,6 +50,8 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.TROPICAL_RESORT_BETTER_MARS]: {Factory: TropicalResortBetterMars},
     [CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS]: {Factory: MartianMediaCenterBetterMars, compatibility: 'turmoil'},
     [CardName.MEAT_INDUSTRY_BETTER_MARS]: {Factory: MeatIndustryBetterMars},
+    [CardName.LUNAR_MINING_BETTER_MARS]: {Factory: LunarMiningBetterMars, compatibility: ['colonies', 'moon']},
+    [CardName.LUNA_GOVERNOR_BETTER_MARS]: {Factory: LunaGovernorBetterMars, compatibility: ['colonies', 'moon']},
   },
   cardsToRemove: [
     CardName.EOS_CHASMA_NATIONAL_PARK,
@@ -74,5 +78,7 @@ export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.EARLY_SETTLEMENT, CardName.EARLY_SETTLEMENT_BETTER_MARS],
     [CardName.SELF_SUFFICIENT_SETTLEMENT, CardName.SELF_SUFFICIENT_SETTLEMENT_BETTER_MARS],
     [CardName.MARTIAN_MEDIA_CENTER, CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS],
+    [CardName.LUNAR_MINING, CardName.LUNAR_MINING_BETTER_MARS],
+    [CardName.LUNA_GOVERNOR, CardName.LUNA_GOVERNOR_BETTER_MARS],
   ]),
 });

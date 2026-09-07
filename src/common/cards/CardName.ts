@@ -723,6 +723,8 @@ export enum CardName {
   TROPICAL_RESORT_BETTER_MARS = 'Tropical Resort:bm',
   MARTIAN_MEDIA_CENTER_BETTER_MARS = 'Martian Media Center:bm',
   MEAT_INDUSTRY_BETTER_MARS = 'Meat Industry:bm',
+  LUNAR_MINING_BETTER_MARS = 'Lunar Mining:bm',
+  LUNA_GOVERNOR_BETTER_MARS = 'Luna Governor:bm',
 
   // Community corps
   AEROTECH = 'Aerotech',

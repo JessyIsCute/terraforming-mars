@@ -10,14 +10,18 @@ import {LunaMetropolisBetterMars} from '../../../src/server/cards/betterMars/Lun
 import {LunarExportsBetterMars} from '../../../src/server/cards/betterMars/LunarExportsBetterMars';
 import {MarsUniversityBetterMars} from '../../../src/server/cards/betterMars/MarsUniversityBetterMars';
 import {MeatIndustryBetterMars} from '../../../src/server/cards/betterMars/MeatIndustryBetterMars';
+import {LunarMiningBetterMars} from '../../../src/server/cards/betterMars/LunarMiningBetterMars';
+import {LunaGovernorBetterMars} from '../../../src/server/cards/betterMars/LunaGovernorBetterMars';
 import {Fish} from '../../../src/server/cards/base/Fish';
-import {runAllActions} from '../../TestingUtils';
+import {fakeCard, runAllActions} from '../../TestingUtils';
 import {testGame} from '../../TestGame';
 
 const MOON_SWAPS: ReadonlyArray<[CardName, ReadonlyArray<Tag>]> = [
   [CardName.LUNAR_BEAM_BETTER_MARS, [Tag.MOON, Tag.POWER]],
   [CardName.LUNA_METROPOLIS_BETTER_MARS, [Tag.CITY, Tag.SPACE, Tag.MOON]],
   [CardName.LUNAR_EXPORTS_BETTER_MARS, [Tag.SPACE, Tag.MOON]],
+  [CardName.LUNAR_MINING_BETTER_MARS, [Tag.MOON]],
+  [CardName.LUNA_GOVERNOR_BETTER_MARS, [Tag.MOON, Tag.MOON]],
 ];
 
 const MARS_ADDS: ReadonlyArray<CardName> = [
@@ -54,6 +58,8 @@ const ALL_REPLACEMENTS: ReadonlyArray<[CardName, CardName]> = [
   [CardName.TROPICAL_RESORT_BETTER_MARS, CardName.TROPICAL_RESORT],
   [CardName.MARTIAN_MEDIA_CENTER_BETTER_MARS, CardName.MARTIAN_MEDIA_CENTER],
   [CardName.MEAT_INDUSTRY_BETTER_MARS, CardName.MEAT_INDUSTRY],
+  [CardName.LUNAR_MINING_BETTER_MARS, CardName.LUNAR_MINING],
+  [CardName.LUNA_GOVERNOR_BETTER_MARS, CardName.LUNA_GOVERNOR],
 ];
 
 describe('BetterMars replacement cards', () => {
@@ -64,6 +70,8 @@ describe('BetterMars replacement cards', () => {
     expect(newCard(CardName.LUNAR_BEAM_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
     expect(newCard(CardName.LUNA_METROPOLIS_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
     expect(newCard(CardName.LUNAR_EXPORTS_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
+    expect(newCard(CardName.LUNAR_MINING_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
+    expect(newCard(CardName.LUNA_GOVERNOR_BETTER_MARS).tags).to.not.contain(Tag.EARTH);
   });
 
   it('mars-add cards gain a Mars tag on top of the original tags', () => {
@@ -187,6 +195,62 @@ describe('BetterMars replacement cards', () => {
     expect(pool).to.not.contain(CardName.LUNAR_EXPORTS);
   });
 
+  it('Lunar Mining:bm also requires the Moon expansion, since it swaps Earth for Moon', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.not.contain(CardName.LUNAR_MINING_BETTER_MARS);
+    expect(pool).to.contain(CardName.LUNAR_MINING);
+  });
+
+  it('Lunar Mining:bm replaces the base card once the Moon expansion is also on', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: true,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.contain(CardName.LUNAR_MINING_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.LUNAR_MINING);
+  });
+
+  it('Luna Governor:bm also requires the Moon expansion, since it swaps Earth for Moon', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.not.contain(CardName.LUNA_GOVERNOR_BETTER_MARS);
+    expect(pool).to.contain(CardName.LUNA_GOVERNOR);
+  });
+
+  it('Luna Governor:bm replaces the base card once the Moon expansion is also on', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      coloniesExtension: true,
+      betterMarsExpansion: true,
+      moonExpansion: true,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = cards.getProjectCards().map(toName);
+    expect(pool).to.contain(CardName.LUNA_GOVERNOR_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.LUNA_GOVERNOR);
+  });
+
   it('Pristar:bm also requires Turmoil, since it only replaces the Turmoil-only base', () => {
     const gameOptions: GameOptions = {
       ...DEFAULT_GAME_OPTIONS,
@@ -247,5 +311,30 @@ describe('BetterMars replacement cards', () => {
     expect(player.production.heat).to.eq(2);
     expect(player.production.energy).to.eq(2);
     expect(player.production.megacredits).to.eq(1);
+  });
+
+  it('Lunar Mining:bm gains titanium production per 2 Moon tags, not Earth tags', () => {
+    const [/* game */, player] = testGame(2);
+    const card = new LunarMiningBetterMars();
+    player.playedCards.push(card);
+    player.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+    player.playedCards.push(fakeCard({tags: [Tag.EARTH, Tag.EARTH, Tag.EARTH]}));
+    card.play(player);
+    // 1 Moon tag from itself + 1 from the fake card = 2 Moon tags -> 1 step. The 3
+    // Earth tags on the other fake card must not count at all.
+    expect(player.production.titanium).to.eq(1);
+  });
+
+  it('Luna Governor:bm requires 3 Moon tags, not Earth tags', () => {
+    const [/* game */, player] = testGame(2);
+    const card = new LunaGovernorBetterMars();
+    player.playedCards.push(fakeCard({tags: [Tag.EARTH, Tag.EARTH, Tag.EARTH]}));
+    expect(card.canPlay(player)).is.false;
+
+    player.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+    expect(card.canPlay(player)).is.false;
+
+    player.playedCards.push(fakeCard({tags: [Tag.MOON, Tag.MOON]}));
+    expect(card.canPlay(player)).is.true;
   });
 });
