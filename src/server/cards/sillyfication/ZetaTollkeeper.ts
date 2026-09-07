@@ -2,14 +2,17 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {CorporationCard} from '../corporation/CorporationCard';
 import {ICorporationCard} from '../corporation/ICorporationCard';
+import {IActionCard} from '../ICard';
+import {IPlayer} from '../../IPlayer';
+import {PlayerInput} from '../../PlayerInput';
+import {DeltaProjectExpansion, DELTA_TRACK_TAGS} from '../../delta/DeltaProjectExpansion';
 import {Size} from '../../../common/cards/render/Size';
 
-/** Turns the shared Delta Project prelude action into an all-or-nothing "collect
- * everything" button for its owner - at the price of an extra toll (1 unit of any standard
- * resource, their choice) on every use, and of being the corp most exposed to its own
- * passive if it falls behind. See DeltaProjectExpansion.buildAdvanceInput, .advance, and
- * .applyZetaTollkeeperGenerationStart for the logic. */
-export class ZetaTollkeeper extends CorporationCard implements ICorporationCard {
+/** Re-triggers its owner's current Delta Project position bonus, without moving the
+ * marker - both automatically each generation while in the lead, and on demand via its
+ * own action. See DeltaProjectExpansion.applyZetaTollkeeperGenerationStart for the
+ * generation-start logic. */
+export class ZetaTollkeeper extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
     super({
       name: CardName.ZETA_TOLLKEEPER,
@@ -25,19 +28,31 @@ export class ZetaTollkeeper extends CorporationCard implements ICorporationCard 
         description: 'You start with 72 M€ and -3 M€ production.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(72).nbsp.production((pb) => pb.minus().megacredits(3)).br;
-          b.corpBox('effect', (eb) => {
-            eb.vSpace(Size.LARGE);
-            eb.br;
-            eb.effect('When doing the Delta Project action, it costs 1 additional standard resource of your choice - but you gain the reward of every earlier step too, not just the one you land on.', (e1) => {
-              e1.wild(1).startEffect.plate('Delta track').asterix();
+          b.corpBox('effect-action', (cea) => {
+            cea.vSpace(Size.LARGE);
+            cea.br;
+            cea.effect('At the start of each generation, if you are the furthest along the Delta Project track, gain your current position\'s bonus again (not the Jovian tag or a blue card action).', (e1) => {
+              e1.empty().startEffect.plate('Delta track').asterix();
             });
-            eb.br;
-            eb.effect('At the start of each generation, whoever is furthest along the Delta Project track moves back 1 step and gains nothing for it - unless that is you, in which case you gain every step\'s reward up to your new position instead.', (e2) => {
-              e2.empty().startEffect.plate('Delta track').minus();
+            cea.br;
+            cea.action('Gain your current Delta Project position\'s bonus again.', (ab) => {
+              ab.empty().startAction.plate('Delta track').asterix();
             });
           });
         }),
       },
     });
+  }
+
+  public canAct(player: IPlayer): boolean {
+    const position = player.deltaProjectData?.position ?? 0;
+    return DELTA_TRACK_TAGS[position] !== undefined;
+  }
+
+  public action(player: IPlayer): PlayerInput | undefined {
+    const position = player.deltaProjectData?.position ?? 0;
+    DeltaProjectExpansion.grantRewardForPosition(player, position, 'primary');
+    player.game.log('${0} used Zeta Tollkeeper to gain their Delta Project position bonus again', (b) => b.player(player));
+    return undefined;
   }
 }

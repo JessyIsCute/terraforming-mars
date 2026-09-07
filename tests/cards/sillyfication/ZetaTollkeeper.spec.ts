@@ -13,6 +13,8 @@ describe('ZetaTollkeeper', () => {
   beforeEach(() => {
     card = new ZetaTollkeeper();
     [game, player] = testGame(1, {deltaProjectExpansion: true});
+    player.playCorporationCard(card);
+    runAllActions(game);
   });
 
   it('has no tags', () => {
@@ -20,10 +22,27 @@ describe('ZetaTollkeeper', () => {
   });
 
   it('starts with 72 M€ and -3 M€ production', () => {
-    player.playCorporationCard(card);
-    runAllActions(game);
-
     expect(player.megaCredits).eq(72);
     expect(player.production.megacredits).eq(-3);
+  });
+
+  it('cannot act at position 0', () => {
+    expect(card.canAct(player)).is.false;
+  });
+
+  it('cannot act on a VP spot', () => {
+    player.deltaProjectData!.position = 10; // 2VP
+    expect(card.canAct(player)).is.false;
+  });
+
+  it('action re-grants the current position bonus without moving', () => {
+    player.deltaProjectData!.position = 3; // Earth: +2 M€ production
+    player.production.override({megacredits: 0});
+
+    expect(card.canAct(player)).is.true;
+    card.action(player);
+
+    expect(player.deltaProjectData!.position).eq(3);
+    expect(player.production.megacredits).eq(2);
   });
 });

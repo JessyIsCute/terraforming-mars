@@ -3,7 +3,7 @@ import {IPlayer} from '../IPlayer';
 import {DeltaProjectPlayerModel} from '../../common/models/DeltaProjectPlayerModel';
 import {CardName} from '../../common/cards/CardName';
 import {Tag} from '../../common/cards/Tag';
-import {ALL_RESOURCES, Resource} from '../../common/Resource';
+import {Resource} from '../../common/Resource';
 import {SelectOption} from '../inputs/SelectOption';
 import {SelectCard} from '../inputs/SelectCard';
 import {OrOptions} from '../inputs/OrOptions';
@@ -230,20 +230,13 @@ export class DeltaProjectExpansion {
     const progress = DeltaProjectExpansion.getProgress(player);
     const currentPos = progress.position;
     const newPos = currentPos + steps;
-    const isTollkeeper = player.tableau.has(CardName.ZETA_TOLLKEEPER);
 
     DeltaProjectExpansion.deductEnergyForDelta(player, steps);
     progress.position = newPos;
 
-    // Zeta Tollkeeper: gain every step's reward from the very start of the track, not just
-    // the ones passed this move - a superset of what Delta Surge does, so check it first.
     // Delta Surge: gain every step's reward when advancing multiple steps at once, not
     // just the landing position (resolveReward already no-ops for the VP-only positions).
-    if (isTollkeeper) {
-      for (let pos = 1; pos <= newPos; pos++) {
-        DeltaProjectExpansion.resolveReward(player, pos, 'primary');
-      }
-    } else if (player.tableau.has(CardName.DELTA_SURGE)) {
+    if (player.tableau.has(CardName.DELTA_SURGE)) {
       for (let pos = currentPos + 1; pos <= newPos; pos++) {
         DeltaProjectExpansion.resolveReward(player, pos, 'primary');
       }
@@ -255,29 +248,9 @@ export class DeltaProjectExpansion {
     player.game.log('${0} spend ${1} energy to advance on the Delta Project track', (b) => b.player(player).number(steps));
   }
 
-  /**
-   * Builds the player input for using the Delta Project prelude action. Normally that's
-   * just the step-selection input, but Zeta Tollkeeper's owner must first pay a toll of 1
-   * unit of any standard resource of their choice - paid before the step choice is built,
-   * so the steps on offer always reflect whatever the player has left afterward (e.g.
-   * paying the toll in energy leaves less of it for the steps themselves).
-   */
+  /** Builds the player input for using the Delta Project prelude action. */
   public static buildAdvanceInput(player: IPlayer): PlayerInput | undefined {
-    if (!player.tableau.has(CardName.ZETA_TOLLKEEPER)) {
-      return DeltaProjectExpansion.buildStepInput(player);
-    }
-
-    const toll = new OrOptions().setTitle('Select a resource to pay the Zeta Tollkeeper toll');
-    for (const resource of ALL_RESOURCES) {
-      if (player.stock.get(resource) < 1) {
-        continue;
-      }
-      toll.options.push(new SelectOption(`Pay 1 ${resource}`, 'Pay').andThen(() => {
-        player.stock.deduct(resource, 1, {log: true});
-        return DeltaProjectExpansion.buildStepInput(player);
-      }));
-    }
-    return toll;
+    return DeltaProjectExpansion.buildStepInput(player);
   }
 
   private static buildStepInput(player: IPlayer): PlayerInput | undefined {
@@ -340,14 +313,13 @@ export class DeltaProjectExpansion {
   }
 
   /**
-   * Zeta Tollkeeper's passive: at the start of every generation, whichever player is
-   * furthest along the Delta Project track (counting both their primary marker and, if
-   * they have it, their Epsilon Dample marker) is knocked back one step. Nobody claims
-   * the landing reward for this forced retreat - unless the affected player is the
-   * Tollkeeper's own owner, who (per the corp's core ability) claims every reward from
-   * position 1 up to their new position instead. Does nothing if there's no single
-   * unique leader (a tie skips the effect for that generation), or if no player in the
-   * game has this corporation. No-op for a "leader" sitting at position 0.
+   * Zeta Tollkeeper's passive: at the start of every generation, if its owner's marker is
+   * at least as far along the Delta Project track as every other marker in play (their own
+   * primary marker, or another player's primary or Epsilon Dample marker), they gain their
+   * current position's reward again. The Jovian tag (position 8) and reusing a blue card
+   * action (position 7) don't repeat this way - and VP spots have nothing extra to repeat
+   * in the first place. No-op for an owner sitting at position 0, or if no player in the
+   * game has this corporation.
    */
   public static applyZetaTollkeeperGenerationStart(game: IGame): void {
     const tollkeeper = game.players.find((p) => p.tableau.has(CardName.ZETA_TOLLKEEPER));
@@ -355,47 +327,23 @@ export class DeltaProjectExpansion {
       return;
     }
 
-    let leader: IPlayer | undefined;
-    let leaderMarker: MarkerKind = 'primary';
-    let leaderPos = -1;
-    let tied = false;
-
-    for (const p of game.players) {
-      const candidates: Array<[MarkerKind, number]> = [['primary', p.deltaProjectData?.position ?? -1]];
-      if (p.epsilonDampleData !== undefined) {
-        candidates.push(['epsilon', p.epsilonDampleData.position]);
-      }
-      for (const [marker, pos] of candidates) {
-        if (pos < 0) {
-          continue;
-        }
-        if (pos > leaderPos) {
-          leaderPos = pos;
-          leader = p;
-          leaderMarker = marker;
-          tied = false;
-        } else if (pos === leaderPos && p !== leader) {
-          tied = true;
-        }
-      }
-    }
-
-    if (leader === undefined || tied || leaderPos <= 0) {
+    const position = tollkeeper.deltaProjectData?.position ?? 0;
+    if (position <= 0) {
       return;
     }
-    const knockedBackPlayer = leader;
 
-    const progress = DeltaProjectExpansion.getMarkerData(knockedBackPlayer, leaderMarker);
-    const newPos = progress.position - 1;
-    progress.position = newPos;
-    game.log('${0} is knocked back a step on the Delta Project track by ${1}\'s Zeta Tollkeeper', (b) => b.player(knockedBackPlayer).player(tollkeeper));
-
-    if (knockedBackPlayer === tollkeeper) {
-      for (let pos = 1; pos <= newPos; pos++) {
-        DeltaProjectExpansion.resolveReward(knockedBackPlayer, pos, leaderMarker);
+    for (const p of game.players) {
+      if (p === tollkeeper) {
+        continue;
       }
-      game.log('${0} claims every reward up to their new position', (b) => b.player(knockedBackPlayer));
+      const otherBest = Math.max(p.deltaProjectData?.position ?? -1, p.epsilonDampleData?.position ?? -1);
+      if (otherBest > position) {
+        return;
+      }
     }
+
+    DeltaProjectExpansion.resolveReward(tollkeeper, position, 'primary', {skipJovianAndMicrobe: true});
+    game.log('${0} is furthest along the Delta Project track and gains their position bonus again from Zeta Tollkeeper', (b) => b.player(tollkeeper));
   }
 
   /**
@@ -403,8 +351,8 @@ export class DeltaProjectExpansion {
    * machinery. Used by cards that grant a reward independent of the normal action (Dutch
    * Mountains re-triggering an old position, Corporate Espionage's opponent-facing effect).
    */
-  public static grantRewardForPosition(player: IPlayer, position: number, marker: MarkerKind): void {
-    DeltaProjectExpansion.resolveReward(player, position, marker);
+  public static grantRewardForPosition(player: IPlayer, position: number, marker: MarkerKind, options?: {skipJovianAndMicrobe?: boolean}): void {
+    DeltaProjectExpansion.resolveReward(player, position, marker, options);
   }
 
   /** Non-mutating check for whether {@link forceAdvanceOneStep} would succeed right now. */
@@ -469,7 +417,7 @@ export class DeltaProjectExpansion {
     return true;
   }
 
-  private static resolveReward(player: IPlayer, position: number, marker: MarkerKind): void {
+  private static resolveReward(player: IPlayer, position: number, marker: MarkerKind, options?: {skipJovianAndMicrobe?: boolean}): void {
     // Positions 10/11 (VP spots) have no additional reward beyond VP claiming.
     switch (DELTA_TRACK_TAGS[position]) {
     case Tag.BUILDING: // Choose 2 steel or 2 plants
@@ -517,6 +465,9 @@ export class DeltaProjectExpansion {
     }
 
     case Tag.MICROBE: { // Reuse a used blue card action
+      if (options?.skipJovianAndMicrobe) {
+        break;
+      }
       const actionCards = DeltaProjectExpansion.getUsedActionCards(player);
       if (actionCards.length > 0) {
         player.defer(() => new SelectCard<IActionCard & ICard>(
@@ -532,6 +483,9 @@ export class DeltaProjectExpansion {
     }
 
     case Tag.JOVIAN: { // Gain one Jovian tag
+      if (options?.skipJovianAndMicrobe) {
+        break;
+      }
       const progress = DeltaProjectExpansion.getMarkerData(player, marker);
       if (!progress.jovianBonus) {
         progress.jovianBonus = true;

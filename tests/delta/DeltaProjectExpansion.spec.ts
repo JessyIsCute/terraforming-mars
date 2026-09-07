@@ -739,62 +739,16 @@ describe('DeltaProjectExpansion', () => {
       player.playedCards.push(fakeCard({name: CardName.ZETA_TOLLKEEPER}));
     });
 
-    it('does not affect getValidAdvanceSteps by itself - the toll is a separate input', () => {
+    it('does not affect getValidAdvanceSteps, and buildAdvanceInput is just the plain step input', () => {
       playAllDeltaTrackTags(player);
       player.energy = 2;
       expect(DeltaProjectExpansion.getValidAdvanceSteps(player)).deep.eq([1, 2]);
-    });
-
-    it('buildAdvanceInput asks for a toll resource before the step choice', () => {
-      playAllDeltaTrackTags(player);
-      player.energy = 2;
-      player.megaCredits = 5;
-      player.steel = 0;
-      player.titanium = 0;
-      player.plants = 0;
-      player.heat = 0;
-
-      const toll = cast(DeltaProjectExpansion.buildAdvanceInput(player), OrOptions);
-      // Only resources the player actually has are offered.
-      expect(toll.options.map((o) => o.title)).deep.eq(['Pay 1 megacredits', 'Pay 1 energy']);
-
-      toll.options[0].cb(); // pay with megacredits - energy is untouched
-      expect(player.megaCredits).eq(4);
-      expect(player.energy).eq(2);
-    });
-
-    it('paying the toll in energy leaves less of it for the steps that follow', () => {
-      playAllDeltaTrackTags(player);
-      player.energy = 2;
-      player.megaCredits = 0;
-      player.steel = 0;
-      player.titanium = 0;
-      player.plants = 0;
-      player.heat = 0;
-
-      const toll = cast(DeltaProjectExpansion.buildAdvanceInput(player), OrOptions);
-      expect(toll.options.map((o) => o.title)).deep.eq(['Pay 1 energy']);
-
-      const stepInput = cast(toll.options[0].cb(), DeltaProjectInput);
-      expect(player.energy).eq(1);
-      // Only 1 energy left - only a single step is affordable now.
-      expect(stepInput.validSteps).deep.eq([1]);
-
-      stepInput.cb(1);
-      expect(player.deltaProjectData!.position).eq(1);
-      expect(player.energy).eq(0);
-    });
-
-    it('a non-Tollkeeper player skips the toll entirely', () => {
-      [game, player, player2] = testGame(2, {deltaProjectExpansion: true});
-      playAllDeltaTrackTags(player);
-      player.energy = 2;
 
       const stepInput = cast(DeltaProjectExpansion.buildAdvanceInput(player), DeltaProjectInput);
       expect(stepInput.validSteps).deep.eq([1, 2]);
     });
 
-    it('grants every reward from position 1 up to the landing position, not just newly passed ones', () => {
+    it('advancing only grants the landing position reward, not every earlier one', () => {
       playAllDeltaTrackTags(player);
       player.deltaProjectData!.position = 3; // already past positions 1-3 by some other means
       player.energy = 2;
@@ -802,62 +756,55 @@ describe('DeltaProjectExpansion', () => {
 
       DeltaProjectExpansion.advance(player, 1); // to position 4 (Space) - a single step
 
-      // Position 4's reward (titanium production) fires immediately...
       expect(player.production.titanium).eq(1);
-      // ...and so does every earlier position's reward, even though this move only
-      // covered 1 step - position 1 (Building) and 2 (Power) each queue a choice.
-      expect(game.deferredActions).has.lengthOf(2);
-    });
-
-    it('is unaffected by having Delta Surge too - still covers positions 1..landing', () => {
-      player.playedCards.push(fakeCard({tags: DELTA_TRACK_TAGS.filter((t) => t !== undefined)}));
-      player.playedCards.push(fakeCard({name: CardName.DELTA_SURGE}));
-      player.deltaProjectData!.position = 5;
-      player.energy = 3;
-      player.production.override({titanium: 0});
-
-      DeltaProjectExpansion.advance(player, 2); // to position 7
-
-      runAllActions(game);
-      expect(player.production.titanium).eq(1); // position 4's reward still fires
+      // No queued rewards for the earlier positions - that multiplier is gone.
+      expect(game.deferredActions).has.lengthOf(0);
     });
 
     describe('generation-start regression', () => {
-      it('knocks back the sole furthest player with no reward, when that is not the owner', () => {
+      it('does nothing for a non-owner leader', () => {
         playAllDeltaTrackTags(player2);
         player2.deltaProjectData!.position = 5;
         player.deltaProjectData!.position = 2;
-        player2.production.override({titanium: 0});
 
         DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
 
-        expect(player2.deltaProjectData!.position).eq(4);
-        runAllActions(game);
-        expect(player2.production.titanium).eq(0); // no reward for landing on position 4 (Space)
-        expect(game.deferredActions).has.lengthOf(0);
+        expect(player2.deltaProjectData!.position).eq(5);
+        expect(player.deltaProjectData!.position).eq(2);
       });
 
-      it('knocks back the owner too, but grants every reward up to their new position', () => {
+      it('grants the owner their current position bonus again when they are the sole leader', () => {
         playAllDeltaTrackTags(player);
-        player.deltaProjectData!.position = 5;
+        player.deltaProjectData!.position = 4; // Space: +1 titanium production
         player2.deltaProjectData!.position = 2;
         player.production.override({titanium: 0});
 
         DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
 
-        expect(player.deltaProjectData!.position).eq(4);
-        expect(player.production.titanium).eq(1); // position 4 (Space)
-        expect(game.deferredActions).has.lengthOf(2); // positions 1 and 2's choices
+        expect(player.deltaProjectData!.position).eq(4); // marker does not move
+        expect(player.production.titanium).eq(1);
       });
 
-      it('does nothing when there is a tie for furthest', () => {
-        player.deltaProjectData!.position = 5;
-        player2.deltaProjectData!.position = 5;
+      it('also grants the bonus when tied for the lead', () => {
+        playAllDeltaTrackTags(player);
+        player.deltaProjectData!.position = 4;
+        player2.deltaProjectData!.position = 4;
+        player.production.override({titanium: 0});
 
         DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
 
-        expect(player.deltaProjectData!.position).eq(5);
-        expect(player2.deltaProjectData!.position).eq(5);
+        expect(player.production.titanium).eq(1);
+      });
+
+      it('does nothing when the owner is behind', () => {
+        playAllDeltaTrackTags(player);
+        player.deltaProjectData!.position = 2;
+        player2.deltaProjectData!.position = 5;
+        player.production.override({megacredits: 0});
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+
+        expect(player.production.megacredits).eq(0); // position 2 (Power) reward not granted
       });
 
       it('does nothing when nobody has moved off position 0', () => {
@@ -876,38 +823,41 @@ describe('DeltaProjectExpansion', () => {
         expect(player.deltaProjectData!.position).eq(5);
       });
 
-      it('considers Epsilon Dample markers too when finding the furthest player', () => {
+      it('considers Epsilon Dample markers too when checking whether an opponent is ahead', () => {
         player2.epsilonDampleData = {position: 6, jovianBonus: false};
         player.deltaProjectData!.position = 2;
+        player.production.override({megacredits: 0});
 
         DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
 
-        expect(player2.epsilonDampleData!.position).eq(5);
-        expect(player2.deltaProjectData!.position).eq(0);
-        runAllActions(game);
-        expect(player2.popWaitingFor()).is.undefined; // no reward (position 5 would draw 4 keep 2)
+        expect(player.production.megacredits).eq(0); // owner is not the leader, no bonus
       });
 
-      it('does not double the bonus when the owner has both corporations and their own two markers tie for the lead', () => {
-        // Two-corporations variant: the same player owns both Zeta Tollkeeper (from the
-        // outer beforeEach) and Epsilon Dample, and their two markers are tied for the
-        // overall lead - only one of them should be knocked back and rewarded, not both.
-        player.epsilonDampleData = {position: 6, jovianBonus: false};
-        player.deltaProjectData!.position = 6;
+      it('does not repeat the Jovian tag bonus', () => {
+        playAllDeltaTrackTags(player);
+        player.deltaProjectData!.position = 8; // Jovian
         player2.deltaProjectData!.position = 2;
-        player.production.override({titanium: 0, megacredits: 0});
+        const before = player.tags.count(Tag.JOVIAN, 'raw');
 
         DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
 
-        // The primary marker is the deterministic tie-break winner - it moves back and
-        // is rewarded; the epsilon marker, tied at the same position, is untouched.
-        expect(player.deltaProjectData!.position).eq(5);
-        expect(player.epsilonDampleData!.position).eq(6);
+        expect(player.tags.count(Tag.JOVIAN, 'raw')).eq(before);
+        expect(player.tags.extraJovianTags).eq(0);
+        expect(player.deltaProjectData!.jovianBonus).is.false;
+      });
 
-        // Positions 1-5's rewards are each granted exactly once, not doubled up.
-        expect(player.production.megacredits).eq(2); // position 3
-        expect(player.production.titanium).eq(1); // position 4
-        expect(game.deferredActions).has.lengthOf(3); // positions 1, 2 and 5's choices
+      it('does not repeat the blue-card-action-reuse bonus', () => {
+        playAllDeltaTrackTags(player);
+        player.deltaProjectData!.position = 7; // Microbe
+        player2.deltaProjectData!.position = 2;
+        const regolith = new RegolithEaters();
+        player.playedCards.push(regolith);
+        player.actionsThisGeneration.add(CardName.REGOLITH_EATERS);
+
+        DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(game);
+        runAllActions(game);
+
+        expect(player.popWaitingFor()).is.undefined; // no "reuse an action" choice was queued
       });
     });
   });
