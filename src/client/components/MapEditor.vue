@@ -306,6 +306,9 @@ export default defineComponent({
       awardNames,
     };
   },
+  mounted() {
+    this.adoptCodeFromMapLibrary();
+  },
   computed: {
     BoardName(): typeof BoardName {
       return BoardName;
@@ -496,6 +499,27 @@ export default defineComponent({
     },
     copyCode(): void {
       navigator.clipboard?.writeText(this.code);
+    },
+    // Mirrors play()'s localStorage hand-off in reverse: MapLibraryRow.vue's "Open in editor"
+    // button stashes the map's code and navigates here with ?loadCode=1.
+    adoptCodeFromMapLibrary(): void {
+      if (!window.location.search.includes('loadCode=1')) {
+        return;
+      }
+      let code: string | null = null;
+      try {
+        code = window.localStorage?.getItem('mapEditorLoadCode') ?? null;
+      } catch (e) {
+        code = null;
+      }
+      if (code === null) {
+        return;
+      }
+      try {
+        this.applyDefinition(decodeCustomBoard(code));
+      } catch (e) {
+        this.loadError = e instanceof Error ? e.message : String(e);
+      }
     },
     loadCode(): void {
       this.loadError = '';

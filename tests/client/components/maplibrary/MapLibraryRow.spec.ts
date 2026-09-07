@@ -42,6 +42,7 @@ describe('MapLibraryRow', () => {
     Object.defineProperty(window, 'location', {configurable: true, value: originalLocation});
     try {
       window.localStorage?.removeItem('customBoardCode');
+      window.localStorage?.removeItem('mapEditorLoadCode');
     } catch (e) { /* ignore */ }
   });
 
@@ -152,5 +153,15 @@ describe('MapLibraryRow', () => {
     expect(location.href).to.contain(`new-game?board=${encodeURIComponent(boardName)}`);
     expect(location.href).to.not.contain('customBoard=1');
     expect(window.localStorage.getItem('customBoardCode')).eq('sentinel-should-not-change');
+  });
+
+  it('opening any map in the editor stashes its code and navigates to map-editor?loadCode=1, regardless of origin', async () => {
+    const location = stubLocation();
+    const entry = fanmadeEntry({code: encodeCustomBoard(blankCustomBoard(9, 'Open Me'))});
+    const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry}});
+    const openButton = wrapper.findAll('button').find((b) => b.text() === 'Open in editor')!;
+    await openButton.trigger('click');
+    expect(window.localStorage.getItem('mapEditorLoadCode')).eq(entry.code);
+    expect(location.href).to.contain('map-editor?loadCode=1');
   });
 });

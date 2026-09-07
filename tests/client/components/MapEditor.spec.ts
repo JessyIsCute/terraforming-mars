@@ -186,4 +186,46 @@ describe('MapEditor', () => {
     // All unchecked milestone boxes are disabled once 5 are chosen.
     expect(disabled.length).to.be.greaterThan(0);
   });
+
+  describe('opening a Map Library entry (MapLibraryRow.vue\'s "Open in editor" hand-off)', () => {
+    afterEach(() => {
+      window.history.pushState(null, '', '/');
+      try {
+        window.localStorage?.removeItem('mapEditorLoadCode');
+      } catch (e) { /* ignore */ }
+    });
+
+    it('loads the stashed code on mount when the URL says ?loadCode=1', () => {
+      const source = blankCustomBoard(5, 'From The Library');
+      source.spaces[0].spaceType = SpaceType.OCEAN;
+      window.localStorage.setItem('mapEditorLoadCode', encodeCustomBoard(source));
+      window.history.pushState(null, '', '/map-editor?loadCode=1');
+
+      const wrapper = mount(MapEditor, {...globalConfig});
+      const vm = wrapper.vm as any;
+
+      expect(vm.rows).to.eq(5);
+      expect(vm.name).to.eq('From The Library');
+      expect(decodeCustomBoard(vm.code)).to.deep.eq(source);
+    });
+
+    it('does nothing when the URL has no ?loadCode=1, even if something is stashed', () => {
+      window.localStorage.setItem('mapEditorLoadCode', encodeCustomBoard(blankCustomBoard(5, 'Ignore Me')));
+
+      const wrapper = mount(MapEditor, {...globalConfig});
+      const vm = wrapper.vm as any;
+
+      expect(vm.name).to.not.eq('Ignore Me');
+    });
+
+    it('surfaces a load error instead of crashing on a corrupt stashed code', () => {
+      window.localStorage.setItem('mapEditorLoadCode', 'not a real code');
+      window.history.pushState(null, '', '/map-editor?loadCode=1');
+
+      const wrapper = mount(MapEditor, {...globalConfig});
+      const vm = wrapper.vm as any;
+
+      expect(vm.loadError).to.not.eq('');
+    });
+  });
 });

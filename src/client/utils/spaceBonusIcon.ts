@@ -19,7 +19,9 @@ const SPACE_BONUS_CSS: Partial<Record<SpaceBonus, string>> = {
   [SpaceBonus.DELEGATE]: 'delegate',
   [SpaceBonus.OCEAN]: 'bonusocean',
   [SpaceBonus.TEMPERATURE]: 'bonustemperature',
+  [SpaceBonus.TEMPERATURE_4MC]: 'bonustemperature4mc',
   [SpaceBonus.COLONY]: 'colony',
+  [SpaceBonus.ASTEROID]: 'asteroid',
 };
 
 /** CSS suffix for `.board-space-bonus--<suffix>` (board.less), or '' if unrecognized. */

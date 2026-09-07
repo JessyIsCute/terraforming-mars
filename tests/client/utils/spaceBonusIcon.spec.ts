@@ -12,6 +12,21 @@ describe('spaceBonusIcon', () => {
     it('returns an empty string for an unrecognized bonus', () => {
       expect(spaceBonusCss(SpaceBonus._RESTRICTED)).to.eq('');
     });
+
+    it("maps the two double-wide/official-only bonuses too (Vastitas Borealis Nova's temperature-for-4MC, Deimos Down's asteroid)", () => {
+      expect(spaceBonusCss(SpaceBonus.TEMPERATURE_4MC)).to.eq('bonustemperature4mc');
+      expect(spaceBonusCss(SpaceBonus.ASTEROID)).to.eq('asteroid');
+    });
+
+    it("has a real icon for every SpaceBonus except the structural _RESTRICTED marker (regression guard: a map thumbnail rendered a blank hex where Vastitas Borealis Nova's temperature bonus belongs, because this map was missing an entry Bonus.vue already had)", () => {
+      const allBonuses = Object.values(SpaceBonus).filter((b): b is SpaceBonus => typeof b === 'number');
+      for (const bonus of allBonuses) {
+        if (bonus === SpaceBonus._RESTRICTED) {
+          continue;
+        }
+        expect(spaceBonusCss(bonus), `SpaceBonus value ${bonus}`).to.not.eq('');
+      }
+    });
   });
 
   describe('groupSpaceBonuses', () => {

@@ -18,6 +18,7 @@
 
       <div class="map-card-actions">
         <button type="button" class="btn btn-primary" @click="play" v-i18n>Play this map</button>
+        <button type="button" class="btn" @click="openInEditor" v-i18n>Open in editor</button>
         <button type="button" class="btn" @click="copyCode" v-i18n>{{ copyButtonLabel }}</button>
         <template v-if="isAdmin">
           <button v-if="entry.origin === 'fanmade' && entry.status === 'submitted'" type="button" class="btn" @click="$emit('approve', entry.id)" v-i18n>
@@ -95,6 +96,18 @@ export default defineComponent({
         // localStorage may be unavailable; fall through to the query param.
       }
       window.location.href = `${paths.NEW_GAME}?customBoard=1`;
+    },
+    // Every entry -- official, built-in fan board, or a genuine community submission alike --
+    // opens the same way: there's no representation of a board other than its
+    // CustomBoardDefinition code for the editor to load, so this is uniform regardless of origin
+    // (unlike play(), which prefers a built-in board's real BoardName for actual gameplay).
+    openInEditor(): void {
+      try {
+        window.localStorage?.setItem('mapEditorLoadCode', this.entry.code);
+      } catch (e) {
+        // localStorage may be unavailable; nothing more we can do here.
+      }
+      window.location.href = `${paths.MAP_EDITOR}?loadCode=1`;
     },
     async copyCode(): Promise<void> {
       try {
