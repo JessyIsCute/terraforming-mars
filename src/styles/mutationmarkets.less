@@ -14,6 +14,15 @@
   margin-bottom: 6px;
 }
 
+// A little more breathing room between the project cards themselves, and extra clearance
+// above the row so it doesn't crowd the mutation row physically on top of it this
+// generation -- slots with no coveringMutationsAbove badge would otherwise have no gap at
+// all above them, since that badge is the only other thing pushing the rows apart.
+.mutation-market-project-row {
+  gap: 16px;
+  margin-top: 10px;
+}
+
 // Project cards are shown at reduced scale with all hover/interaction disabled -- this is
 // a read-only preview of the market, not a hand of playable cards. `zoom` (not `transform:
 // scale`, which repaints but doesn't reflow) shrinks both the paint AND the layout box
@@ -136,16 +145,28 @@
   z-index: 2;
 }
 
-.mutation-market-minimum-bid-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  padding: 3px 12px;
-  border-radius: 15px;
-  font-size: 13px;
-  color: #cfe8d6;
-  background: rgba(55, 71, 79, 0.7);
-  z-index: 2;
+// Shown in the normal-flow space below the project card, not overlaid on top of it --
+// unlike the auction badge (which replaces this once bidding opens), this needs no
+// absolute positioning since there's no artwork underneath it to avoid covering.
+.mutation-market-minimum-bid {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+}
+.mutation-market-minimum-bid-coin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-image: url(./assets/resources/megacredit.png);
+  background-size: 30px;
+  font-family: Prototype, sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: #000;
+  filter: drop-shadow(0px 0px 1px black);
 }
 
 // Entrance animations: mutation cards slide in from the left, project cards from the right.
@@ -188,4 +209,11 @@
 @keyframes mutation-tag-glow {
   0%, 100% { filter: drop-shadow(0 0 2px #1b5e20); }
   50% { filter: drop-shadow(0 0 6px #69f0ae); }
+}
+// A resource/production icon a mutation's grant was merged into (bumping its amount --
+// see mergeMutationGrantIntoRenderData). Reuses the tag glow's drop-shadow pulse rather
+// than `.mutation-glow`'s color pulse, since these are image/background-based icons, not
+// colored text.
+.mutation-icon-glow {
+  animation: mutation-tag-glow 2s ease-in-out infinite;
 }

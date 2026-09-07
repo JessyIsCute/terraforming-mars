@@ -31,15 +31,16 @@ describe('MutationMarketProjectSlot', () => {
       props: {marketSlot: slotFor(CardName.PLANT_EATER)},
     });
     expect(wrapper.findComponent({name: 'Card'}).exists()).to.be.true;
-    expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.false;
   });
 
-  it('shows the inactive overlay for a preview slot', () => {
+  // Unlike the mutation cards, project cards show no grey inactive overlay at all -- a
+  // preview (inactive) slot's card renders exactly like an active one.
+  it('renders no grey overlay for a preview (inactive) slot', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {active: false})},
     });
-    expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.true;
+    expect(wrapper.find('.mutation-market-inactive-overlay').exists()).to.be.false;
   });
 
   it('previews a mutation covering from below the project row', () => {
@@ -90,26 +91,26 @@ describe('MutationMarketProjectSlot', () => {
     expect(badge.exists()).to.be.true;
     expect(badge.text()).to.contain('5');
     expect(badge.classes()).to.include('board-cube--red');
-    expect(wrapper.find('.mutation-market-minimum-bid-badge').exists()).to.be.false;
+    expect(wrapper.find('.mutation-market-minimum-bid-coin').exists()).to.be.false;
   });
 
-  it('shows the fixed minimum bid on an active slot with no auction yet', () => {
+  it('shows the fixed minimum bid, as an M€ coin, on an active slot with no auction yet', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {minimumBid: 3})},
     });
-    const badge = wrapper.find('.mutation-market-minimum-bid-badge');
-    expect(badge.exists()).to.be.true;
-    expect(badge.text()).to.contain('3');
+    const coin = wrapper.find('.mutation-market-minimum-bid-coin');
+    expect(coin.exists()).to.be.true;
+    expect(coin.text()).to.eq('3');
     expect(wrapper.find('.mutation-market-auction-badge').exists()).to.be.false;
   });
 
-  it('shows no minimum bid badge for an inactive preview slot', () => {
+  it('shows no minimum bid coin for an inactive preview slot', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {active: false})},
     });
-    expect(wrapper.find('.mutation-market-minimum-bid-badge').exists()).to.be.false;
+    expect(wrapper.find('.mutation-market-minimum-bid-coin').exists()).to.be.false;
   });
 
   it('plays and then clears the entrance animation when the card is replaced', async () => {

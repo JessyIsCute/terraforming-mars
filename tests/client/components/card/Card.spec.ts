@@ -69,6 +69,39 @@ describe('Card', () => {
     expect(description.text()).to.eq('Gain 2 Plants on play');
   });
 
+  it('merges a resource grant into a matching icon the card already shows, instead of a separate description line', () => {
+    const customCard: CustomCardModel = {
+      type: CardType.AUTOMATED,
+      cost: 12,
+      tags: [],
+      requirements: [],
+      metadata: {
+        description: 'Gain plants.',
+        renderData: {
+          is: 'root',
+          rows: [[{is: 'item', type: 'plants', amount: 1}]],
+        } as ICardRenderRoot,
+      },
+      module: 'customCards',
+      compatibility: [],
+    };
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: 'My Custom Card' as CardName,
+          customCard,
+          mutationNames: [MutationName.GREENERY_KEEPER], // grants +2 plants on play
+        },
+      },
+    });
+    // The existing "1 plant" icon's amount is bumped to 3 (1 + 2), glowing -- no
+    // separate "Gain 2 Plants on play" line is added on top of it.
+    expect(wrapper.find('.mutation-icon-glow').exists()).to.be.true;
+    expect(wrapper.find('.mutation-glow.card-description').exists()).to.be.false;
+    expect(wrapper.text()).to.not.contain('Gain 2 Plants on play');
+  });
+
   it('renders an unmutated card with no Mutated ribbon or extra description', () => {
     const wrapper = mount(Card, {
       ...globalConfig,

@@ -126,6 +126,14 @@ export interface ICardRenderItem extends CardComponent {
   resource?: CardResource;
   /** Has a value when type is CardRenderItemType.TAG. Renders a tag */
   tag?: Tag;
+  /**
+   * MutationMarkets: client-only annotation, never set server-side. Set on a freshly
+   * cloned copy of a card's own renderData (see mergeMutationGrantIntoRenderData) when a
+   * mutation's flat resource/production grant matches an item the card already shows --
+   * its `amount` gets bumped in place instead of the mutation adding a separate
+   * description line, and this flag tells the renderer to glow it.
+   */
+  mutationGlow?: true;
 }
 
 export function isICardRenderItem(item: ItemType): item is ICardRenderItem {
