@@ -12,8 +12,6 @@ export const SYMBOL_FOR_COLOR = {
   pink: '◈',
   bronze: '▦',
   neutral: '★',
-  white: '○',
-  gray: '●',
 } satisfies Record<Color, string>;
 
 export function playerSymbol(color: Color, optionalSuffix: string = '') {

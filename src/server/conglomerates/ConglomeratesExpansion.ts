@@ -9,7 +9,7 @@ import {sum} from '../../common/utils/utils';
 import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictoryPointsBreakdown';
 import {ConglomeratesTeamModel} from '../../common/models/ConglomeratesModel';
 import {IParty} from '../turmoil/parties/IParty';
-import {Color, CONGLOMERATES_TEAM_COLORS} from '../../common/Color';
+import {Color, PLAYER_COLORS} from '../../common/Color';
 
 const MILESTONE_TEAM_VP = 8;
 const AWARD_TEAM_VP = 8;
@@ -244,12 +244,14 @@ export class ConglomeratesExpansion {
   }
 
   /**
-   * The shared delegate color for `player`'s team in Turmoil (see `CONGLOMERATES_TEAM_COLORS`
-   * in `common/Color.ts`), or undefined if `player` is teamless or their team's index has no
-   * reserved color (more teams than reserved colors -- not supported beyond 2v2 yet).
+   * The shared delegate color for `player`'s team in Turmoil: one of the 8 standard
+   * `PLAYER_COLORS` that no player in this game is actually using, assigned by team index --
+   * no new colors needed. Undefined if `player` is teamless, or if every color is already
+   * taken by an actual player (not possible in 2v2, but a graceful fallback for larger games).
    */
   public static teamDisplayColor(player: IPlayer): Color | undefined {
-    const teams = player.game?.conglomerates?.teams;
+    const game = player.game;
+    const teams = game?.conglomerates?.teams;
     if (teams === undefined) {
       return undefined;
     }
@@ -257,7 +259,9 @@ export class ConglomeratesExpansion {
     if (index === -1) {
       return undefined;
     }
-    return CONGLOMERATES_TEAM_COLORS[index];
+    const usedColors = new Set(game.players.map((p) => p.color));
+    const availableColors = PLAYER_COLORS.filter((color) => !usedColors.has(color));
+    return availableColors[index];
   }
 
   public static getTeamModels(game: IGame): Array<ConglomeratesTeamModel> {
