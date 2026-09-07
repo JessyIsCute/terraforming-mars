@@ -12,11 +12,11 @@ export class OutpostOnEuropa extends Card implements IProjectCard {
     super({
       type: CardType.AUTOMATED,
       name: CardName.OUTPOST_ON_EUROPA,
-      tags: [Tag.JOVIAN, Tag.MICROBE, Tag.MICROBE, Tag.MICROBE],
+      tags: [Tag.JOVIAN, Tag.MICROBE],
       cost: 23,
       victoryPoints: 2,
 
-      requirements: {tag: Tag.MICROBE},
+      requirements: {tag: Tag.MICROBE, count: 3},
 
       behavior: {
         addResourcesToAnyCard: {count: {tag: Tag.JOVIAN, all: true}, type: CardResource.MICROBE},
@@ -27,7 +27,7 @@ export class OutpostOnEuropa extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.resource(CardResource.MICROBE).asterix().slash().tag(Tag.JOVIAN, {all});
         }),
-        description: 'Requires 1 Microbe tag. Choose 1 of your played cards and add 1 microbe to it for every Jovian tag in play, including this.',
+        description: 'Requires 3 Microbe tags. Choose 1 of your played cards and add 1 microbe to it for every Jovian tag in play, including this.',
       },
     });
   }

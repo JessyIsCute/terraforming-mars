@@ -23,11 +23,14 @@ describe('OutpostOnEuropa', () => {
     [game, player, player2] = testGame(2);
   });
 
-  it('has a Jovian tag and three Microbe tags', () => {
-    expect(card.tags).to.deep.eq([Tag.JOVIAN, Tag.MICROBE, Tag.MICROBE, Tag.MICROBE]);
+  it('has a Jovian tag and one Microbe tag', () => {
+    expect(card.tags).to.deep.eq([Tag.JOVIAN, Tag.MICROBE]);
   });
 
-  it('requires 1 Microbe tag', () => {
+  it('requires 3 Microbe tags', () => {
+    player.playedCards.push(fakeCard({tags: [Tag.MICROBE]}));
+    expect(card.canPlay(player)).is.false;
+    player.playedCards.push(fakeCard({tags: [Tag.MICROBE]}));
     expect(card.canPlay(player)).is.false;
     player.playedCards.push(fakeCard({tags: [Tag.MICROBE]}));
     expect(card.canPlay(player)).is.true;
