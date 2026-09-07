@@ -17,6 +17,7 @@ import {Resource} from '../../common/Resource';
 import {ClaimedMilestoneModel, MilestoneScore} from '../../common/models/ClaimedMilestoneModel';
 import {FundedAwardModel, AwardScore} from '../../common/models/FundedAwardModel';
 import {getTurmoilModel} from '../models/TurmoilModel';
+import {getConglomeratesModel} from '../models/ConglomeratesModel';
 import {SpectatorModel} from '../../common/models/SpectatorModel';
 import {GameModel} from '../../common/models/GameModel';
 import {Turmoil} from '../turmoil/Turmoil';
@@ -58,6 +59,7 @@ export class Server {
       aresData: game.aresData,
       awards: this.getAwards(game),
       colonies: coloniesToModel(game, game.colonies, false, true),
+      conglomerates: getConglomeratesModel(game),
       deckSize: game.projectDeck.drawPile.length,
       discardPileSize: game.projectDeck.discardPile.length,
       discardedColonies: game.discardedColonies.map(toName),

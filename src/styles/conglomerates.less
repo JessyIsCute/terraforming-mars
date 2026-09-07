@@ -1,0 +1,58 @@
+// Conglomerates: the live team-score panel (ConglomeratesTeams.vue).
+
+.conglomerates-teams-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.conglomerates-team {
+  background: @grey_850;
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-width: 180px;
+}
+
+.conglomerates-team-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.conglomerates-team-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.conglomerates-team-name {
+  flex: 1;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conglomerates-team-total {
+  color: #ffcc64;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.conglomerates-team-breakdown {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  color: #ccc;
+  font-size: 12px;
+}
+
+.conglomerates-team-row {
+  display: contents;
+}

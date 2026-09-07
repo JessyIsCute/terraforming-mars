@@ -6,6 +6,8 @@ import {ConglomeratesPlayerData} from '../../common/conglomerates/ConglomeratesP
 import {AwardScorer} from '../awards/AwardScorer';
 import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuilder';
 import {sum} from '../../common/utils/utils';
+import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictoryPointsBreakdown';
+import {ConglomeratesTeamModel} from '../../common/models/ConglomeratesModel';
 
 const MILESTONE_TEAM_VP = 8;
 const AWARD_TEAM_VP = 8;
@@ -159,5 +161,44 @@ export class ConglomeratesExpansion {
         builder.setVictoryPoints('awards', AWARD_TEAM_VP, 'Team won ${0} award (funded by ${1})', [fundedAward.award.name, fundedAward.player.name]);
       }
     }
+  }
+
+  /**
+   * The live team scoreboard: each member's personal VP (their own total, with the
+   * milestones/awards categories subtracted out -- those are already the *team's* full
+   * milestone/award VP, identically duplicated onto every member's own breakdown by
+   * `calculateVictoryPoints` above, so summing members' raw totals would double-count them),
+   * plus the team's milestone and award VP counted once, plus a `bonuses` category reserved
+   * for future team-only VP sources (e.g. the Turmoil ruling bonus, not yet implemented).
+   */
+  public static calculateTeamVictoryPoints(game: IGame, team: ConglomeratesTeam): TeamVictoryPointsBreakdown {
+    const memberBreakdowns = team.playerIds.map((id) => game.getPlayerById(id).getVictoryPoints());
+    const players = sum(memberBreakdowns.map((vp) => vp.total - vp.milestones - vp.awards));
+    const milestones = memberBreakdowns[0]?.milestones ?? 0;
+    const awards = memberBreakdowns[0]?.awards ?? 0;
+    const bonuses = 0;
+    return {
+      players,
+      milestones,
+      awards,
+      bonuses,
+      total: players + milestones + awards + bonuses,
+    };
+  }
+
+  public static getTeamModels(game: IGame): Array<ConglomeratesTeamModel> {
+    if (!game.gameOptions.conglomeratesExpansion) {
+      return [];
+    }
+    return game.conglomerates.teams.map((team, index) => {
+      const members = team.playerIds.map((id) => game.getPlayerById(id));
+      return {
+        id: `team-${index + 1}`,
+        playerIds: [...team.playerIds],
+        playerColors: members.map((member) => member.color),
+        name: members.map((member) => member.name).join(' & '),
+        victoryPoints: this.calculateTeamVictoryPoints(game, team),
+      };
+    });
   }
 }
