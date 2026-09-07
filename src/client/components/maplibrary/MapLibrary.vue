@@ -30,6 +30,12 @@
         </select>
       </label>
 
+      <fieldset class="map-library-layout">
+        <legend v-i18n>Layout</legend>
+        <label><input type="radio" name="map-library-layout" value="grid" v-model="layout"> <span v-i18n>Grid</span></label>
+        <label><input type="radio" name="map-library-layout" value="list" v-model="layout"> <span v-i18n>List (larger)</span></label>
+      </fieldset>
+
       <button type="button" class="btn" @click="showSubmitForm = !showSubmitForm" v-i18n>
         {{ showSubmitForm ? 'Cancel' : 'Submit a map' }}
       </button>
@@ -40,12 +46,13 @@
     <p v-if="loading" v-i18n>Loading…</p>
     <p v-else-if="error" class="map-library-error">{{ error }}</p>
     <p v-else-if="sortedEntries.length === 0" v-i18n>No maps match these filters.</p>
-    <div v-else class="map-library-grid">
+    <div v-else class="map-library-grid" :class="{'map-library-grid--list': layout === 'list'}">
       <MapLibraryRow
         v-for="entry in sortedEntries"
         :key="entry.id"
         :entry="entry"
         :is-admin="isAdmin"
+        :large="layout === 'list'"
         @approve="approve"
         @delete="remove"
       />
@@ -64,6 +71,7 @@ import {paths} from '@/common/app/paths';
 import {setDocumentTitle} from '@/client/utils/documentTitle';
 
 type SortBy = 'oldest' | 'newest' | 'name';
+type Layout = 'grid' | 'list';
 
 type DataModel = {
   entries: Array<MapLibraryEntry>;
@@ -73,7 +81,18 @@ type DataModel = {
   originFilter: {official: boolean, fanmade: boolean};
   statusFilter: {submitted: boolean, approved: boolean};
   sortBy: SortBy;
+  layout: Layout;
 };
+
+const LAYOUT_STORAGE_KEY = 'mapLibraryLayout';
+
+function loadStoredLayout(): Layout {
+  try {
+    return window.localStorage?.getItem(LAYOUT_STORAGE_KEY) === 'list' ? 'list' : 'grid';
+  } catch (e) {
+    return 'grid';
+  }
+}
 
 export default defineComponent({
   name: 'MapLibrary',
@@ -87,11 +106,21 @@ export default defineComponent({
       originFilter: {official: true, fanmade: true},
       statusFilter: {submitted: true, approved: true},
       sortBy: 'oldest',
+      layout: loadStoredLayout(),
     };
   },
   mounted() {
     setDocumentTitle('Map library');
     this.fetchEntries();
+  },
+  watch: {
+    layout(newValue: Layout): void {
+      try {
+        window.localStorage?.setItem(LAYOUT_STORAGE_KEY, newValue);
+      } catch (e) {
+        // localStorage may be unavailable; the toggle still works for this page view.
+      }
+    },
   },
   computed: {
     paths: () => paths,
@@ -222,7 +251,7 @@ export default defineComponent({
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
-.map-library-filters {
+.map-library-filters, .map-library-layout {
   border: 1px solid #444;
   border-radius: 4px;
   padding: 6px 10px;
@@ -243,5 +272,10 @@ export default defineComponent({
   grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
   gap: 16px;
   align-items: stretch;
+}
+// One big card per row instead, so each map (and its thumbnail, rendered notably larger by
+// MapLibraryRow's `large` prop) has the full width to itself.
+.map-library-grid--list {
+  grid-template-columns: 1fr;
 }
 </style>

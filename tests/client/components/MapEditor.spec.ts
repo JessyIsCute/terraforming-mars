@@ -90,6 +90,25 @@ describe('MapEditor', () => {
     expect(hexBonus.classes()).to.include('board-space-bonus--heat');
   });
 
+  it('offers the fixed-4M€ temperature bonus (Vastitas Borealis Nova) as its own paintable, stackable tool', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const hex = () => wrapper.findAll('.map-editor-hex')[0];
+
+    // The palette offers it distinctly from the regular (configurable-cost) Temperature tool.
+    const icons = wrapper.findAll('.map-editor-bonus-icon');
+    expect(icons.some((i) => i.classes().includes('board-space-bonus--bonustemperature4mc'))).to.be.true;
+
+    vm.tool = 'bonus:' + 18; // TEMPERATURE_4MC
+    await wrapper.vm.$nextTick();
+    await hex().trigger('click');
+    await hex().trigger('click');
+    expect(decodeCustomBoard(vm.code).spaces[0].bonus).to.deep.eq([18, 18]);
+
+    const hexBonus = hex().find('.map-editor-hex-bonus');
+    expect(hexBonus.classes()).to.include('board-space-bonus--bonustemperature4mc');
+  });
+
   it('stacks placement bonuses in any combination', async () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const vm = wrapper.vm as any;

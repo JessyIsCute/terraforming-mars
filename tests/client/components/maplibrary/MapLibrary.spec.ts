@@ -36,6 +36,9 @@ describe('MapLibrary', () => {
   afterEach(() => {
     global.fetch = originalFetch;
     history.pushState({}, '', '/');
+    try {
+      window.localStorage?.removeItem('mapLibraryLayout');
+    } catch (e) { /* ignore */ }
   });
 
   async function mountReady() {
@@ -115,5 +118,32 @@ describe('MapLibrary', () => {
     await wrapper.vm.$nextTick();
     expect(wrapper.text()).to.contain('Brand New Map');
     expect(wrapper.findComponent({name: 'MapSubmitForm'}).exists()).is.false;
+  });
+
+  it('defaults to a multi-column Grid layout with normal-size thumbnails', async () => {
+    const wrapper = await mountReady();
+    expect(wrapper.find('.map-library-grid').classes()).to.not.include('map-library-grid--list');
+    const thumb = wrapper.find('.map-thumbnail');
+    expect((thumb.element as HTMLElement).style.width).eq('500px');
+  });
+
+  it('switching to List gives a single-column layout with much bigger thumbnails', async () => {
+    const wrapper = await mountReady();
+    const listRadio = wrapper.findAll('input[type=radio]').find((r) => (r.element as HTMLInputElement).value === 'list')!;
+    await listRadio.setValue(true);
+
+    expect(wrapper.find('.map-library-grid').classes()).to.include('map-library-grid--list');
+    const thumb = wrapper.find('.map-thumbnail');
+    expect((thumb.element as HTMLElement).style.width).eq('900px');
+  });
+
+  it('remembers the chosen layout across mounts (localStorage)', async () => {
+    const wrapper = await mountReady();
+    const listRadio = wrapper.findAll('input[type=radio]').find((r) => (r.element as HTMLInputElement).value === 'list')!;
+    await listRadio.setValue(true);
+    expect(window.localStorage.getItem('mapLibraryLayout')).eq('list');
+
+    const secondWrapper = await mountReady();
+    expect(secondWrapper.find('.map-library-grid').classes()).to.include('map-library-grid--list');
   });
 });

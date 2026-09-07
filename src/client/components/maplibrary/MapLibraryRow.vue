@@ -1,8 +1,8 @@
 <template>
   <div class="map-card">
     <div class="map-card-thumb">
-      <MapThumbnail v-if="decoded !== undefined" :definition="decoded" :width="THUMBNAIL_WIDTH" :height="THUMBNAIL_HEIGHT"/>
-      <div v-else class="map-thumbnail map-thumbnail--error" v-i18n>Can't preview this map</div>
+      <MapThumbnail v-if="decoded !== undefined" :definition="decoded" :width="thumbnailWidth" :height="thumbnailHeight"/>
+      <div v-else class="map-thumbnail map-thumbnail--error" :style="{width: thumbnailWidth + 'px', height: thumbnailHeight + 'px'}" v-i18n>Can't preview this map</div>
     </div>
 
     <div class="map-card-body">
@@ -47,6 +47,10 @@ type DataModel = {
 // Sized well above MapThumbnail's own default -- the map itself is the point of a library card.
 const THUMBNAIL_WIDTH = 500;
 const THUMBNAIL_HEIGHT = 410;
+// MapLibrary.vue's "List" layout: one card per row, so the thumbnail can go a lot bigger.
+// Same aspect ratio as the grid size above (500:410).
+const LARGE_THUMBNAIL_WIDTH = 900;
+const LARGE_THUMBNAIL_HEIGHT = 738;
 
 export default defineComponent({
   name: 'MapLibraryRow',
@@ -54,14 +58,20 @@ export default defineComponent({
   props: {
     entry: {type: Object as PropType<MapLibraryEntry>, required: true},
     isAdmin: {type: Boolean, default: false},
+    // MapLibrary.vue's "List" layout -- render a notably bigger thumbnail.
+    large: {type: Boolean, default: false},
   },
   emits: ['approve', 'delete'],
   data(): DataModel {
     return {copied: false};
   },
   computed: {
-    THUMBNAIL_WIDTH: () => THUMBNAIL_WIDTH,
-    THUMBNAIL_HEIGHT: () => THUMBNAIL_HEIGHT,
+    thumbnailWidth(): number {
+      return this.large ? LARGE_THUMBNAIL_WIDTH : THUMBNAIL_WIDTH;
+    },
+    thumbnailHeight(): number {
+      return this.large ? LARGE_THUMBNAIL_HEIGHT : THUMBNAIL_HEIGHT;
+    },
     decoded(): CustomBoardDefinition | undefined {
       try {
         return decodeCustomBoard(this.entry.code);
@@ -142,8 +152,8 @@ export default defineComponent({
   background: #15131f;
 }
 .map-thumbnail--error {
-  width: 500px;
-  height: 410px;
+  // width/height are set inline (MapLibraryRow.vue's thumbnailWidth/thumbnailHeight) so this
+  // fallback box always matches the real MapThumbnail's size, in both grid and list layouts.
   display: flex;
   align-items: center;
   justify-content: center;

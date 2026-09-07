@@ -38,9 +38,14 @@ import {spaceBonusCss} from '@/client/utils/spaceBonusIcon';
 const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 620, naturalHeight: 600};
 
 // Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
-// every side, so the heat/oxygen tracks painted just outside the diamond peek into the preview
-// instead of being cropped off flush with the hexes.
-const TRACK_MARGIN = 44;
+// each side, so the heat/oxygen/temperature tracks painted just outside the diamond peek into
+// the preview instead of being cropped off flush with the hexes. The temperature track (right
+// side of mars-without-venus.png) sits further out than the others, so it gets extra margin of
+// its own rather than a single uniform value.
+const TRACK_MARGIN_LEFT = 55;
+const TRACK_MARGIN_TOP = 55;
+const TRACK_MARGIN_BOTTOM = 55;
+const TRACK_MARGIN_RIGHT = 100;
 
 export default defineComponent({
   name: 'MapThumbnail',
@@ -77,8 +82,8 @@ export default defineComponent({
     },
     naturalSize(): {width: number, height: number} {
       return {
-        width: this.bounds.maxLeft + 90 + TRACK_MARGIN * 2,
-        height: this.bounds.maxTop + 90 + TRACK_MARGIN * 2,
+        width: this.bounds.maxLeft + 90 + TRACK_MARGIN_LEFT + TRACK_MARGIN_RIGHT,
+        height: this.bounds.maxTop + 90 + TRACK_MARGIN_TOP + TRACK_MARGIN_BOTTOM,
       };
     },
     scale(): number {
@@ -94,8 +99,8 @@ export default defineComponent({
       // the same scale/alignment, with a uniform strip of extra board revealed on every side.
       const sx = ((maxLeft - minLeft) + 46) / MARS_IMAGE.width;
       const sy = ((maxTop - minTop) + 51) / MARS_IMAGE.height;
-      const bgX = (minLeft - MARS_IMAGE.left * sx + TRACK_MARGIN).toFixed(1);
-      const bgY = (minTop - MARS_IMAGE.top * sy + TRACK_MARGIN).toFixed(1);
+      const bgX = (minLeft - MARS_IMAGE.left * sx + TRACK_MARGIN_LEFT).toFixed(1);
+      const bgY = (minTop - MARS_IMAGE.top * sy + TRACK_MARGIN_TOP).toFixed(1);
       return {
         background:
           'linear-gradient(rgba(21, 19, 31, 0.45), rgba(21, 19, 31, 0.45)) local, ' +
@@ -118,7 +123,7 @@ export default defineComponent({
     },
     hexStyle(space: CustomSpaceDef): Record<string, string> {
       const p = customSpacePixel(space.x, space.y, this.maxY);
-      return {left: `${p.left + TRACK_MARGIN}px`, top: `${p.top + TRACK_MARGIN}px`};
+      return {left: `${p.left + TRACK_MARGIN_LEFT}px`, top: `${p.top + TRACK_MARGIN_TOP}px`};
     },
     hexClass(space: CustomSpaceDef): Record<string, boolean> {
       const isCove = space.spaceType === SpaceType.COVE;

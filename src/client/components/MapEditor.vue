@@ -153,15 +153,17 @@
 
     <div class="map-editor-preview">
       <h3 v-i18n>Preview</h3>
-      <Board
-        :spaces="previewSpaces"
-        :expansions="expansions"
-        :venusScaleLevel="0"
-        :boardName="BoardName.CUSTOM"
-        :globalParameters="definition.globalParameters"
-        :customBoardRows="rows"
-        tileView="show"
-      />
+      <div class="map-editor-preview-zoom">
+        <Board
+          :spaces="previewSpaces"
+          :expansions="expansions"
+          :venusScaleLevel="0"
+          :boardName="BoardName.CUSTOM"
+          :globalParameters="definition.globalParameters"
+          :customBoardRows="rows"
+          tileView="show"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -266,7 +268,8 @@ const BONUS_TOOLS: Array<BonusTool> = ([
   {bonus: SpaceBonus.ENERGY_PRODUCTION, css: 'energy-production', label: 'Energy prod.', description: 'Increase your energy production 1 step when you place a tile on this space.'},
   {bonus: SpaceBonus.DELEGATE, css: 'delegate', label: 'Delegate', description: 'Add 1 delegate from the reserve when you place a tile on this space (Vastitas Borealis Nova).'},
   {bonus: SpaceBonus.OCEAN, css: 'bonusocean', label: 'Ocean', description: 'Place an ocean tile (paying its M€ cost) when you place a tile on this space — the Hellas south-pole bonus.'},
-  {bonus: SpaceBonus.TEMPERATURE, css: 'bonustemperature', label: 'Temperature', description: 'Raise the temperature 1 step (paying an M€ cost) when you place a tile on this space (Vastitas Borealis).'},
+  {bonus: SpaceBonus.TEMPERATURE, css: 'bonustemperature', label: 'Temperature', description: 'Raise the temperature 1 step (paying the configurable M€ cost below) when you place a tile on this space (Vastitas Borealis).'},
+  {bonus: SpaceBonus.TEMPERATURE_4MC, css: 'bonustemperature4mc', label: 'Temperature (4 M€)', description: 'Raise the temperature 1 step for a fixed 4 M€ -- always 4, not the configurable cost below -- when you place a tile on this space (Vastitas Borealis Nova).'},
   {bonus: SpaceBonus.COLONY, css: 'colony', label: 'Colony', description: 'Build a colony (paying an M€ cost) when you place a tile on this space (Terra Cimmeria Nova).'},
 ] as Array<Omit<BonusTool, 'key'>>).map((t) => ({...t, key: 'bonus:' + t.bonus}));
 
@@ -783,6 +786,16 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
   .map-editor-preview {
     margin-top: 24px;
     h3 { color: #fff; }
+  }
+  .map-editor-preview-zoom {
+    // The real <Board> renders at its normal (smallish) size; blow it up so it's actually
+    // useful for checking hex/bonus placement while editing. `zoom` (not `transform: scale`)
+    // reserves real layout space for the enlarged board, same technique as CardMaker.vue's
+    // preview and MutationMarket.vue's card scaling.
+    zoom: 1.6;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
   }
 }
 </style>
