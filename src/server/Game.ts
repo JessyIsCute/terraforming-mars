@@ -383,6 +383,7 @@ export class Game implements IGame, Logger {
 
     if (gameOptions.conglomeratesExpansion) {
       game.conglomerates = ConglomeratesExpansion.initialize(players);
+      players.forEach((player) => ConglomeratesExpansion.gainCoordination(player, 1));
     }
 
     // and 2 neutral cities and forests on board

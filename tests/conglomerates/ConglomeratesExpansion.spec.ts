@@ -59,10 +59,11 @@ describe('ConglomeratesExpansion', () => {
     expect(player1.conglomeratesData.coordination).to.eq(5);
   });
 
-  it('does not grant coordination when Conglomerates is off', () => {
+  it('does not grant any coordination when Conglomerates is off', () => {
     const [, player1] = testGame(4);
+    expect(player1.conglomeratesData.coordination).to.eq(0);
     player1.runProductionPhase();
-    expect(player1.conglomeratesData.coordination).to.eq(1);
+    expect(player1.conglomeratesData.coordination).to.eq(0);
   });
 
   it('escalates a team action cost for both teammates after use', () => {

@@ -48,7 +48,7 @@ export class ConglomeratesExpansion {
   }
 
   public static initializePlayer(): ConglomeratesPlayerData {
-    return {coordination: 1};
+    return {coordination: 0};
   }
 
   public static getTeam(player: IPlayer): ConglomeratesTeam | undefined {
