@@ -17,14 +17,10 @@ export function calculateVictoryPoints(player: IPlayer) {
 
   // Victory points from cards
   let playerOwnsVermin = false; // For Vermin
-  let negativeVP = 0; // For Underworld.
   for (const playedCard of player.tableau) {
     if (playedCard.victoryPoints !== undefined) {
       const vp = playedCard.getVictoryPoints(player);
       builder.setVictoryPoints('victoryPoints', vp, playedCard.name);
-      if (vp < 0) {
-        negativeVP += vp;
-      }
     }
     // MutationMarkets: a mutation's ongoing VP bonus applies even to a card with no
     // printed victoryPoints formula of its own.
@@ -39,8 +35,9 @@ export function calculateVictoryPoints(player: IPlayer) {
   if (player.game.verminInEffect && playerOwnsVermin === false) {
     const cities = player.game.board.getCities(player).length;
     builder.setVictoryPoints('victoryPoints', cities * -1, CardName.VERMIN);
-    negativeVP -= cities;
   }
+
+  const negativeVP = calculateNegativeVP(player); // For Underworld.
 
   // Victory points from TR
   builder.setVictoryPoints('terraformRating', player.terraformRating);
@@ -96,6 +93,13 @@ export function calculateVictoryPoints(player: IPlayer) {
   if (player.game.gameOptions.underworldExpansion === true) {
     const bribe = Math.min(Math.abs(negativeVP), player.underworldData.corruption);
     builder.setVictoryPoints('victoryPoints', bribe, 'Underworld Corruption Bribe');
+
+    if (player.game.gameOptions.conglomeratesExpansion) {
+      const assist = ConglomeratesExpansion.teammateCorruptionAssist(player, negativeVP, bribe);
+      if (assist > 0) {
+        builder.setVictoryPoints('victoryPoints', assist, 'Teammate Corruption Bribe');
+      }
+    }
   }
 
   // Escape velocity VP penalty
@@ -113,6 +117,35 @@ export function calculateVictoryPoints(player: IPlayer) {
   }
 
   return builder.build();
+}
+
+/**
+ * A player's negative VP from cards and the Vermin penalty -- the same total the Underworld
+ * corruption bribe above offsets.
+ *
+ * Not exported: `ConglomeratesExpansion` needs the equivalent for a teammate (to see how much
+ * of their corruption is "leftover" after covering their own negative VP), but importing this
+ * function here would put an edge from ConglomeratesExpansion back to this file, on top of the
+ * existing edge the other way (`ConglomeratesExpansion.calculateVictoryPoints` above) -- that
+ * cycle triggers a real "cannot access before initialization" crash at module load, so
+ * `ConglomeratesExpansion.ts` keeps its own small copy of this instead of importing it.
+ */
+function calculateNegativeVP(player: IPlayer): number {
+  let negativeVP = 0;
+  let playerOwnsVermin = false;
+  for (const playedCard of player.tableau) {
+    if (playedCard.victoryPoints !== undefined) {
+      const vp = playedCard.getVictoryPoints(player);
+      if (vp < 0) {
+        negativeVP += vp;
+      }
+    }
+    playerOwnsVermin ||= playedCard.name === CardName.VERMIN;
+  }
+  if (player.game.verminInEffect && playerOwnsVermin === false) {
+    negativeVP -= player.game.board.getCities(player).length;
+  }
+  return negativeVP;
 }
 
 function maybeSetVP(thisPlayer: IPlayer, awardWinner: IPlayer, fundedAward: FundedAward, vps: number, place: '1st' | '2nd', builder: VictoryPointsBreakdownBuilder) {

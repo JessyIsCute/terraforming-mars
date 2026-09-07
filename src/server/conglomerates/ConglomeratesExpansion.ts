@@ -10,6 +10,7 @@ import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictory
 import {ConglomeratesTeamModel} from '../../common/models/ConglomeratesModel';
 import {IParty} from '../turmoil/parties/IParty';
 import {Color, PLAYER_COLORS} from '../../common/Color';
+import {CardName} from '../../common/cards/CardName';
 
 const MILESTONE_TEAM_VP = 8;
 const AWARD_TEAM_VP = 8;
@@ -262,6 +263,58 @@ export class ConglomeratesExpansion {
     const usedColors = new Set(game.players.map((p) => p.color));
     const availableColors = PLAYER_COLORS.filter((color) => !usedColors.has(color));
     return availableColors[index];
+  }
+
+  /**
+   * How much of `player`'s still-uncovered negative VP (after their own Underworld corruption
+   * bribe, `ownBribe`) a teammate's leftover corruption can offset. A teammate only has
+   * leftover corruption once their own negative VP is fully covered by their own corruption
+   * (see `calculateNegativeVP`), so a player who themselves needs help can never simultaneously
+   * have leftover to give -- this can't double-count or go in circles.
+   */
+  public static teammateCorruptionAssist(player: IPlayer, negativeVP: number, ownBribe: number): number {
+    let remaining = Math.abs(negativeVP) - ownBribe;
+    if (remaining <= 0) {
+      return 0;
+    }
+    let assist = 0;
+    for (const teammate of player.teammates()) {
+      const teammateNegativeVP = this.negativeVPForCorruptionSharing(teammate);
+      const teammateOwnBribe = Math.min(Math.abs(teammateNegativeVP), teammate.underworldData.corruption);
+      const leftover = teammate.underworldData.corruption - teammateOwnBribe;
+      const contribution = Math.min(remaining, leftover);
+      assist += contribution;
+      remaining -= contribution;
+      if (remaining <= 0) {
+        break;
+      }
+    }
+    return assist;
+  }
+
+  /**
+   * A copy of `calculateVictoryPoints.ts`'s private `calculateNegativeVP` (cards' negative VP
+   * plus the Vermin penalty). Not imported from there: that file already imports this one (for
+   * `calculateVictoryPoints` above), and importing back would create a two-file cycle that
+   * crashes at module load ("cannot access before initialization") rather than just at
+   * typecheck time -- so this small, stable calculation is duplicated instead.
+   */
+  private static negativeVPForCorruptionSharing(player: IPlayer): number {
+    let negativeVP = 0;
+    let playerOwnsVermin = false;
+    for (const playedCard of player.tableau) {
+      if (playedCard.victoryPoints !== undefined) {
+        const vp = playedCard.getVictoryPoints(player);
+        if (vp < 0) {
+          negativeVP += vp;
+        }
+      }
+      playerOwnsVermin ||= playedCard.name === CardName.VERMIN;
+    }
+    if (player.game.verminInEffect && playerOwnsVermin === false) {
+      negativeVP -= player.game.board.getCities(player).length;
+    }
+    return negativeVP;
   }
 
   public static getTeamModels(game: IGame): Array<ConglomeratesTeamModel> {
