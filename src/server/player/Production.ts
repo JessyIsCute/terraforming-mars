@@ -3,6 +3,8 @@ import {Resource} from '../../common/Resource';
 import {From, isFromPlayer} from '../logs/From';
 import {BaseStock} from './StockBase';
 import {IPlayer} from '../IPlayer';
+import {CardName} from '../../common/cards/CardName';
+import {RebalanceSeebeckProductionLoss} from '../deferredActions/RebalanceSeebeckProductionLoss';
 
 export class Production extends BaseStock {
   constructor(player: IPlayer) {
@@ -11,8 +13,20 @@ export class Production extends BaseStock {
   public add(
     resource: Resource,
     amount : number,
-    options? : { log: boolean, from? : From, stealing?: boolean},
+    options? : { log: boolean, from? : From, stealing?: boolean, skipSeebeckRedistribution?: boolean},
   ) {
+    // Sistemas Seebeck: energy and heat production are one pool for its owner - redirect a
+    // reduction to either into a deferred choice of how to split it between the two,
+    // instead of applying it to whichever one the caller specified.
+    if (amount < 0 &&
+      (resource === Resource.ENERGY || resource === Resource.HEAT) &&
+      options?.skipSeebeckRedistribution !== true &&
+      this.player.game !== undefined &&
+      this.player.tableau.has(CardName.SISTEMAS_SEEBECK)) {
+      this.player.game.defer(new RebalanceSeebeckProductionLoss(this.player, resource, -amount, options));
+      return;
+    }
+
     const adj = resource === Resource.MEGACREDITS ? -5 : 0;
     const delta = (amount >= 0) ? amount : Math.max(amount, -(this[resource] - adj));
     this[resource] += delta;

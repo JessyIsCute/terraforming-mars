@@ -9,6 +9,8 @@ import {TestPlayer} from '../../TestPlayer';
 import {ProductionRequirement} from '../../../src/server/cards/requirements/ProductionRequirement';
 import {TradeWithEnergy} from '../../../src/server/player/Colonies';
 import {Pluto} from '../../../src/server/colonies/Pluto';
+import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
+import {cast} from '../../../src/common/utils/utils';
 
 describe('SistemasSeebeck', () => {
   let card: SistemasSeebeck;
@@ -110,5 +112,77 @@ describe('SistemasSeebeck', () => {
 
     const trader = new TradeWithEnergy(player);
     expect(trader.canUse()).is.false;
+  });
+
+  it('a card reducing heat production offers a choice of how to split the loss with energy', () => {
+    player.playedCards.push(card);
+    player.production.override({heat: 3, energy: 2});
+
+    player.production.add(Resource.HEAT, -2, {log: true});
+    runAllActions(game);
+
+    const input = cast(player.popWaitingFor(), SelectAmount);
+    expect(input.min).eq(0);
+    expect(input.max).eq(2);
+
+    input.cb(1); // 1 from heat, 1 from energy
+
+    expect(player.production.heat).eq(2);
+    expect(player.production.energy).eq(1);
+  });
+
+  it('does not offer a choice when the other side has no room', () => {
+    player.playedCards.push(card);
+    player.production.override({heat: 3, energy: 0});
+
+    player.production.add(Resource.HEAT, -2, {log: true});
+    runAllActions(game);
+
+    expect(player.popWaitingFor()).is.undefined;
+    expect(player.production.heat).eq(1);
+    expect(player.production.energy).eq(0);
+  });
+
+  it('the combined pool is the real floor - a big reduction can dip into both', () => {
+    player.playedCards.push(card);
+    player.production.override({heat: 1, energy: 1});
+
+    // Asking for 5 heat production, but only 2 exist combined - 1 from each is the only
+    // possible split, so no choice is offered.
+    player.production.add(Resource.HEAT, -5, {log: true});
+    runAllActions(game);
+
+    expect(player.popWaitingFor()).is.undefined;
+    expect(player.production.heat).eq(0);
+    expect(player.production.energy).eq(0);
+  });
+
+  it('the combined pool is the real floor, with a real choice when there is room on both sides', () => {
+    player.playedCards.push(card);
+    player.production.override({heat: 3, energy: 3});
+
+    // Asking for 5 heat production, but only 6 exist combined - capped at 5 total lost,
+    // and anywhere from 2 to 3 of it can come from heat.
+    player.production.add(Resource.HEAT, -5, {log: true});
+    runAllActions(game);
+
+    const input = cast(player.popWaitingFor(), SelectAmount);
+    expect(input.min).eq(2);
+    expect(input.max).eq(3);
+    input.cb(2);
+
+    expect(player.production.heat).eq(1);
+    expect(player.production.energy).eq(0);
+  });
+
+  it('without Sistemas Seebeck, a heat production reduction is not redirected', () => {
+    player.production.override({heat: 3, energy: 2});
+
+    player.production.add(Resource.HEAT, -2, {log: true});
+    runAllActions(game);
+
+    expect(player.popWaitingFor()).is.undefined;
+    expect(player.production.heat).eq(1);
+    expect(player.production.energy).eq(2);
   });
 });
