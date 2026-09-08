@@ -115,4 +115,23 @@ describe('Milestone', () => {
 
     expect(wrapper.find('.ma-number-patch').exists()).to.be.false;
   });
+
+  it('shows a bracketed team score row when teamScores is set', () => {
+    const milestone = createMilestone({claimed: false});
+    milestone.teamScores = [
+      {playerColors: ['red', 'yellow'], score: 9},
+      {playerColors: ['blue', 'green'], score: 4},
+    ];
+    const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});
+
+    const rows = wrapper.findAll('[data-test=team-score]').map((w) => w.text());
+    expect(rows).to.deep.eq(['[9]', '[4]']);
+  });
+
+  it('does not show a team score row when teamScores is absent', () => {
+    const milestone = createMilestone({claimed: false});
+    const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});
+
+    expect(wrapper.find('[data-test=team-score]').exists()).to.be.false;
+  });
 });

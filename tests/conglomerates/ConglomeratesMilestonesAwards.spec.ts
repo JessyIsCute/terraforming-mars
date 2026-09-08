@@ -9,6 +9,8 @@ import {Resource} from '../../src/common/Resource';
 import {OrOptions} from '../../src/server/inputs/OrOptions';
 import {cast} from '../../src/common/utils/utils';
 import {runAllActions} from '../TestingUtils';
+import {Server} from '../../src/server/models/ServerModel';
+import {ConglomeratesExpansion} from '../../src/server/conglomerates/ConglomeratesExpansion';
 
 describe('Conglomerates milestones and awards', () => {
   let game: IGame;
@@ -104,6 +106,36 @@ describe('Conglomerates milestones and awards', () => {
       expect(game.claimedMilestones.some((cm) => cm.milestone.name === 'Terraformer53' && cm.player === player1)).is.true;
       expect(player1.conglomeratesData.coordination).to.eq(6);
     });
+
+    it('the client model includes each team\'s combined score alongside per-player scores', () => {
+      player1.setTerraformRating(30);
+      player3.setTerraformRating(15); // player1's team: 30 + 15 = 45
+      player2.setTerraformRating(10);
+      player4.setTerraformRating(5); // player2's team: 10 + 5 = 15
+
+      const milestones = Server.getMilestones(game);
+      const terraformer = milestones.find((m) => m.name === 'Terraformer53')!;
+
+      expect(terraformer.teamScores).to.have.length(2);
+      const team1 = terraformer.teamScores!.find((t) => t.playerColors.includes(player1.color))!;
+      const team2 = terraformer.teamScores!.find((t) => t.playerColors.includes(player2.color))!;
+      expect(team1.score).to.eq(45);
+      expect(team2.score).to.eq(15);
+    });
+
+    it('does not include team scores when Conglomerates is off', () => {
+      const [soloGame, solo] = testGame(4);
+      solo.setTerraformRating(35);
+      const milestones = Server.getMilestones(soloGame);
+      const terraformer = milestones.find((m) => m.name === 'Terraformer')!;
+      expect(terraformer.teamScores).is.undefined;
+    });
+
+    it('Generalist2\'s team score uses the already-combined value once, not summed twice', () => {
+      const getScore = () => 4; // every team member reports the same already-combined value
+      const teamScores = ConglomeratesExpansion.getTeamScores(game, getScore, true);
+      expect(teamScores.every((t) => t.score === 4)).is.true; // not 8 (which a naive sum would give)
+    });
   });
 
   describe('awards', () => {
@@ -159,6 +191,31 @@ describe('Conglomerates milestones and awards', () => {
 
       expect(game.hasBeenFunded(new Banker())).is.true;
       expect(player1.conglomeratesData.coordination).to.eq(6);
+    });
+
+    it('the client model includes each team\'s combined score alongside per-player scores', () => {
+      game.awards = [new Banker()];
+      player1.production.add(Resource.MEGACREDITS, 4);
+      player3.production.add(Resource.MEGACREDITS, 3); // player1's team: 7 combined
+      player2.production.add(Resource.MEGACREDITS, 2);
+      player4.production.add(Resource.MEGACREDITS, 2); // player2's team: 4 combined
+
+      const awards = Server.getAwards(game);
+      const banker = awards.find((a) => a.name === 'Banker')!;
+
+      expect(banker.teamScores).to.have.length(2);
+      const team1 = banker.teamScores!.find((t) => t.playerColors.includes(player1.color))!;
+      const team2 = banker.teamScores!.find((t) => t.playerColors.includes(player2.color))!;
+      expect(team1.score).to.eq(7);
+      expect(team2.score).to.eq(4);
+    });
+
+    it('does not include team scores when Conglomerates is off', () => {
+      const [soloGame] = testGame(4);
+      soloGame.awards = [new Banker()];
+      const awards = Server.getAwards(soloGame);
+      const banker = awards.find((a) => a.name === 'Banker')!;
+      expect(banker.teamScores).is.undefined;
     });
   });
 });

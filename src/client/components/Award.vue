@@ -23,6 +23,14 @@
           ></p>
       </template>
       </div>
+      <div v-if="award.teamScores !== undefined" class="ma-team-scores">
+        <span
+          v-for="(team, idx) in award.teamScores"
+          :key="idx"
+          class="ma-team-score"
+          data-test="team-score"
+        >[{{ team.score }}]</span>
+      </div>
     </div>
 
     <div v-if="showDescription" class="ma-description">

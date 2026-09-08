@@ -132,4 +132,23 @@ describe('Award', () => {
 
     expect(wrapper.text()).to.not.include('between you and your teammate');
   });
+
+  it('shows a bracketed team score row when teamScores is set', () => {
+    const award = createAward({funded: false});
+    award.teamScores = [
+      {playerColors: ['red', 'yellow'], score: 9},
+      {playerColors: ['blue', 'green'], score: 4},
+    ];
+    const wrapper = mount(Award, {...globalConfig, props: {award}});
+
+    const rows = wrapper.findAll('[data-test=team-score]').map((w) => w.text());
+    expect(rows).to.deep.eq(['[9]', '[4]']);
+  });
+
+  it('does not show a team score row when teamScores is absent', () => {
+    const award = createAward({funded: false});
+    const wrapper = mount(Award, {...globalConfig, props: {award}});
+
+    expect(wrapper.find('[data-test=team-score]').exists()).to.be.false;
+  });
 });

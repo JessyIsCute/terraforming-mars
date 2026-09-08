@@ -7,7 +7,7 @@ import {AwardScorer} from '../awards/AwardScorer';
 import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuilder';
 import {sum} from '../../common/utils/utils';
 import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictoryPointsBreakdown';
-import {ConglomeratesTeamModel} from '../../common/models/ConglomeratesModel';
+import {ConglomeratesTeamModel, ConglomeratesTeamScore} from '../../common/models/ConglomeratesModel';
 import {IParty} from '../turmoil/parties/IParty';
 import {Color, PLAYER_COLORS} from '../../common/Color';
 import {CardName} from '../../common/cards/CardName';
@@ -362,6 +362,26 @@ export class ConglomeratesExpansion {
         name: members.map((member) => member.name).join(' & '),
         victoryPoints: this.calculateTeamVictoryPoints(game, team),
       };
+    });
+  }
+
+  /**
+   * Each team's combined score for one milestone/award, shown alongside the per-player scores
+   * in Milestone.vue/Award.vue. For an ordinary per-player `getScore`, this sums across
+   * teammates -- the same combination `BaseMilestone.canClaim` (via `meetsTeamThreshold`)
+   * already compares against internally, just exposed here as a real number for display.
+   * `alreadyTeamScoped` is for the rare milestone (currently only `Generalist2`) whose own
+   * `getScore` already returns an identical team-wide value for every member -- summing those
+   * would double-count, so this takes just one member's value instead.
+   */
+  public static getTeamScores(game: IGame, getScore: (player: IPlayer) => number, alreadyTeamScoped: boolean = false): Array<ConglomeratesTeamScore> {
+    if (!game.gameOptions.conglomeratesExpansion) {
+      return [];
+    }
+    return game.conglomerates.teams.map((team) => {
+      const members = team.playerIds.map((id) => game.getPlayerById(id));
+      const score = alreadyTeamScoped ? getScore(members[0]) : sum(members.map(getScore));
+      return {playerColors: members.map((member) => member.color), score};
     });
   }
 }

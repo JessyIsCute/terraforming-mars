@@ -18,6 +18,7 @@ import {ClaimedMilestoneModel, MilestoneScore} from '../../common/models/Claimed
 import {FundedAwardModel, AwardScore} from '../../common/models/FundedAwardModel';
 import {getTurmoilModel} from '../models/TurmoilModel';
 import {getConglomeratesModel} from '../models/ConglomeratesModel';
+import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 import {SpectatorModel} from '../../common/models/SpectatorModel';
 import {GameModel} from '../../common/models/GameModel';
 import {Turmoil} from '../turmoil/Turmoil';
@@ -153,12 +154,20 @@ export class Server {
         (m) => m.milestone.name === milestone.name,
       );
       let scores: Array<MilestoneScore> = [];
+      let teamScores: ReturnType<typeof ConglomeratesExpansion.getTeamScores> | undefined = undefined;
       if (claimed === undefined && claimedMilestones.length < MAX_MILESTONES) {
         scores = game.players.map((player) => ({
           color: player.color,
           score: milestone.getScore(player),
           claimable: milestone.canClaim(player),
         }));
+        if (game.gameOptions.conglomeratesExpansion) {
+          teamScores = ConglomeratesExpansion.getTeamScores(
+            game,
+            (player) => milestone.getScore(player),
+            milestone.name === 'Generalist2',
+          );
+        }
       }
 
       milestoneModels.push({
@@ -166,6 +175,7 @@ export class Server {
         color: claimed?.player.color,
         name: milestone.name,
         scores,
+        teamScores,
       });
     }
 
@@ -180,11 +190,15 @@ export class Server {
       const funded = fundedAwards.find((a) => a.award.name === award.name);
       const scorer = new AwardScorer(game, award);
       let scores: Array<AwardScore> = [];
+      let teamScores: ReturnType<typeof ConglomeratesExpansion.getTeamScores> | undefined = undefined;
       if (fundedAwards.length < MAX_AWARDS || funded !== undefined) {
         scores = game.players.map((player) => ({
           color: player.color,
           score: scorer.get(player),
         }));
+        if (game.gameOptions.conglomeratesExpansion) {
+          teamScores = ConglomeratesExpansion.getTeamScores(game, (player) => scorer.get(player));
+        }
       }
 
       awardModels.push({
@@ -192,6 +206,7 @@ export class Server {
         color: funded?.player.color,
         name: award.name,
         scores: scores,
+        teamScores,
       });
     }
 

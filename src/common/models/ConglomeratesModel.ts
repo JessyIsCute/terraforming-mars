@@ -15,3 +15,9 @@ export type ConglomeratesTeamModel = {
 export type ConglomeratesModel = {
   teams: Array<ConglomeratesTeamModel>;
 }
+
+/** A team's combined score for one milestone/award, shown alongside the per-player scores. */
+export type ConglomeratesTeamScore = {
+  playerColors: Array<Color>;
+  score: number;
+}

@@ -400,6 +400,32 @@ each(@players, {
       margin-left: -2px;
     }
 
+    // Conglomerates: each team's combined score for this milestone/award, shown as a row of
+    // "[total]" badges below the per-player scores -- same bracket notation as the Team
+    // Scores panel's own total (ConglomeratesTeams.vue), gold to visually distinguish a team
+    // total from an individual player's score.
+    .ma-team-scores {
+      display: block;
+      width: 144px;
+      margin: 2px 0 0 -2px;
+    }
+
+    .ma-team-score {
+      display: inline-block;
+      min-width: 24px;
+      height: 18px;
+      line-height: 18px;
+      border-radius: 2px;
+      margin: 0 2px;
+      padding: 0 2px;
+      font-size: 13px;
+      font-weight: bold;
+      font-family: Prototype, sans-serif;
+      color: #ffcc64;
+      background: #1a1a1a;
+      box-shadow: 0 0 1px 1px black;
+    }
+
     .ma-player {
       margin: 25px 0 0 70px;
       position: absolute;
@@ -622,7 +648,11 @@ each(@players, {
 // separate from the Milestones/Awards title above it).
 .milestone-award-arrow {
   position: absolute;
-  left: 100px;
+  // .milestone-award-price sits at left:80px (10px padding + 70px margin), 30px wide,
+  // but `transform: scale(0.8)` shrinks it toward its own center without moving that box,
+  // so its visual right edge lands at 107px (95 center +/- 12), not 100px -- the previous
+  // value here overlapped the price icon. Starting the arrow at 110px clears it.
+  left: 110px;
   top: 8px;
   width: 15px;
   height: 15px;
@@ -633,7 +663,7 @@ each(@players, {
 
 .milestone-award-coordination {
   position: absolute;
-  left: 122px;
+  left: 128px;
   top: 3px;
   width: 24px;
   height: 24px;
@@ -644,11 +674,13 @@ each(@players, {
 
   // Inner fill, inset from the bevel ring above: same bright-top/dark-bottom treatment as
   // the ring, one shade lighter/darker -- matches .card-resource-coordination/
-  // .resource_icon--coordination exactly.
+  // .resource_icon--coordination exactly. Inset is tighter than the 36px resource-bar/card
+  // version's 3-4px since this icon renders at 24px -- the same absolute inset reads
+  // proportionally thicker at this smaller size.
   &::after {
     content: "";
     position: absolute;
-    inset: 3px;
+    inset: 2px;
     background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
   }
 
