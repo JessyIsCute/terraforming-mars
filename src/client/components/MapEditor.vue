@@ -769,6 +769,12 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     border-radius: 6px;
     overflow: auto;
     max-height: 60vh;
+    // gridStyle()'s width/height (set inline, in real hex-grid pixels) now include the track
+    // margins too, so the whole thing is bigger than it used to be -- shrink it back down with
+    // zoom (not transform: scale, which wouldn't affect layout size or the max-height cap above)
+    // so the full board, tracks and all, actually fits without scrolling instead of just
+    // reintroducing the same edge-cropping one size up.
+    zoom: 0.8;
   }
 
   // The hex's fill comes from the real board-space-type-* sprites (global, from board.less);
