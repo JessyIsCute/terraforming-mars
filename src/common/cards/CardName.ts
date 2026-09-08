@@ -1007,7 +1007,7 @@ export enum CardName {
 
   POLARIS = 'Polaris',
   PLANET_PR = 'Planet PR',
-  PLANETARY_OUTREACH = 'Planetary Outreach',
+  PLANET_PR_II = 'Planet PR II',
   AMBIENT = 'Ambient',
   RINGCOM = 'Ringcom',
   CHIMERA = 'Chimera',

@@ -22,7 +22,7 @@ import {GlobalEventName} from '../../common/turmoil/globalEvents/GlobalEventName
 import {Priority} from '../deferredActions/Priority';
 import {message} from '../logs/MessageBuilder';
 import {PlanetPr} from '../cards/pathfinders/PlanetPr';
-import {PlanetaryOutreach} from '../cards/pathfinders/PlanetaryOutreach';
+import {PlanetPrII} from '../cards/pathfinders/PlanetPrII';
 
 export class PathfindersExpansion {
   private constructor() {
@@ -43,14 +43,14 @@ export class PathfindersExpansion {
     if (player.game.gameOptions.pathfindersExpansion === false) {
       return;
     }
-    // Planet PR (BetterMars) and Planetary Outreach (plain Pathfinders) share this streak:
+    // Planet PR (BetterMars) and Planet PR II (plain Pathfinders) share this streak:
     // playing two cards with the same planetary tag back to back raises that track 1
     // additional step on the second one. Playing a card with no planetary tag at all
     // breaks the streak, even though it doesn't touch any track itself. A player could
     // hold both (e.g. via Merger), in which case they share one streak tracker.
     const planetPr = player.tableau.get(CardName.PLANET_PR) as PlanetPr | undefined;
-    const planetaryOutreach = player.tableau.get(CardName.PLANETARY_OUTREACH) as PlanetaryOutreach | undefined;
-    const streakCard = planetPr ?? planetaryOutreach;
+    const planetPrII = player.tableau.get(CardName.PLANET_PR_II) as PlanetPrII | undefined;
+    const streakCard = planetPr ?? planetPrII;
     const tags = card.tags;
     let hadPlanetaryTag = false;
     tags.forEach((tag) => {
@@ -60,10 +60,10 @@ export class PathfindersExpansion {
       hadPlanetaryTag = true;
       const steps = streakCard !== undefined && streakCard.lastPlanetaryTag === tag ? 2 : 1;
       PathfindersExpansion.raiseTrack(tag, player, steps);
-      // Planetary Outreach's whole bonus is a flat 2 M€ when the streak itself triggers,
+      // Planet PR II's whole bonus is a flat 2 M€ when the streak itself triggers,
       // unlike Planet PR's per-track piggyback bonuses (see grantPlanetPrBonus).
-      if (steps === 2 && planetaryOutreach !== undefined) {
-        player.stock.add(Resource.MEGACREDITS, 2, {log: true, from: {card: planetaryOutreach}});
+      if (steps === 2 && planetPrII !== undefined) {
+        player.stock.add(Resource.MEGACREDITS, 2, {log: true, from: {card: planetPrII}});
       }
       if (streakCard !== undefined) {
         streakCard.lastPlanetaryTag = tag;

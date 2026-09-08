@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {PlanetaryOutreach} from '../../../src/server/cards/pathfinders/PlanetaryOutreach';
+import {PlanetPrII} from '../../../src/server/cards/pathfinders/PlanetPrII';
 import {PlanetPr} from '../../../src/server/cards/pathfinders/PlanetPr';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -11,13 +11,13 @@ import {Tag} from '../../../src/common/cards/Tag';
 import {cast} from '../../../src/common/utils/utils';
 import {fakeCard, runAllActions} from '../../TestingUtils';
 
-describe('PlanetaryOutreach', () => {
-  let card: PlanetaryOutreach;
+describe('PlanetPrII', () => {
+  let card: PlanetPrII;
   let game: IGame;
   let player: TestPlayer;
 
   beforeEach(() => {
-    card = new PlanetaryOutreach();
+    card = new PlanetPrII();
     [game, player] = testGame(1, {pathfindersExpansion: true});
     player.playedCards.push(card);
   });
@@ -28,7 +28,7 @@ describe('PlanetaryOutreach', () => {
 
   it('starts with 40 M€', () => {
     const [freshGame, freshPlayer] = testGame(1, {pathfindersExpansion: true});
-    const freshCard = new PlanetaryOutreach();
+    const freshCard = new PlanetPrII();
     freshPlayer.playCorporationCard(freshCard);
     runAllActions(freshGame);
     expect(freshPlayer.megaCredits).to.eq(40);
@@ -99,7 +99,7 @@ describe('PlanetaryOutreach', () => {
 
     PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.JOVIAN]}));
     expect(game.pathfindersData!.jovian).to.eq(3); // streak bonus applies once, not twice
-    expect(player.megaCredits).to.eq(2); // Planetary Outreach's flat bonus
+    expect(player.megaCredits).to.eq(2); // Planet PR II's flat bonus
     // Jovian space 2's own everyone('titanium') reward, plus Planet PR's piggyback bonus
     // on top of it - both fire, since crossing space 2 triggers a real track bonus.
     expect(player.titanium).to.eq(2);

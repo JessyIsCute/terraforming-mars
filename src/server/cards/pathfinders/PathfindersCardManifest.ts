@@ -19,7 +19,7 @@ import {CharityDonation} from './CharityDonation';
 import {Chimera} from './Chimera';
 import {SistemasSeebeck} from './SistemasSeebeck';
 import {InSpire} from './InSpire';
-import {PlanetaryOutreach} from './PlanetaryOutreach';
+import {PlanetPrII} from './PlanetPrII';
 import {CO2Reducers} from './CO2Reducers';
 import {CollegiumCopernicus} from './CollegiumCopernicus';
 import {CommunicationBoom} from './CommunicationBoom';
@@ -205,7 +205,7 @@ export const PATHFINDERS_CARD_MANIFEST = new ModuleManifest({
     [CardName.CHIMERA]: {Factory: Chimera},
     [CardName.SISTEMAS_SEEBECK]: {Factory: SistemasSeebeck},
     [CardName.IN_SPIRE]: {Factory: InSpire},
-    [CardName.PLANETARY_OUTREACH]: {Factory: PlanetaryOutreach},
+    [CardName.PLANET_PR_II]: {Factory: PlanetPrII},
     // [CardName.SPIRE]: {Factory: Spire},
     [CardName.SOYLENT_SEEDLING_SYSTEMS]: {Factory: SoylentSeedlingSystems},
     [CardName.STEELARIS]: {Factory: Steelaris},

@@ -15,14 +15,14 @@ import {PlanetaryTag} from '../../pathfinders/PathfindersData';
  * mechanic, but none of Planet PR's per-track piggyback bonuses - just a flat 2 M€
  * whenever the streak's extra step actually triggers. See
  * PathfindersExpansion.onCardPlayed for the shared streak logic. */
-export class PlanetaryOutreach extends CorporationCard implements ICorporationCard, ICloneTagCard {
+export class PlanetPrII extends CorporationCard implements ICorporationCard, ICloneTagCard {
   /** The planetary tag of the last card played that carried one - tracked so
    * PathfindersExpansion.onCardPlayed can tell when two in a row match. */
   public lastPlanetaryTag: PlanetaryTag | undefined = undefined;
 
   constructor() {
     super({
-      name: CardName.PLANETARY_OUTREACH,
+      name: CardName.PLANET_PR_II,
       startingMegaCredits: 40,
       initialActionText: 'Choose a planet tag, then draw a card with that tag',
 
