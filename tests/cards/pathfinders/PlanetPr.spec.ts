@@ -25,15 +25,15 @@ describe('PlanetPr', () => {
     expect(card.tags).deep.eq([Tag.CLONE]);
   });
 
-  it('starts with 32 M€, 2 steel, and 1 titanium', () => {
+  it('starts with 40 M€ and no other resources', () => {
     const [freshGame, freshPlayer] = testGame(1, {pathfindersExpansion: true});
     const freshCard = new PlanetPr();
     freshPlayer.playCorporationCard(freshCard);
     runAllActions(freshGame);
 
-    expect(freshPlayer.megaCredits).to.eq(32);
-    expect(freshPlayer.steel).to.eq(2);
-    expect(freshPlayer.titanium).to.eq(1);
+    expect(freshPlayer.megaCredits).to.eq(40);
+    expect(freshPlayer.steel).to.eq(0);
+    expect(freshPlayer.titanium).to.eq(0);
   });
 
   it('initialAction declares a tag and draws a matching card', () => {

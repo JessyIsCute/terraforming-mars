@@ -10,7 +10,6 @@ import {ICloneTagCard} from './ICloneTagCard';
 import {DrawCards} from '../../deferredActions/DrawCards';
 import {CardResource} from '../../../common/CardResource';
 import {Size} from '../../../common/cards/render/Size';
-import {digit} from '../Options';
 import {PlanetaryTag} from '../../pathfinders/PathfindersData';
 
 export class PlanetPr extends CorporationCard implements ICorporationCard, ICloneTagCard {
@@ -21,18 +20,14 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
   constructor() {
     super({
       name: CardName.PLANET_PR,
-      startingMegaCredits: 32,
+      startingMegaCredits: 40,
       initialActionText: 'Choose a planet tag, then draw a card with that tag',
-
-      behavior: {
-        stock: {steel: 2, titanium: 1},
-      },
 
       metadata: {
         cardNumber: 'Pf00', // Renumber
-        description: 'You start with 32 M€, 2 steel, and 1 titanium.',
+        description: 'You start with 40 M€.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(32).nbsp.steel(2, {digit}).nbsp.titanium(1, {digit}).br;
+          b.megacredits(40).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;
