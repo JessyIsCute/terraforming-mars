@@ -146,10 +146,13 @@ export const PaymentWidgetMixin = defineComponent({
     availableHeat(): number {
       const thisPlayer = this.playerView.thisPlayer;
       const stormcraft = thisPlayer.tableau.find((card) => card.name === CardName.STORMCRAFT_INCORPORATED);
-      if (stormcraft?.resources !== undefined) {
-        return thisPlayer.heat + (stormcraft.resources * 2);
+      let heat = thisPlayer.heat + (stormcraft?.resources !== undefined ? stormcraft.resources * 2 : 0);
+      // Sistemas Seebeck: energy and heat are one pool, so energy can cover a heat payment
+      // (Merger'd Helion, or anything else that lets heat be spent as M€) too.
+      if (thisPlayer.tableau.some((card) => card.name === CardName.SISTEMAS_SEEBECK)) {
+        heat += thisPlayer.energy;
       }
-      return thisPlayer.heat;
+      return heat;
     },
   },
 });

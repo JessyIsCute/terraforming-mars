@@ -11,6 +11,8 @@ import {TradeWithEnergy} from '../../../src/server/player/Colonies';
 import {Pluto} from '../../../src/server/colonies/Pluto';
 import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
 import {cast} from '../../../src/common/utils/utils';
+import {Payment} from '../../../src/common/inputs/Payment';
+import {LandClaim} from '../../../src/server/cards/base/LandClaim';
 
 describe('SistemasSeebeck', () => {
   let card: SistemasSeebeck;
@@ -184,5 +186,29 @@ describe('SistemasSeebeck', () => {
     expect(player.popWaitingFor()).is.undefined;
     expect(player.production.heat).eq(1);
     expect(player.production.energy).eq(2);
+  });
+
+  it('with canUseHeatAsMegaCredits (e.g. Merger\'d Helion), energy can cover a heat payment', () => {
+    player.playedCards.push(card);
+    player.canUseHeatAsMegaCredits = true;
+    player.heat = 0;
+    player.energy = 3;
+    player.megaCredits = 0;
+
+    const landClaim = new LandClaim(); // cost 1
+    expect(() => player.checkPaymentAndPlayCard(landClaim, Payment.of({heat: 1}))).to.not.throw();
+
+    expect(player.energy).eq(2);
+    expect(player.heat).eq(0);
+  });
+
+  it('without Sistemas Seebeck, canUseHeatAsMegaCredits alone does not let energy cover a heat payment', () => {
+    player.canUseHeatAsMegaCredits = true;
+    player.heat = 0;
+    player.energy = 3;
+    player.megaCredits = 0;
+
+    const landClaim = new LandClaim();
+    expect(() => player.checkPaymentAndPlayCard(landClaim, Payment.of({heat: 1}))).to.throw();
   });
 });
