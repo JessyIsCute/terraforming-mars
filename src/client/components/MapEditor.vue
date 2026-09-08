@@ -110,27 +110,29 @@
       </div>
 
       <div class="map-editor-canvas">
-        <div class="map-editor-grid" :style="gridStyle">
-          <button
-            v-for="cell in cells"
-            :key="cell.x + ',' + cell.y"
-            type="button"
-            class="map-editor-hex"
-            :class="hexClass(cell)"
-            :style="hexStyle(cell)"
-            @click="paint(cell)"
-            @contextmenu.prevent="removeLastBonus(cell)"
-            :title="cell.x + ',' + cell.y"
-          >
-            <span class="map-editor-hex-bonuses" v-if="cell.space">
-              <i
-                v-for="(item, i) in groupedBonus(cell.space.bonus)"
-                :key="i"
-                class="map-editor-hex-bonus"
-                :class="'board-space-bonus--' + bonusCss(item.bonus)"
-              ><b v-if="item.bonus === SpaceBonus.MEGACREDITS" class="map-editor-hex-bonus-count">{{ item.count }}</b></i>
-            </span>
-          </button>
+        <div class="map-editor-grid-wrap">
+          <div class="map-editor-grid" :style="gridStyle">
+            <button
+              v-for="cell in cells"
+              :key="cell.x + ',' + cell.y"
+              type="button"
+              class="map-editor-hex"
+              :class="hexClass(cell)"
+              :style="hexStyle(cell)"
+              @click="paint(cell)"
+              @contextmenu.prevent="removeLastBonus(cell)"
+              :title="cell.x + ',' + cell.y"
+            >
+              <span class="map-editor-hex-bonuses" v-if="cell.space">
+                <i
+                  v-for="(item, i) in groupedBonus(cell.space.bonus)"
+                  :key="i"
+                  class="map-editor-hex-bonus"
+                  :class="'board-space-bonus--' + bonusCss(item.bonus)"
+                ><b v-if="item.bonus === SpaceBonus.MEGACREDITS" class="map-editor-hex-bonus-count">{{ item.count }}</b></i>
+              </span>
+            </button>
+          </div>
         </div>
 
         <div v-if="warnings.length" class="map-editor-warnings">
@@ -304,10 +306,10 @@ const MAX_HEX_BONUSES = 8;
 // to crop tight to the diamond with no margin at all, which is why the tracks looked chopped off
 // on both sides. Same values (and the same per-side reasoning) as MapThumbnail.vue's
 // TRACK_MARGIN_* constants, which this mirrors.
-const GRID_TRACK_MARGIN_LEFT = 70;
+const GRID_TRACK_MARGIN_LEFT = 90;
 const GRID_TRACK_MARGIN_TOP = 63;
 const GRID_TRACK_MARGIN_BOTTOM = 55;
-const GRID_TRACK_MARGIN_RIGHT = 120;
+const GRID_TRACK_MARGIN_RIGHT = 100;
 
 export default defineComponent({
   name: 'MapEditor',
@@ -762,19 +764,25 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     min-width: 480px;
   }
 
-  .map-editor-grid {
-    position: relative;
-    // The Mars backdrop is set inline (gridStyle) so it aligns with the hexes; this is a fallback.
+  // Centers the (fixed-size, set inline via gridStyle) grid horizontally when the canvas column
+  // is wider than it, exactly like MapThumbnail.vue centers its own content -- without this, the
+  // grid just sits flush left, so the asymmetric left/right track margins in gridStyle() (the
+  // temperature track sits further out than the oxygen track, so it gets more) end up skewing
+  // the whole board toward one side of the visible canvas instead of centering it with even
+  // breathing room on both edges. Falls back to a scrollbar on a narrow viewport.
+  .map-editor-grid-wrap {
+    display: flex;
+    justify-content: center;
     background: #15131f;
     border-radius: 6px;
     overflow: auto;
     max-height: 60vh;
-    // gridStyle()'s width/height (set inline, in real hex-grid pixels) now include the track
-    // margins too, so the whole thing is bigger than it used to be -- shrink it back down with
-    // zoom (not transform: scale, which wouldn't affect layout size or the max-height cap above)
-    // so the full board, tracks and all, actually fits without scrolling instead of just
-    // reintroducing the same edge-cropping one size up.
-    zoom: 0.8;
+  }
+  .map-editor-grid {
+    position: relative;
+    flex: 0 0 auto;
+    // The Mars backdrop is set inline (gridStyle) so it aligns with the hexes; this is a fallback.
+    background: #15131f;
   }
 
   // The hex's fill comes from the real board-space-type-* sprites (global, from board.less);

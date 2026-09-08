@@ -39,15 +39,15 @@ const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 6
 
 // Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
 // each side, so the heat/oxygen/temperature tracks painted just outside the diamond peek into
-// the preview instead of being cropped off flush with the hexes. Each side is tuned separately
-// against what actually sits there on mars-without-venus.png: the oxygen track (left) got a
-// further bump for more breathing room; the pale Venus track arcing across the very top needed
-// only about half that extra reveal; and the temperature track (right side) sits further out
-// than the others, so it keeps the biggest margin of the four.
-const TRACK_MARGIN_LEFT = 70;
+// the preview instead of being cropped off flush with the hexes. This box is centered as a whole
+// (see .map-thumbnail below), so a bigger left/right disparity here doesn't just reveal more --
+// it visibly skews the planet itself off-center within the thumbnail. Keep left/right close to
+// each other; the temperature track (right side) sits very slightly further out than the oxygen
+// track, so it keeps a touch more margin, but not enough to look lopsided.
+const TRACK_MARGIN_LEFT = 90;
 const TRACK_MARGIN_TOP = 63;
 const TRACK_MARGIN_BOTTOM = 55;
-const TRACK_MARGIN_RIGHT = 120;
+const TRACK_MARGIN_RIGHT = 100;
 
 export default defineComponent({
   name: 'MapThumbnail',
