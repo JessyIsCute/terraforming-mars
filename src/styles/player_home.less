@@ -572,6 +572,7 @@ each(@players, {
 }
 
 .milestone-award-inline {
+  position: relative;
   white-space: nowrap;
   color: #000;
   text-transform: uppercase;
@@ -612,34 +613,52 @@ each(@players, {
 }
 
 // Conglomerates: claiming a milestone or funding an award also grants 1 Coordination -- shown
-// as "price -> [blue Coordination box]" right after the price badge, via ::before (the arrow)
-// and ::after (a real styled box matching the Coordination icon used elsewhere -- card renders,
-// the resource bar). Both are absolutely positioned so neither can affect the pill's own inline
-// layout/flow (a real sibling element here previously forced the price row onto its own line,
+// as "price -> [red arrow] [blue Coordination box]" right after the price badge. Both are real
+// elements (so the Coordination box can have its own ::after for the full bevel, matching the
+// icon everywhere else -- a single pseudo-element can't fit both an arrow AND a two-layer
+// bevel), but `position: absolute` on both takes them out of the pill's normal flow entirely,
+// so neither can push the row's width/height the way plain inline-block siblings did before
+// (that was the earlier bug: it forced the whole unclaimed-price pill onto its own line,
 // separate from the Milestones/Awards title above it).
-.milestone-award-price--conglomerates {
-  &::before {
-    content: "\2192";
+.milestone-award-arrow {
+  position: absolute;
+  left: 100px;
+  top: 8px;
+  width: 15px;
+  height: 15px;
+  background-image: url(./assets/misc/short-arrow.png);
+  background-size: 15px;
+  background-repeat: no-repeat;
+}
+
+.milestone-award-coordination {
+  position: absolute;
+  left: 122px;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
+  overflow: hidden;
+
+  // Inner fill, inset from the bevel ring above: same bright-top/dark-bottom treatment as
+  // the ring, one shade lighter/darker -- matches .card-resource-coordination/
+  // .resource_icon--coordination exactly.
+  &::after {
+    content: "";
     position: absolute;
-    left: 34px;
-    top: 0;
-    font-size: 16px;
-    line-height: 30px;
-    color: black;
+    inset: 3px;
+    background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
   }
 
-  &::after {
+  &::before {
     content: "🤝";
-    position: absolute;
-    left: 50px;
-    top: 4px;
-    width: 22px;
-    height: 22px;
-    box-sizing: border-box;
-    border: 1px solid black;
-    background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
-    font-size: 12px;
-    line-height: 22px;
+    position: relative;
+    z-index: 1;
+    display: block;
+    font-size: 13px;
+    line-height: 24px;
     text-align: center;
   }
 }
