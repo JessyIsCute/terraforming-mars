@@ -2,7 +2,6 @@ import {ICard} from '../cards/ICard';
 import {IPlayer} from '../IPlayer';
 import {Tag} from '../../common/cards/Tag';
 import {ALL_TAGS} from '../../common/cards/Tag';
-import {CardName} from '../../common/cards/CardName';
 import {CardType} from '../../common/cards/CardType';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
@@ -29,10 +28,11 @@ export class MutationEffects {
 
   private static chooseRandomTag(card: ICard, rng: Random): Tag {
     const existing = new Set(card.tags);
-    const candidates = ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.EVENT && !existing.has(tag));
+    // Tag.INFECTED is reserved for the Infection mechanic -- never a Tag Diversifier outcome.
+    const candidates = ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.EVENT && tag !== Tag.INFECTED && !existing.has(tag));
     if (candidates.length === 0) {
       // Every tag already present (essentially impossible) -- fall back to any non-wild tag.
-      return ALL_TAGS.filter((tag) => tag !== Tag.WILD)[0];
+      return ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.INFECTED)[0];
     }
     return candidates[rng.nextInt(candidates.length)];
   }
@@ -90,9 +90,9 @@ export class MutationEffects {
     return bonus;
   }
 
-  /** The card's name prefixed by every applied mutation's prefix, e.g. "Gigantic Asteroid Mining". */
-  public static displayName(mutationNames: ReadonlyArray<MutationName>, cardName: CardName): string {
-    return [...mutationNames.map((m) => MUTATION_DEFINITIONS[m].prefix), cardName].join(' ');
+  /** Every applied mutation's display-name prefix, e.g. ["Gigantic"] -- combined with any Infection prefixes by the caller (see `combinedDisplayName` in ModelUtils.ts/MutationMarketModel.ts). */
+  public static namePrefixes(mutationNames: ReadonlyArray<MutationName>): Array<string> {
+    return mutationNames.map((m) => MUTATION_DEFINITIONS[m].prefix);
   }
 
   /**

@@ -71,6 +71,23 @@ describe('CardVictoryPoints', () => {
     expect(wrapper.text()).to.eq('6');
     expect(wrapper.find('.mutation-glow').exists()).to.be.true;
   });
+  it('folds a negative (infection) bonus into the plain number and glows red', async () => {
+    await wrapper.setProps({victoryPoints: 2, bonus: -1});
+    expect(wrapper.text()).to.eq('1');
+    expect(wrapper.find('.infection-glow').exists()).to.be.true;
+    expect(wrapper.find('.mutation-glow').exists()).to.be.false;
+  });
+  it('folds a negative bonus into the dynamic-formula plain-points case and glows red', async () => {
+    await wrapper.setProps({...prop({points: 5, target: 0}), bonus: -2});
+    expect(wrapper.text()).to.eq('3');
+    expect(wrapper.find('.infection-glow').exists()).to.be.true;
+  });
+  it('a net-zero combined bonus (equal mutation and infection contributions) glows neither color', async () => {
+    await wrapper.setProps({victoryPoints: 2, bonus: 0});
+    expect(wrapper.text()).to.eq('2');
+    expect(wrapper.find('.mutation-glow').exists()).to.be.false;
+    expect(wrapper.find('.infection-glow').exists()).to.be.false;
+  });
 
 
   function prop(vps: RecursivePartial<CardRenderDynamicVictoryPoints>) {

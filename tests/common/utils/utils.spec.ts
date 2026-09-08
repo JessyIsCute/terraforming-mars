@@ -124,6 +124,7 @@ describe('utils', () => {
       'WILD',
       'EVENT',
       'CLONE',
+      'INFECTED',
     ]);
   });
 
@@ -146,6 +147,7 @@ describe('utils', () => {
       'wild',
       'event',
       'clone',
+      'infected',
     ]);
   });
 

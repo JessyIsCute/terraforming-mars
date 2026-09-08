@@ -30,6 +30,8 @@ import {Warning} from '../../common/cards/Warning';
 import {Resource} from '@/common/Resource';
 import {MutationEffects} from '../mutationmarkets/MutationEffects';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
+import {InfectionEffects} from '../mutationmarkets/InfectionEffects';
+import {AppliedInfection} from '../../common/mutationmarkets/AppliedInfection';
 
 const NO_WARNINGS: ReadonlySet<Warning> = new Set();
 
@@ -203,10 +205,12 @@ export abstract class Card implements ICard {
     return this.properties.cost === undefined ? 0 : this.properties.cost;
   }
   public get cost(): number {
-    return MutationEffects.applyCost(this, this.baseCost);
+    return InfectionEffects.applyCost(this, MutationEffects.applyCost(this, this.baseCost));
   }
   /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
   public mutations: Array<AppliedMutation> | undefined;
+  /** MutationMarkets: infections permanently applied to this card instance by Pandemica's action. */
+  public infections: Array<AppliedInfection> | undefined;
   public get initialActionText() {
     return this.properties.initialActionText || this.properties.firstAction?.text;
   }
@@ -232,7 +236,7 @@ export abstract class Card implements ICard {
     return this.properties.startingMegaCredits === undefined ? 0 : this.properties.startingMegaCredits;
   }
   public get tags(): Array<Tag> {
-    return MutationEffects.applyTags(this, this.properties.tags === undefined ? [] : this.properties.tags);
+    return InfectionEffects.applyTags(this, MutationEffects.applyTags(this, this.properties.tags === undefined ? [] : this.properties.tags));
   }
   public get cardDiscount() {
     return this.properties.cardDiscount;

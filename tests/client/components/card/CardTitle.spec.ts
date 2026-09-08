@@ -42,5 +42,37 @@ describe('CardTitle', () => {
     expect(wrapper.text()).to.contain('Diverse Gigantic Asteroid');
     expect(wrapper.find('.mutated-label').exists()).to.be.true;
     expect(wrapper.find('.mutated-label').text()).to.eq('Mutated');
+    expect(wrapper.find('.infected-label').exists()).to.be.false;
+  });
+
+  it('renders the Infected ribbon when infected', () => {
+    const wrapper = shallowMount(CardTitle, {
+      ...globalConfig,
+      props: {
+        title: 'Gigantic Asteroid' as CardName,
+        type: CardType.AUTOMATED,
+        displayTitle: 'Overpriced Gigantic Asteroid',
+        infected: true,
+      },
+    });
+    expect(wrapper.text()).to.contain('Overpriced Gigantic Asteroid');
+    expect(wrapper.find('.infected-label').exists()).to.be.true;
+    expect(wrapper.find('.infected-label').text()).to.eq('Infected');
+    expect(wrapper.find('.mutated-label').exists()).to.be.false;
+  });
+
+  it('renders both the Mutated and Infected ribbons when both apply', () => {
+    const wrapper = shallowMount(CardTitle, {
+      ...globalConfig,
+      props: {
+        title: 'Gigantic Asteroid' as CardName,
+        type: CardType.AUTOMATED,
+        displayTitle: 'Overpriced Diverse Gigantic Asteroid',
+        mutated: true,
+        infected: true,
+      },
+    });
+    expect(wrapper.find('.mutated-label').exists()).to.be.true;
+    expect(wrapper.find('.infected-label').exists()).to.be.true;
   });
 });

@@ -2,26 +2,28 @@
   <div class="card-container filterDiv hover-hide-res" :class="cardClasses">
       <div class="card-content-wrapper" v-i18n @mouseover="hovering = true" @mouseleave="hovering = false">
           <div v-if="!isStandardProject" class="card-cost-and-tags">
-              <div :class="{'mutation-cost-glow': mutationHighlight?.cost}"><CardCost :amount="cost" :newCost="reducedCost" /></div>
+              <div :class="{'mutation-cost-glow': mutationHighlight?.cost, 'infection-cost-glow': infectionHighlight?.cost}"><CardCost :amount="cost" :newCost="reducedCost" /></div>
               <div v-if="showPlayerCube" :class="playerCubeClass"></div>
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
               <CardTags :tags="tags" />
               <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
+              <div v-if="card.infectionAddedTag" class="infection-tag-glow"><CardTag :index="0" :type="card.infectionAddedTag" /></div>
           </div>
-          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.mutationDisplayName" :mutated="card.mutationDisplayName !== undefined"/>
+          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated" :infected="infected"/>
           <CardContent
               :metadata="cardMetadata"
               :requirements="cardRequirements"
               :isCorporation="isCorporationCard"
               :bottomPadding="bottomPadding"
-              :mutationText="mutationEffectText" />
+              :mutationText="mutationEffectText"
+              :infectionText="infectionEffectText" />
       </div>
       <CardExpansion :expansion="cardExpansion" :isCorporation="isCorporationCard" :isResourceCard="isResourceCard" :compatibility="cardCompatibility" />
       <CardResourceCounter v-if="hasResourceType" :amount="resourceAmount" :type="resourceType" />
       <CardVictoryPoints
-        v-if="cardMetadata.victoryPoints !== undefined || card.mutationVictoryPoints"
+        v-if="cardMetadata.victoryPoints !== undefined || combinedVictoryPointsBonus !== 0"
         :victoryPoints="cardMetadata.victoryPoints"
-        :bonus="card.mutationVictoryPoints ?? 0" />
+        :bonus="combinedVictoryPointsBonus" />
       <CardExtraContent :card="card" />
       <slot></slot>
   </div>
@@ -57,6 +59,8 @@ import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions
 import {describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
 import {MutationEffect} from '@/common/mutationmarkets/MutationEffect';
 import {mergeMutationGrantIntoRenderData} from '@/client/utils/mergeMutationGrantIntoRenderData';
+import {INFECTION_DEFINITIONS} from '@/common/mutationmarkets/InfectionDefinitions';
+import {describeInfectionEffect} from '@/common/mutationmarkets/describeInfection';
 
 
 export default defineComponent({
@@ -155,6 +159,31 @@ export default defineComponent({
     mutationHighlight(): CardModel['mutationHighlight'] {
       return this.card.mutationHighlight;
     },
+    infectionHighlight(): CardModel['infectionHighlight'] {
+      return this.card.infectionHighlight;
+    },
+    mutated(): boolean {
+      return (this.card.mutationNames?.length ?? 0) > 0;
+    },
+    infected(): boolean {
+      return (this.card.infectionNames?.length ?? 0) > 0;
+    },
+    combinedVictoryPointsBonus(): number {
+      return (this.card.mutationVictoryPoints ?? 0) + (this.card.infectionVictoryPoints ?? 0);
+    },
+    // Infections don't get the render-tree "merge into an existing icon" treatment
+    // mutations do (see mergeMutationGrantIntoRenderData) -- resourceDrainOnPlay always
+    // shows as its own description line. costIncrease/victoryPointPenalty need no line
+    // at all, same reasoning as mutations' costPercent: already visible via the glowing
+    // cost number and VP badge (infectionHighlight.cost/vp).
+    infectionEffectText(): string {
+      return (this.card.infectionNames ?? [])
+        .map((name) => INFECTION_DEFINITIONS[name].effect)
+        .filter((effect) => effect.kind === 'resourceDrainOnPlay')
+        .map((effect) => describeInfectionEffect(effect))
+        .filter((text) => text !== '')
+        .join('; ');
+    },
     // For each applied mutation, either fold its effect into the card's own renderData
     // (a resource/production grant that matches an icon the card already shows -- see
     // mergeMutationGrantIntoRenderData) or fall back to a separate description line.
@@ -247,7 +276,7 @@ export default defineComponent({
       return this.cardInstance.resourceType ?? CardResource.RESOURCE_CUBE;
     },
     bottomPadding(): string {
-      if (this.cardMetadata.victoryPoints !== undefined || this.card.mutationVictoryPoints) {
+      if (this.cardMetadata.victoryPoints !== undefined || this.combinedVictoryPointsBonus !== 0) {
         return 'long';
       }
       if (this.hasResourceType) {

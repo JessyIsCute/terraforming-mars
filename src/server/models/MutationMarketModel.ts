@@ -78,7 +78,7 @@ function previewCardModel(game: IGame, card: IProjectCard, coveringMutations: Re
   } as ICard;
   model.calculatedCost = MutationEffects.applyCost(preview, baseCost);
   model.mutationHighlight = MutationEffects.highlightsFor(preview);
-  model.mutationDisplayName = MutationEffects.displayName(coveringMutations, card.name);
+  model.combinedDisplayName = [...MutationEffects.namePrefixes(coveringMutations), card.name].join(' ');
   model.mutationNames = coveringMutations;
   const vp = MutationEffects.victoryPointsBonus(preview, game.players[0]);
   if (vp !== 0) {

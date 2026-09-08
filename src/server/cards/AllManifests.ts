@@ -20,6 +20,7 @@ import {DELTA_PROJECT_CARD_MANIFEST} from './delta/DeltaProjectCardManifest';
 import {SILLYFICATION_CARD_MANIFEST} from './sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './betterMars/BetterMarsCardManifest';
 import {CONGLOMERATES_CARD_MANIFEST} from './conglomerates/ConglomeratesCardManifest';
+import {MUTATIONMARKETS_CARD_MANIFEST} from './mutationmarkets/MutationMarketsCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -41,4 +42,5 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   SILLYFICATION_CARD_MANIFEST,
   BETTER_MARS_CARD_MANIFEST,
   CONGLOMERATES_CARD_MANIFEST,
+  MUTATIONMARKETS_CARD_MANIFEST,
 ];

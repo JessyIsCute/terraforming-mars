@@ -4,6 +4,7 @@
     <div v-if="isCorporation()" class="corporation-label">corporation</div>
     <div v-if="isCeo()" class="ceo-label">CEO</div>
     <div v-if="mutated" class="mutated-label">Mutated</div>
+    <div v-if="infected" class="infected-label">Infected</div>
     <CardCorporationLogo v-if="isCorporation()" :title="title"/>
     <div v-else ref="title" :class="getClasses()">{{ displayTitleWithoutSuffix }}</div>
   </div>
@@ -41,6 +42,10 @@ export default defineComponent({
       default: undefined,
     },
     mutated: {
+      type: Boolean,
+      default: false,
+    },
+    infected: {
       type: Boolean,
       default: false,
     },

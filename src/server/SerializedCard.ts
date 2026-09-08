@@ -4,6 +4,8 @@ import {Tag} from '../common/cards/Tag';
 import {OneOrArray} from '../common/utils/types';
 import {JSONValue} from '../common/Types';
 import {AppliedMutation} from '../common/mutationmarkets/AppliedMutation';
+import {AppliedInfection} from '../common/mutationmarkets/AppliedInfection';
+import {PlayerId} from '../common/Types';
 
 export type SerializedCard = {
   allTags?: Array<Tag>; // For Aridor
@@ -17,6 +19,8 @@ export type SerializedCard = {
   resourceCount?: number;
   targetCards?: Array<SerializedRobotCard>;
   mutations?: Array<AppliedMutation>; // For MutationMarkets
+  infections?: Array<AppliedInfection>; // For MutationMarkets (Pandemica)
+  pandemicaLastTargetId?: PlayerId; // For Pandemica
 }
 
 export type SerializedRobotCard = {

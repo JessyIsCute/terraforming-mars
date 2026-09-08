@@ -6,6 +6,7 @@
     <CardRenderData v-if="remainingRows !== undefined" :renderData="remainingRows" />
     <CardDescription v-if="!isCorporation && hasDescription" :item="metadata.description"/>
     <div v-if="mutationText" class="card-description mutation-glow">{{ mutationText }}</div>
+    <div v-if="infectionText" class="card-description infection-glow">{{ infectionText }}</div>
     <div :class="'bottom-padding-' + bottomPadding" v-if="bottomPadding"></div>
   </div>
 </template>
@@ -39,6 +40,10 @@ export default defineComponent({
       type: String, // '', 'short', 'long'
     },
     mutationText: {
+      type: String,
+      required: false,
+    },
+    infectionText: {
       type: String,
       required: false,
     },

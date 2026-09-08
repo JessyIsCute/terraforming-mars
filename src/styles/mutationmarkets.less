@@ -225,3 +225,46 @@
 .mutation-icon-glow {
   animation: mutation-tag-glow 2s ease-in-out infinite;
 }
+
+// The red "infected" glow -- Pandemica's negative counterpart to the green mutated glow
+// above. A card can carry both a mutation and an infection at once (two independent fan
+// mechanics), so these are separate classes rather than a shared one with a color
+// variable, letting both apply to the same card without fighting over one class name.
+@keyframes infection-glow {
+  0%, 100% { color: #7f0000; }
+  50% { color: #ff5252; }
+}
+.infection-glow {
+  animation: infection-glow 2s ease-in-out infinite;
+}
+.infection-cost-glow .card-old-cost {
+  animation: infection-glow 2s ease-in-out infinite;
+}
+// When BOTH a mutation and an infection affect the same card's cost, this compound
+// selector (two classes on one element beats either single-class rule at equal
+// specificity, regardless of source order) gives an explicit answer for which color
+// wins, instead of leaving it to an arbitrary cascade outcome.
+.mutation-cost-glow.infection-cost-glow .card-old-cost {
+  animation: mixed-mutation-infection-glow 2s ease-in-out infinite;
+}
+@keyframes mixed-mutation-infection-glow {
+  0%, 100% { color: #1b5e20; }
+  50% { color: #ff5252; }
+}
+.infection-tag-glow {
+  display: inline-block;
+  animation: infection-tag-glow 2s ease-in-out infinite;
+}
+@keyframes infection-tag-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px #7f0000); }
+  50% { filter: drop-shadow(0 0 6px #ff5252); }
+}
+.infection-icon-glow {
+  animation: infection-tag-glow 2s ease-in-out infinite;
+}
+// Every other tag has a PNG icon asset backing its `.tag-<name>` class -- this one is a
+// CSS-only icon instead (a real asset can replace it later with no other code changes).
+.tag-infected {
+  background-color: #7f0000;
+  background-image: radial-gradient(circle at 35% 30%, #ff5252 0%, #7f0000 60%, #4a0000 100%);
+}

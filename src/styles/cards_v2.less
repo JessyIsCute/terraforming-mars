@@ -2958,6 +2958,29 @@
       border-radius: 14px 2px 2px 2px;
       .raised-bevel();
     }
+    // MutationMarkets: Pandemica's red-glow counterpart to `.mutated-label`, which can
+    // coexist with it on the same card (a card can carry both a mutation and an
+    // infection). Stacked below `.mutated-label` rather than at the same position so
+    // both remain visible/distinguishable at once -- a best-effort layout, not verified
+    // against an actual render.
+    .infected-label {
+      position: absolute;
+      text-transform: uppercase;
+      top: 37px;
+      left: 48px;
+      margin: 0px;
+      width: 64px;
+      height: 20px;
+      line-height: 22px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+      box-shadow: @outline-shadow;
+      background: linear-gradient(-60deg, #7f0000 10%, #ff5252, #7f0000 90%);
+      border-radius: 14px 2px 2px 2px;
+      .raised-bevel();
+    }
   }
   .card-expansion {
     position: absolute;

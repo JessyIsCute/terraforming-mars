@@ -5,7 +5,10 @@ import {SearchIndex} from '@/client/components/cardlist/SearchIndex';
 import {CardResource} from '@/common/CardResource';
 
 export type TypeOption = CardType | 'colonyTiles' | 'globalEvents' | 'milestones' | 'awards' | 'agendas' | 'mutationCards';
-export type TagOption = Tag | 'none';
+// Tag.INFECTED is never printed on a card -- it's only ever added to a specific card
+// instance at runtime by Pandemica's Infection mechanic -- so it would never match
+// anything in this static card-reference list and is excluded as a filter option.
+export type TagOption = Exclude<Tag, Tag.INFECTED> | 'none';
 export type ResourceOption = CardResource | 'none';
 
 export type CardListModel = {

@@ -40,9 +40,11 @@ export default defineComponent({
       type: [Number, Object as () => CardRenderDynamicVictoryPoints],
       default: undefined,
     },
-    // MutationMarkets: extra VP a mutation grants on top of the card's own printed
-    // formula. Folded into the displayed number (not shown as a separate badge) so the
-    // VP shown is always the card's actual current value; glows when non-zero.
+    // MutationMarkets: extra VP a mutation grants and/or an infection penalizes, on top
+    // of the card's own printed formula (the two are summed into one net value if both
+    // apply). Folded into the displayed number (not shown as a separate badge) so the
+    // VP shown is always the card's actual current value; glows green if positive, red
+    // if negative.
     bonus: {
       type: Number,
       default: 0,
@@ -69,6 +71,8 @@ export default defineComponent({
       }
       if (this.bonus > 0) {
         classes.push('mutation-glow');
+      } else if (this.bonus < 0) {
+        classes.push('infection-glow');
       }
       return classes.join(' ');
     },
@@ -103,6 +107,8 @@ export default defineComponent({
       const classes = ['card-points', 'card-points-big'];
       if (this.bonus > 0) {
         classes.push('mutation-glow');
+      } else if (this.bonus < 0) {
+        classes.push('infection-glow');
       }
       return classes.join(' ');
     },

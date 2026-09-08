@@ -30,6 +30,7 @@ import {SelectProjectCardToPlay} from './inputs/SelectProjectCardToPlay';
 import {SelectOption} from './inputs/SelectOption';
 import {SelectAmount} from './inputs/SelectAmount';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
+import {InfectionEffects} from './mutationmarkets/InfectionEffects';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -967,6 +968,7 @@ export class Player implements IPlayer {
     // stripped back out of hand.
     if (selectedCard.type !== CardType.PROXY) {
       MutationMarkets.applyOnPlayEffects(this, selectedCard);
+      InfectionEffects.applyOnPlayEffects(this, selectedCard);
     }
 
     switch (cardAction) {

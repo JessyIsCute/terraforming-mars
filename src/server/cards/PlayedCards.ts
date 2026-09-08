@@ -28,6 +28,7 @@ const NO_TAGS = {
   [Tag.WILD]: 0,
   [Tag.EVENT]: 0,
   [Tag.CLONE]: 0,
+  [Tag.INFECTED]: 0,
 } as const;
 
 /**

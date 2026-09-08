@@ -9,6 +9,7 @@ import {CustomCardModel} from '@/common/models/CardModel';
 import {ICardRenderItem, ICardRenderRoot} from '@/common/cards/render/Types';
 import {CardRenderItemType} from '@/common/cards/render/CardRenderItemType';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
+import {InfectionName} from '@/common/mutationmarkets/InfectionName';
 
 describe('Card', () => {
   let localStorage: FakeLocalStorage;
@@ -58,7 +59,7 @@ describe('Card', () => {
       props: {
         card: {
           name: CardName.ADAPTED_LICHEN,
-          mutationDisplayName: 'Verdant Adapted Lichen',
+          combinedDisplayName: 'Verdant Adapted Lichen',
           mutationNames: [MutationName.GREENERY_KEEPER],
         },
       },
@@ -112,6 +113,59 @@ describe('Card', () => {
     });
     expect(wrapper.find('.mutated-label').exists()).to.be.false;
     expect(wrapper.find('.mutation-glow.card-description').exists()).to.be.false;
+  });
+
+  it('renders an infected card\'s display name, Infected ribbon, glowing red cost, and glowing effect description', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          combinedDisplayName: 'Drained Adapted Lichen',
+          infectionNames: [InfectionName.POWER_DRAIN],
+          infectionHighlight: {},
+        },
+      },
+    });
+    expect(wrapper.text()).to.contain('Drained Adapted Lichen');
+    expect(wrapper.find('.infected-label').exists()).to.be.true;
+    expect(wrapper.find('.mutated-label').exists()).to.be.false;
+    const description = wrapper.find('.infection-glow.card-description');
+    expect(description.exists()).to.be.true;
+    expect(description.text()).to.eq('Lose 2 Energy on play');
+  });
+
+  it('renders red cost glow for an infection with a cost highlight', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          infectionNames: [InfectionName.COST_INFLATION],
+          infectionHighlight: {cost: true},
+        },
+      },
+    });
+    expect(wrapper.find('.infection-cost-glow').exists()).to.be.true;
+  });
+
+  it('renders both Mutated and Infected ribbons, and both description lines, when a card carries both', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          combinedDisplayName: 'Drained Verdant Adapted Lichen',
+          mutationNames: [MutationName.GREENERY_KEEPER],
+          infectionNames: [InfectionName.POWER_DRAIN],
+        },
+      },
+    });
+    expect(wrapper.text()).to.contain('Drained Verdant Adapted Lichen');
+    expect(wrapper.find('.mutated-label').exists()).to.be.true;
+    expect(wrapper.find('.infected-label').exists()).to.be.true;
+    expect(wrapper.find('.mutation-glow.card-description').text()).to.eq('Gain 2 Plants on play');
+    expect(wrapper.find('.infection-glow.card-description').text()).to.eq('Lose 2 Energy on play');
   });
 
   it('throws if a card is neither in the static manifest nor carries customCard fallback data', () => {
