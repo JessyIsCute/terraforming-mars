@@ -14,6 +14,9 @@ import {agendaIdDescription, BONUS_IDS, POLICY_IDS} from '@/common/turmoil/Types
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
 import {describeMutationRequirement, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
+import {InfectionName} from '@/common/mutationmarkets/InfectionName';
+import {INFECTION_DEFINITIONS} from '@/common/mutationmarkets/InfectionDefinitions';
+import {describeInfectionEffect} from '@/common/mutationmarkets/describeInfection';
 
 export class SearchIndex {
   private searchIndex: Map<string, Array<string>>;
@@ -77,6 +80,14 @@ export class SearchIndex {
       this.add(describeMutationRequirement(definition.requirement));
       this.add(describeMutationEffect(definition.effect));
       this.store('mutation', mutationName);
+    }
+
+    for (const infectionName of Object.values(InfectionName)) {
+      const definition = INFECTION_DEFINITIONS[infectionName];
+      this.add(infectionName);
+      this.add(definition.prefix);
+      this.add(describeInfectionEffect(definition.effect));
+      this.store('infection', infectionName);
     }
 
     for (const id of BONUS_IDS) {

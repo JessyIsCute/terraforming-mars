@@ -89,6 +89,33 @@
   display: inline-block;
 }
 
+// Infection's red-tinted counterpart to the green .mutation-market-mutation-slot
+// background -- reuses the same box geometry (padding/radius/min-height/bevel), just a
+// different gradient. Declared after .mutation-market-mutation-slot so it wins the
+// cascade at equal (single-class) specificity.
+.infection-card-standalone {
+  background: linear-gradient(-60deg, #2a1414 10%, #4a1f1f, #2a1414 90%);
+}
+
+.infection-market-mutation-label {
+  position: absolute;
+  text-transform: uppercase;
+  top: 6px;
+  left: 6px;
+  margin: 0;
+  padding: 0 12px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #06180d;
+  box-shadow: @outline-shadow;
+  background: linear-gradient(-60deg, #7f0000 10%, #ff5252, #7f0000 90%);
+  border-radius: 18px 3px 3px 3px;
+  .raised-bevel();
+}
+
 .mutation-market-mutation-label {
   position: absolute;
   text-transform: uppercase;
