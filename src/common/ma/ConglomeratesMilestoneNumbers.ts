@@ -17,7 +17,7 @@ export const CONGLOMERATES_MILESTONE_NUMBERS: Partial<Record<MilestoneName, numb
   'Capitalist96': 96,
   'Coastguard5': 5,
   'Colonizer6': 6,
-  'Diversifier12': 12,
+  'Diversifier10': 10,
   'Ecologist6': 6,
   'Economizer8': 8,
   'Energizer9': 9,

@@ -110,7 +110,7 @@ export const milestoneNames = [
   'Capitalist96',
   'Coastguard5',
   'Colonizer6',
-  'Diversifier12',
+  'Diversifier10',
   'Ecologist6',
   'Economizer8',
   'Energizer9',
