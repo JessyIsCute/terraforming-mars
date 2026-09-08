@@ -256,7 +256,7 @@ describe('Awards', () => {
       },
     });
 
-    expect(wrapper.findAll('[data-test=award-coordination-icon]')).to.have.lengthOf(3);
+    expect(wrapper.findAll('.milestone-award-price--conglomerates')).to.have.lengthOf(3);
   });
 
   it('does not show a Coordination icon when Conglomerates is off', () => {
@@ -268,7 +268,7 @@ describe('Awards', () => {
       },
     });
 
-    expect(wrapper.find('[data-test=award-coordination-icon]').exists()).to.be.false;
+    expect(wrapper.find('.milestone-award-price--conglomerates').exists()).to.be.false;
   });
 
   it('shows award descriptions on click', async () => {

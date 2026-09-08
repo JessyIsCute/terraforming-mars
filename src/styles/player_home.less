@@ -270,21 +270,22 @@ each(@players, {
 
 // A small "+2" badge on the Coordination tag (everyone gets 2 per generation, flat -- not a
 // real per-player adjustable production value, so this is a static label, not wired to
-// player data) -- same floating-badge convention as .player-tag-discount, just bottom-right
-// instead of top-right so the two never collide.
+// player data). Sits INSIDE the tag icon's own bottom-right corner (no negative offsets) so
+// it can never overflow past the tag bar's edge and get clipped -- the tag bar packs icons
+// tightly with no spare margin, unlike the wider card/milestone contexts.
 .coordination-production-box {
   position: absolute;
-  bottom: -4px;
-  right: -6px;
+  bottom: 0;
+  right: 0;
   z-index: 10;
   background: #1f4682;
   color: white;
   border: 1px solid black;
-  border-radius: 8px;
-  padding: 0px 3px;
-  font-size: 10px;
+  border-radius: 4px 0 0 0;
+  padding: 0px 2px;
+  font-size: 9px;
   font-weight: bold;
-  line-height: 14px;
+  line-height: 12px;
 }
 
 .player-board-blue-action-counter{
@@ -655,6 +656,7 @@ each(@players, {
   margin-top: -3px;
   margin-left: 70px;
   transform: scale(0.8);
+  position: relative;
 
   font-family: Prototype, sans-serif;
   color: black;
@@ -663,41 +665,20 @@ each(@players, {
   text-align: center;
 }
 
-// Conglomerates: claiming a milestone or funding an award also grants 1 Coordination --
-// shown as "price -> handshake icon" right after the price badge, in the leftover room of
-// the same pill (.milestone-award-inline is 190px wide; the price badge only uses ~100px).
-.milestone-award-arrow {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 2px;
-  font-size: 16px;
-  color: black;
-}
-.milestone-award-coordination {
-  display: inline-block;
-  vertical-align: middle;
-  width: 20px;
-  height: 20px;
-  box-sizing: border-box;
-  border: 1px solid black;
-  background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 2px;
-    background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
-  }
-
-  &::before {
-    content: "🤝";
-    position: relative;
-    z-index: 1;
-    font-size: 11px;
-    line-height: 20px;
-  }
+// Conglomerates: claiming a milestone or funding an award also grants 1 Coordination -- shown
+// as "price -> handshake" right after the price badge, via an absolutely-positioned ::after
+// so it can never affect the pill's own inline layout/flow (a sibling element here previously
+// forced the price row onto its own line, separate from the Milestones/Awards title above it).
+.milestone-award-price--conglomerates::after {
+  content: "\2192 \1F91D";
+  position: absolute;
+  left: 34px;
+  top: 0;
+  width: 60px;
+  font-size: 14px;
+  line-height: 30px;
+  white-space: nowrap;
+  text-align: left;
 }
 
 .player_home_block--setup {
