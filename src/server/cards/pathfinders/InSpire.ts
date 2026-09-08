@@ -79,16 +79,18 @@ export class InSpire extends CorporationCard implements ICorporationCard {
             ce.vSpace(Size.LARGE);
             ce.br;
             ce.tag(Tag.BUILDING, {size: Size.SMALL}).colon().steel(1, {size: Size.SMALL}).slash(Size.SMALL)
-              .tag(Tag.SPACE, {size: Size.SMALL}).colon().titanium(1, {size: Size.SMALL}).slash(Size.SMALL)
-              .tag(Tag.POWER, {size: Size.SMALL}).colon().energy(1, {size: Size.SMALL});
+              .tag(Tag.SPACE, {size: Size.SMALL}).colon().titanium(1, {size: Size.SMALL});
             ce.br;
-            ce.tag(Tag.PLANT, {size: Size.SMALL}).colon().plants(1, {size: Size.SMALL}).slash(Size.SMALL)
-              .tag(Tag.MICROBE, {size: Size.SMALL}).colon().resource(CardResource.MICROBE, {size: Size.SMALL}).slash(Size.SMALL)
+            ce.tag(Tag.POWER, {size: Size.SMALL}).colon().energy(1, {size: Size.SMALL}).slash(Size.SMALL)
+              .tag(Tag.PLANT, {size: Size.SMALL}).colon().plants(1, {size: Size.SMALL});
+            ce.br;
+            ce.tag(Tag.MICROBE, {size: Size.SMALL}).colon().resource(CardResource.MICROBE, {size: Size.SMALL}).slash(Size.SMALL)
               .tag(Tag.ANIMAL, {size: Size.SMALL}).colon().resource(CardResource.ANIMAL, {size: Size.SMALL});
             ce.br;
             ce.tag(Tag.SCIENCE, {size: Size.SMALL}).colon().megacredits(1, {size: Size.SMALL}).slash(Size.SMALL)
-              .tag(Tag.MARS, {size: Size.SMALL}).colon().resource(CardResource.DATA, {size: Size.SMALL}).slash(Size.SMALL)
-              .tag(Tag.JOVIAN, {size: Size.SMALL}).nbsp.or().nbsp.tag(Tag.VENUS, {size: Size.SMALL}).colon().resource(CardResource.FLOATER, {size: Size.SMALL});
+              .tag(Tag.MARS, {size: Size.SMALL}).colon().resource(CardResource.DATA, {size: Size.SMALL});
+            ce.br;
+            ce.tag(Tag.JOVIAN, {size: Size.SMALL}).nbsp.or().nbsp.tag(Tag.VENUS, {size: Size.SMALL}).colon().resource(CardResource.FLOATER, {size: Size.SMALL});
           });
         }),
       },
