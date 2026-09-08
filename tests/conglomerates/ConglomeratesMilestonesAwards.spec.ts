@@ -69,6 +69,27 @@ describe('Conglomerates milestones and awards', () => {
       expect(variant.getScore(player1)).to.eq(player1.terraformRating);
     });
 
+    it('Generalist2 requires the team\'s combined production to reach 2 of each resource', () => {
+      const variant = milestoneManifest.createOrThrow('Generalist2');
+
+      // player1 alone has 1 of everything -- not enough per-resource on its own.
+      for (const resource of [Resource.MEGACREDITS, Resource.STEEL, Resource.TITANIUM, Resource.PLANTS, Resource.ENERGY, Resource.HEAT]) {
+        player1.production.add(resource, 1);
+      }
+      expect(variant.getScore(player1)).to.eq(0);
+      expect(variant.canClaim(player1)).is.false;
+
+      // player3 (teammate) makes up the other 1 of each -- combined team production hits 2.
+      for (const resource of [Resource.MEGACREDITS, Resource.STEEL, Resource.TITANIUM, Resource.PLANTS, Resource.ENERGY, Resource.HEAT]) {
+        player3.production.add(resource, 1);
+      }
+      expect(variant.getScore(player1)).to.eq(6);
+      expect(variant.canClaim(player1)).is.true;
+
+      // player2 (other team) does not count toward player1's team.
+      expect(variant.canClaim(player2)).is.false;
+    });
+
     it('gives the claimer 1 Coordination when actually claimed', () => {
       player1.conglomeratesData.coordination = 5;
       player1.megaCredits = 20;

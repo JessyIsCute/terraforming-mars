@@ -226,6 +226,15 @@ describe('MilestoneAwardSelector', () => {
       expect(mas.milestones).to.contain('Minimalist');
     });
 
+    it('swaps Generalist (Elysium) for its redefined team variant, not a 1.5x scale', () => {
+      const mas = choose({
+        boardName: BoardName.ELYSIUM,
+        randomMA: RandomMAOptionType.NONE,
+        conglomeratesExpansion: true,
+      });
+      expect(mas.milestones).to.contain('Generalist2');
+    });
+
     it('never offers a Conglomerates milestone variant as a random candidate', () => {
       const [milestones] = getCandidates({
         ...DEFAULT_GAME_OPTIONS,

@@ -71,20 +71,22 @@ import {Trader} from './modular/Trader';
 import {Tactician4} from './modular/Tactician4';
 import {Briber} from './Briber';
 import {conglomeratesVariant} from './conglomerates/ConglomeratesMilestoneVariant';
+import {GeneralistConglomerates} from './conglomerates/GeneralistConglomerates';
 
 /**
- * Maps each board milestone to its Conglomerates-scaled sibling (1.5x threshold, rounded up),
- * swapped in for the board's slot only when the Conglomerates expansion is on -- see
- * MilestoneAwardSelector.ts. Deliberately absent, each for its own reason (same documented-gap
- * treatment as Merchant/Briber elsewhere in this module):
+ * Maps each board milestone to its Conglomerates-scaled sibling (1.5x threshold, rounded up,
+ * unless otherwise noted), swapped in for the board's slot only when the Conglomerates
+ * expansion is on -- see MilestoneAwardSelector.ts. Deliberately absent:
  *  - `Minimalist` (Amazonis): a maximum (not minimum) threshold -- scaling it up would make it
- *    easier, not harder.
- *  - `Generalist` (Elysium): its score is a 0-6 count of "productions increased at all," hard
- *    capped at 6 by the number of production types that exist -- a scaled threshold above 6
- *    could never be met by anyone.
- *  - `Planetologist` (Terra Cimmeria Nova): same issue -- its score is explicitly clamped to a
- *    maximum of 6 in `getScore` (2 Earth + 2 Venus + 2 Jovian tags, capped), so a threshold
- *    above 6 is unreachable.
+ *    easier, not harder. Same documented-gap treatment as Merchant/Briber elsewhere in this
+ *    module.
+ *  - `Planetologist` (Terra Cimmeria Nova): its score is explicitly clamped to a maximum of 6
+ *    in `getScore` (2 Earth + 2 Venus + 2 Jovian tags, capped), so a threshold above 6 would be
+ *    unreachable by anyone.
+ * `Generalist` (Elysium) is present, but NOT a 1.5x scale of the original -- its base score is
+ * a 0-6 count of "productions increased at all," also hard-capped at 6, so it's redefined
+ * instead (see GeneralistConglomerates): your team's COMBINED production of each of the 6
+ * resources must be at least 2.
  */
 export const CONGLOMERATES_MILESTONE_MAP: Partial<Record<MilestoneName, MilestoneName>> = {
   'Agronomist': 'Agronomist6',
@@ -105,6 +107,7 @@ export const CONGLOMERATES_MILESTONE_MAP: Partial<Record<MilestoneName, Mileston
   'Fundraiser': 'Fundraiser18',
   'Gambler': 'Gambler3',
   'Gardener': 'Gardener5',
+  'Generalist': 'Generalist2',
   'Geologist': 'Geologist5',
   'Irrigator': 'Irrigator6',
   'Land Specialist': 'Land Specialist5',
@@ -226,6 +229,7 @@ export const milestoneManifest: MAManifest<MilestoneName, IMilestone> = {
     'Fundraiser18': {Factory: conglomeratesVariant('Fundraiser18', 'Have 18 M€ production', () => new Fundraiser()), compatibility: 'conglomerates'},
     'Gambler3': {Factory: conglomeratesVariant('Gambler3', 'Fund 3 awards', () => new Gambler()), compatibility: 'conglomerates'},
     'Gardener5': {Factory: conglomeratesVariant('Gardener5', 'Own 5 greenery tiles', () => new Gardener()), compatibility: 'conglomerates'},
+    'Generalist2': {Factory: GeneralistConglomerates, compatibility: 'conglomerates'},
     'Geologist5': {Factory: conglomeratesVariant('Geologist5', 'Own 5 tiles ON or ADJACENT to volcanic areas', () => new Geologist()), compatibility: 'conglomerates'},
     'Irrigator6': {Factory: conglomeratesVariant('Irrigator6', 'Own 6 tiles adjacent to oceans', () => new Irrigator()), compatibility: 'conglomerates'},
     'Land Specialist5': {Factory: conglomeratesVariant('Land Specialist5', 'Own 5 special (normally, brown) tiles', () => new LandSpecialist()), compatibility: 'conglomerates'},

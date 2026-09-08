@@ -121,6 +121,7 @@ export const milestoneNames = [
   'Fundraiser18',
   'Gambler3',
   'Gardener5',
+  'Generalist2',
   'Geologist5',
   'Irrigator6',
   'Land Specialist5',
