@@ -148,6 +148,25 @@
           <button type="button" class="map-editor-play" @click="play" v-i18n>Play with this map</button>
         </div>
         <div v-if="loadError" class="map-editor-error">{{ loadError }}</div>
+
+        <fieldset class="map-editor-submit">
+          <legend v-i18n>Submit to the Map Library</legend>
+          <label class="map-editor-field">
+            <span v-i18n>Description</span>
+            <textarea rows="2" v-model="submitDescription" :maxlength="MAX_MAP_LIBRARY_DESCRIPTION_LENGTH"></textarea>
+          </label>
+          <label class="map-editor-field">
+            <span v-i18n>Submitted by</span>
+            <input type="text" v-model="submitSubmittedBy" :maxlength="MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH">
+          </label>
+          <div v-if="submitError" class="map-editor-error">{{ submitError }}</div>
+          <div v-if="submitSuccess" class="map-editor-submit-success" v-i18n>
+            Submitted! It'll show up in the Map Library once an admin approves it.
+          </div>
+          <button type="button" class="btn btn-primary" :disabled="submitting" @click="submitMap" v-i18n>
+            Submit map
+          </button>
+        </fieldset>
       </div>
     </div>
 
@@ -190,6 +209,7 @@ import {
   hexRowLayout,
 } from '@/common/boards/CustomBoardDefinition';
 import {decodeCustomBoard, encodeCustomBoard, validateCustomBoard} from '@/common/boards/customBoardCodec';
+import {MAX_MAP_LIBRARY_DESCRIPTION_LENGTH, MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH} from '@/common/boards/MapLibraryEntry';
 import {paths} from '@/common/app/paths';
 import {HELLAS_BONUS_OCEAN_COST, VASTITAS_BOREALIS_BONUS_TEMPERATURE_COST, TERRA_CIMMERIA_COLONY_COST} from '@/common/constants';
 import {groupSpaceBonuses, GroupedSpaceBonus} from '@/client/utils/spaceBonusIcon';
@@ -297,10 +317,17 @@ export default defineComponent({
       bonusCostColony: TERRA_CIMMERIA_COLONY_COST,
       loadInput: '',
       loadError: '',
+      submitDescription: '',
+      submitSubmittedBy: '',
+      submitting: false,
+      submitError: '',
+      submitSuccess: false,
       expansions: DEFAULT_EXPANSIONS,
       MAX_CUSTOM_NAME_LENGTH,
       MAX_CUSTOM_ROWS,
       MIN_CUSTOM_ROWS,
+      MAX_MAP_LIBRARY_DESCRIPTION_LENGTH,
+      MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH,
       terrainTools: TERRAIN_TOOLS,
       markerTools: MARKER_TOOLS,
       bonusTools: BONUS_TOOLS,
@@ -563,6 +590,40 @@ export default defineComponent({
       }
       window.location.href = `${paths.NEW_GAME}?customBoard=1`;
     },
+    // Posts the editor's own live code straight to the library -- unlike MapSubmitForm.vue's
+    // paste-a-code path (for someone submitting a code they got from elsewhere), the editor
+    // already has the definition in memory, so there's no reason to make its own author
+    // copy/paste it into a second form.
+    async submitMap(): Promise<void> {
+      this.submitting = true;
+      this.submitError = '';
+      this.submitSuccess = false;
+      try {
+        const response = await fetch(paths.API_MAP_LIBRARY, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            code: this.code,
+            description: this.submitDescription,
+            submittedBy: this.submitSubmittedBy,
+          }),
+        });
+        if (response.status === 429) {
+          this.submitError = 'You are submitting maps too quickly. Try again later.';
+          return;
+        }
+        if (!response.ok) {
+          const body = await response.text();
+          this.submitError = body || 'That map could not be submitted.';
+          return;
+        }
+        this.submitSuccess = true;
+      } catch (e) {
+        this.submitError = 'Error submitting that map.';
+      } finally {
+        this.submitting = false;
+      }
+    },
   },
 });
 
@@ -804,6 +865,14 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
   }
 
   .map-editor-error { color: #e74c3c; margin-top: 6px; }
+
+  .map-editor-submit {
+    margin-top: 12px;
+    .map-editor-field { align-items: flex-start; }
+    textarea { flex: 1; font-family: inherit; }
+    button { margin-top: 6px; }
+  }
+  .map-editor-submit-success { color: #6c6; font-size: 12px; }
 
   .map-editor-preview {
     margin-top: 24px;

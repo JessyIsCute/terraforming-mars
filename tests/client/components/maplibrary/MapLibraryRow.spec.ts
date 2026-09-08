@@ -155,6 +155,16 @@ describe('MapLibraryRow', () => {
     expect(window.localStorage.getItem('customBoardCode')).eq('sentinel-should-not-change');
   });
 
+  it('hides all action buttons in previewOnly mode, admin or not', () => {
+    const wrapper = mount(MapLibraryRow, {...globalConfig, props: {entry: fanmadeEntry(), isAdmin: true, previewOnly: true}});
+    expect(wrapper.find('.map-card-actions').exists()).is.false;
+    expect(wrapper.text()).to.not.contain('Play this map');
+    expect(wrapper.text()).to.not.contain('Open in editor');
+    expect(wrapper.text()).to.not.contain('Copy code');
+    expect(wrapper.text()).to.not.contain('Approve');
+    expect(wrapper.text()).to.not.contain('Delete');
+  });
+
   it('opening any map in the editor stashes its code and navigates to map-editor?loadCode=1, regardless of origin', async () => {
     const location = stubLocation();
     const entry = fanmadeEntry({code: encodeCustomBoard(blankCustomBoard(9, 'Open Me'))});

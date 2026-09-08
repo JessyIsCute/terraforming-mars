@@ -6,14 +6,10 @@
     </label>
     <div v-if="codeError" class="map-submit-error">{{ codeError }}</div>
     <template v-else-if="decoded !== undefined">
-      <div class="map-submit-preview">
-        <MapThumbnail :definition="decoded"/>
-        <div>
-          <strong>{{ decoded.name }}</strong>
-          <div v-if="warnings.length" class="map-submit-warnings">
-            <div v-for="(w, i) in warnings" :key="i">⚠ {{ w }}</div>
-          </div>
-        </div>
+      <div class="map-submit-preview-label" v-i18n>This is how it'll look in the Map Library:</div>
+      <MapLibraryRow :entry="previewEntry" :is-admin="false" :preview-only="true"/>
+      <div v-if="warnings.length" class="map-submit-warnings">
+        <div v-for="(w, i) in warnings" :key="i">⚠ {{ w }}</div>
       </div>
     </template>
 
@@ -35,7 +31,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import MapThumbnail from '@/client/components/maplibrary/MapThumbnail.vue';
+import MapLibraryRow from '@/client/components/maplibrary/MapLibraryRow.vue';
 import {CustomBoardDefinition} from '@/common/boards/CustomBoardDefinition';
 import {decodeCustomBoard, validateCustomBoard} from '@/common/boards/customBoardCodec';
 import {MAX_MAP_LIBRARY_DESCRIPTION_LENGTH, MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH, MapLibraryEntry} from '@/common/boards/MapLibraryEntry';
@@ -53,7 +49,7 @@ type DataModel = {
 
 export default defineComponent({
   name: 'MapSubmitForm',
-  components: {MapThumbnail},
+  components: {MapLibraryRow},
   emits: ['submitted'],
   data(): DataModel {
     return {
@@ -71,6 +67,20 @@ export default defineComponent({
     MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH: () => MAX_MAP_LIBRARY_SUBMITTED_BY_LENGTH,
     warnings(): Array<string> {
       return this.decoded === undefined ? [] : validateCustomBoard(this.decoded);
+    },
+    // Not a real library row -- there's no id yet, and it isn't approved -- but it round-trips
+    // through the same MapLibraryRow used on the real list, so this preview can never drift from
+    // what the entry will actually look like once submitted.
+    previewEntry(): MapLibraryEntry {
+      return {
+        id: 'm-preview',
+        code: this.codeInput.trim(),
+        description: this.description,
+        submittedBy: this.submittedBy,
+        origin: 'fanmade',
+        status: 'submitted',
+        createdAt: Date.now(),
+      };
     },
   },
   methods: {
@@ -136,7 +146,8 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 480px;
+  // Wide enough for MapLibraryRow's real (non-large) 500px-wide card preview plus its padding.
+  max-width: 560px;
   color: #ddd;
 }
 .map-submit-field {
@@ -149,9 +160,8 @@ export default defineComponent({
 }
 .map-submit-error { color: #e74c3c; font-size: 12px; }
 .map-submit-warnings { color: #f1c40f; font-size: 11px; }
-.map-submit-preview {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
+.map-submit-preview-label {
+  font-size: 12px;
+  color: #999;
 }
 </style>

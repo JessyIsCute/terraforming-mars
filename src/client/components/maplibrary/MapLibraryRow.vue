@@ -16,7 +16,7 @@
         <span v-i18n>Submitted by</span>: {{ entry.submittedBy }}
       </p>
 
-      <div class="map-card-actions">
+      <div v-if="!previewOnly" class="map-card-actions">
         <button type="button" class="btn btn-primary" @click="play" v-i18n>Play this map</button>
         <button type="button" class="btn" @click="openInEditor" v-i18n>Open in editor</button>
         <button type="button" class="btn" @click="copyCode" v-i18n>{{ copyButtonLabel }}</button>
@@ -61,6 +61,10 @@ export default defineComponent({
     isAdmin: {type: Boolean, default: false},
     // MapLibrary.vue's "List" layout -- render a notably bigger thumbnail.
     large: {type: Boolean, default: false},
+    // MapSubmitForm.vue's "here's how it'll look" preview: this entry isn't real yet (no id,
+    // not actually submitted), so Play/Open in editor/Copy code/Approve/Delete would all be
+    // either meaningless or, worse, a way to accidentally navigate away mid-submission.
+    previewOnly: {type: Boolean, default: false},
   },
   emits: ['approve', 'delete'],
   data(): DataModel {
