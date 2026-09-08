@@ -60,14 +60,14 @@ describe('Pandemica', () => {
 
     const target = selectCard.cards[0];
     const orOptions = cast(selectCard.cb([target]), OrOptions);
-    expect(orOptions.options).to.have.length(3); // one per InfectionName
+    expect(orOptions.options).to.have.length(Object.values(InfectionName).length);
 
     orOptions.options[0].cb(undefined);
 
     expect(target.infections).to.have.length(1);
   });
 
-  it('offers the 3 infections in InfectionName enum order, applying the chosen one', () => {
+  it('offers every infection in InfectionName enum order, applying the chosen one', () => {
     player.underworldData.corruption = 1;
     const targetCard = fakeCard({cost: 10, baseCost: 10});
     player2.cardsInHand = [targetCard];

@@ -69,6 +69,11 @@ describe('InfectionEffects', () => {
       expect(InfectionEffects.namePrefixes([InfectionName.COST_INFLATION, InfectionName.VALUE_SIPHON])).to.deep.eq(['Overpriced', 'Siphoned']);
     });
 
+    it('has a distinct prefix for every infection, including the resource-drain set', () => {
+      const prefixes = InfectionEffects.namePrefixes(Object.values(InfectionName));
+      expect(new Set(prefixes).size).to.eq(Object.values(InfectionName).length);
+    });
+
     it('returns an empty array for no infections', () => {
       expect(InfectionEffects.namePrefixes([])).to.deep.eq([]);
     });
@@ -128,6 +133,20 @@ describe('InfectionEffects', () => {
       InfectionEffects.applyOnPlayEffects(player, card);
       expect(player.megaCredits).to.eq(10);
     });
+
+    for (const {infection, field, amount} of [
+      {infection: InfectionName.PLANT_ROT, field: 'plants' as const, amount: 2},
+      {infection: InfectionName.STEEL_RUST, field: 'steel' as const, amount: 2},
+      {infection: InfectionName.TITANIUM_CORROSION, field: 'titanium' as const, amount: 1},
+      {infection: InfectionName.HEAT_LOSS, field: 'heat' as const, amount: 2},
+    ]) {
+      it(`${infection} drains ${amount} ${field} on play`, () => {
+        player[field] = 5;
+        const card = fakeCard({infections: [{infection}]});
+        InfectionEffects.applyOnPlayEffects(player, card);
+        expect(player[field]).to.eq(5 - amount);
+      });
+    }
   });
 
   describe('apply', () => {
