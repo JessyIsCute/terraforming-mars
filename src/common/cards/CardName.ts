@@ -1240,4 +1240,5 @@ export enum CardName {
 
   // MutationMarkets Corporations
   BLACKLAB_CARTEL = 'Blacklab Cartel',
+  HELIX_CONFERENCE = 'Helix Conference',
 }
