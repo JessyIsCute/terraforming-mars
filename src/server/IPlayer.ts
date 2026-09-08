@@ -93,6 +93,9 @@ export interface IPlayer {
 
   // Helion
   canUseHeatAsMegaCredits: boolean;
+  // Sistemas Seebeck (fan): set right before an action resolves to mark it as free -
+  // takeAction() checks and clears this instead of incrementing actionsTakenThisRound.
+  skipNextActionIncrement: boolean;
   // Luna Trade Federation
   canUseTitaniumAsMegacredits: boolean;
   // Martian Lumber Corp

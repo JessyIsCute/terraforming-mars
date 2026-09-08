@@ -13,6 +13,8 @@ import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
 import {cast} from '../../../src/common/utils/utils';
 import {Payment} from '../../../src/common/inputs/Payment';
 import {LandClaim} from '../../../src/server/cards/base/LandClaim';
+import {OrOptions} from '../../../src/server/inputs/OrOptions';
+import {SelectOption} from '../../../src/server/inputs/SelectOption';
 
 describe('SistemasSeebeck', () => {
   let card: SistemasSeebeck;
@@ -210,5 +212,96 @@ describe('SistemasSeebeck', () => {
 
     const landClaim = new LandClaim();
     expect(() => player.checkPaymentAndPlayCard(landClaim, Payment.of({heat: 1}))).to.throw();
+  });
+
+  describe('free energy/heat conversion', () => {
+    it('is unavailable without the card', () => {
+      player.heat = 5;
+      player.energy = 5;
+      player.production.override({heat: 5, energy: 5});
+      expect(SistemasSeebeck.buildFreeConvertAction(player)).is.undefined;
+    });
+
+    it('is unavailable with nothing to convert', () => {
+      player.playedCards.push(card);
+      player.heat = 0;
+      player.energy = 0;
+      player.production.override({heat: 0, energy: 0});
+      expect(SistemasSeebeck.buildFreeConvertAction(player)).is.undefined;
+    });
+
+    it('only offers the directions that actually have something to convert', () => {
+      player.playedCards.push(card);
+      player.heat = 3;
+      player.energy = 0;
+      player.production.override({heat: 0, energy: 0});
+
+      const menu = cast(SistemasSeebeck.buildFreeConvertAction(player), OrOptions);
+      expect(menu.options).has.lengthOf(1);
+      expect(menu.options[0].title.toString()).to.include('heat to energy');
+    });
+
+    it('converts stock 1:1', () => {
+      player.playedCards.push(card);
+      player.heat = 3;
+      player.energy = 1;
+
+      const menu = cast(SistemasSeebeck.buildFreeConvertAction(player), OrOptions);
+      const heatToEnergy = cast(
+        menu.options.find((o) => (o as SelectOption).title.toString().includes('heat to energy')),
+        SelectOption);
+      const amountInput = cast(heatToEnergy.cb(undefined), SelectAmount);
+      expect(amountInput.min).eq(1);
+      expect(amountInput.max).eq(3);
+
+      amountInput.cb(2);
+
+      expect(player.heat).eq(1);
+      expect(player.energy).eq(3);
+    });
+
+    it('converts production 1:1 without triggering the redistribution prompt', () => {
+      player.playedCards.push(card);
+      player.production.override({heat: 3, energy: 1});
+
+      const menu = cast(SistemasSeebeck.buildFreeConvertAction(player), OrOptions);
+      const heatToEnergy = cast(
+        menu.options.find((o) => (o as SelectOption).title.toString().includes('heat production to energy production')),
+        SelectOption);
+      const amountInput = cast(heatToEnergy.cb(undefined), SelectAmount);
+
+      amountInput.cb(2);
+      runAllActions(game);
+
+      expect(player.popWaitingFor()).is.undefined; // no redistribution choice offered
+      expect(player.production.heat).eq(1);
+      expect(player.production.energy).eq(3);
+    });
+
+    it('does not consume the turn\'s action', () => {
+      player.playedCards.push(card);
+      player.heat = 3;
+      player.energy = 0;
+      player.megaCredits = 200;
+      expect(player.actionsTakenThisRound).eq(0);
+
+      player.takeAction();
+      const [topLevel, topLevelCb] = player.popWaitingFor2();
+      const menu = cast(topLevel, OrOptions);
+      const seebeckMenu = cast(
+        menu.options.find((o) => o instanceof OrOptions && o.title.toString().includes('Sistemas Seebeck')),
+        OrOptions);
+      const heatToEnergy = cast(
+        seebeckMenu.options.find((o) => (o as SelectOption).title.toString().includes('heat to energy')),
+        SelectOption);
+
+      const amountInput = cast(heatToEnergy.cb(undefined), SelectAmount);
+      amountInput.cb(2);
+      topLevelCb?.();
+
+      expect(player.actionsTakenThisRound).eq(0);
+      expect(player.heat).eq(1);
+      expect(player.energy).eq(2);
+    });
   });
 });

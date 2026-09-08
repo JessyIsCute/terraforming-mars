@@ -8,6 +8,10 @@ import {CardRenderer} from '../render/CardRenderer';
 import {DrawCards} from '../../deferredActions/DrawCards';
 import {Behavior} from '../../behavior/Behavior';
 import {Size} from '../../../common/cards/render/Size';
+import {Resource} from '../../../common/Resource';
+import {OrOptions} from '../../inputs/OrOptions';
+import {SelectOption} from '../../inputs/SelectOption';
+import {SelectAmount} from '../../inputs/SelectAmount';
 
 /** Whether a card's declarative behavior spends energy or heat - used by Sistemas
  * Seebeck's initial draw filter. Cards that merely grant energy or heat (production or
@@ -48,5 +52,60 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
       include: (card) => usesEnergyOrHeat(card.behavior),
     }));
     return undefined;
+  }
+
+  /** A free conversion (energy<->heat, stock and production) offered directly in
+   * Player.getActions() alongside Convert Plants/Convert Heat - unlike those, using it
+   * does not consume one of the player's actions for the turn (see
+   * Player.skipNextActionIncrement). Returns undefined if the player doesn't have this
+   * corporation, or has nothing convertible right now. */
+  public static buildFreeConvertAction(player: IPlayer): PlayerInput | undefined {
+    if (!player.tableau.has(CardName.SISTEMAS_SEEBECK)) {
+      return undefined;
+    }
+
+    const options: Array<SelectOption> = [];
+
+    const addStockOption = (from: typeof Resource.ENERGY | typeof Resource.HEAT, to: typeof Resource.ENERGY | typeof Resource.HEAT) => {
+      const available = player.stock.get(from);
+      if (available <= 0) {
+        return;
+      }
+      options.push(new SelectOption(`Convert ${from} to ${to}`, 'Convert').andThen(() => {
+        return new SelectAmount(`Select amount of ${from} to convert to ${to}`, 'Convert', 1, available)
+          .andThen((amount) => {
+            player.stock.deduct(from, amount);
+            player.stock.add(to, amount, {log: true});
+            player.skipNextActionIncrement = true;
+            return undefined;
+          });
+      }));
+    };
+
+    const addProductionOption = (from: typeof Resource.ENERGY | typeof Resource.HEAT, to: typeof Resource.ENERGY | typeof Resource.HEAT) => {
+      const available = player.production.get(from);
+      if (available <= 0) {
+        return;
+      }
+      options.push(new SelectOption(`Convert ${from} production to ${to} production`, 'Convert').andThen(() => {
+        return new SelectAmount(`Select amount of ${from} production to convert to ${to} production`, 'Convert', 1, available)
+          .andThen((amount) => {
+            player.production.add(from, -amount, {log: true, skipSeebeckRedistribution: true});
+            player.production.add(to, amount, {log: true});
+            player.skipNextActionIncrement = true;
+            return undefined;
+          });
+      }));
+    };
+
+    addStockOption(Resource.HEAT, Resource.ENERGY);
+    addStockOption(Resource.ENERGY, Resource.HEAT);
+    addProductionOption(Resource.HEAT, Resource.ENERGY);
+    addProductionOption(Resource.ENERGY, Resource.HEAT);
+
+    if (options.length === 0) {
+      return undefined;
+    }
+    return new OrOptions(...options).setTitle('Sistemas Seebeck: convert energy/heat (does not use your action)');
   }
 }

@@ -45,6 +45,7 @@ import {IStandardProjectCard} from './cards/IStandardProjectCard';
 import {ConvertPlants} from './cards/base/standardActions/ConvertPlants';
 import {ConvertHeat} from './cards/base/standardActions/ConvertHeat';
 import {KELVINISTS_POLICY_3} from './turmoil/parties/Kelvinists';
+import {SistemasSeebeck} from './cards/pathfinders/SistemasSeebeck';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {LogHelper} from './LogHelper';
 import {UndoActionOption} from './inputs/UndoActionOption';
@@ -121,6 +122,8 @@ export class Player implements IPlayer {
   private steelValue: number = 2;
   // Helion
   public canUseHeatAsMegaCredits: boolean = false;
+  // Sistemas Seebeck (fan): see IPlayer.skipNextActionIncrement.
+  public skipNextActionIncrement: boolean = false;
   // Martian Lumber Corp
   public canUsePlantsAsMegacredits: boolean = false;
   // Luna Trade Federation
@@ -1675,7 +1678,12 @@ export class Player implements IPlayer {
     }
 
     this.setWaitingFor(this.getActions(), this.runWhenEmpty(() => {
-      this.incrementActionsTaken();
+      // Sistemas Seebeck (fan): a free conversion sets this instead of consuming an action.
+      if (this.skipNextActionIncrement) {
+        this.skipNextActionIncrement = false;
+      } else {
+        this.incrementActionsTaken();
+      }
       this.takeAction();
     }));
   }
@@ -1726,6 +1734,12 @@ export class Player implements IPlayer {
         }
         action.options.push(option);
       }
+    }
+
+    // Sistemas Seebeck (fan): a free energy<->heat conversion - see SistemasSeebeck.buildFreeConvertAction.
+    const seebeckConvert = SistemasSeebeck.buildFreeConvertAction(this);
+    if (seebeckConvert !== undefined) {
+      action.options.push(seebeckConvert);
     }
 
     // Turmoil
