@@ -2,7 +2,6 @@
   display: flex;
   flex-flow: row;
   white-space: nowrap;
-  filter: grayscale(0.3);
   border-radius: 8px;
   border: 2px solid transparent;
   padding: 2px;
@@ -71,6 +70,10 @@ each(@players, {
   height: 36px;
   display: inline-block;
   background-size: contain;
+  // Moved here from .resource_items_cont (the whole bar) so .resource_icon--coordination can
+  // opt back out below -- a filter on an ancestor rasterizes/desaturates its whole subtree,
+  // which a descendant's own `filter: none` can't undo, only a filter on the SAME element can.
+  filter: grayscale(0.3);
 }
 
 .resource_icon--rating {
@@ -119,8 +122,12 @@ each(@resource_types, {
   background-image: url(./assets/underworld/corruption.png);
 }
 // Conglomerates: no art asset, so CSS-only -- same blue-box/handshake styling as the
-// Coordination icon used elsewhere (card renders, the tag overview).
+// Coordination icon used elsewhere (card renders, the tag overview). The bevel relies on two
+// similar blues for contrast, which the bar's usual grayscale filter (see .resource_icon
+// above) crushes almost flat -- opt back out of it here since none of the other icons'
+// contrast depends on their own saturation the way this CSS-only one does.
 .resource_icon--coordination {
+  filter: none;
   background-image: none;
   background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
   border: 1px solid black;
