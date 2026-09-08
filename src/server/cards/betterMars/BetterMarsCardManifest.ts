@@ -19,17 +19,22 @@ import {MartianMediaCenterBetterMars} from './MartianMediaCenterBetterMars';
 import {MeatIndustryBetterMars} from './MeatIndustryBetterMars';
 import {LunarMiningBetterMars} from './LunarMiningBetterMars';
 import {LunaGovernorBetterMars} from './LunaGovernorBetterMars';
+import {PlanetPr} from '../pathfinders/PlanetPr';
 
 /**
  * BetterMars: replaces a handful of official cards with tag-variant reworks
  * (an extra Mars tag, an Earth tag turned into a Moon tag, an Animal tag added
  * to a meat-industry card, etc). The base cards are
  * swapped out via `cardsToRemove` whenever this module is enabled.
+ *
+ * Planet PR is the one exception - it's not a rework of an existing card, just bundled
+ * into this module's corporationCards (still requiring Pathfinders, via `compatibility`).
  */
 export const BETTER_MARS_CARD_MANIFEST = new ModuleManifest({
   module: 'betterMars',
   corporationCards: {
     [CardName.PRISTAR_BETTER_MARS]: {Factory: PristarBetterMars, compatibility: 'turmoil'},
+    [CardName.PLANET_PR]: {Factory: PlanetPr, compatibility: 'pathfinders'},
   },
   preludeCards: {
     [CardName.EARLY_SETTLEMENT_BETTER_MARS]: {Factory: EarlySettlementBetterMars, compatibility: 'prelude'},
