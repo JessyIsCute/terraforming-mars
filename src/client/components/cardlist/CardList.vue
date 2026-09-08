@@ -501,7 +501,7 @@ export default defineComponent({
       let matches = false;
       for (const tag of card.tags) {
         // A static card definition never carries Tag.INFECTED (only added to a live
-        // instance at runtime by Pandemica), so it's excluded from TagOption/this.tags --
+        // instance at runtime by Blacklab Cartel), so it's excluded from TagOption/this.tags --
         // this cast is safe since that case never actually occurs here.
         if (this.tags[tag as TagOption]) {
           matches = true;

@@ -19,8 +19,8 @@ export type SerializedCard = {
   resourceCount?: number;
   targetCards?: Array<SerializedRobotCard>;
   mutations?: Array<AppliedMutation>; // For MutationMarkets
-  infections?: Array<AppliedInfection>; // For MutationMarkets (Pandemica)
-  pandemicaLastTargetId?: PlayerId; // For Pandemica
+  infections?: Array<AppliedInfection>; // For MutationMarkets (Blacklab Cartel)
+  blacklabCartelLastTargetId?: PlayerId; // For Blacklab Cartel
 }
 
 export type SerializedRobotCard = {

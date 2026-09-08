@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {Pandemica} from '../../../src/server/cards/mutationmarkets/Pandemica';
+import {BlacklabCartel} from '../../../src/server/cards/mutationmarkets/BlacklabCartel';
 import {testGame} from '../../TestGame';
 import {fakeCard, runAllActions} from '../../TestingUtils';
 import {IGame} from '../../../src/server/IGame';
@@ -11,14 +11,14 @@ import {cast} from '../../../src/common/utils/utils';
 import {InfectionName} from '../../../src/common/mutationmarkets/InfectionName';
 import {SerializedCard} from '../../../src/server/SerializedCard';
 
-describe('Pandemica', () => {
-  let card: Pandemica;
+describe('BlacklabCartel', () => {
+  let card: BlacklabCartel;
   let game: IGame;
   let player: TestPlayer;
   let player2: TestPlayer;
 
   beforeEach(() => {
-    card = new Pandemica();
+    card = new BlacklabCartel();
     [game, player, player2] = testGame(2, {mutationMarketsExpansion: true, underworldExpansion: true});
   });
 
@@ -142,9 +142,9 @@ describe('Pandemica', () => {
 
       const serialized = {name: card.name} as SerializedCard;
       card.serialize(serialized);
-      expect(serialized.pandemicaLastTargetId).eq(player2.id);
+      expect(serialized.blacklabCartelLastTargetId).eq(player2.id);
 
-      const restored = new Pandemica();
+      const restored = new BlacklabCartel();
       restored.deserialize(serialized);
 
       const selectPlayer = cast(restored.action(player), SelectPlayer);

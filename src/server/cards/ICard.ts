@@ -215,7 +215,7 @@ export interface ICard {
   readonly baseCost?: number;
   /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
   mutations?: Array<AppliedMutation>;
-  /** MutationMarkets: infections permanently applied to this card instance by Pandemica's action. */
+  /** MutationMarkets: infections permanently applied to this card instance by Blacklab Cartel's action. */
   infections?: Array<AppliedInfection>;
   /** The printed type, before any MutationMarkets `convertType` effect is folded in. Same as `type` for an unmutated card. */
   readonly baseType?: CardType;

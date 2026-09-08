@@ -19,12 +19,12 @@ import {SelectOption} from '../../inputs/SelectOption';
 import {inplaceShuffle} from '../../utils/shuffle';
 import {SerializedCard} from '../../SerializedCard';
 
-export class Pandemica extends CorporationCard implements ICorporationCard, IActionCard {
+export class BlacklabCartel extends CorporationCard implements ICorporationCard, IActionCard {
   private lastTargetId?: PlayerId;
 
   constructor() {
     super({
-      name: CardName.PANDEMICA,
+      name: CardName.BLACKLAB_CARTEL,
       tags: [Tag.SCIENCE, Tag.CRIME],
       startingMegaCredits: 38,
 
@@ -100,10 +100,10 @@ export class Pandemica extends CorporationCard implements ICorporationCard, IAct
   }
 
   public serialize(serialized: SerializedCard): void {
-    serialized.pandemicaLastTargetId = this.lastTargetId;
+    serialized.blacklabCartelLastTargetId = this.lastTargetId;
   }
 
   public deserialize(serialized: SerializedCard): void {
-    this.lastTargetId = serialized.pandemicaLastTargetId;
+    this.lastTargetId = serialized.blacklabCartelLastTargetId;
   }
 }

@@ -6,7 +6,7 @@ import {InfectionName} from '../../common/mutationmarkets/InfectionName';
 import {INFECTION_DEFINITIONS} from '../../common/mutationmarkets/InfectionDefinitions';
 
 /**
- * Applies Pandemica's permanent, negative Infection effects -- the negative counterpart
+ * Applies Blacklab Cartel's permanent, negative Infection effects -- the negative counterpart
  * to `MutationEffects`. Reads the sanctioned per-instance `ICard.infections` field only --
  * never touches `Card.properties` (the shared, process-wide cache every instance of a
  * card class points to).

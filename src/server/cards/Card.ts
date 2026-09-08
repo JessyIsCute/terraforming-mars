@@ -209,7 +209,7 @@ export abstract class Card implements ICard {
   }
   /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
   public mutations: Array<AppliedMutation> | undefined;
-  /** MutationMarkets: infections permanently applied to this card instance by Pandemica's action. */
+  /** MutationMarkets: infections permanently applied to this card instance by Blacklab Cartel's action. */
   public infections: Array<AppliedInfection> | undefined;
   public get initialActionText() {
     return this.properties.initialActionText || this.properties.firstAction?.text;

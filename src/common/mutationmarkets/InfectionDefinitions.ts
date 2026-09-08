@@ -2,7 +2,7 @@ import {InfectionName} from './InfectionName';
 import {InfectionDefinition} from './InfectionDefinition';
 import {Resource} from '../Resource';
 
-/** The Infection card manifest -- Pandemica's action lets the acting player choose one of these to apply. */
+/** The Infection card manifest -- Blacklab Cartel's action lets the acting player choose one of these to apply. */
 export const INFECTION_DEFINITIONS: Record<InfectionName, InfectionDefinition> = {
   [InfectionName.COST_INFLATION]: {
     name: InfectionName.COST_INFLATION,

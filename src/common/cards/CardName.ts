@@ -1238,5 +1238,5 @@ export enum CardName {
   HIRED_RAIDERS_UNDERWORLD = 'Hired Raiders:u',
 
   // MutationMarkets Corporations
-  PANDEMICA = 'Pandemica',
+  BLACKLAB_CARTEL = 'Blacklab Cartel',
 }
