@@ -11,14 +11,14 @@ export class Balance extends PreludeCard {
   constructor() {
     super({
       name: CardName.BALANCE,
-      victoryPoints: -2,
+      behavior: {tr: 1},
 
       metadata: {
         cardNumber: 'T16',
         renderData: CardRenderer.builder((b) => {
-          b.text('everyone').colon().cards(10, {digit});
+          b.tr(1).nbsp.text('everyone').colon().cards(10, {digit});
         }),
-        description: 'Every player draws or discards until they have exactly 10 cards in hand.',
+        description: 'Increase your TR 1 step. Every player draws or discards until they have exactly 10 cards in hand.',
       },
     });
   }

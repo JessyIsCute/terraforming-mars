@@ -16,12 +16,9 @@ describe('Balance', () => {
     [/* game */, player, player2] = testGame(2, {preludeExtension: true});
   });
 
-  it('scores -2 VP', () => {
-    expect(card.getVictoryPoints(player)).to.eq(-2);
-  });
-
-  it('draws players up to 10 cards short, and makes players over 10 discard down to 10', () => {
+  it('draws players up to 10 cards short, and makes players over 10 discard down to 10, and raises TR', () => {
     const game = player.game;
+    const tr = player.terraformRating;
     player.cardsInHand = [];
     for (let i = 0; i < 4; i++) {
       player.cardsInHand.push({name: `short-${i}`} as any);
@@ -33,6 +30,7 @@ describe('Balance', () => {
 
     card.play(player);
     expect(player.cardsInHand).has.lengthOf(10);
+    expect(player.terraformRating).to.eq(tr + 1);
 
     runAllActions(game);
     const discard = cast(player2.popWaitingFor(), SelectCard);
