@@ -39,11 +39,29 @@
   text-overflow: ellipsis;
 }
 
+// The team's combined score, standalone and double-size (vs. the per-member "(6)(3)" row
+// below it) so the two are unmistakably grouped -- outlined in the team's shared Turmoil
+// delegate color (see PlayerResources.vue's own team-colored outline for the same color).
 .conglomerates-team-total {
+  display: inline-block;
   color: #ffcc64;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 32px;
+  line-height: 1;
+  margin: 2px 0 6px;
+  padding: 2px 12px;
+  border-radius: 4px;
+  background: #1a1a1a;
+  border: 3px solid #888;
 }
+
+each(@players, {
+@c: ~"player_@{value}";
+.conglomerates-team-total--@{value} {
+  border-color: @@c;
+  box-shadow: 0 0 6px @@c;
+}
+})
 
 // The per-member score row (e.g. "(6) (3)"), shown right under the team total -- one entry
 // per member, in the same order as the header's color swatches.

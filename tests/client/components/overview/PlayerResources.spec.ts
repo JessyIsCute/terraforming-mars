@@ -40,4 +40,29 @@ describe('PlayerResources', () => {
 
     expect(wrapper.find('[data-test="coordination-resource"]').exists()).to.be.false;
   });
+
+  it('outlines the resource bar in the player\'s Conglomerates team color', () => {
+    const wrapper = shallowMount(PlayerResources, {
+      ...globalConfig,
+      props: {
+        player: fakePublicPlayerModel({conglomeratesTeamColor: 'red'}),
+        conglomeratesExpansion: true,
+      },
+    });
+
+    expect(wrapper.find('.resource_items_cont').classes()).to.include('resource_items_cont--team_red');
+  });
+
+  it('does not outline the resource bar when the player has no Conglomerates team', () => {
+    const wrapper = shallowMount(PlayerResources, {
+      ...globalConfig,
+      props: {
+        player: fakePublicPlayerModel(),
+      },
+    });
+
+    expect(wrapper.find('.resource_items_cont').classes()).to.not.include.members(
+      ['resource_items_cont--team_red', 'resource_items_cont--team_blue'],
+    );
+  });
 });

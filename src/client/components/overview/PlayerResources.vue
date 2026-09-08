@@ -1,5 +1,5 @@
 <template>
-  <div class="resource_items_cont">
+  <div class="resource_items_cont" :class="teamColorClass">
     <PlayerResource
       :type="Resource.MEGACREDITS"
       :count="player.megacredits"
@@ -78,6 +78,10 @@ export default defineComponent({
     // TODO LUNA TRADE FEDERATION
     canUseHeatAsMegaCredits(): boolean {
       return this.player.tableau.some((card) => card.name === CardName.HELION);
+    },
+    teamColorClass(): string {
+      const color = this.player.conglomeratesTeamColor;
+      return color !== undefined ? `resource_items_cont--team_${color}` : '';
     },
   },
   components: {

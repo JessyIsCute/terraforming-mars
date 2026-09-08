@@ -358,6 +358,7 @@ export class ConglomeratesExpansion {
         id: `team-${index + 1}`,
         playerIds: [...team.playerIds],
         playerColors: members.map((member) => member.color),
+        teamColor: this.teamDisplayColor(members[0]),
         memberScores: members.map((member) => member.getVictoryPoints().total),
         name: members.map((member) => member.name).join(' & '),
         victoryPoints: this.calculateTeamVictoryPoints(game, team),

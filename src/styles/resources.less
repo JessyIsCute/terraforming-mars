@@ -3,7 +3,19 @@
   flex-flow: row;
   white-space: nowrap;
   filter: grayscale(0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 2px;
 }
+
+// Conglomerates: outline a player's own resource bar in their team's shared Turmoil delegate
+// color, so which team someone belongs to is visible at a glance without opening the team panel.
+each(@players, {
+@c: ~"player_@{value}";
+.resource_items_cont--team_@{value} {
+  border-color: @@c;
+}
+})
 
 .resource_item {
   display: flex;

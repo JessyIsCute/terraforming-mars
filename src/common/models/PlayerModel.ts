@@ -82,6 +82,8 @@ export type PublicPlayerModel = {
   tradesThisGeneration: number;
   underworldData: UnderworldPlayerData,
   conglomeratesData: ConglomeratesPlayerData,
+  /** This player's shared Conglomerates team color (see ConglomeratesExpansion.teamDisplayColor), undefined if teamless or the expansion is off. */
+  conglomeratesTeamColor?: Color,
   victoryPointsBreakdown: VictoryPointsBreakdown;
   victoryPointsByGeneration: ReadonlyArray<number>;
   globalParameterSteps: Partial<Record<GlobalParameter, number>>;

@@ -653,7 +653,10 @@ each(@players, {
   // so its visual right edge lands at 107px (95 center +/- 12), not 100px -- the previous
   // value here overlapped the price icon. Starting the arrow at 110px clears it.
   left: 110px;
-  top: 8px;
+  // .milestone-award-price's own visual vertical center (after its -3px margin-top and the
+  // 0.8 scale, both applied around its own center) works out to ~13px from the pill's top --
+  // top:5/1 below center these two on that same line instead of sitting visibly lower.
+  top: 5px;
   width: 15px;
   height: 15px;
   background-image: url(./assets/misc/short-arrow.png);
@@ -664,7 +667,7 @@ each(@players, {
 .milestone-award-coordination {
   position: absolute;
   left: 128px;
-  top: 3px;
+  top: 1px;
   width: 24px;
   height: 24px;
   box-sizing: border-box;

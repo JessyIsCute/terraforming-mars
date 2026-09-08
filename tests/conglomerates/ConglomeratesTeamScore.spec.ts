@@ -67,6 +67,7 @@ describe('Conglomerates team score', () => {
     const team1 = models.find((t) => t.playerIds.includes(player1.id))!;
     expect(team1.playerIds.sort()).to.deep.eq([player1.id, player3.id].sort());
     expect(team1.playerColors).to.deep.eq([player1.color, player3.color]);
+    expect(team1.teamColor).to.eq(ConglomeratesExpansion.teamDisplayColor(player1));
     expect(team1.name).to.eq(`${player1.name} & ${player3.name}`);
     expect(team1.victoryPoints.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total);
     expect(team1.memberScores.sort()).to.deep.eq(

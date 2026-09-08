@@ -277,6 +277,7 @@ export class Server {
       tradesThisGeneration: player.colonies.usedTradeFleets,
       underworldData: player.underworldData,
       conglomeratesData: player.conglomeratesData,
+      conglomeratesTeamColor: ConglomeratesExpansion.teamDisplayColor(player),
       victoryPointsBreakdown: {
         terraformRating: 0,
         milestones: 0,
