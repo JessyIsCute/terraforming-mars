@@ -313,40 +313,6 @@ export class DeltaProjectExpansion {
   }
 
   /**
-   * Zeta Tollkeeper's passive: at the start of every generation, if its owner's marker is
-   * at least as far along the Delta Project track as every other marker in play (their own
-   * primary marker, or another player's primary or Epsilon Dample marker), they gain their
-   * current position's reward again. The Jovian tag (position 8) and reusing a blue card
-   * action (position 7) don't repeat this way - and VP spots have nothing extra to repeat
-   * in the first place. No-op for an owner sitting at position 0, or if no player in the
-   * game has this corporation.
-   */
-  public static applyZetaTollkeeperGenerationStart(game: IGame): void {
-    const tollkeeper = game.players.find((p) => p.tableau.has(CardName.ZETA_TOLLKEEPER));
-    if (tollkeeper === undefined) {
-      return;
-    }
-
-    const position = tollkeeper.deltaProjectData?.position ?? 0;
-    if (position <= 0) {
-      return;
-    }
-
-    for (const p of game.players) {
-      if (p === tollkeeper) {
-        continue;
-      }
-      const otherBest = Math.max(p.deltaProjectData?.position ?? -1, p.epsilonDampleData?.position ?? -1);
-      if (otherBest > position) {
-        return;
-      }
-    }
-
-    DeltaProjectExpansion.resolveReward(tollkeeper, position, 'primary', {skipJovianAndMicrobe: true});
-    game.log('${0} is furthest along the Delta Project track and gains their position bonus again from Zeta Tollkeeper', (b) => b.player(tollkeeper));
-  }
-
-  /**
    * Grants `position`'s landing reward outright, bypassing all the normal step/cost/tag
    * machinery. Used by cards that grant a reward independent of the normal action (Dutch
    * Mountains re-triggering an old position, Corporate Espionage's opponent-facing effect).

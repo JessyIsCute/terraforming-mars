@@ -73,7 +73,6 @@ import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
 import {MutationMarketData} from './mutationmarkets/MutationMarketData';
-import {DeltaProjectExpansion} from './delta/DeltaProjectExpansion';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -948,7 +947,6 @@ export class Game implements IGame, Logger {
         player.epsilonDampleData.blocked = false;
       }
     });
-    DeltaProjectExpansion.applyZetaTollkeeperGenerationStart(this);
 
     if (this.gameOptions.draftVariant) {
       this.gotoDraftPhase();

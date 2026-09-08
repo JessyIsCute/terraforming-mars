@@ -9,33 +9,27 @@ import {DeltaProjectExpansion, DELTA_TRACK_TAGS} from '../../delta/DeltaProjectE
 import {Size} from '../../../common/cards/render/Size';
 
 /** Re-triggers its owner's current Delta Project position bonus, without moving the
- * marker - both automatically each generation while in the lead, and on demand via its
- * own action. See DeltaProjectExpansion.applyZetaTollkeeperGenerationStart for the
- * generation-start logic. */
+ * marker, on demand via its own action. */
 export class ZetaTollkeeper extends CorporationCard implements ICorporationCard, IActionCard {
   constructor() {
     super({
       name: CardName.ZETA_TOLLKEEPER,
       tags: [],
-      startingMegaCredits: 72,
+      startingMegaCredits: 14,
 
       behavior: {
-        production: {megacredits: -3},
+        production: {megacredits: 6},
       },
 
       metadata: {
         cardNumber: 'DP13',
-        description: 'You start with 72 M€ and -3 M€ production.',
+        description: 'You start with 14 M€ and 6 M€ production.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(72).nbsp.production((pb) => pb.minus().megacredits(3)).br;
-          b.corpBox('effect-action', (cea) => {
-            cea.vSpace(Size.LARGE);
-            cea.br;
-            cea.effect('At the start of each generation, if you are the furthest along the Delta Project track, gain your current position\'s bonus again (not the Jovian tag or a blue card action).', (e1) => {
-              e1.empty().startEffect.plate('Delta track').asterix();
-            });
-            cea.br;
-            cea.action('Gain your current Delta Project position\'s bonus again.', (ab) => {
+          b.megacredits(14).nbsp.production((pb) => pb.megacredits(6)).br;
+          b.corpBox('action', (ca) => {
+            ca.vSpace(Size.LARGE);
+            ca.br;
+            ca.action('Gain your current Delta Project position\'s bonus again.', (ab) => {
               ab.empty().startAction.plate('Delta track').asterix();
             });
           });
