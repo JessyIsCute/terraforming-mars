@@ -1,12 +1,15 @@
 <template>
-  <div class="mutation-market-mutation-slot" :class="entranceClass" :style="{gridColumn}">
+  <div
+    class="mutation-market-mutation-slot"
+    :class="[entranceClass, {'infection-card-standalone': marketSlot?.kind === 'infection'}]"
+    :style="{gridColumn}">
     <div v-if="isVoid" class="mutation-market-void"></div>
     <template v-else-if="marketSlot !== undefined">
-      <div class="mutation-market-mutation-label">mutation</div>
-      <div class="mutation-market-mutation-name">{{ marketSlot.mutation }}</div>
+      <div :class="marketSlot.kind === 'infection' ? 'infection-market-mutation-label' : 'mutation-market-mutation-label'">{{ marketSlot.kind }}</div>
+      <div class="mutation-market-mutation-name">{{ slotName }}</div>
       <div class="mutation-market-mutation-detail">
-        <span>Needs: {{ requirementText }}</span>
-        <span v-if="effectText" class="mutation-glow">{{ effectText }}</span>
+        <span v-if="requirementText">Needs: {{ requirementText }}</span>
+        <span v-if="effectText" :class="glowClass">{{ effectText }}</span>
       </div>
       <div v-if="marketSlot.playerProgress" class="ma-scores player_home_block--milestones-and-awards-scores">
         <template v-for="progress in marketSlot.playerProgress" :key="progress.color">
@@ -30,6 +33,8 @@ import {defineComponent, PropType} from 'vue';
 import {MutationMarketMutationSlotModel} from '@/common/models/MutationMarketModel';
 import {MUTATION_DEFINITIONS} from '@/common/mutationmarkets/MutationDefinitions';
 import {describeMutationRequirement, describeMutationEffect} from '@/common/mutationmarkets/describeMutation';
+import {INFECTION_DEFINITIONS} from '@/common/mutationmarkets/InfectionDefinitions';
+import {describeInfectionEffect} from '@/common/mutationmarkets/describeInfection';
 import {Color} from '@/common/Color';
 import {playerSymbol} from '@/client/utils/playerSymbol';
 
@@ -65,18 +70,39 @@ export default defineComponent({
     entranceClass(): string {
       return this.entering ? 'mutation-market-slot--entering-left' : '';
     },
+    // Mutation or infection's display name -- whichever this slot holds.
+    slotName(): string {
+      if (this.marketSlot === undefined) {
+        return '';
+      }
+      return this.marketSlot.kind === 'mutation' ? this.marketSlot.mutation : this.marketSlot.infection;
+    },
+    // Infections have no bidding requirement at all, so there's nothing to show here.
     requirementText(): string {
-      return this.marketSlot === undefined ? '' : describeMutationRequirement(MUTATION_DEFINITIONS[this.marketSlot.mutation].requirement);
+      if (this.marketSlot === undefined || this.marketSlot.kind !== 'mutation') {
+        return '';
+      }
+      return describeMutationRequirement(MUTATION_DEFINITIONS[this.marketSlot.mutation].requirement);
     },
     effectText(): string {
-      return this.marketSlot === undefined ? '' : describeMutationEffect(MUTATION_DEFINITIONS[this.marketSlot.mutation].effect);
+      if (this.marketSlot === undefined) {
+        return '';
+      }
+      return this.marketSlot.kind === 'mutation' ?
+        describeMutationEffect(MUTATION_DEFINITIONS[this.marketSlot.mutation].effect) :
+        describeInfectionEffect(INFECTION_DEFINITIONS[this.marketSlot.infection].effect);
+    },
+    glowClass(): string {
+      return this.marketSlot?.kind === 'infection' ? 'infection-glow' : 'mutation-glow';
     },
   },
   watch: {
-    // Mutation cards enter the market from the left. Only a genuine replacement should
-    // animate, not the component's initial mount (which a non-immediate `watch` skips).
-    'marketSlot.mutation'(newMutation: string | undefined, oldMutation: string | undefined) {
-      if (newMutation !== undefined && oldMutation !== undefined && newMutation !== oldMutation) {
+    // Mutation/infection cards enter the market from the left. Only a genuine replacement
+    // should animate, not the component's initial mount (which a non-immediate `watch`
+    // skips). Watches the computed `slotName` rather than a raw prop path so it fires
+    // correctly regardless of which kind replaces which.
+    slotName(newName: string, oldName: string) {
+      if (newName !== '' && oldName !== '' && newName !== oldName) {
         this.entering = true;
         setTimeout(() => {
           this.entering = false;

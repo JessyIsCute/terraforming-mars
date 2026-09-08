@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {MutationMarkets} from '../../src/server/mutationmarkets/MutationMarkets';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
+import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {Tag} from '../../src/common/cards/Tag';
 import {IGame} from '../../src/server/IGame';
 import {IProjectCard} from '../../src/server/cards/IProjectCard';
@@ -29,8 +30,13 @@ describe('MutationMarkets bidding', () => {
     cardD = fakeCard({cost: 10, tags: []});
     data.projectSlots = [fakeCard(), cardA, cardB, cardC, cardD, fakeCard()];
     data.projectAuctions = new Array(6).fill(undefined);
-    data.alignedRow = [undefined, {mutation: MutationName.TAG_DIVERSIFIER}, undefined];
-    data.offsetRow = [undefined, {mutation: MutationName.GIGANTIC_UNDERTAKINGS}, {mutation: MutationName.MINI_MUTATION}, undefined];
+    data.alignedRow = [undefined, {kind: 'mutation', mutation: MutationName.TAG_DIVERSIFIER}, undefined];
+    data.offsetRow = [
+      undefined,
+      {kind: 'mutation', mutation: MutationName.GIGANTIC_UNDERTAKINGS},
+      {kind: 'mutation', mutation: MutationName.MINI_MUTATION},
+      undefined,
+    ];
 
     // player: qualifies for Tag Diversifier (5 unique tags) -- covers slots 2 and 3.
     for (const tag of [Tag.SCIENCE, Tag.BUILDING, Tag.PLANT, Tag.ANIMAL, Tag.SPACE]) {
@@ -161,5 +167,42 @@ describe('MutationMarkets bidding', () => {
     expect(data.projectAuctions[2]).is.not.undefined;
     expect(data.projectAuctions[2]!.highBidder).to.eq(player.id);
     expect(data.projectAuctions[3]).is.undefined;
+  });
+
+  describe('infections in the market pool', () => {
+    beforeEach(() => {
+      // Replace slot 1's only covering mutation (Gigantic Undertakings, which player
+      // doesn't qualify for) with an infection -- infections have no requirement at all.
+      game.mutationMarketData!.offsetRow[1] = {kind: 'infection', infection: InfectionName.POWER_DRAIN};
+    });
+
+    it('makes a slot biddable even for a player who qualifies for nothing', () => {
+      // player qualifies for no mutation/infection requirement on slot 1 (Tag Diversifier
+      // covers slots 2/3, not 1) -- but the infection alone should still make it biddable.
+      expect(MutationMarkets.biddableSlots(game, player)).to.include(1);
+    });
+
+    it('always applies on win, regardless of the winner\'s stats', () => {
+      MutationMarkets.placeBid(game, player, 1, 4); // player qualifies for nothing covering slot 1
+      MutationMarkets.resolveAuction(game, 1);
+
+      expect(player.cardsInHand).to.include(cardA);
+      expect(cardA.infections).to.deep.eq([{infection: InfectionName.POWER_DRAIN}]);
+      expect(cardA.mutations ?? []).has.lengthOf(0);
+    });
+
+    it('applies alongside a qualifying mutation on a doubly-covered slot, and skips a non-qualifying one', () => {
+      // Slot 2 is covered by Tag Diversifier (player qualifies) and, after this override,
+      // also by an infection -- both should land. player2 doesn't qualify for Tag
+      // Diversifier, so if they win instead only the infection should land.
+      game.mutationMarketData!.offsetRow[1] = {kind: 'infection', infection: InfectionName.VALUE_SIPHON};
+
+      MutationMarkets.placeBid(game, player2, 2, 3);
+      MutationMarkets.resolveAuction(game, 2);
+
+      expect(player2.cardsInHand).to.include(cardB);
+      expect(cardB.mutations ?? []).has.lengthOf(0); // player2 doesn't qualify for Tag Diversifier
+      expect(cardB.infections).to.deep.eq([{infection: InfectionName.VALUE_SIPHON}]);
+    });
   });
 });

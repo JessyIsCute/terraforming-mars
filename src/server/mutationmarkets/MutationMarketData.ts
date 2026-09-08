@@ -1,11 +1,11 @@
 import {IProjectCard} from '../cards/IProjectCard';
 import {CardName} from '../../common/cards/CardName';
-import {MutationName} from '../../common/mutationmarkets/MutationName';
+import {MarketSlotContent} from '../../common/mutationmarkets/MarketSlotContent';
 import {PlayerId} from '../../common/Types';
 
 export type MutationRow = 'alignedRow' | 'offsetRow';
 
-export type MutationSlot = {mutation: MutationName} | undefined;
+export type MutationSlot = MarketSlotContent | undefined;
 
 /**
  * A live, possibly multi-turn auction on a project slot. `resolutionCheckpoint` is
@@ -37,8 +37,9 @@ export type MutationMarketData = {
   offsetRow: Array<MutationSlot>;
   /** Which of alignedRow/offsetRow is currently rendered as the "top" row; swaps each generation. */
   offsetRowIsTop: boolean;
-  mutationDrawPile: Array<MutationName>;
-  mutationDiscardPile: Array<MutationName>;
+  /** One shared shuffled pool of every Mutation and Infection -- see MutationMarkets.shuffledMarketSlotContents. */
+  mutationDrawPile: Array<MarketSlotContent>;
+  mutationDiscardPile: Array<MarketSlotContent>;
 };
 
 /** On-disk shape: project slots hold only the card's name, reconstructed on load. */
@@ -48,6 +49,6 @@ export type SerializedMutationMarketData = {
   alignedRow: Array<MutationSlot>;
   offsetRow: Array<MutationSlot>;
   offsetRowIsTop: boolean;
-  mutationDrawPile: Array<MutationName>;
-  mutationDiscardPile: Array<MutationName>;
+  mutationDrawPile: Array<MarketSlotContent>;
+  mutationDiscardPile: Array<MarketSlotContent>;
 };

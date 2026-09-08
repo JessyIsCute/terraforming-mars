@@ -1,7 +1,8 @@
 import {expect} from 'chai';
 import {MutationMarkets} from '../../src/server/mutationmarkets/MutationMarkets';
-import {MutationMarketData} from '../../src/server/mutationmarkets/MutationMarketData';
+import {MutationMarketData, MutationSlot} from '../../src/server/mutationmarkets/MutationMarketData';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
+import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {IGame} from '../../src/server/IGame';
 import {testGame} from '../TestGame';
 
@@ -27,6 +28,20 @@ describe('MutationMarkets', () => {
     expect(data.offsetRow.every((slot) => slot !== undefined)).is.true;
 
     expect(data.offsetRowIsTop).is.false;
+  });
+
+  it('the shared shuffled pool contains every Mutation and every Infection, mixed together', () => {
+    const data = game.mutationMarketData!;
+    // 7 slots dealt onto the board (3 aligned + 4 offset) plus whatever's left in the draw
+    // pile should together account for every unique Mutation/Infection exactly once.
+    const wholePool: Array<MutationSlot> = [...data.alignedRow, ...data.offsetRow, ...data.mutationDrawPile];
+    const mutations = wholePool.filter((c) => c?.kind === 'mutation');
+    const infections = wholePool.filter((c) => c?.kind === 'infection');
+
+    expect(mutations).to.have.length(Object.values(MutationName).length);
+    expect(infections).to.have.length(Object.values(InfectionName).length);
+    expect(new Set(mutations.map((c) => (c as {mutation: MutationName}).mutation)).size).to.eq(Object.values(MutationName).length);
+    expect(new Set(infections.map((c) => (c as {infection: InfectionName}).infection)).size).to.eq(Object.values(InfectionName).length);
   });
 
   it('isProjectSlotActive flags only slots 0 and 5 as inactive', () => {
@@ -71,14 +86,14 @@ describe('MutationMarkets', () => {
 
   it('claimMutationSlot removes the target, slides earlier mutations toward it, and deals one fresh mutation from the left', () => {
     const data = game.mutationMarketData!;
-    const before = data.alignedRow.map((slot) => slot!.mutation);
+    const before = data.alignedRow.slice();
 
     const claimed = MutationMarkets.claimMutationSlot(game, 'alignedRow', 2);
 
-    expect(claimed).to.eq(before[2]);
+    expect(claimed).to.deep.eq(before[2]);
     expect(data.alignedRow).has.lengthOf(3);
-    expect(data.alignedRow[2]!.mutation).to.eq(before[1]);
-    expect(data.alignedRow[1]!.mutation).to.eq(before[0]);
+    expect(data.alignedRow[2]).to.deep.eq(before[1]);
+    expect(data.alignedRow[1]).to.deep.eq(before[0]);
     expect(data.alignedRow[0]).is.not.undefined;
   });
 
@@ -87,17 +102,20 @@ describe('MutationMarkets', () => {
     const projectNamesBefore = data.projectSlots.map((slot) => slot!.name);
 
     data.alignedRow = [
-      {mutation: MutationName.GREENERY_KEEPER}, // inactive (touches slot 0)
-      {mutation: MutationName.CITY_PLANNER}, // active
-      {mutation: MutationName.SCIENCE_PATRON}, // inactive (touches slot 5)
+      {kind: 'mutation', mutation: MutationName.GREENERY_KEEPER}, // inactive (touches slot 0)
+      {kind: 'mutation', mutation: MutationName.CITY_PLANNER}, // active
+      {kind: 'mutation', mutation: MutationName.SCIENCE_PATRON}, // inactive (touches slot 5)
     ];
     data.offsetRow = [
       undefined,
-      {mutation: MutationName.TAG_DIVERSIFIER}, // active
+      {kind: 'mutation', mutation: MutationName.TAG_DIVERSIFIER}, // active
       undefined,
       undefined,
     ];
-    data.mutationDrawPile = [MutationName.HEAT_BANKER, MutationName.OCEAN_SURVEYOR];
+    data.mutationDrawPile = [
+      {kind: 'mutation', mutation: MutationName.HEAT_BANKER},
+      {kind: 'mutation', mutation: MutationName.OCEAN_SURVEYOR},
+    ];
     data.mutationDiscardPile = [];
 
     MutationMarkets.onGenerationEnd(game);
@@ -112,16 +130,16 @@ describe('MutationMarkets', () => {
 
     // alignedRow always shifts by exactly 1, active or not: the last slot (SCIENCE_PATRON,
     // inactive) is discarded, everything slides right one, and a fresh mutation enters at 0.
-    expect(data.alignedRow[0]!.mutation).to.eq(MutationName.OCEAN_SURVEYOR);
-    expect(data.alignedRow[1]!.mutation).to.eq(MutationName.GREENERY_KEEPER);
-    expect(data.alignedRow[2]!.mutation).to.eq(MutationName.CITY_PLANNER);
-    expect(data.mutationDiscardPile).to.include(MutationName.SCIENCE_PATRON);
+    expect(data.alignedRow[0]).to.deep.eq({kind: 'mutation', mutation: MutationName.OCEAN_SURVEYOR});
+    expect(data.alignedRow[1]).to.deep.eq({kind: 'mutation', mutation: MutationName.GREENERY_KEEPER});
+    expect(data.alignedRow[2]).to.deep.eq({kind: 'mutation', mutation: MutationName.CITY_PLANNER});
+    expect(data.mutationDiscardPile).to.deep.include({kind: 'mutation', mutation: MutationName.SCIENCE_PATRON});
 
     // offsetRow also always shifts by exactly 1: the last slot (empty) discards nothing,
     // everything slides right one, and a fresh mutation enters at 0.
-    expect(data.offsetRow[0]!.mutation).to.eq(MutationName.HEAT_BANKER);
+    expect(data.offsetRow[0]).to.deep.eq({kind: 'mutation', mutation: MutationName.HEAT_BANKER});
     expect(data.offsetRow[1]).is.undefined;
-    expect(data.offsetRow[2]!.mutation).to.eq(MutationName.TAG_DIVERSIFIER);
+    expect(data.offsetRow[2]).to.deep.eq({kind: 'mutation', mutation: MutationName.TAG_DIVERSIFIER});
     expect(data.offsetRow[3]).is.undefined;
 
     expect(data.offsetRowIsTop).is.true;
@@ -130,7 +148,7 @@ describe('MutationMarkets', () => {
   it('reshuffles the mutation discard pile into the draw pile once it runs dry', () => {
     const data = game.mutationMarketData!;
     data.mutationDrawPile = [];
-    data.mutationDiscardPile = [MutationName.STEEL_BARON];
+    data.mutationDiscardPile = [{kind: 'mutation', mutation: MutationName.STEEL_BARON}];
 
     const dealt = MutationMarkets.claimMutationSlot(game, 'alignedRow', 0);
     expect(dealt).is.not.undefined;

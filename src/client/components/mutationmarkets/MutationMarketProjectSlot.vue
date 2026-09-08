@@ -2,8 +2,8 @@
   <div class="mutation-market-project-slot" :class="entranceClass">
     <template v-if="marketSlot !== undefined">
       <div v-if="marketSlot.coveringMutationsAbove.length > 0" class="mutation-market-preview-badges mutation-market-preview-badges--above">
-        <div v-for="mutation in marketSlot.coveringMutationsAbove" :key="mutation" class="mutation-market-preview-badge mutation-glow">
-          {{ mutation }}
+        <div v-for="content in marketSlot.coveringMutationsAbove" :key="badgeText(content)" class="mutation-market-preview-badge" :class="badgeClass(content)">
+          {{ badgeText(content) }}
         </div>
       </div>
       <div class="mutation-market-card-scale-wrapper">
@@ -16,8 +16,8 @@
         <span class="mutation-market-minimum-bid-coin">{{ marketSlot.minimumBid }}</span>
       </div>
       <div v-if="marketSlot.coveringMutationsBelow.length > 0" class="mutation-market-preview-badges">
-        <div v-for="mutation in marketSlot.coveringMutationsBelow" :key="mutation" class="mutation-market-preview-badge mutation-glow">
-          {{ mutation }}
+        <div v-for="content in marketSlot.coveringMutationsBelow" :key="badgeText(content)" class="mutation-market-preview-badge" :class="badgeClass(content)">
+          {{ badgeText(content) }}
         </div>
       </div>
     </template>
@@ -29,6 +29,7 @@
 import {defineComponent, PropType} from 'vue';
 import Card from '@/client/components/card/Card.vue';
 import {MutationMarketProjectSlotModel} from '@/common/models/MutationMarketModel';
+import {MarketSlotContent} from '@/common/mutationmarkets/MarketSlotContent';
 
 const ENTRANCE_ANIMATION_MS = 700;
 
@@ -64,6 +65,14 @@ export default defineComponent({
           this.entering = false;
         }, ENTRANCE_ANIMATION_MS);
       }
+    },
+  },
+  methods: {
+    badgeText(content: MarketSlotContent): string {
+      return content.kind === 'mutation' ? content.mutation : content.infection;
+    },
+    badgeClass(content: MarketSlotContent): string {
+      return content.kind === 'mutation' ? 'mutation-glow' : 'infection-glow';
     },
   },
 });

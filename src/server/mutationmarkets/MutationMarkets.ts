@@ -13,6 +13,9 @@ import {MutationName} from '../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../common/mutationmarkets/MutationDefinitions';
 import {MutationEffect} from '../../common/mutationmarkets/MutationEffect';
 import {MutationEffects} from './MutationEffects';
+import {InfectionName} from '../../common/mutationmarkets/InfectionName';
+import {InfectionEffects} from './InfectionEffects';
+import {MarketSlotContent} from '../../common/mutationmarkets/MarketSlotContent';
 import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescriptor';
 import {CardRequirements} from '../cards/requirements/CardRequirements';
 import {InequalityRequirement} from '../cards/requirements/InequalityRequirement';
@@ -38,7 +41,7 @@ export class MutationMarkets {
       alignedRow: new Array(ALIGNED_ROW_LENGTH).fill(undefined),
       offsetRow: new Array(OFFSET_ROW_LENGTH).fill(undefined),
       offsetRowIsTop: false,
-      mutationDrawPile: MutationMarkets.shuffledMutationNames(game),
+      mutationDrawPile: MutationMarkets.shuffledMarketSlotContents(game),
       mutationDiscardPile: [],
     };
 
@@ -103,8 +106,8 @@ export class MutationMarkets {
     return claimed;
   }
 
-  /** Removes the mutation at `row[index]`, slides earlier mutations toward the gap, and deals one fresh mutation in from the left. */
-  public static claimMutationSlot(game: IGame, row: MutationRow, index: number): MutationName {
+  /** Removes the mutation/infection at `row[index]`, slides earlier ones toward the gap, and deals one fresh one in from the left. */
+  public static claimMutationSlot(game: IGame, row: MutationRow, index: number): MarketSlotContent {
     const data = MutationMarkets.dataOrThrow(game);
     const slots = data[row];
     const claimed = slots[index];
@@ -115,7 +118,7 @@ export class MutationMarkets {
       slots[i] = slots[i - 1];
     }
     slots[0] = MutationMarkets.dealMutation(game, data);
-    return claimed.mutation;
+    return claimed;
   }
 
   public static onGenerationEnd(game: IGame): void {
@@ -175,7 +178,7 @@ export class MutationMarkets {
         continue;
       }
       const qualifies = MutationMarkets.coveringMutations(data, index).some(
-        (mutation) => CardRequirements.compile([MUTATION_DEFINITIONS[mutation].requirement]).satisfies(player, card));
+        (content) => MutationMarkets.qualifiesFor(content, player, card));
       if (qualifies) {
         result.push(index);
       }
@@ -330,7 +333,7 @@ export class MutationMarkets {
     MutationMarkets.claimProjectSlot(game, slotIndex);
   }
 
-  /** Refunds every losing bidder, applies whichever covering mutations the winner qualifies for, and hands the card over -- that's the entire prize, there's no separate reward. */
+  /** Refunds every losing bidder, applies whichever covering mutations/infections the winner qualifies for, and hands the card over -- that's the entire prize, there's no separate reward. */
   private static settleAuction(game: IGame, data: MutationMarketData, slotIndex: number, auction: OpenAuction, card: IProjectCard): void {
     const winner = MutationMarkets.playerById(game, auction.highBidder);
     for (const playerId of Object.keys(auction.escrow) as Array<PlayerId>) {
@@ -339,19 +342,32 @@ export class MutationMarkets {
       }
     }
 
-    const qualifyingMutations = MutationMarkets.coveringMutations(data, slotIndex).filter(
-      (mutation) => CardRequirements.compile([MUTATION_DEFINITIONS[mutation].requirement]).satisfies(winner, card));
-    for (const mutation of qualifyingMutations) {
-      const applied = MutationEffects.apply(card, mutation, game.rng);
-      card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
+    const qualifying = MutationMarkets.coveringMutations(data, slotIndex).filter(
+      (content) => MutationMarkets.qualifiesFor(content, winner, card));
+    for (const content of qualifying) {
+      if (content.kind === 'mutation') {
+        const applied = MutationEffects.apply(card, content.mutation, game.rng);
+        card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
+      } else {
+        const applied = InfectionEffects.apply(content.infection);
+        card.infections = card.infections === undefined ? [applied] : [...card.infections, applied];
+      }
     }
 
     winner.cardsInHand.push(card);
     game.log('${0} won the auction for ${1} for ${2} M€', (b) => b.player(winner).card(card).number(auction.escrow[auction.highBidder]));
   }
 
-  /** The active mutations (from either row) covering `slotIndex`. */
-  public static coveringMutations(data: MutationMarketData, slotIndex: number): Array<MutationName> {
+  /** An infection has no bidding requirement -- it always qualifies. A mutation only qualifies if the player satisfies its printed requirement. */
+  private static qualifiesFor(content: MarketSlotContent, player: IPlayer, card: IProjectCard): boolean {
+    if (content.kind === 'infection') {
+      return true;
+    }
+    return CardRequirements.compile([MUTATION_DEFINITIONS[content.mutation].requirement]).satisfies(player, card);
+  }
+
+  /** The active mutations/infections (from either row) covering `slotIndex`. */
+  public static coveringMutations(data: MutationMarketData, slotIndex: number): Array<MarketSlotContent> {
     return [
       ...MutationMarkets.coveringMutationsForRow(data, 'alignedRow', slotIndex),
       ...MutationMarkets.coveringMutationsForRow(data, 'offsetRow', slotIndex),
@@ -364,7 +380,7 @@ export class MutationMarkets {
    * physically "top" each generation (`data.offsetRowIsTop`), so the market UI needs this
    * mapped to "above"/"below", not the raw row name.
    */
-  public static coveringMutationsByRow(data: MutationMarketData, slotIndex: number): {above: Array<MutationName>, below: Array<MutationName>} {
+  public static coveringMutationsByRow(data: MutationMarketData, slotIndex: number): {above: Array<MarketSlotContent>, below: Array<MarketSlotContent>} {
     const aboveRow: MutationRow = data.offsetRowIsTop ? 'offsetRow' : 'alignedRow';
     const belowRow: MutationRow = data.offsetRowIsTop ? 'alignedRow' : 'offsetRow';
     return {
@@ -373,16 +389,16 @@ export class MutationMarkets {
     };
   }
 
-  private static coveringMutationsForRow(data: MutationMarketData, row: MutationRow, slotIndex: number): Array<MutationName> {
+  private static coveringMutationsForRow(data: MutationMarketData, row: MutationRow, slotIndex: number): Array<MarketSlotContent> {
     const slots = data[row];
-    const result: Array<MutationName> = [];
+    const result: Array<MarketSlotContent> = [];
     for (let index = 0; index < slots.length; index++) {
       const slot = slots[index];
       if (slot === undefined || !MutationMarkets.isMutationSlotActive(row, index, data)) {
         continue;
       }
       if (MutationMarkets.linkedProjectSlots(row, index).includes(slotIndex)) {
-        result.push(slot.mutation);
+        result.push(slot);
       }
     }
     return result;
@@ -396,12 +412,12 @@ export class MutationMarkets {
     return player;
   }
 
-  /** Mutation rows always shift one position to the right at generation end -- the exiting slot is discarded, and a fresh mutation enters from the left. */
+  /** Mutation rows always shift one position to the right at generation end -- the exiting slot is discarded, and a fresh mutation/infection enters from the left. */
   private static shiftRow(game: IGame, data: MutationMarketData, row: MutationRow): void {
     const slots = data[row];
     const exiting = slots[slots.length - 1];
     if (exiting !== undefined) {
-      data.mutationDiscardPile.push(exiting.mutation);
+      data.mutationDiscardPile.push(exiting);
     }
     for (let j = slots.length - 1; j > 0; j--) {
       slots[j] = slots[j - 1];
@@ -416,10 +432,14 @@ export class MutationMarkets {
     return game.mutationMarketData;
   }
 
-  private static shuffledMutationNames(game: IGame): Array<MutationName> {
-    const names = Object.values(MutationName);
-    inplaceShuffle(names, game.rng);
-    return names;
+  /** One shared shuffled pool of every Mutation and every Infection, unweighted -- roughly 3-in-16 dealt slots are infections today, purely a function of there being fewer infection types. */
+  private static shuffledMarketSlotContents(game: IGame): Array<MarketSlotContent> {
+    const contents: Array<MarketSlotContent> = [
+      ...Object.values(MutationName).map((mutation): MarketSlotContent => ({kind: 'mutation', mutation})),
+      ...Object.values(InfectionName).map((infection): MarketSlotContent => ({kind: 'infection', infection})),
+    ];
+    inplaceShuffle(contents, game.rng);
+    return contents;
   }
 
   private static dealMutation(game: IGame, data: MutationMarketData): MutationSlot {
@@ -431,8 +451,7 @@ export class MutationMarkets {
       data.mutationDiscardPile = [];
       inplaceShuffle(data.mutationDrawPile, game.rng);
     }
-    const mutation = data.mutationDrawPile.pop();
-    return mutation === undefined ? undefined : {mutation};
+    return data.mutationDrawPile.pop();
   }
 
   public static serialize(data: MutationMarketData | undefined): SerializedMutationMarketData | undefined {

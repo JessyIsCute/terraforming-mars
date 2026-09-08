@@ -1,6 +1,6 @@
 import {CardModel} from './CardModel';
 import {Color} from '../Color';
-import {MutationName} from '../mutationmarkets/MutationName';
+import {MarketSlotContent} from '../mutationmarkets/MarketSlotContent';
 
 export type MutationMarketProjectSlotModel = {
   card: CardModel;
@@ -8,22 +8,22 @@ export type MutationMarketProjectSlotModel = {
   /** Fixed by this slot's position -- see MutationMarkets.minimumBidFor. Only meaningful while `active`. */
   minimumBid: number;
   auction?: {highBid: number, highBidderColor: Color};
-  /** Covering mutation(s) whose row is currently physically above the project row. */
-  coveringMutationsAbove: ReadonlyArray<MutationName>;
-  /** Covering mutation(s) whose row is currently physically below the project row. */
-  coveringMutationsBelow: ReadonlyArray<MutationName>;
+  /** Covering mutation(s)/infection(s) whose row is currently physically above the project row. */
+  coveringMutationsAbove: ReadonlyArray<MarketSlotContent>;
+  /** Covering mutation(s)/infection(s) whose row is currently physically below the project row. */
+  coveringMutationsBelow: ReadonlyArray<MarketSlotContent>;
 } | undefined;
 
-export type MutationMarketMutationSlotModel = {
-  mutation: MutationName;
+export type MutationMarketMutationSlotModel = ({
   active: boolean;
   /**
    * Each player's current numeric progress toward this mutation's requirement, mirroring
    * Milestones/Awards' public per-player score display. Omitted for requirement kinds
-   * with no natural running count (e.g. boolean-only checks like `chairman`/`party`).
+   * with no natural running count (e.g. boolean-only checks like `chairman`/`party`), and
+   * always omitted for an infection slot -- infections have no requirement to track.
    */
   playerProgress?: ReadonlyArray<{color: Color, score: number}>;
-} | undefined;
+} & MarketSlotContent) | undefined;
 
 export type MutationMarketModel = {
   /** Length 6. Index 0 and the last index are inactive-but-visible previews. */

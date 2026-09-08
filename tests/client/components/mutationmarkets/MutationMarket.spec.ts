@@ -19,14 +19,14 @@ function fakeMarket(offsetRowIsTop: boolean): MutationMarketModel {
       undefined,
     ],
     alignedRow: [
-      {mutation: MutationName.TAG_DIVERSIFIER, active: false},
-      {mutation: MutationName.GIGANTIC_UNDERTAKINGS, active: true},
-      {mutation: MutationName.MINI_MUTATION, active: false},
+      {kind: 'mutation', mutation: MutationName.TAG_DIVERSIFIER, active: false},
+      {kind: 'mutation', mutation: MutationName.GIGANTIC_UNDERTAKINGS, active: true},
+      {kind: 'mutation', mutation: MutationName.MINI_MUTATION, active: false},
     ],
     offsetRow: [
       undefined,
-      {mutation: MutationName.CITY_PLANNER, active: true},
-      {mutation: MutationName.HEAT_BANKER, active: true},
+      {kind: 'mutation', mutation: MutationName.CITY_PLANNER, active: true},
+      {kind: 'mutation', mutation: MutationName.HEAT_BANKER, active: true},
       undefined,
     ],
     offsetRowIsTop,
@@ -58,8 +58,9 @@ describe('MutationMarket', () => {
     const mutationSlots = wrapper.findAllComponents(MutationMarketMutationSlot);
     // The offset row (4 entries) comes first in the template when it's on top.
     expect(mutationSlots).to.have.lengthOf(7);
-    expect(mutationSlots[0].props('marketSlot')?.mutation).to.eq(undefined);
-    expect(mutationSlots[1].props('marketSlot')?.mutation).to.eq(MutationName.CITY_PLANNER);
+    expect(mutationSlots[0].props('marketSlot')).to.eq(undefined);
+    const slot1 = mutationSlots[1].props('marketSlot');
+    expect(slot1?.kind === 'mutation' ? slot1.mutation : undefined).to.eq(MutationName.CITY_PLANNER);
   });
 
   it('assigns aligned-row mutation slots a 2-column span starting at their doubled index', () => {
