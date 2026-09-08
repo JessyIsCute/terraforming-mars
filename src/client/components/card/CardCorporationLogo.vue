@@ -346,6 +346,12 @@
           <div class="word-2">CARTEL</div>
         </div>
       </template>
+      <template v-else-if="title === CardName.HELIX_CONFERENCE">
+        <div class="card-helix-conference-logo">
+          <div class="word-1">HELIX</div>
+          <div class="word-2">CONFERENCE</div>
+        </div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -395,6 +401,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.HADESPHERE]: 'bespoke',
   [CardName.HECATE_SPEDITIONS]: 'bespoke',
   [CardName.HELION]: 'css',
+  [CardName.HELIX_CONFERENCE]: 'bespoke',
   [CardName.HENKEI_GENETICS]: 'bespoke',
   [CardName.INCITE]: 'bespoke',
   [CardName.IN_SPIRE]: 'bespoke',

@@ -16,6 +16,7 @@ import {MutationName} from '../../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../../common/mutationmarkets/MutationDefinitions';
 import {describeMutationEffect} from '../../../common/mutationmarkets/describeMutation';
 import {MutationEffects} from '../../mutationmarkets/MutationEffects';
+import {Size} from '../../../common/cards/render/Size';
 
 // A science-conference corp in the mold of Olympus Conference: every Science or Microbe
 // tag played (including this card's own) either banks a science resource here, or --
@@ -50,9 +51,14 @@ export class HelixConference extends CorporationCard implements ICorporationCard
           'to apply one of 3 mutations to a card in your hand.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(40).br;
-          b.tag(Tag.SCIENCE).tag(Tag.MICROBE).colon().resource(CardResource.SCIENCE).br;
-          b.or().br;
-          b.minus().resource(CardResource.SCIENCE, 2).asterix();
+          b.corpBox('effect', (ce) => {
+            ce.vSpace(Size.LARGE);
+            ce.br;
+            ce.effect('When you play a science or microbe tag, incl. this, either add a science resource to this card, or remove 2 to apply a mutation to a card in your hand.', (eb) => {
+              eb.tag(Tag.SCIENCE, {size: Size.SMALL}).tag(Tag.MICROBE, {size: Size.SMALL}).startEffect;
+              eb.resource(CardResource.SCIENCE, {size: Size.SMALL}).nbsp.or().nbsp.minus().resource(CardResource.SCIENCE, {amount: 2, size: Size.SMALL}).asterix();
+            });
+          });
         }),
       },
     });
