@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import {HelixConference} from '../../../src/server/cards/mutationmarkets/HelixConference';
-import {Bushes} from '../../../src/server/cards/base/Bushes';
 import {testGame} from '../../TestGame';
 import {fakeCard, runAllActions} from '../../TestingUtils';
 import {IGame} from '../../../src/server/IGame';
@@ -65,11 +64,11 @@ describe('HelixConference', () => {
     expect(orOptions.options).has.lengthOf(2);
   });
 
-  it('spending 2 resources lets the player pick a target card and one of 3 mutations', () => {
+  it('spending 2 resources lets the player pick a target card in hand and one of 3 mutations', () => {
     player.playedCards.push(card);
     card.resourceCount = 2;
     const target = fakeCard({tags: []});
-    player.playedCards.push(target);
+    player.cardsInHand.push(target);
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
     const orOptions = cast(game.deferredActions.peek()!.execute(), OrOptions);
@@ -92,7 +91,7 @@ describe('HelixConference', () => {
     player.playedCards.push(card);
     card.resourceCount = 2;
     const target = fakeCard({tags: []});
-    player.playedCards.push(target);
+    player.cardsInHand.push(target);
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
     const orOptions = cast(game.deferredActions.peek()!.execute(), OrOptions);
@@ -104,9 +103,10 @@ describe('HelixConference', () => {
     expect(target.mutations).to.deep.eq([{mutation: MutationName.GIGANTIC_UNDERTAKINGS}]);
   });
 
-  it('does not offer a card to mutate when the player has no played project cards', () => {
+  it('does not offer a card to mutate when the player has an empty hand', () => {
     player.playedCards.push(card);
     card.resourceCount = 2;
+    player.cardsInHand = [];
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
     const orOptions = cast(game.deferredActions.peek()!.execute(), OrOptions);
@@ -116,26 +116,21 @@ describe('HelixConference', () => {
     expect(card.resourceCount).to.eq(0);
   });
 
-  it('adding a tag mutation keeps the tableau tag count in sync', () => {
-    // A real Card subclass, unlike fakeCard(): its .tags getter is computed live from
-    // .mutations (see MutationEffects.applyTags), so this actually exercises whether
-    // playedCards.retagCard is wired up correctly -- a fakeCard's plain .tags field
-    // wouldn't reflect the mutation at all, silently passing regardless.
-    player.playedCards.push(card);
-    card.resourceCount = 2;
-    const target = new Bushes();
-    player.playedCards.push(target);
-    const tagsBefore = {...player.playedCards.tags};
+  it('a mutated hand card still grants its on-play bonus normally once actually played', () => {
+    // Confirms the fix for targeting hand cards (not already-played tableau cards):
+    // a mutation with an "on play" grant only ever fires once, from
+    // MutationMarkets.applyOnPlayEffects, at the moment a card is played from hand -- a
+    // moment that hasn't happened yet for a card still in hand, unlike one already on
+    // the table. Greenery Keeper isn't one of HelixConference's own curated 3, so apply
+    // it directly here, the same way a market win would.
+    const target = fakeCard({tags: []});
+    player.cardsInHand = [target];
+    target.mutations = [{mutation: MutationName.GREENERY_KEEPER}];
 
-    card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
-    const orOptions = cast(game.deferredActions.peek()!.execute(), OrOptions);
-    game.deferredActions.pop();
-    const selectCard = cast(orOptions.options[0].cb(), SelectCard);
-    const mutationChoice = cast(selectCard.cb([target]), OrOptions);
-    mutationChoice.options[0].cb(undefined); // Science Patron: addRandomTag
+    const plantsBefore = player.plants;
+    player.playCard(target);
+    runAllActions(game);
 
-    const chosenTag = target.mutations![0].chosenTag!;
-    expect(target.tags).to.include(chosenTag);
-    expect(player.playedCards.tags[chosenTag]).to.eq(tagsBefore[chosenTag] + 1);
+    expect(player.plants).to.eq(plantsBefore + 2);
   });
 });

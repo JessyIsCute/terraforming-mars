@@ -19,17 +19,17 @@ import {MutationEffects} from '../../mutationmarkets/MutationEffects';
 
 // A science-conference corp in the mold of Olympus Conference: every Science or Microbe
 // tag played (including this card's own) either banks a science resource here, or --
-// once 2 are banked -- spends them to mutate one of the player's own played cards.
+// once 2 are banked -- spends them to mutate one of the cards in the player's OWN hand
+// (mirroring Blacklab Cartel's Infect, which likewise targets a card in hand, not
+// something already on the table -- a mutation applied there behaves exactly like one
+// won from the market: MutationEffects' cost/tag/type effects are live getters, and any
+// "on play" grant fires normally, for real, whenever the player eventually plays it).
 // Deliberately effect-triggered, not action-based, and unrelated to Underworld
 // corruption, as a positive counterpart to Blacklab Cartel's opponent-targeting Infect.
 export class HelixConference extends CorporationCard implements ICorporationCard {
-  // Restricted to mutations whose effect still does something useful when applied to a
-  // card that's already been played (addRandomTag/costPercent's VP bonus/convertType are
-  // all computed live from `card.mutations`, not just once at play time -- see
-  // MutationEffects.applyTags/victoryPointsBonus/applyType). grantResourceOnPlay,
-  // grantProductionOnPlay, and nestedCopy only ever fire from
-  // MutationMarkets.applyOnPlayEffects, at the one moment a card is played from hand --
-  // offering those here would be a dead pick, since that moment has already passed.
+  // A representative spread across the three effect families a mutation can have
+  // (addRandomTag / costPercent+VP / convertType) -- arbitrary otherwise, since every
+  // mutation works correctly on a card still in hand.
   private static readonly MUTATION_CHOICES: ReadonlyArray<MutationName> = [
     MutationName.SCIENCE_PATRON,
     MutationName.GIGANTIC_UNDERTAKINGS,
@@ -47,7 +47,7 @@ export class HelixConference extends CorporationCard implements ICorporationCard
         cardNumber: 'MM02',
         description: 'You start with 40 M€. When you play a science or microbe tag, including this, ' +
           'either add a science resource to this card, or remove 2 science resources from this card ' +
-          'to apply one of 3 mutations to one of your played cards.',
+          'to apply one of 3 mutations to a card in your hand.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(40).br;
           b.tag(Tag.SCIENCE).tag(Tag.MICROBE).colon().resource(CardResource.SCIENCE).br;
@@ -83,7 +83,7 @@ export class HelixConference extends CorporationCard implements ICorporationCard
       return undefined;
     }
     return new OrOptions(
-      new SelectOption('Remove 2 science resources from this card to mutate one of your cards', 'Mutate').andThen(() => {
+      new SelectOption('Remove 2 science resources from this card to mutate a card in your hand', 'Mutate').andThen(() => {
         player.removeResourceFrom(this, 2, {log: true});
         return this.selectCardToMutate(player);
       }),
@@ -95,11 +95,11 @@ export class HelixConference extends CorporationCard implements ICorporationCard
   }
 
   private selectCardToMutate(player: IPlayer): PlayerInput | undefined {
-    const candidates = player.playedCards.projects();
+    const candidates = player.cardsInHand;
     if (candidates.length === 0) {
       return undefined;
     }
-    return new SelectCard('Select a card to mutate', 'Mutate', candidates).andThen(([card]) => {
+    return new SelectCard('Select a card in your hand to mutate', 'Mutate', candidates).andThen(([card]) => {
       return this.selectMutation(player, card);
     });
   }
@@ -112,9 +112,7 @@ export class HelixConference extends CorporationCard implements ICorporationCard
       orOptions.options.push(
         new SelectOption(`${definition.prefix}: ${describeMutationEffect(definition.effect)}`, 'Mutate').andThen(() => {
           const applied = MutationEffects.apply(card, mutation, game.rng);
-          player.playedCards.retagCard(card, () => {
-            card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
-          });
+          card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
           game.log('${0} mutated ${1} with ${2}', (b) => b.player(player).card(card).string(definition.name));
           return undefined;
         }));
