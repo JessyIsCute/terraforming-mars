@@ -298,6 +298,17 @@ const BONUS_CSS: Partial<Record<SpaceBonus, string>> = Object.fromEntries(BONUS_
 /** Guard against a runaway click-fest; real boards never exceed a handful. */
 const MAX_HEX_BONUSES = 8;
 
+// Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
+// each side, so the heat/oxygen/temperature/Venus tracks painted just outside the diamond peek
+// into the editing canvas instead of being cropped off flush with the hexes -- gridStyle() used
+// to crop tight to the diamond with no margin at all, which is why the tracks looked chopped off
+// on both sides. Same values (and the same per-side reasoning) as MapThumbnail.vue's
+// TRACK_MARGIN_* constants, which this mirrors.
+const GRID_TRACK_MARGIN_LEFT = 70;
+const GRID_TRACK_MARGIN_TOP = 63;
+const GRID_TRACK_MARGIN_BOTTOM = 55;
+const GRID_TRACK_MARGIN_RIGHT = 120;
+
 export default defineComponent({
   name: 'MapEditor',
   components: {Board},
@@ -434,14 +445,17 @@ export default defineComponent({
       // Scale/position mars-without-venus.png (620x600) so its painted diamond -- hex box
       // [6,444]x[34,413] within #main_board, offset (93,85) in the image -- lands under the
       // editor's hex bounding box, so the backdrop lines up with the hexes as in the preview.
+      // The GRID_TRACK_MARGIN_* terms below grow the container and shift the backdrop by the
+      // same amount on each side, revealing a uniform strip of extra board -- tracks and all --
+      // beyond the tight hex diamond, instead of cropping flush with the hexes.
       const img = {left: 99, top: 119, width: 438, height: 379};
       const sx = ((maxL - minL) + 46) / img.width;
       const sy = ((maxT - minT) + 51) / img.height;
-      const bgX = (minL - img.left * sx).toFixed(1);
-      const bgY = (minT - img.top * sy).toFixed(1);
+      const bgX = (minL - img.left * sx + GRID_TRACK_MARGIN_LEFT).toFixed(1);
+      const bgY = (minT - img.top * sy + GRID_TRACK_MARGIN_TOP).toFixed(1);
       return {
-        width: `${maxL + 90}px`,
-        height: `${maxT + 90}px`,
+        width: `${maxL + 90 + GRID_TRACK_MARGIN_LEFT + GRID_TRACK_MARGIN_RIGHT}px`,
+        height: `${maxT + 90 + GRID_TRACK_MARGIN_TOP + GRID_TRACK_MARGIN_BOTTOM}px`,
         background:
           'linear-gradient(rgba(21, 19, 31, 0.55), rgba(21, 19, 31, 0.55)) local, ' +
           `url("/assets/board/mars-without-venus.png") local no-repeat ${bgX}px ${bgY}px / ${(620 * sx).toFixed(1)}px ${(600 * sy).toFixed(1)}px, ` +
@@ -516,7 +530,7 @@ export default defineComponent({
     hexStyle(cell: Cell): Record<string, string> {
       const maxY = this.rows - 1;
       const p = customSpacePixel(cell.x, cell.y, maxY);
-      return {left: `${p.left}px`, top: `${p.top}px`};
+      return {left: `${p.left + GRID_TRACK_MARGIN_LEFT}px`, top: `${p.top + GRID_TRACK_MARGIN_TOP}px`};
     },
     bonusCss(bonus: SpaceBonus): string {
       return BONUS_CSS[bonus] ?? '';
