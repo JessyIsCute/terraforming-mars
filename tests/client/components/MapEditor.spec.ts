@@ -247,4 +247,41 @@ describe('MapEditor', () => {
       expect(vm.loadError).to.not.eq('');
     });
   });
+
+  describe('submitting to the Map Library', () => {
+    let originalFetch: typeof global.fetch;
+
+    beforeEach(() => {
+      originalFetch = global.fetch;
+    });
+    afterEach(() => {
+      global.fetch = originalFetch;
+    });
+
+    it('posts the live editor code, description, and submitter, then shows success', async () => {
+      let sentBody: any;
+      global.fetch = ((_url: string, init: any) => {
+        sentBody = JSON.parse(init.body);
+        return Promise.resolve({ok: true, status: 200, json: () => Promise.resolve({entry: {}})} as Response);
+      }) as typeof fetch;
+
+      const wrapper = mount(MapEditor, {...globalConfig});
+      const vm = wrapper.vm as any;
+      await wrapper.find('.map-editor-submit textarea').setValue('a fine map');
+      await wrapper.find('.map-editor-submit input[type=text]').setValue('me');
+      await wrapper.find('.map-editor-submit button.btn-primary').trigger('click');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(sentBody).to.deep.eq({code: vm.code, description: 'a fine map', submittedBy: 'me'});
+      expect(wrapper.text()).to.contain('Submitted!');
+    });
+
+    it('shows a clear message when rate-limited', async () => {
+      global.fetch = (() => Promise.resolve({ok: false, status: 429} as Response)) as typeof fetch;
+      const wrapper = mount(MapEditor, {...globalConfig});
+      await wrapper.find('.map-editor-submit button.btn-primary').trigger('click');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(wrapper.text()).to.contain('too quickly');
+    });
+  });
 });
