@@ -9,7 +9,7 @@
               <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
               <div v-if="card.infectionAddedTag" class="infection-tag-glow"><CardTag :index="0" :type="card.infectionAddedTag" /></div>
           </div>
-          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated" :infected="infected"/>
+          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated"/>
           <CardContent
               :metadata="cardMetadata"
               :requirements="cardRequirements"
@@ -18,6 +18,7 @@
               :mutationText="mutationEffectText"
               :infectionText="infectionEffectText" />
       </div>
+      <div v-if="infected" class="infected-label">Infected</div>
       <CardExpansion :expansion="cardExpansion" :isCorporation="isCorporationCard" :isResourceCard="isResourceCard" :compatibility="cardCompatibility" />
       <CardResourceCounter v-if="hasResourceType" :amount="resourceAmount" :type="resourceType" />
       <CardVictoryPoints

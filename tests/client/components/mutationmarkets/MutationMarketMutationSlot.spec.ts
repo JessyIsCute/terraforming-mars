@@ -82,7 +82,7 @@ describe('MutationMarketMutationSlot', () => {
     });
     // One score cell per player (the color-symbol badge is hidden unless the
     // symbol_overlay preference is on, so don't assume it renders here).
-    expect(wrapper.findAll('.ma-score').length).to.be.at.least(2);
+    expect(wrapper.findAll('.mutation-market-player-score').length).to.be.at.least(2);
     expect(wrapper.text()).to.contain('3');
   });
 
@@ -91,7 +91,7 @@ describe('MutationMarketMutationSlot', () => {
       ...globalConfig,
       props: {marketSlot: slotFor(MutationName.TAG_DIVERSIFIER), gridColumn: '1 / span 2'},
     });
-    expect(wrapper.find('.ma-scores').exists()).to.be.false;
+    expect(wrapper.find('.mutation-market-player-scores').exists()).to.be.false;
   });
 
   it('renders an infection slot with no "Needs:" line, red label/glow, and no player-progress block', () => {
@@ -106,7 +106,7 @@ describe('MutationMarketMutationSlot', () => {
     expect(wrapper.find('.mutation-market-mutation-label').exists()).to.be.false;
     expect(wrapper.find('.infection-glow').exists()).to.be.true;
     // Infections have no requirement, so the server never sends a playerProgress for one.
-    expect(wrapper.find('.ma-scores').exists()).to.be.false;
+    expect(wrapper.find('.mutation-market-player-scores').exists()).to.be.false;
   });
 
   it('applies the infection-card-standalone red background class for an infection slot', () => {

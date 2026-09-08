@@ -11,15 +11,15 @@
         <span v-if="requirementText">Needs: {{ requirementText }}</span>
         <span v-if="effectText" :class="glowClass">{{ effectText }}</span>
       </div>
-      <div v-if="marketSlot.playerProgress" class="ma-scores player_home_block--milestones-and-awards-scores">
+      <div v-if="marketSlot.playerProgress" class="mutation-market-player-scores">
         <template v-for="progress in marketSlot.playerProgress" :key="progress.color">
           <p
             v-if="playerSymbol(progress.color).length > 0"
-            class="ma-score"
+            class="mutation-market-player-score"
             :class="`player_bg_color_${progress.color}`"
             v-text="playerSymbol(progress.color)"
           ></p>
-          <p class="ma-score" :class="`player_bg_color_${progress.color}`" v-text="progress.score"></p>
+          <p class="mutation-market-player-score" :class="`player_bg_color_${progress.color}`" v-text="progress.score"></p>
         </template>
       </div>
       <div v-if="!marketSlot.active" class="mutation-market-inactive-overlay"></div>

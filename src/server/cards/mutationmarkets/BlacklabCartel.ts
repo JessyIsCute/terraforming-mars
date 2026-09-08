@@ -38,8 +38,7 @@ export class BlacklabCartel extends CorporationCard implements ICorporationCard,
 
       metadata: {
         cardNumber: 'MM01',
-        description: 'You start with 38 M€ and 1 corruption. Action: Spend 1 corruption to target ' +
-          'an opponent, look at 2 random cards from their hand, choose one, and infect it.',
+        description: 'You start with 38 M€ and 1 corruption.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(38).corruption(1).br;
           b.action('Spend 1 corruption. Look at 2 random cards from an opponent\'s hand, choose one, and infect it.', (ab) => {

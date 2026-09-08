@@ -2958,29 +2958,34 @@
       border-radius: 14px 2px 2px 2px;
       .raised-bevel();
     }
-    // MutationMarkets: Blacklab Cartel's red-glow counterpart to `.mutated-label`, which can
-    // coexist with it on the same card (a card can carry both a mutation and an
-    // infection). Stacked below `.mutated-label` rather than at the same position so
-    // both remain visible/distinguishable at once -- a best-effort layout, not verified
-    // against an actual render.
-    .infected-label {
-      position: absolute;
-      text-transform: uppercase;
-      top: 37px;
-      left: 48px;
-      margin: 0px;
-      width: 64px;
-      height: 20px;
-      line-height: 22px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: #fff;
-      box-shadow: @outline-shadow;
-      background: linear-gradient(-60deg, #7f0000 10%, #ff5252, #7f0000 90%);
-      border-radius: 14px 2px 2px 2px;
-      .raised-bevel();
-    }
+  }
+  // MutationMarkets: Blacklab Cartel's red "Infected" ribbon. Deliberately NOT nested
+  // inside `.card-title` like `.mutated-label`/`.prelude-label`/`.ceo-label` -- those all
+  // anchor with `top:`, which is fine for a fixed-position ribbon near the title, but a
+  // card's height is variable (`.filterDiv` sets no fixed height), so this instead sits
+  // here as a sibling of `.card-title`/`.card-expansion`, positioned with `bottom:`
+  // relative to `.card-container` directly, the same way `.card-points`/
+  // `.card-resources-counter` reliably reach the card's actual bottom corners regardless
+  // of content length. Placed bottom-left so it never overlaps `.mutated-label` (which
+  // stays up near the cost circle) even when a card carries both at once.
+  .infected-label {
+    position: absolute;
+    text-transform: uppercase;
+    bottom: 32px;
+    left: 4px;
+    margin: 0px;
+    width: 64px;
+    height: 20px;
+    line-height: 22px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: @outline-shadow;
+    background: linear-gradient(-60deg, #7f0000 10%, #ff5252, #7f0000 90%);
+    border-radius: 14px 2px 2px 2px;
+    z-index: 3;
+    .raised-bevel();
   }
   .card-expansion {
     position: absolute;
