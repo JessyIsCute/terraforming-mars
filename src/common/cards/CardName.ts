@@ -1011,6 +1011,7 @@ export enum CardName {
   RINGCOM = 'Ringcom',
   CHIMERA = 'Chimera',
   SISTEMAS_SEEBECK = 'Sistemas Seebeck',
+  IN_SPIRE = 'InSpire',
   // SPIRE = 'Spire',
   SOYLENT_SEEDLING_SYSTEMS = 'Soylent Seedling Systems',
   STEELARIS = 'Steelaris',
