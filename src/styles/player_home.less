@@ -441,6 +441,7 @@ each(@players, {
 
     .ma-name {
       display: inline-block;
+      position: relative;
       width: 140px;
       height: 83px;
       color: black;
@@ -521,6 +522,57 @@ each(@players, {
       // background-position: -30px -5px;
       }
     })
+
+    // Conglomerates milestone variants have no dedicated art -- reuse the base milestone's
+    // image (Milestone.vue then draws a small patch over the corner number, see
+    // .ma-number-patch below, using CONGLOMERATES_MILESTONE_NUMBERS to know the real value).
+    @ma-name-conglomerates:
+      agronomist6 agronomist, architect5 architect, builder12 builder,
+      c-forester5 c-forester, capitalist96 capitalist, coastguard5 coastguard,
+      colonizer6 colonizer, diversifier12 diversifier, ecologist6 ecologist,
+      economizer8 economizer, energizer9 energizer, engineer15 engineer,
+      farmer8 farmer, firestarter30 firestarter, forester6 forester,
+      fundraiser18 fundraiser, gambler3 gambler, gardener5 gardener,
+      generalist2 generalist, geologist5 geologist, irrigator6 irrigator,
+      land-specialist5 land-specialist, legend8 legend, martian6 martian,
+      mayor5 mayor, pioneer5 pioneer, planner24 planner,
+      polar-explorer5 polar-explorer, researcher6 researcher, rim-settler5 rim-settler,
+      smith9 smith, spacefarer9 spacefarer, specialist15 specialist,
+      t-collector5 t-collector, tactician8 tactician, terra-pioneer8 terra-pioneer,
+      terraformer53 terraformer, terran9 terran, tradesman5 tradesman,
+      tropicalist5 tropicalist, tycoon23 tycoon, v-electrician6 v-electrician,
+      v-spacefarer6 v-spacefarer;
+    each(@ma-name-conglomerates, {
+      @variant: extract(@value, 1);
+      @base: extract(@value, 2);
+      .ma-name--@{variant} {
+        background-image: url("assets/ma/@{base}.png");
+      }
+    })
+
+    // A small patch drawn over the reused image's corner number, showing the real
+    // Conglomerates-scaled value. Deliberately one consistent style (gold hex, black bold
+    // number) rather than trying to match each base image's own badge color/shape -- reading
+    // through the ~40 source images showed enough variety (circles, hexagons, diamonds, at
+    // least 6 different badge colors) that faithfully recreating each one via CSS wasn't
+    // realistic without real image-editing tools; a consistent "team variant" look is more
+    // achievable and arguably clearer anyway.
+    .ma-number-patch {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 28px;
+      height: 28px;
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: linear-gradient(to bottom, #e8c66a, #b8912f);
+      border: 1px solid #5c4210;
+      color: #1a1200;
+      font-weight: bold;
+      font-size: 12px;
+      line-height: 28px;
+      text-align: center;
+      z-index: 1;
+    }
 
     .ma-description {
       display: inline-block;

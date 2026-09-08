@@ -4,6 +4,7 @@
       <i :title="milestone.playerName" class="board-cube" :class="`board-cube--${milestone.color}`" ></i>
     </div>
     <div class="ma-name--milestones" :class="nameCss">
+      <div v-if="conglomeratesNumberPatch !== undefined" class="ma-number-patch">{{ conglomeratesNumberPatch }}</div>
       <span ref="name" v-i18n>{{name}}</span>
       <div v-if="showScores" class="ma-scores player_home_block--milestones-and-awards-scores">
         <template v-for="score in sortedScores" :key="score.color">
@@ -34,6 +35,7 @@
 import {defineComponent} from 'vue';
 import {ClaimedMilestoneModel, MilestoneScore} from '@/common/models/ClaimedMilestoneModel';
 import {getMilestone} from '@/client/MilestoneAwardManifest';
+import {CONGLOMERATES_MILESTONE_NUMBERS} from '@/common/ma/ConglomeratesMilestoneNumbers';
 import {playerSymbol} from '@/client/utils/playerSymbol';
 import {Color} from '@/common/Color';
 import {fitTextWhenReady} from '@/client/utils/textFit';
@@ -101,6 +103,9 @@ export default defineComponent({
     },
     description(): string {
       return getMilestone(this.milestone.name).description;
+    },
+    conglomeratesNumberPatch(): number | undefined {
+      return CONGLOMERATES_MILESTONE_NUMBERS[this.milestone.name];
     },
   },
 });
