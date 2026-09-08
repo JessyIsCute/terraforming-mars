@@ -1134,7 +1134,20 @@ export class Player implements IPlayer {
 
   public availableHeat(): number {
     const floaters = this.resourcesOnCard(CardName.STORMCRAFT_INCORPORATED);
-    return this.heat + (floaters * 2);
+    let total = this.heat + (floaters * 2);
+    if (this.tableau.has(CardName.SISTEMAS_SEEBECK)) {
+      total += this.energy;
+    }
+    return total;
+  }
+
+  public availableEnergy(): number {
+    let total = this.energy;
+    if (this.tableau.has(CardName.SISTEMAS_SEEBECK)) {
+      const floaters = this.resourcesOnCard(CardName.STORMCRAFT_INCORPORATED);
+      total += this.heat + (floaters * 2);
+    }
+    return total;
   }
 
   public spendHeat(amount: number, cb: () => (undefined | PlayerInput) = () => undefined) : PlayerInput | undefined {
@@ -1142,8 +1155,24 @@ export class Player implements IPlayer {
     if (stormcraft?.resourceCount > 0) {
       return stormcraft.spendHeat(this, amount, cb);
     }
+    if (this.tableau.has(CardName.SISTEMAS_SEEBECK) && this.heat < amount) {
+      const fromHeat = Math.min(this.heat, amount);
+      this.stock.deduct(Resource.HEAT, fromHeat);
+      this.stock.deduct(Resource.ENERGY, amount - fromHeat);
+      return cb();
+    }
     this.stock.deduct(Resource.HEAT, amount);
     return cb();
+  }
+
+  public spendEnergy(amount: number): void {
+    if (this.tableau.has(CardName.SISTEMAS_SEEBECK) && this.energy < amount) {
+      const fromEnergy = Math.min(this.energy, amount);
+      this.stock.deduct(Resource.ENERGY, fromEnergy);
+      this.stock.deduct(Resource.HEAT, amount - fromEnergy);
+      return;
+    }
+    this.stock.deduct(Resource.ENERGY, amount);
   }
 
   public claimableMilestones(): Array<IMilestone> {
@@ -1460,13 +1489,16 @@ export class Player implements IPlayer {
     options.lunaTradeFederationTitanium = this.canUseTitaniumAsMegacredits;
 
     const reserveUnits = options.reserveUnits ?? Units.EMPTY;
-    if (reserveUnits.heat > 0) {
-      // Special-case heat
-      const unitsWithoutHeat = {...reserveUnits, heat: 0};
-      if (!this.stock.has(unitsWithoutHeat)) {
+    if (reserveUnits.heat > 0 || reserveUnits.energy > 0) {
+      // Special-case heat and energy (Stormcraft floaters, Sistemas Seebeck)
+      const unitsWithoutHeatOrEnergy = {...reserveUnits, heat: 0, energy: 0};
+      if (!this.stock.has(unitsWithoutHeatOrEnergy)) {
         return Player.CANNOT_AFFORD;
       }
       if (this.availableHeat() < reserveUnits.heat) {
+        return Player.CANNOT_AFFORD;
+      }
+      if (this.availableEnergy() < reserveUnits.energy) {
         return Player.CANNOT_AFFORD;
       }
     } else {

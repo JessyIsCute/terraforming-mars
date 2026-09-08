@@ -17,6 +17,7 @@ import {CassiniStation} from './CassiniStation';
 import {CeresSpaceport} from './CeresSpaceport';
 import {CharityDonation} from './CharityDonation';
 import {Chimera} from './Chimera';
+import {SistemasSeebeck} from './SistemasSeebeck';
 import {CO2Reducers} from './CO2Reducers';
 import {CollegiumCopernicus} from './CollegiumCopernicus';
 import {CommunicationBoom} from './CommunicationBoom';
@@ -201,7 +202,7 @@ export const PATHFINDERS_CARD_MANIFEST = new ModuleManifest({
     [CardName.AMBIENT]: {Factory: Ambient, compatibility: 'venus'},
     [CardName.RINGCOM]: {Factory: Ringcom},
     [CardName.CHIMERA]: {Factory: Chimera},
-    // [CardName.SISTEMAS_SEEBECK]: {Factory: SistemasSeebeck},
+    [CardName.SISTEMAS_SEEBECK]: {Factory: SistemasSeebeck},
     // [CardName.SPIRE]: {Factory: Spire},
     [CardName.SOYLENT_SEEDLING_SYSTEMS]: {Factory: SoylentSeedlingSystems},
     [CardName.STEELARIS]: {Factory: Steelaris},
