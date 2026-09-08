@@ -40,6 +40,15 @@
       :value="canUseHeatAsMegaCredits ? 1 : 0"
       :resourceProtection="player.protectedResources.heat"
       :productionProtection="player.protectedProduction.heat"/>
+    <div v-if="conglomeratesExpansion" class="resource_item resource_item--coordination" data-test="coordination-resource">
+      <div class="resource_item_stock">
+        <i class="resource_icon resource_icon--coordination tooltip tooltip-bottom" :data-tooltip="$t('Coordination')"></i>
+        <div class="resource_item_stock_count" data-test="stock-count">{{ player.conglomeratesData.coordination }}</div>
+      </div>
+      <div class="resource_item_prod">
+        <span class="resource_item_prod_count tooltip tooltip-bottom" data-test="production" :data-tooltip="$t('Every player gains 2 Coordination each generation')">+2</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,6 +65,10 @@ export default defineComponent({
     player: {
       type: Object as () => PublicPlayerModel,
       required: true,
+    },
+    conglomeratesExpansion: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

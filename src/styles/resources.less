@@ -106,6 +106,34 @@ each(@resource_types, {
 .resource_icon--corruption {
   background-image: url(./assets/underworld/corruption.png);
 }
+// Conglomerates: no art asset, so CSS-only -- same blue-box/handshake styling as the
+// Coordination icon used elsewhere (card renders, the tag overview).
+.resource_icon--coordination {
+  background-image: none;
+  background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
+  border: 1px solid black;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
+  }
+
+  &::before {
+    content: "🤝";
+    position: relative;
+    z-index: 1;
+    display: block;
+    top: -1px;
+    font-size: 20px;
+    line-height: 36px;
+    text-align: center;
+  }
+}
 .resource_icon--auroraidata {
   background-image: url("assets/resources/data.png");
 }

@@ -15,7 +15,7 @@
             <PlayerStatus :timer="player.timer" :showTimer="playerView.game.gameOptions.showTimers" :liveTimer="playerView.game.phase !== Phase.END" :firstForGen="firstForGen" v-trim-whitespace :actionLabel="actionLabel"/>
           </div>
         </div>
-          <PlayerResources :player="player" v-trim-whitespace />
+          <PlayerResources :player="player" :conglomeratesExpansion="playerView.game.gameOptions.expansions.conglomerates" v-trim-whitespace />
           <div class="player-played-cards">
             <div class="player-played-cards-top">
               <div class="played-cards-elements">

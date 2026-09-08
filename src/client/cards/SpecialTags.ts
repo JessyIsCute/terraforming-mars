@@ -6,6 +6,5 @@ export const SpecialTags = {
   UNDERGROUND_TOKEN_COUNT: 'underground-token-count',
   CORRUPTION: 'corruption-count',
   NEGATIVE_VP: 'negative-vp',
-  COORDINATION: 'coordination-count',
 } as const;
 export type SpecialTags = typeof SpecialTags[keyof typeof SpecialTags];

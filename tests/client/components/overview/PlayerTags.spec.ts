@@ -157,10 +157,4 @@ describe('PlayerTags', () => {
     expect(cityCount.points).to.eq(0);
     expect(cityCount.asterisk).to.eq(true);
   });
-
-  it('shows a +2 production badge on the Coordination tag', () => {
-    const badge = wrapper.find('[data-test="coordination-production"]');
-    expect(badge.exists()).to.eq(true);
-    expect(badge.text()).to.eq('+2');
-  });
 });

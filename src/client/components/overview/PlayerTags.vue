@@ -25,12 +25,6 @@
               <PlayerTagDiscount v-if="tagDetail.discount > 0" :color="player.color" :amount="tagDetail.discount" :data-test="'discount-' + tagDetail.name"/>
               <PointsPerTag :points="tagDetail"/>
               <TagCount :tag="tagDetail.name" :count="tagDetail.count" :size="'big'" :type="'secondary'"/>
-              <div
-                v-if="tagDetail.name === SpecialTags.COORDINATION"
-                class="coordination-production-box"
-                data-test="coordination-production"
-                :title="$t('+2 Coordination per generation')"
-              >+2</div>
             </div>
           </div>
         </div>
@@ -92,7 +86,6 @@ const ORDER: Array<InterfaceTagsType> = [
   SpecialTags.UNDERGROUND_TOKEN_COUNT,
   SpecialTags.CORRUPTION,
   SpecialTags.NEGATIVE_VP,
-  SpecialTags.COORDINATION,
 ];
 
 const isInGame = (tag: InterfaceTagsType, game: GameModel): boolean => {
@@ -109,8 +102,6 @@ const isInGame = (tag: InterfaceTagsType, game: GameModel): boolean => {
   case SpecialTags.CORRUPTION:
   case SpecialTags.NEGATIVE_VP:
     return gameOptions.expansions.underworld !== false;
-  case SpecialTags.COORDINATION:
-    return gameOptions.expansions.conglomerates !== false;
   case Tag.VENUS:
   case Tag.MOON:
   case Tag.MARS:
@@ -134,8 +125,6 @@ const getTagCount = (tagName: InterfaceTagsType, player: PublicPlayerModel): num
     return player.underworldData.tokens.length;
   case SpecialTags.CORRUPTION:
     return player.underworldData.corruption;
-  case SpecialTags.COORDINATION:
-    return player.conglomeratesData.coordination;
   case SpecialTags.NEGATIVE_VP:
     return player.victoryPointsBreakdown.negativeVP;
   case 'separator':

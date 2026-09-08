@@ -234,60 +234,6 @@ each(@players, {
   .tag-count-icon();
 }
 
-// Conglomerates: a square blue badge (matching the other resource icons' shape)
-// with a handshake emoji, CSS-only since there's no art asset for it.
-.tag-coordination-count {
-  .tag-count-icon();
-  background-image: none;
-  background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%) !important;
-  border: 1px solid black !important;
-  box-sizing: border-box;
-  filter: none;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-
-  // Inner fill, inset from the bevel ring above: same bright-top/dark-bottom
-  // treatment as the ring, one shade lighter/darker, echoing the beveled look
-  // of the real resource token art.
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 4px;
-    background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
-    z-index: 0;
-  }
-
-  &::before {
-    content: "🤝";
-    position: relative;
-    z-index: 1;
-    top: -2px;
-    font-size: 20px;
-    line-height: 32px;
-  }
-}
-
-// A small "+2" badge on the Coordination tag (everyone gets 2 per generation, flat -- not a
-// real per-player adjustable production value, so this is a static label, not wired to
-// player data). Sits INSIDE the tag icon's own bottom-right corner (no negative offsets) so
-// it can never overflow past the tag bar's edge and get clipped -- the tag bar packs icons
-// tightly with no spare margin, unlike the wider card/milestone contexts.
-.coordination-production-box {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 10;
-  background: #1f4682;
-  color: white;
-  border: 1px solid black;
-  border-radius: 4px 0 0 0;
-  padding: 0px 2px;
-  font-size: 9px;
-  font-weight: bold;
-  line-height: 12px;
-}
-
 .player-board-blue-action-counter{
   margin-top: 8px;
 }
@@ -666,19 +612,36 @@ each(@players, {
 }
 
 // Conglomerates: claiming a milestone or funding an award also grants 1 Coordination -- shown
-// as "price -> handshake" right after the price badge, via an absolutely-positioned ::after
-// so it can never affect the pill's own inline layout/flow (a sibling element here previously
-// forced the price row onto its own line, separate from the Milestones/Awards title above it).
-.milestone-award-price--conglomerates::after {
-  content: "\2192 \1F91D";
-  position: absolute;
-  left: 34px;
-  top: 0;
-  width: 60px;
-  font-size: 14px;
-  line-height: 30px;
-  white-space: nowrap;
-  text-align: left;
+// as "price -> [blue Coordination box]" right after the price badge, via ::before (the arrow)
+// and ::after (a real styled box matching the Coordination icon used elsewhere -- card renders,
+// the resource bar). Both are absolutely positioned so neither can affect the pill's own inline
+// layout/flow (a real sibling element here previously forced the price row onto its own line,
+// separate from the Milestones/Awards title above it).
+.milestone-award-price--conglomerates {
+  &::before {
+    content: "\2192";
+    position: absolute;
+    left: 34px;
+    top: 0;
+    font-size: 16px;
+    line-height: 30px;
+    color: black;
+  }
+
+  &::after {
+    content: "🤝";
+    position: absolute;
+    left: 50px;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    border: 1px solid black;
+    background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
+    font-size: 12px;
+    line-height: 22px;
+    text-align: center;
+  }
 }
 
 .player_home_block--setup {
