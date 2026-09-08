@@ -143,7 +143,7 @@ export class Executor implements BehaviorExecutor {
         return false;
       }
       if (spend.energy) {
-        if (player.energy < spend.energy) {
+        if (player.availableEnergy() < spend.energy) {
           return false;
         }
         if (!player.canAfford({
@@ -380,7 +380,7 @@ export class Executor implements BehaviorExecutor {
         player.stock.deduct(Resource.PLANTS, spend.plants);
       }
       if (spend.energy) {
-        player.stock.deduct(Resource.ENERGY, spend.energy);
+        player.spendEnergy(spend.energy);
       }
       if (spend.heat) {
         player.defer(player.spendHeat(spend.heat, () => {
