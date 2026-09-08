@@ -41,7 +41,8 @@ export class BlacklabCartel extends CorporationCard implements ICorporationCard,
         description: 'You start with 38 M€ and 1 corruption.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(38).corruption(1).br;
-          b.action('Spend 1 corruption. Look at 2 random cards from an opponent\'s hand, choose one, and infect it.', (ab) => {
+          b.action('Spend 1 corruption. Look at 2 random cards from an opponent\'s hand, choose one, ' +
+            'then infect it with one of 2 random infections.', (ab) => {
             ab.corruption(1).startAction.cards(2).asterix();
           });
         }),
@@ -80,8 +81,12 @@ export class BlacklabCartel extends CorporationCard implements ICorporationCard,
         return new SelectCard('Choose a card to infect', 'Infect', revealed, {showOwner: true})
           .andThen((cards: ReadonlyArray<IProjectCard>) => {
             const target = cards[0];
+            const shuffledInfections = Object.values(InfectionName);
+            inplaceShuffle(shuffledInfections, game.rng);
+            const infectionChoices = shuffledInfections.slice(0, 2);
+
             const orOptions = new OrOptions();
-            for (const infection of Object.values(InfectionName)) {
+            for (const infection of infectionChoices) {
               const definition = INFECTION_DEFINITIONS[infection];
               orOptions.options.push(
                 new SelectOption(`${definition.prefix}: ${describeInfectionEffect(definition.effect)}`, 'Infect')

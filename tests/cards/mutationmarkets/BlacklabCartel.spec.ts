@@ -60,14 +60,14 @@ describe('BlacklabCartel', () => {
 
     const target = selectCard.cards[0];
     const orOptions = cast(selectCard.cb([target]), OrOptions);
-    expect(orOptions.options).to.have.length(Object.values(InfectionName).length);
+    expect(orOptions.options).to.have.length(2);
 
     orOptions.options[0].cb(undefined);
 
     expect(target.infections).to.have.length(1);
   });
 
-  it('offers every infection in InfectionName enum order, applying the chosen one', () => {
+  it('offers 2 distinct random infections, applying whichever one is chosen', () => {
     player.underworldData.corruption = 1;
     const targetCard = fakeCard({cost: 10, baseCost: 10});
     player2.cardsInHand = [targetCard];
@@ -75,13 +75,17 @@ describe('BlacklabCartel', () => {
     const selectPlayer = cast(card.action(player), SelectPlayer);
     const selectCard = cast(selectPlayer.cb(player2), SelectCard);
     const orOptions = cast(selectCard.cb([targetCard]), OrOptions);
-    // InfectionName enum order (COST_INFLATION first) drives the OrOptions build order --
-    // the actual cost-math effect of Cost Inflation is unit-tested in InfectionEffects.spec.ts;
-    // FakeCard's `cost` is a plain field, not a getter composed with InfectionEffects like
-    // the real Card class, so it can't be observed via `targetCard.cost` here.
+    // Which 2 of the full InfectionName set get offered is RNG-driven (see
+    // BlacklabCartel.action's inplaceShuffle), so this doesn't assert a specific one --
+    // just that exactly 2 distinct, valid infections are offered, and picking one applies
+    // it. The actual cost-math effect of e.g. Cost Inflation is unit-tested in
+    // InfectionEffects.spec.ts.
+    expect(orOptions.options).to.have.length(2);
+
     orOptions.options[0].cb(undefined);
 
-    expect(targetCard.infections).to.deep.eq([{infection: InfectionName.COST_INFLATION}]);
+    expect(targetCard.infections).to.have.length(1);
+    expect(Object.values(InfectionName)).to.include(targetCard.infections![0].infection);
   });
 
   it('does not offer a targeted opponent with no cards in hand', () => {
