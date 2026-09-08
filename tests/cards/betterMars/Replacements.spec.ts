@@ -264,6 +264,33 @@ describe('BetterMars replacement cards', () => {
     expect(pool).to.not.contain(CardName.PRISTAR); // Pristar itself also requires Turmoil
   });
 
+  it('Planet PR lives in BetterMars now, and still requires Pathfinders', () => {
+    const withoutPathfinders: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: true,
+      pathfindersExpansion: false,
+    };
+    expect(new GameCards(withoutPathfinders).getCorporationCards().map(toName)).to.not.contain(CardName.PLANET_PR);
+
+    const withoutBetterMars: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: false,
+      pathfindersExpansion: true,
+    };
+    // No longer registered in the Pathfinders module at all.
+    expect(new GameCards(withoutBetterMars).getCorporationCards().map(toName)).to.not.contain(CardName.PLANET_PR);
+
+    const withBoth: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      betterMarsExpansion: true,
+      pathfindersExpansion: true,
+    };
+    expect(new GameCards(withBoth).getCorporationCards().map(toName)).to.contain(CardName.PLANET_PR);
+  });
+
   it('with BetterMars off, the base cards are untouched', () => {
     const gameOptions: GameOptions = {
       ...DEFAULT_GAME_OPTIONS,
