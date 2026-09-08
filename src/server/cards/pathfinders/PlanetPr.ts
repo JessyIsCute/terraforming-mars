@@ -38,10 +38,13 @@ export class PlanetPr extends CorporationCard implements ICorporationCard, IClon
             ce.br;
             ce.effect('Each time you play two cards with the same planetary tag in a row, raise that track 1 additional step on the second one.', (eb) => {
               eb.tag(Tag.EARTH, {size: Size.SMALL}).nbsp.tag(Tag.EARTH, {size: Size.SMALL}).slash(Size.SMALL)
-                .tag(Tag.VENUS, {size: Size.SMALL}).nbsp.tag(Tag.VENUS, {size: Size.SMALL}).slash(Size.SMALL)
-                .tag(Tag.JOVIAN, {size: Size.SMALL}).nbsp.tag(Tag.JOVIAN, {size: Size.SMALL}).slash(Size.SMALL)
-                .tag(Tag.MARS, {size: Size.SMALL}).nbsp.tag(Tag.MARS, {size: Size.SMALL}).slash(Size.SMALL)
-                .tag(Tag.MOON, {size: Size.SMALL}).nbsp.tag(Tag.MOON, {size: Size.SMALL})
+                .tag(Tag.VENUS, {size: Size.SMALL}).nbsp.tag(Tag.VENUS, {size: Size.SMALL})
+                .startEffect.planetaryTrack().plus(Size.SMALL).text('1', {size: Size.SMALL});
+            });
+            ce.br;
+            ce.effect(undefined, (eb) => {
+              eb.tag(Tag.JOVIAN, {size: Size.SMALL}).nbsp.tag(Tag.JOVIAN, {size: Size.SMALL}).slash(Size.SMALL)
+                .tag(Tag.MARS, {size: Size.SMALL}).nbsp.tag(Tag.MOON, {size: Size.SMALL})
                 .startEffect.planetaryTrack().plus(Size.SMALL).text('1', {size: Size.SMALL});
             });
             ce.br;
