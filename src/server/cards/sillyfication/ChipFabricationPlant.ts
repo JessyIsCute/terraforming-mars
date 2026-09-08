@@ -33,15 +33,15 @@ export class ChipFabricationPlant extends Card implements IProjectCard, IActionC
   }
 
   public canAct(player: IPlayer): boolean {
-    return player.energy > 0;
+    return player.availableEnergy() > 0;
   }
 
   public action(player: IPlayer) {
     return new SelectAmount(
-      message('Select up to ${0} energy to convert to steel', (b) => b.number(player.energy)),
-      'Convert energy', 1, player.energy, false)
+      message('Select up to ${0} energy to convert to steel', (b) => b.number(player.availableEnergy())),
+      'Convert energy', 1, player.availableEnergy(), false)
       .andThen((amount) => {
-        player.stock.deduct(Resource.ENERGY, amount);
+        player.spendEnergy(amount);
         player.stock.add(Resource.STEEL, amount);
         player.game.log('${0} converted ${1} energy to steel', (b) => b.player(player).number(amount));
         return undefined;

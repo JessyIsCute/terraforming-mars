@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {MusicalChairs} from '../../../src/server/cards/sillyfication/MusicalChairs';
+import {SistemasSeebeck} from '../../../src/server/cards/pathfinders/SistemasSeebeck';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -41,5 +42,17 @@ describe('MusicalChairs', () => {
     expect(player.energy).to.eq(1);
     expect(game.first).to.not.eq(before);
     expect(game.playersInGenerationOrder[0]).to.eq(game.first);
+  });
+
+  it('with Sistemas Seebeck, heat covers an energy shortfall', () => {
+    player.playedCards.push(new SistemasSeebeck());
+    player.energy = 0;
+    player.heat = 1;
+
+    expect(card.canAct(player)).is.true;
+    card.action(player);
+
+    expect(player.energy).to.eq(0);
+    expect(player.heat).to.eq(0);
   });
 });

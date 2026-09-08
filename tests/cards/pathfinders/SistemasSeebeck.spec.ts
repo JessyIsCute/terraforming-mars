@@ -7,6 +7,8 @@ import {runAllActions, fakeCard} from '../../TestingUtils';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {ProductionRequirement} from '../../../src/server/cards/requirements/ProductionRequirement';
+import {TradeWithEnergy} from '../../../src/server/player/Colonies';
+import {Pluto} from '../../../src/server/colonies/Pluto';
 
 describe('SistemasSeebeck', () => {
   let card: SistemasSeebeck;
@@ -86,5 +88,27 @@ describe('SistemasSeebeck', () => {
 
     player.production.override({energy: 1, heat: 2});
     expect(requirement.satisfies(player, card)).is.true;
+  });
+
+  it('colony trading with energy can be paid for with heat', () => {
+    player.playedCards.push(card);
+    player.energy = 1;
+    player.heat = 2;
+
+    const trader = new TradeWithEnergy(player);
+    expect(trader.canUse()).is.true;
+
+    trader.trade(new Pluto());
+
+    expect(player.energy).eq(0);
+    expect(player.heat).eq(0);
+  });
+
+  it('without Sistemas Seebeck, colony trading with energy cannot be covered by heat', () => {
+    player.energy = 1;
+    player.heat = 2;
+
+    const trader = new TradeWithEnergy(player);
+    expect(trader.canUse()).is.false;
   });
 });

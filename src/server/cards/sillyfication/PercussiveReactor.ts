@@ -45,9 +45,9 @@ export class PercussiveReactor extends Card implements IProjectCard, IActionCard
   public action(player: IPlayer) {
     const options = new OrOptions();
 
-    if (player.energy >= 2) {
+    if (player.availableEnergy() >= 2) {
       options.options.push(new SelectOption('Spend 2 energy to gain 7 heat', 'Whack it').andThen(() => {
-        player.stock.deduct(Resource.ENERGY, 2);
+        player.spendEnergy(2);
         player.stock.add(Resource.HEAT, 7, {log: true});
         return undefined;
       }));

@@ -6,7 +6,6 @@ import {IProjectCard} from '../IProjectCard';
 import {IActionCard} from '../ICard';
 import {IPlayer} from '../../IPlayer';
 import {PlayerInput} from '../../PlayerInput';
-import {Resource} from '../../../common/Resource';
 import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
 import {DELTA_TRACK_TAGS, DeltaProjectExpansion} from '../../delta/DeltaProjectExpansion';
@@ -50,7 +49,7 @@ export class DutchMountains extends Card implements IProjectCard, IActionCard {
   }
 
   public canAct(player: IPlayer): boolean {
-    return player.energy >= 3 && eligiblePositions(player).length > 0;
+    return player.availableEnergy() >= 3 && eligiblePositions(player).length > 0;
   }
 
   public action(player: IPlayer): PlayerInput | undefined {
@@ -59,7 +58,7 @@ export class DutchMountains extends Card implements IProjectCard, IActionCard {
       const tag = DELTA_TRACK_TAGS[pos];
       const label = tag === undefined ? `step ${pos}` : `the ${tag} bonus (step ${pos})`;
       return new SelectOption(`Re-trigger ${label}`, 'Select').andThen(() => {
-        player.stock.deduct(Resource.ENERGY, 3);
+        player.spendEnergy(3);
         DeltaProjectExpansion.grantRewardForPosition(player, pos, 'primary');
         return undefined;
       });

@@ -50,12 +50,12 @@ export class StormSurgeBarrier extends Card implements IProjectCard, IActionCard
 
   public canAct(player: IPlayer): boolean {
     return ownTilesAdjacentToOcean(player) > 0 ||
-      (player.energy >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(player, 'primary'));
+      (player.availableEnergy() >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(player, 'primary'));
   }
 
   public action(player: IPlayer): PlayerInput | undefined {
     const adjacentCount = ownTilesAdjacentToOcean(player);
-    const canAdvance = player.energy >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(player, 'primary');
+    const canAdvance = player.availableEnergy() >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(player, 'primary');
 
     const options: Array<SelectOption> = [];
     if (adjacentCount > 0) {
@@ -66,7 +66,7 @@ export class StormSurgeBarrier extends Card implements IProjectCard, IActionCard
     }
     if (canAdvance) {
       options.push(new SelectOption('Spend 1 energy to advance 1 step on the Delta Project track', 'Advance').andThen(() => {
-        player.stock.deduct(Resource.ENERGY, 1);
+        player.spendEnergy(1);
         DeltaProjectExpansion.forceAdvanceOneStep(player, 'primary');
         return undefined;
       }));

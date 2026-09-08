@@ -4,7 +4,6 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {IProjectCard} from '../IProjectCard';
 import {IPlayer} from '../../IPlayer';
-import {Resource} from '../../../common/Resource';
 import {Space} from '../../boards/Space';
 import {TileType} from '../../../common/TileType';
 import {OrOptions} from '../../inputs/OrOptions';
@@ -35,7 +34,7 @@ export class DynamicOceanBarrier extends Card implements IProjectCard {
     }
 
     const freeAvailable = DeltaProjectExpansion.canForceAdvanceOneStep(cardOwner, 'primary');
-    const paidAvailable = cardOwner.energy >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(cardOwner, 'primary', {ignoreTag: true});
+    const paidAvailable = cardOwner.availableEnergy() >= 1 && DeltaProjectExpansion.canForceAdvanceOneStep(cardOwner, 'primary', {ignoreTag: true});
     if (!freeAvailable && !paidAvailable) {
       return;
     }
@@ -49,7 +48,7 @@ export class DynamicOceanBarrier extends Card implements IProjectCard {
     }
     if (paidAvailable) {
       options.push(new SelectOption('Pay 1 energy to move 1 step, ignoring 1 required tag', 'Advance').andThen(() => {
-        cardOwner.stock.deduct(Resource.ENERGY, 1);
+        cardOwner.spendEnergy(1);
         DeltaProjectExpansion.forceAdvanceOneStep(cardOwner, 'primary', {ignoreTag: true});
         return undefined;
       }));

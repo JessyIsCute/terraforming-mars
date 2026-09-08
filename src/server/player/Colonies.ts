@@ -6,7 +6,6 @@ import {CanAffordOptions, IPlayer} from '../IPlayer';
 import {ENERGY_TRADE_COST, MC_TRADE_COST, TITANIUM_TRADE_COST} from '../../common/constants';
 import {IColony} from '../colonies/IColony';
 import {SelectPaymentDeferred} from '../deferredActions/SelectPaymentDeferred';
-import {Resource} from '../../common/Resource';
 import {TradeWithTitanFloatingLaunchPad} from '../cards/colonies/TitanFloatingLaunchPad';
 import {OrOptions} from '../inputs/OrOptions';
 import {SelectOption} from '../inputs/SelectOption';
@@ -188,14 +187,14 @@ export class TradeWithEnergy implements IColonyTrader {
   }
 
   public canUse() {
-    return this.player.energy >= this.tradeCost;
+    return this.player.availableEnergy() >= this.tradeCost;
   }
   public optionText() {
     return message('Pay ${0} energy', (b) => b.number(this.tradeCost));
   }
 
   public trade(colony: IColony) {
-    this.player.stock.deduct(Resource.ENERGY, this.tradeCost);
+    this.player.spendEnergy(this.tradeCost);
     this.player.game.log('${0} spent ${1} energy to trade with ${2}', (b) => b.player(this.player).number(this.tradeCost).colony(colony));
     colony.trade(this.player);
   }

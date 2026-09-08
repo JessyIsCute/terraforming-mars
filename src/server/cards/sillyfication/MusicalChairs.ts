@@ -4,7 +4,6 @@ import {IActionCard} from '../ICard';
 import {IProjectCard} from '../IProjectCard';
 import {IPlayer} from '../../IPlayer';
 import {CardName} from '../../../common/cards/CardName';
-import {Resource} from '../../../common/Resource';
 import {CardRenderer} from '../render/CardRenderer';
 
 /** Blue card: spend 1 energy to randomly hand the first-player marker to another player. */
@@ -28,12 +27,12 @@ export class MusicalChairs extends Card implements IActionCard, IProjectCard {
   }
 
   public canAct(player: IPlayer): boolean {
-    return player.energy >= 1 && player.game.players.length >= 2;
+    return player.availableEnergy() >= 1 && player.game.players.length >= 2;
   }
 
   public action(player: IPlayer) {
     const game = player.game;
-    player.stock.deduct(Resource.ENERGY, 1);
+    player.spendEnergy(1);
     const candidates = game.players.filter((p) => p.id !== game.first.id);
     const next = candidates[game.rng.nextInt(candidates.length)];
     game.log('${0} used ${1} to shuffle the turn order', (b) => b.player(player).card(this));
