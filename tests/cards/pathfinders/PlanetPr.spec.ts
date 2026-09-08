@@ -96,6 +96,23 @@ describe('PlanetPr', () => {
     expect(game.pathfindersData!.earth).to.eq(1);
   });
 
+  it('a non-planetary tag in between also breaks the streak - no bonus', () => {
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]})); // earth: +1
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.PLANT]})); // no planetary tag - breaks the streak
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]})); // earth: +1 again, no bonus
+
+    expect(game.pathfindersData!.earth).to.eq(2);
+    expect(card.lastPlanetaryTag).to.eq(Tag.EARTH);
+  });
+
+  it('a card with no tags at all also breaks the streak', () => {
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]})); // earth: +1
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: []}));
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]})); // earth: +1 again, no bonus
+
+    expect(game.pathfindersData!.earth).to.eq(2);
+  });
+
   it('does not grant the bonus for a player without Planet PR', () => {
     const [otherGame, otherPlayer] = testGame(1, {pathfindersExpansion: true});
 

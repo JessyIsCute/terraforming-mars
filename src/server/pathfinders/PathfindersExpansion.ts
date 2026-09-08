@@ -43,19 +43,25 @@ export class PathfindersExpansion {
       return;
     }
     // Planet PR: playing two cards with the same planetary tag back to back raises that
-    // track 1 additional step on the second one.
+    // track 1 additional step on the second one. Playing a card with no planetary tag at
+    // all breaks the streak, even though it doesn't touch any track itself.
     const planetPr = player.tableau.get(CardName.PLANET_PR) as PlanetPr | undefined;
     const tags = card.tags;
+    let hadPlanetaryTag = false;
     tags.forEach((tag) => {
       if (!isPlanetaryTag(tag)) {
         return;
       }
+      hadPlanetaryTag = true;
       const steps = planetPr !== undefined && planetPr.lastPlanetaryTag === tag ? 2 : 1;
       PathfindersExpansion.raiseTrack(tag, player, steps);
       if (planetPr !== undefined) {
         planetPr.lastPlanetaryTag = tag;
       }
     });
+    if (!hadPlanetaryTag && planetPr !== undefined) {
+      planetPr.lastPlanetaryTag = undefined;
+    }
   }
 
   public static willGainEnergyProductionOnNextMarsTag(player: IPlayer, count: 1 | 2 = 1): boolean {
