@@ -80,4 +80,29 @@ describe('Milestones', () => {
     const prices = wrapper.findAll('.milestone-award-price').map((priceWrapper) => parseInt(priceWrapper.text()));
     expect(prices).to.deep.eq([12, 12, 12]);
   });
+
+  it('shows a Coordination icon next to the price when Conglomerates is on', () => {
+    const wrapper = mount(Milestones, {
+      ...globalConfig,
+      props: {
+        milestones: [],
+        preferences: {...PreferencesManager.INSTANCE.values(), learner_mode: true} as Readonly<Preferences>,
+        conglomeratesExpansion: true,
+      },
+    });
+
+    expect(wrapper.findAll('.milestone-award-coordination')).to.have.lengthOf(3);
+  });
+
+  it('does not show a Coordination icon when Conglomerates is off', () => {
+    const wrapper = mount(Milestones, {
+      ...globalConfig,
+      props: {
+        milestones: [],
+        preferences: {...PreferencesManager.INSTANCE.values(), learner_mode: true} as Readonly<Preferences>,
+      },
+    });
+
+    expect(wrapper.find('.milestone-award-coordination').exists()).to.be.false;
+  });
 });

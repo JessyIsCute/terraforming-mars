@@ -45,6 +45,27 @@
   font-size: 16px;
 }
 
+// The per-member score row (e.g. "(6) (3)"), shown right under the team total -- one entry
+// per member, in the same order as the header's color swatches.
+.conglomerates-team-members {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: #ddd;
+  font-size: 13px;
+}
+
+.conglomerates-team-member-score {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  .conglomerates-team-swatch {
+    width: 10px;
+    height: 10px;
+  }
+}
+
 .conglomerates-team-breakdown {
   display: grid;
   grid-template-columns: 1fr auto;

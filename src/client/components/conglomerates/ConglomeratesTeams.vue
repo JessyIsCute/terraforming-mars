@@ -13,7 +13,16 @@
                       :class="playerColorClass(color, 'bg')"
                     ></span>
                     <span class="conglomerates-team-name">{{ team.name }}</span>
-                    <span class="conglomerates-team-total">{{ team.victoryPoints.total }}</span>
+                    <span class="conglomerates-team-total">[{{ team.victoryPoints.total }}]</span>
+                </div>
+                <div class="conglomerates-team-members">
+                    <span
+                      v-for="(score, idx) in team.memberScores"
+                      :key="idx"
+                      class="conglomerates-team-member-score"
+                    >
+                      <span class="conglomerates-team-swatch" :class="playerColorClass(team.playerColors[idx], 'bg')"></span>({{ score }})
+                    </span>
                 </div>
                 <div class="conglomerates-team-breakdown">
                     <div class="conglomerates-team-row">

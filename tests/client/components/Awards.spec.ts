@@ -246,6 +246,31 @@ describe('Awards', () => {
     expect(prices).to.be.deep.eq([12, 18, 24]);
   });
 
+  it('shows a Coordination icon next to the price when Conglomerates is on', () => {
+    const wrapper = shallowMount(Awards, {
+      ...globalConfig,
+      props: {
+        awards: [],
+        preferences: learnerModeOn,
+        conglomeratesExpansion: true,
+      },
+    });
+
+    expect(wrapper.findAll('[data-test=award-coordination-icon]')).to.have.lengthOf(3);
+  });
+
+  it('does not show a Coordination icon when Conglomerates is off', () => {
+    const wrapper = shallowMount(Awards, {
+      ...globalConfig,
+      props: {
+        awards: [],
+        preferences: learnerModeOn,
+      },
+    });
+
+    expect(wrapper.find('[data-test=award-coordination-icon]').exists()).to.be.false;
+  });
+
   it('shows award descriptions on click', async () => {
     const awards = [
       createAward({id: 1, funded: true}),

@@ -111,4 +111,25 @@ describe('Award', () => {
 
     expect(wrapper.find('.ma-name--cosmic-settler').exists()).to.be.true;
   });
+
+  it('appends a team note to the description when Conglomerates is on', () => {
+    const award = createAward({funded: false});
+    const wrapper = mount(Award, {
+      ...globalConfig,
+      props: {award, showDescription: true, conglomeratesExpansion: true},
+    });
+
+    const base = getAward('Cosmic Settler').description;
+    expect(wrapper.text()).to.include(`${base} between you and your teammate`);
+  });
+
+  it('does not append a team note when Conglomerates is off', () => {
+    const award = createAward({funded: false});
+    const wrapper = mount(Award, {
+      ...globalConfig,
+      props: {award, showDescription: true},
+    });
+
+    expect(wrapper.text()).to.not.include('between you and your teammate');
+  });
 });

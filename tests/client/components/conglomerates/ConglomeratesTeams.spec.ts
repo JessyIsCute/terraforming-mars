@@ -11,6 +11,7 @@ function fakeModel(): ConglomeratesModel {
         id: 'team-1',
         playerIds: ['p-blue-id', 'p-yellow-id'] as any,
         playerColors: ['blue', 'yellow'],
+        memberScores: [22, 16],
         name: 'Blue & Yellow',
         victoryPoints: {players: 30, milestones: 8, awards: 0, bonuses: 0, total: 38},
       },
@@ -18,6 +19,7 @@ function fakeModel(): ConglomeratesModel {
         id: 'team-2',
         playerIds: ['p-red-id', 'p-green-id'] as any,
         playerColors: ['red', 'green'],
+        memberScores: [12, 16],
         name: 'Red & Green',
         victoryPoints: {players: 20, milestones: 0, awards: 8, bonuses: 0, total: 28},
       },
@@ -42,8 +44,18 @@ describe('ConglomeratesTeams', () => {
     const teamCards = wrapper.findAll('.conglomerates-team');
     expect(teamCards).to.have.lengthOf(2);
     expect(teamCards[0].find('.conglomerates-team-name').text()).to.eq('Blue & Yellow');
-    expect(teamCards[0].find('.conglomerates-team-total').text()).to.eq('38');
-    expect(teamCards[0].findAll('.conglomerates-team-swatch')).to.have.lengthOf(2);
+    expect(teamCards[0].find('.conglomerates-team-total').text()).to.eq('[38]');
+    expect(teamCards[0].find('.conglomerates-team-header').findAll('.conglomerates-team-swatch')).to.have.lengthOf(2);
+  });
+
+  it('renders each member\'s own score in the member-scores row', () => {
+    const wrapper = shallowMount(ConglomeratesTeams, {
+      ...globalConfig,
+      props: {model: fakeModel()},
+    });
+    const teamCards = wrapper.findAll('.conglomerates-team');
+    const scores = teamCards[0].findAll('.conglomerates-team-member-score').map((s) => s.text());
+    expect(scores).to.deep.eq(['(22)', '(16)']);
   });
 
   it('toggles the breakdown visibility when the title is clicked', async () => {

@@ -69,6 +69,9 @@ describe('Conglomerates team score', () => {
     expect(team1.playerColors).to.deep.eq([player1.color, player3.color]);
     expect(team1.name).to.eq(`${player1.name} & ${player3.name}`);
     expect(team1.victoryPoints.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total);
+    expect(team1.memberScores.sort()).to.deep.eq(
+      [player1.getVictoryPoints().total, player3.getVictoryPoints().total].sort(),
+    );
   });
 
   it('returns no teams when Conglomerates is off', () => {

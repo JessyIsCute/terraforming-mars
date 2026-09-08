@@ -79,17 +79,17 @@ describe('ConglomeratesExpansion', () => {
     expect(player2.teammates().map((p) => p.id)).to.deep.eq([player4.id]);
   });
 
-  it('grants 1 coordination at game start', () => {
+  it('grants 2 coordination at game start', () => {
     const [, player1] = testGame(4, {conglomeratesExpansion: true});
-    expect(player1.conglomeratesData.coordination).to.eq(1);
+    expect(player1.conglomeratesData.coordination).to.eq(2);
   });
 
   it('grants 2 coordination per player at the start of each generation', () => {
     const [, player1] = testGame(4, {conglomeratesExpansion: true});
     player1.runProductionPhase();
-    expect(player1.conglomeratesData.coordination).to.eq(3);
+    expect(player1.conglomeratesData.coordination).to.eq(4);
     player1.runProductionPhase();
-    expect(player1.conglomeratesData.coordination).to.eq(5);
+    expect(player1.conglomeratesData.coordination).to.eq(6);
   });
 
   it('does not grant any coordination when Conglomerates is off', () => {

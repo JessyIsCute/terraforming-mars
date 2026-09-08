@@ -58,6 +58,13 @@ export default defineComponent({
     showDescription: {
       type: Boolean,
     },
+    // Awards are funded/ranked at the team level in Conglomerates games (see
+    // ConglomeratesExpansion.calculateVictoryPoints) -- appended to the description so it's
+    // clear the ranking is combined, not per-player.
+    conglomeratesExpansion: {
+      type: Boolean,
+      default: false,
+    },
   },
   mounted() {
     this.fitName();
@@ -88,7 +95,11 @@ export default defineComponent({
       return this.award.scores.toSorted(reversed(comparing((score) => score.score)));
     },
     description(): string {
-      return getAward(this.award.name).description;
+      const base = getAward(this.award.name).description;
+      if (this.conglomeratesExpansion) {
+        return `${base} between you and your teammate`;
+      }
+      return base;
     },
   },
 });

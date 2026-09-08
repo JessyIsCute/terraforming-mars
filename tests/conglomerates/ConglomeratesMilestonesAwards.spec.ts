@@ -58,7 +58,7 @@ describe('Conglomerates milestones and awards', () => {
 
     it('the Terraformer53 variant shows the real scaled number and claims exactly like Terraformer', () => {
       const variant = milestoneManifest.createOrThrow('Terraformer53');
-      expect(variant.description).to.eq('Have a terraform rating of 53 (or 39 with Turmoil.)');
+      expect(variant.description).to.eq('Have a terraform rating of 53 (or 39 with Turmoil) between you and your teammate');
 
       player1.setTerraformRating(30);
       player3.setTerraformRating(22); // combined 52, just short

@@ -25,6 +25,12 @@
               <PlayerTagDiscount v-if="tagDetail.discount > 0" :color="player.color" :amount="tagDetail.discount" :data-test="'discount-' + tagDetail.name"/>
               <PointsPerTag :points="tagDetail"/>
               <TagCount :tag="tagDetail.name" :count="tagDetail.count" :size="'big'" :type="'secondary'"/>
+              <div
+                v-if="tagDetail.name === SpecialTags.COORDINATION"
+                class="coordination-production-box"
+                data-test="coordination-production"
+                :title="$t('+2 Coordination per generation')"
+              >+2</div>
             </div>
           </div>
         </div>
