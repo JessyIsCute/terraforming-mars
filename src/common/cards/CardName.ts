@@ -704,6 +704,7 @@ export enum CardName {
   BLOCKHOUSE = 'Blockhouse',
   MULLIGANGS = 'Mulligangs',
   MULLIGENS = 'Mulligens',
+  SAND_CLAIM = 'Sand Claim',
 
   // BetterMars replacement cards (swap into the base pool when BetterMars is on)
   LUNAR_BEAM_BETTER_MARS = 'Lunar Beam:bm',

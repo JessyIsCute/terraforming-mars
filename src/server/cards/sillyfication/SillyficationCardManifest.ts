@@ -112,6 +112,7 @@ import {ResearchPhase} from './ResearchPhase';
 import {Blockhouse} from './Blockhouse';
 import {Mulligangs} from './Mulligangs';
 import {Mulligens} from './Mulligens';
+import {SandClaim} from './SandClaim';
 
 export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
   module: 'sillyfication',
@@ -232,5 +233,6 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.BLOCKHOUSE]: {Factory: Blockhouse},
     [CardName.MULLIGANGS]: {Factory: Mulligangs},
     [CardName.MULLIGENS]: {Factory: Mulligens},
+    [CardName.SAND_CLAIM]: {Factory: SandClaim},
   },
 });
