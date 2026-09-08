@@ -53,6 +53,25 @@ describe('PlanetPr', () => {
     expect(player.cardsInHand[player.cardsInHand.length - 1].tags).to.include(Tag.MARS);
   });
 
+  it('declaring the clone tag itself counts as a planetary tag play for the streak bonus', () => {
+    // Play an Earth-tagged card first...
+    PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.EARTH]}));
+    expect(game.pathfindersData!.earth).to.eq(1);
+
+    // ...then declare the corp's own clone tag as Earth too - DeclareCloneTag calls
+    // player.onCardPlayed(this.card) once the tag is set, so Planet PR's own (now-Earth)
+    // tag registers as the second Earth play in a row and earns the streak bonus.
+    card.initialAction(player);
+    const action = cast(game.deferredActions.pop(), DeclareCloneTag);
+    const options = cast(action.execute(), OrOptions);
+    const earthOption = options.options.find((o) => o.title.toString().match(/earth/i));
+    earthOption!.cb();
+    runAllActions(game);
+
+    expect(card.tags).deep.eq([Tag.EARTH]);
+    expect(game.pathfindersData!.earth).to.eq(3); // 1 (prelude) + 2 (corp declaration, streak bonus)
+  });
+
   it('a single planetary tag play raises the track by just 1 step', () => {
     PathfindersExpansion.onCardPlayed(player, fakeCard({tags: [Tag.MARS]}));
 

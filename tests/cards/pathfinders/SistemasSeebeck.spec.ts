@@ -28,19 +28,23 @@ describe('SistemasSeebeck', () => {
     expect(player.megaCredits).eq(45);
   });
 
-  it('initial action draws until 2 energy/heat cards are found, discarding the rest', () => {
-    const match1 = fakeCard({behavior: {production: {energy: 1}}});
-    const nonMatch = fakeCard({behavior: {production: {plants: 1}}});
-    const match2 = fakeCard({behavior: {stock: {heat: 2}}});
-    // drawPile.pop() draws from the end, so this order draws match1, then nonMatch, then match2.
-    game.projectDeck.drawPile.push(match2, nonMatch, match1);
+  it('initial action draws until 2 cards that spend energy or heat are found, discarding the rest', () => {
+    const match1 = fakeCard({behavior: {spend: {energy: 1}}});
+    // Merely granting energy/heat doesn't count - only spending it does.
+    const nonMatch1 = fakeCard({behavior: {production: {energy: 1}}});
+    const nonMatch2 = fakeCard({behavior: {stock: {heat: 2}}});
+    const match2 = fakeCard({behavior: {spend: {heat: 1}}});
+    // drawPile.pop() draws from the end, so this order draws match1, then the two
+    // non-matches, then match2.
+    game.projectDeck.drawPile.push(match2, nonMatch2, nonMatch1, match1);
 
     card.initialAction(player);
     runAllActions(game);
 
     expect(player.cardsInHand).includes(match1);
     expect(player.cardsInHand).includes(match2);
-    expect(player.cardsInHand).not.includes(nonMatch);
+    expect(player.cardsInHand).not.includes(nonMatch1);
+    expect(player.cardsInHand).not.includes(nonMatch2);
   });
 
   it('spend.energy can be paid with heat', () => {

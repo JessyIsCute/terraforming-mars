@@ -9,18 +9,14 @@ import {DrawCards} from '../../deferredActions/DrawCards';
 import {Behavior} from '../../behavior/Behavior';
 import {Size} from '../../../common/cards/render/Size';
 
-/** Whether a card's declarative behavior/action ever produces, stores, or spends energy
- * or heat - used by Sistemas Seebeck's initial draw filter. */
+/** Whether a card's declarative behavior spends energy or heat - used by Sistemas
+ * Seebeck's initial draw filter. Cards that merely grant energy or heat (production or
+ * stock) don't count - only ones that use it as a cost. */
 function usesEnergyOrHeat(behavior: Behavior | undefined): boolean {
   if (behavior === undefined) {
     return false;
   }
-  return behavior.production?.energy !== undefined ||
-    behavior.production?.heat !== undefined ||
-    behavior.stock?.energy !== undefined ||
-    behavior.stock?.heat !== undefined ||
-    behavior.spend?.energy !== undefined ||
-    behavior.spend?.heat !== undefined;
+  return behavior.spend?.energy !== undefined || behavior.spend?.heat !== undefined;
 }
 
 export class SistemasSeebeck extends CorporationCard implements ICorporationCard {
@@ -29,11 +25,11 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
       name: CardName.SISTEMAS_SEEBECK,
       tags: [Tag.SCIENCE, Tag.POWER],
       startingMegaCredits: 45,
-      initialActionText: 'Draw cards until you draw 2 cards with effects or actions that use energy or heat, then shuffle the rest back',
+      initialActionText: 'Draw cards until you draw 2 cards that spend energy or heat, then shuffle the rest back',
 
       metadata: {
         cardNumber: 'PfC97', // Renumber
-        description: 'You start with 45 M€. Draw cards until you draw 2 cards with effects or actions that use energy production or heat production, or energy or heat directly - shuffle the rest back.',
+        description: 'You start with 45 M€. Draw cards until you draw 2 cards that spend energy or heat - shuffle the rest back.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(45).br;
           b.text('2X', {size: Size.SMALL}).cards(1).colon().minus().energy(1, {size: Size.SMALL}).slash().minus().heat(1, {size: Size.SMALL});
