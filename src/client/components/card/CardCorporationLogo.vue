@@ -314,6 +314,38 @@
           </div>
         </div>
       </template>
+      <template v-else-if="title === CardName.ZETA_TOLLKEEPER">
+        <div class="card-zeta-tollkeeper-logo">
+          <img class="zeta-tollkeeper-icon" src="assets/expansion_icons/expansion_icon_deltaProject.png">
+          <div class="zeta-tollkeeper-title">
+            <div class="word-1">ZETA</div>
+            <div class="word-2">TOLLKEEPER</div>
+          </div>
+        </div>
+      </template>
+      <template v-else-if="title === CardName.PLANET_PR">
+        <div class="card-planet-pr-logo">
+          <div class="word-1">PLANET</div>
+          <div class="word-2">PR</div>
+        </div>
+      </template>
+      <template v-else-if="title === CardName.SISTEMAS_SEEBECK">
+        <div class="card-sistemas-seebeck-logo">
+          <div class="word-1">SISTEMAS</div>
+          <div class="word-2">SEEBECK</div>
+        </div>
+      </template>
+      <template v-else-if="title === CardName.IN_SPIRE">
+        <div class="card-in-spire-logo">
+          <span class="word-1">In</span><span class="word-2">Spire</span>
+        </div>
+      </template>
+      <template v-else-if="title === CardName.BLACKLAB_CARTEL">
+        <div class="card-blacklab-cartel-logo">
+          <div class="word-1">BLACKLAB</div>
+          <div class="word-2">CARTEL</div>
+        </div>
+      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -343,6 +375,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.ATHENA]: 'bespoke',
   [CardName.AURORAI]: 'image',
   [CardName.BIO_SOL]: 'image',
+  [CardName.BLACKLAB_CARTEL]: 'bespoke',
   [CardName.CELESTIC]: 'bespoke',
   [CardName.CHEUNG_SHING_MARS]: 'bespoke',
   [CardName.CHIMERA]: 'image',
@@ -364,6 +397,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.HELION]: 'css',
   [CardName.HENKEI_GENETICS]: 'bespoke',
   [CardName.INCITE]: 'bespoke',
+  [CardName.IN_SPIRE]: 'bespoke',
   [CardName.INTERPLANETARY_CINEMATICS]: 'bespoke',
   [CardName.INTRAGEN_SANCTUARY_HEADQUARTERS]: 'image',
   [CardName.INVENTRIX]: 'bespoke',
@@ -394,6 +428,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.PHARMACY_UNION]: 'bespoke',
   [CardName.PHILARES]: 'bespoke',
   [CardName.PHOBOLOG]: 'css',
+  [CardName.PLANET_PR]: 'bespoke',
   [CardName.PLAYWRIGHTS]: 'bespoke',
   [CardName.POINT_LUNA]: 'css',
   [CardName.POLARIS]: 'image',
@@ -410,6 +445,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.SAGITTA_FRONTIER_SERVICES]: 'bespoke',
   [CardName.SATURN_SYSTEMS]: 'bespoke',
   [CardName.SEPTUM_TRIBUS]: 'bespoke',
+  [CardName.SISTEMAS_SEEBECK]: 'bespoke',
   [CardName.SOLBANK]: 'bespoke',
   [CardName.SOYLENT_SEEDLING_SYSTEMS]: 'image',
   [CardName.SPIRE]: 'image',
@@ -435,6 +471,7 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.VITOR]: 'bespoke',
   [CardName.VOLTAGON]: 'bespoke',
   [CardName.WELLNESS_DELUXE]: 'bespoke',
+  [CardName.ZETA_TOLLKEEPER]: 'bespoke',
 };
 
 export default defineComponent({
