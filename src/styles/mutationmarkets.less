@@ -15,10 +15,8 @@
 }
 
 // Extra clearance above the project row so it doesn't crowd the mutation row physically
-// on top of it this generation -- slots with no coveringMutationsAbove badge would
-// otherwise have no gap at all above them, since that badge is the only other thing
-// pushing the rows apart. Deliberately NOT touching this row's `gap` -- the mutation
-// rows above/below use grid-column spans (e.g. "1 / span 2") computed assuming the same
+// on top of it. Deliberately NOT touching this row's `gap` -- the mutation rows
+// above/below use grid-column spans (e.g. "1 / span 2") computed assuming the same
 // @mm-card-width + gap geometry as this row, so a different gap here would misalign
 // every mutation card against the project slots it's meant to cover.
 .mutation-market-project-row {
@@ -45,22 +43,14 @@
   position: relative;
 }
 
+// Badges for mutations/infections covering this slot from either the row above or the
+// row below it -- both sets render together in this one row beneath the card, rather
+// than the above-row set floating on top of it.
 .mutation-market-preview-badges {
   display: flex;
   gap: 6px;
   margin-top: 3px;
   flex-wrap: wrap;
-}
-
-// Badges for a mutation covering this slot from the row physically above it; shown above
-// the card instead of below, mirroring the source row's side (see MutationMarket.vue).
-.mutation-market-preview-badges--above {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 0;
-  margin-bottom: 3px;
 }
 
 .mutation-market-preview-badge {

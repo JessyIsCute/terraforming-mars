@@ -53,19 +53,19 @@ describe('MutationMarketProjectSlot', () => {
     expect(badges).to.have.lengthOf(1);
     expect(badges[0].text()).to.eq(MutationName.MINI_MUTATION);
     expect(badges[0].classes()).to.include('mutation-glow');
-    expect(wrapper.find('.mutation-market-preview-badges--above').exists()).to.be.false;
   });
 
-  it('previews a mutation covering from above the project row, positioned separately', () => {
+  it('previews a mutation covering from above the project row, in the same badge row as one from below', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {coveringMutationsAbove: [{kind: 'mutation', mutation: MutationName.TAG_DIVERSIFIER}]})},
     });
-    expect(wrapper.find('.mutation-market-preview-badges--above').exists()).to.be.true;
-    expect(wrapper.find('.mutation-market-preview-badges--above').text()).to.eq(MutationName.TAG_DIVERSIFIER);
+    const badges = wrapper.findAll('.mutation-market-preview-badge');
+    expect(badges).to.have.lengthOf(1);
+    expect(badges[0].text()).to.eq(MutationName.TAG_DIVERSIFIER);
   });
 
-  it('previews both covering mutations for a doubly-covered slot, one from each side', () => {
+  it('previews both covering mutations for a doubly-covered slot, side by side in one row', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
       props: {marketSlot: slotFor(CardName.PLANT_EATER, {
@@ -73,7 +73,9 @@ describe('MutationMarketProjectSlot', () => {
         coveringMutationsBelow: [{kind: 'mutation', mutation: MutationName.MINI_MUTATION}],
       })},
     });
-    expect(wrapper.findAll('.mutation-market-preview-badge')).to.have.lengthOf(2);
+    expect(wrapper.findAll('.mutation-market-preview-badges')).to.have.lengthOf(1);
+    const badges = wrapper.findAll('.mutation-market-preview-badge');
+    expect(badges.map((b) => b.text())).to.deep.eq([MutationName.TAG_DIVERSIFIER, MutationName.MINI_MUTATION]);
   });
 
   it('previews a covering infection with a red glow badge, distinct from a green mutation badge', () => {
@@ -84,13 +86,13 @@ describe('MutationMarketProjectSlot', () => {
         coveringMutationsBelow: [{kind: 'infection', infection: InfectionName.POWER_DRAIN}],
       })},
     });
-    const above = wrapper.find('.mutation-market-preview-badges--above .mutation-market-preview-badge');
-    expect(above.text()).to.eq(MutationName.TAG_DIVERSIFIER);
-    expect(above.classes()).to.include('mutation-glow');
+    const badges = wrapper.findAll('.mutation-market-preview-badge');
 
-    const below = wrapper.find('.mutation-market-preview-badges:not(.mutation-market-preview-badges--above) .mutation-market-preview-badge');
-    expect(below.text()).to.eq(InfectionName.POWER_DRAIN);
-    expect(below.classes()).to.include('infection-glow');
+    expect(badges[0].text()).to.eq(MutationName.TAG_DIVERSIFIER);
+    expect(badges[0].classes()).to.include('mutation-glow');
+
+    expect(badges[1].text()).to.eq(InfectionName.POWER_DRAIN);
+    expect(badges[1].classes()).to.include('infection-glow');
   });
 
   it('shows no preview badges when nothing covers the slot', () => {
