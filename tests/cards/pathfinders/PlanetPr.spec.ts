@@ -134,6 +134,18 @@ describe('PlanetPr', () => {
     expect(player.titanium).to.eq(1);
   });
 
+  it('grants the bonus on a space that only has an "everyone" reward, not just "risingPlayer"', () => {
+    // Jovian space 2 is `everyone('titanium')` with no risingPlayer reward - that still
+    // counts as triggering the track's bonus for Planet PR's own extra titanium.
+    game.pathfindersData!.jovian = 1;
+    player.titanium = 0;
+    PathfindersExpansion.raiseTrack(Tag.JOVIAN, player, 1);
+
+    expect(game.pathfindersData!.jovian).to.eq(2);
+    // 1 from the track's own everyone('titanium') + 1 from Planet PR's bonus.
+    expect(player.titanium).to.eq(2);
+  });
+
   it('does not grant a bonus when the raise lands on an empty space', () => {
     game.pathfindersData!.mars = 2;
     player.steel = 0;

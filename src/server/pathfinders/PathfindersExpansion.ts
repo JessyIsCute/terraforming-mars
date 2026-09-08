@@ -133,7 +133,10 @@ export class PathfindersExpansion {
           rewards.risingPlayer.forEach((reward) => {
             PathfindersExpansion.grant(reward, from, tag);
           });
-          if (rewards.risingPlayer.length > 0) {
+          // Some spaces (e.g. Mars/Jovian space 2) only have an `everyone` reward and no
+          // `risingPlayer` one - that still counts as "triggering the track's bonus" for
+          // Planet PR, so check both instead of just risingPlayer.
+          if (rewards.risingPlayer.length > 0 || rewards.everyone.length > 0) {
             PathfindersExpansion.grantPlanetPrBonus(from, tag);
           }
         }
