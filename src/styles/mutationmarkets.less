@@ -253,38 +253,11 @@
 .mutation-cost-glow .card-old-cost {
   animation: mutation-glow 2s ease-in-out infinite;
 }
-// Groups the mutation- and infection-added tag icons into a single flex item within
-// `.card-cost-and-tags` (which lays its children out with `justify-content:
-// space-between`) -- without this wrapper, going from just one of these icons to both
-// adds a whole extra space-between slot, visibly shifting the card's normal printed
-// tags (`.card-tags`) leftward to make room. Grouped here, the slot count stays fixed at
-// one regardless of whether 1 or 2 icons are inside it.
-.card-extra-tags {
-  display: flex;
-  gap: 2px;
-}
-// Smaller than a normal 40px printed tag (`.card-cost-and-tags .card-tags .card-tag` in
-// cards_v2.less) -- these are call-outs for an extra, non-printed tag, not part of the
-// card's real tag row, so they read better kept visually secondary. Same crop ratio as
-// the 40px version (background-size 50px, position -5px is a 25% oversize/crop each
-// side) scaled down to this size (28 * 1.25 = 35, 28 * -0.125 = -3.5).
-.mutation-tag-glow, .infection-tag-glow {
-  .card-tag {
-    box-shadow: @outline-shadow;
-    width: 28px;
-    height: 28px;
-    background-size: 35px;
-    background-position: -3.5px;
-    text-align: center;
-    border-radius: @radius_circle;
-    .raised-bevel();
-    background-color: white;
-    filter: brightness(0.9);
-    z-index: 2;
-  }
-}
+// Rendered by CardTags.vue as one more tag in the normal printed-tag row (not a separate
+// flex item elsewhere in Card.vue), so it's already sized correctly by
+// `.card-cost-and-tags .card-tags .card-tag` (cards_v2.less) -- this just layers the
+// pulsing highlight on top.
 .mutation-tag-glow {
-  display: inline-block;
   animation: mutation-tag-glow 2s ease-in-out infinite;
 }
 @keyframes mutation-tag-glow {
@@ -324,20 +297,16 @@
   0%, 100% { color: #1b5e20; }
   50% { color: #ff5252; }
 }
-.infection-tag-glow {
-  display: inline-block;
-  animation: infection-tag-glow 2s ease-in-out infinite;
-}
+// No standalone "Infected" tag icon is rendered on the card face (unlike a mutation's
+// added tag) -- the red "Infected" ribbon (.infected-label) already says so, and
+// Tag.INFECTED itself is a real, functional tag added to the card for gameplay tag
+// counting (see InfectionEffects.applyTags), not something the UI needs to badge
+// separately. This keyframes definition is left in place since .infection-icon-glow
+// below still references it (pre-existing, itself not currently applied anywhere).
 @keyframes infection-tag-glow {
   0%, 100% { filter: drop-shadow(0 0 2px #7f0000); }
   50% { filter: drop-shadow(0 0 6px #ff5252); }
 }
 .infection-icon-glow {
   animation: infection-tag-glow 2s ease-in-out infinite;
-}
-// Every other tag has a PNG icon asset backing its `.tag-<name>` class -- this one is a
-// CSS-only icon instead (a real asset can replace it later with no other code changes).
-.tag-infected {
-  background-color: #7f0000;
-  background-image: radial-gradient(circle at 35% 30%, #ff5252 0%, #7f0000 60%, #4a0000 100%);
 }

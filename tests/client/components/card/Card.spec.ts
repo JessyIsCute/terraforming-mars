@@ -10,6 +10,7 @@ import {ICardRenderItem, ICardRenderRoot} from '@/common/cards/render/Types';
 import {CardRenderItemType} from '@/common/cards/render/CardRenderItemType';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 import {InfectionName} from '@/common/mutationmarkets/InfectionName';
+import {Tag} from '@/common/cards/Tag';
 
 describe('Card', () => {
   let localStorage: FakeLocalStorage;
@@ -69,6 +70,43 @@ describe('Card', () => {
     const description = wrapper.find('.mutation-glow.card-description');
     expect(description.exists()).to.be.true;
     expect(description.text()).to.eq('Gain 2 Plants on play');
+  });
+
+  it('renders a mutation-added tag as a full-size tag among the card\'s real tags, glowing', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          mutationNames: [MutationName.TAG_DIVERSIFIER],
+          mutationAddedTag: Tag.ANIMAL,
+        },
+      },
+    });
+    const addedTag = wrapper.find('.tag-animal');
+    expect(addedTag.exists()).to.be.true;
+    expect(addedTag.classes()).to.include('mutation-tag-glow');
+    // Rendered inside the same .card-tags row as the printed tags (not a separate,
+    // independently-sized wrapper elsewhere in the card) -- regression coverage for a
+    // bug where a standalone wrapper both shrank the added tag and shifted the real
+    // tags leftward.
+    expect(addedTag.element.closest('.card-tags')).to.not.be.null;
+  });
+
+  it('renders no tag icon for an infected card\'s infectionAddedTag -- only the Infected ribbon indicates it', () => {
+    const wrapper = mount(Card, {
+      ...globalConfig,
+      props: {
+        card: {
+          name: CardName.ADAPTED_LICHEN,
+          infectionNames: [InfectionName.POWER_DRAIN],
+          infectionAddedTag: Tag.INFECTED,
+        },
+      },
+    });
+    expect(wrapper.find('.infected-label').exists()).to.be.true;
+    expect(wrapper.find('.tag-infected').exists()).to.be.false;
+    expect(wrapper.find('.infection-tag-glow').exists()).to.be.false;
   });
 
   it('merges a resource grant into a matching icon the card already shows, instead of a separate description line', () => {

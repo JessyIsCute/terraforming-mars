@@ -1,7 +1,7 @@
 <template>
   <div class="card-tags">
-    <template v-if="tags.length <= 4">
-      <CardTag v-for="(cardTag, index) in tags" :key="index" :index="index" :type="cardTag"/>
+    <template v-if="allTags.length <= 4">
+      <CardTag v-for="(cardTag, index) in allTags" :key="index" :index="index" :type="cardTag" :class="glowClass(cardTag)"/>
     </template>
     <template v-else>
       <CardTag :key="0" :index="0" type="asterisk"/>
@@ -22,9 +22,32 @@ export default defineComponent({
       type: Array as () => Array<Tag>,
       required: true,
     },
+    // MutationMarkets: an extra tag granted by a mutation (e.g. Tag Diversifier).
+    // Rendered as one more tag in this same row -- not a separate flex item elsewhere in
+    // Card.vue -- so it reflows naturally with the printed tags instead of shifting them
+    // by adding an extra top-level slot to `.card-cost-and-tags`'s space-between layout.
+    mutationAddedTag: {
+      type: String as () => Tag | undefined,
+      default: undefined,
+    },
   },
   components: {
     CardTag,
+  },
+  computed: {
+    allTags(): Array<Tag> {
+      if (this.mutationAddedTag === undefined) {
+        return this.tags;
+      }
+      return [...this.tags, this.mutationAddedTag];
+    },
+  },
+  methods: {
+    // chooseRandomTag (server) never picks a tag the card already has, so a plain value
+    // match unambiguously identifies the one added tag among the printed ones.
+    glowClass(tag: Tag): string {
+      return tag === this.mutationAddedTag ? 'mutation-tag-glow' : '';
+    },
   },
 });
 

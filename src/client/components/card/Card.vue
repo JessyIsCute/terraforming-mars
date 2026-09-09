@@ -5,11 +5,7 @@
               <div :class="{'mutation-cost-glow': mutationHighlight?.cost, 'infection-cost-glow': infectionHighlight?.cost}"><CardCost :amount="cost" :newCost="reducedCost" /></div>
               <div v-if="showPlayerCube" :class="playerCubeClass"></div>
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
-              <CardTags :tags="tags" />
-              <div v-if="card.mutationAddedTag || card.infectionAddedTag" class="card-extra-tags">
-                <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
-                <div v-if="card.infectionAddedTag" class="infection-tag-glow"><CardTag :index="0" :type="card.infectionAddedTag" /></div>
-              </div>
+              <CardTags :tags="tags" :mutationAddedTag="card.mutationAddedTag" />
           </div>
           <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated"/>
           <CardContent
@@ -44,7 +40,6 @@ import CardCost from './CardCost.vue';
 import CardExtraContent from './CardExtraContent.vue';
 import CardExpansion from './CardExpansion.vue';
 import CardTags from './CardTags.vue';
-import CardTag from './CardTag.vue';
 import CardVictoryPoints from './CardVictoryPoints.vue';
 import CardContent from './CardContent.vue';
 import CardHelp from './CardHelp.vue';
@@ -76,7 +71,6 @@ export default defineComponent({
     CardExtraContent,
     CardExpansion,
     CardTags,
-    CardTag,
     CardContent,
     CardVictoryPoints,
   },
