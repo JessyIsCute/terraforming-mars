@@ -108,6 +108,7 @@ describe('BetterMars replacement cards', () => {
       promoCardsOption: true,
       betterMarsExpansion: true,
       moonExpansion: true,
+      pathfindersExpansion: true,
     };
     const cards = new GameCards(gameOptions);
     const pool = [
@@ -119,6 +120,35 @@ describe('BetterMars replacement cards', () => {
       expect(pool, `${base} removed`).to.not.contain(base);
       expect(pool, `${replacement} present`).to.contain(replacement);
     }
+  });
+
+  it('without Pathfinders, Mars-tag replacements fall back to their base cards', () => {
+    const gameOptions: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      preludeExtension: true,
+      turmoilExtension: true,
+      betterMarsExpansion: true,
+      pathfindersExpansion: false,
+    };
+    const cards = new GameCards(gameOptions);
+    const pool = [
+      ...cards.getProjectCards().map(toName),
+      ...cards.getPreludeCards().map(toName),
+      ...cards.getCorporationCards().map(toName),
+    ];
+    for (const name of MARS_ADDS) {
+      expect(pool, `${name} absent`).to.not.contain(name);
+    }
+    // The base cards stay in the pool instead of vanishing along with their replacements.
+    expect(pool).to.contain(CardName.EOS_CHASMA_NATIONAL_PARK);
+    expect(pool).to.contain(CardName.MARS_UNIVERSITY);
+    expect(pool).to.contain(CardName.PRISTAR); // still gated on Turmoil, which is on here
+    expect(pool).to.contain(CardName.EARLY_SETTLEMENT);
+    // Meat Industry only adds an Animal tag - it doesn't need Pathfinders, so it's still
+    // swapped in.
+    expect(pool).to.contain(CardName.MEAT_INDUSTRY_BETTER_MARS);
+    expect(pool).to.not.contain(CardName.MEAT_INDUSTRY);
   });
 
   it('Luna Metropolis:bm also requires the Moon expansion, since it counts Moon tags', () => {
