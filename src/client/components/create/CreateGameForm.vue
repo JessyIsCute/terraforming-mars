@@ -1151,10 +1151,20 @@ export default defineComponent({
       let players = this.players.slice(0, this.playersCount);
 
       if (this.randomFirstPlayer) {
-        // Shuffle players array to assign each player a random seat around the table
-        players = players.map((a) => ({sort: Math.random(), value: a}))
-          .sort((a, b) => a.sort - b.sort)
-          .map((a) => a.value);
+        if (this.expansions.conglomerates) {
+          // A full shuffle can accidentally seat both members of a team next to each other,
+          // breaking the alternating "sitting crossed" seating that team assignment implies
+          // (and with it, hate-drafting against the other team). Rotate instead: this still
+          // randomizes who goes first, but a cyclic rotation of an alternating team order
+          // (A,B,A,B) is still alternating no matter where it starts.
+          const rotateBy = Math.floor(Math.random() * players.length);
+          players = [...players.slice(rotateBy), ...players.slice(0, rotateBy)];
+        } else {
+          // Shuffle players array to assign each player a random seat around the table
+          players = players.map((a) => ({sort: Math.random(), value: a}))
+            .sort((a, b) => a.sort - b.sort)
+            .map((a) => a.value);
+        }
         this.firstIndex = Math.floor(this.seed * this.playersCount) + 1;
       }
 

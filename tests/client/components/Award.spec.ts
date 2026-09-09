@@ -136,13 +136,29 @@ describe('Award', () => {
   it('shows a bracketed team score row when teamScores is set', () => {
     const award = createAward({funded: false});
     award.teamScores = [
-      {playerColors: ['red', 'yellow'], score: 9},
-      {playerColors: ['blue', 'green'], score: 4},
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
+      {playerColors: ['blue', 'green'], teamColor: 'blue', score: 4},
     ];
     const wrapper = mount(Award, {...globalConfig, props: {award}});
 
     const rows = wrapper.findAll('[data-test=team-score]').map((w) => w.text());
     expect(rows).to.deep.eq(['[9]', '[4]']);
+  });
+
+  it('colors each team score with that team\'s own color and shows it above the player scores', () => {
+    const award = createAward({funded: true, scores: [{color: 'red', score: 2}]});
+    award.teamScores = [
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
+    ];
+    const wrapper = mount(Award, {...globalConfig, props: {award, showScores: true}});
+
+    expect(wrapper.find('[data-test=team-score]').classes()).to.include('ma-team-score--red');
+
+    const nameBlock = wrapper.find('.ma-name--awards');
+    const teamScoresEl = nameBlock.find('.ma-team-scores').element;
+    const playerScoresEl = nameBlock.find('.ma-scores').element;
+    // DOCUMENT_POSITION_FOLLOWING (4) means teamScoresEl comes before playerScoresEl.
+    expect(teamScoresEl.compareDocumentPosition(playerScoresEl) & Node.DOCUMENT_POSITION_FOLLOWING).to.eq(4);
   });
 
   it('does not show a team score row when teamScores is absent', () => {

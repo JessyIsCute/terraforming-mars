@@ -14,7 +14,10 @@
                     ></span>
                     <span class="conglomerates-team-name">{{ team.name }}</span>
                 </div>
-                <div class="conglomerates-team-total" :class="teamColorClass(team)">[{{ team.victoryPoints.total }}]</div>
+                <div class="conglomerates-team-total" :class="teamColorClass(team)">
+                    <div class="conglomerates-team-total-icon">★</div>
+                    <div class="conglomerates-team-total-score">{{ team.victoryPoints.total }}</div>
+                </div>
                 <div class="conglomerates-team-members">
                     <span
                       v-for="(score, idx) in team.memberScores"

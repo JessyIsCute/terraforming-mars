@@ -46,7 +46,7 @@ describe('ConglomeratesTeams', () => {
     const teamCards = wrapper.findAll('.conglomerates-team');
     expect(teamCards).to.have.lengthOf(2);
     expect(teamCards[0].find('.conglomerates-team-name').text()).to.eq('Blue & Yellow');
-    expect(teamCards[0].find('.conglomerates-team-total').text()).to.eq('[38]');
+    expect(teamCards[0].find('.conglomerates-team-total-score').text()).to.eq('38');
     expect(teamCards[0].find('.conglomerates-team-header').findAll('.conglomerates-team-swatch')).to.have.lengthOf(2);
   });
 

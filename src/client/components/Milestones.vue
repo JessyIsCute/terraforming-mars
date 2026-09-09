@@ -9,11 +9,13 @@
                 </span>
                 <span v-if="isLearnerModeOn()">
                     <span v-for="(spotPrice, index) in getAvailableMilestoneSpots()" :key="index" class="milestone-award-inline unpaid">
-                        <div class="milestone-award-price">{{spotPrice}}</div>
-                        <template v-if="conglomeratesExpansion">
-                          <div class="milestone-award-arrow" :title="$t('You also gain 1 Coordination')"></div>
-                          <div class="milestone-award-coordination" :title="$t('You also gain 1 Coordination')"></div>
-                        </template>
+                        <div class="milestone-award-price-row">
+                          <div class="milestone-award-price">{{spotPrice}}</div>
+                          <template v-if="conglomeratesExpansion">
+                            <div class="milestone-award-arrow" :title="$t('You also gain 1 Coordination')"></div>
+                            <div class="milestone-award-coordination" :title="$t('You also gain 1 Coordination')"></div>
+                          </template>
+                        </div>
                     </span>
                 </span>
             </div>

@@ -26,11 +26,13 @@
             :key="spotPrice"
             class="milestone-award-inline unpaid"
           >
-            <div class="milestone-award-price" data-test="spot-price" v-text="spotPrice"></div>
-            <template v-if="conglomeratesExpansion">
-              <div class="milestone-award-arrow" :title="$t('You also gain 1 Coordination')"></div>
-              <div class="milestone-award-coordination" data-test="award-coordination-icon" :title="$t('You also gain 1 Coordination')"></div>
-            </template>
+            <div class="milestone-award-price-row">
+              <div class="milestone-award-price" data-test="spot-price" v-text="spotPrice"></div>
+              <template v-if="conglomeratesExpansion">
+                <div class="milestone-award-arrow" :title="$t('You also gain 1 Coordination')"></div>
+                <div class="milestone-award-coordination" data-test="award-coordination-icon" :title="$t('You also gain 1 Coordination')"></div>
+              </template>
+            </div>
           </span>
         </span>
       </div>

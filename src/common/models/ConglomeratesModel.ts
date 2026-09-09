@@ -21,5 +21,7 @@ export type ConglomeratesModel = {
 /** A team's combined score for one milestone/award, shown alongside the per-player scores. */
 export type ConglomeratesTeamScore = {
   playerColors: Array<Color>;
+  /** The team's shared Turmoil delegate color (see ConglomeratesExpansion.teamDisplayColor). */
+  teamColor: Color | undefined;
   score: number;
 }

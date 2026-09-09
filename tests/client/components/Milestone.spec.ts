@@ -119,8 +119,8 @@ describe('Milestone', () => {
   it('shows a bracketed team score row when teamScores is set', () => {
     const milestone = createMilestone({claimed: false});
     milestone.teamScores = [
-      {playerColors: ['red', 'yellow'], score: 9},
-      {playerColors: ['blue', 'green'], score: 4},
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
+      {playerColors: ['blue', 'green'], teamColor: 'blue', score: 4},
     ];
     const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});
 

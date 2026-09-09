@@ -259,6 +259,33 @@ describe('CreateGameForm', () => {
     expect(config.players.map((p: any) => p.team)).to.deep.eq([0, 1, 0, 1]);
   });
 
+  it('rotates (not shuffles) player order for Conglomerates games, so teams stay alternating', async () => {
+    // A full shuffle could seat both members of a team next to each other, breaking the
+    // alternating "sitting crossed" seating team assignment implies (and hate-drafting with
+    // it). Run many trials since the rotation amount is random -- every result must still
+    // alternate team-wise, cyclically, no matter where the rotation lands.
+    const originalRandom = Math.random;
+    try {
+      for (let trial = 0; trial < 20; trial++) {
+        Math.random = () => trial / 20;
+        const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+        const vm = wrapper.vm as any;
+        vm.playersCount = 4;
+        vm.expansions.conglomerates = true;
+        await wrapper.vm.$nextTick();
+
+        const config = await vm.serializeSettings();
+        const teams = config.players.map((p: any) => p.team);
+        expect(teams).to.have.lengthOf(4);
+        for (let i = 0; i < teams.length; i++) {
+          expect(teams[i]).to.not.eq(teams[(i + 1) % teams.length]);
+        }
+      }
+    } finally {
+      Math.random = originalRandom;
+    }
+  });
+
   it('saves current settings before creating a game', async () => {
     const originalFetch = global.fetch;
     const originalAlert = global.alert;

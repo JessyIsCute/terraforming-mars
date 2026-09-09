@@ -426,6 +426,16 @@ each(@players, {
       box-shadow: 0 0 1px 1px black;
     }
 
+    // Outline each team's score in that team's own shared Turmoil delegate color (see
+    // PlayerResources.vue's own team-colored outline for the same color), so which bracket
+    // goes with which team is obvious without cross-referencing the player scores below it.
+    each(@players, {
+    @c: ~"player_@{value}";
+    .ma-team-score--@{value} {
+      box-shadow: 0 0 0 2px @@c;
+    }
+    })
+
     .ma-player {
       margin: 25px 0 0 70px;
       position: absolute;
@@ -525,7 +535,7 @@ each(@players, {
     @ma-name-conglomerates:
       agronomist6 agronomist 18 21, architect5 architect 18 21, builder12 builder 18 21,
       c-forester5 c-forester 25 22, capitalist96 capitalist 27 17, coastguard5 coastguard 3 23,
-      colonizer6 colonizer 32 21, diversifier12 diversifier 18 22, ecologist6 ecologist 1 23,
+      colonizer6 colonizer 32 21, diversifier10 diversifier 18 22, ecologist6 ecologist 1 23,
       economizer8 economizer 13 23, energizer9 energizer 13 21, engineer15 engineer 1 23,
       farmer8 farmer 4 17, firestarter30 firestarter 27 22, forester6 forester 24 23,
       fundraiser18 fundraiser 13 23, gambler3 gambler 21 20, gardener5 gardener 16 21,
@@ -620,43 +630,39 @@ each(@players, {
     background: @grey_850;
   }
 }
+// The price row: normally just the MC price badge, plus (in Conglomerates games) an arrow and
+// a Coordination icon showing the extra reward. A flex row so the whole group centers as one
+// unit within the pill and every icon vertically aligns automatically -- previous rounds tried
+// to hand-position the arrow/Coordination icon with `position: absolute` pixel offsets against
+// `.milestone-award-price`'s `transform: scale(0.8)`, which repeatedly produced slightly-wrong
+// results because a CSS transform changes an element's paint, not its layout box or the
+// offsets other elements are measured from. Dropping the transform (using real, already-small
+// sizes instead) removes that whole class of error.
+.milestone-award-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 24px;
+}
+
 .milestone-award-price {
   background-image: url(./assets/resources/megacredit.png);
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  background-size: 30px;
-  margin-top: -3px;
-  margin-left: 70px;
-  transform: scale(0.8);
-  position: relative;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  background-size: 24px;
+  flex: none;
 
   font-family: Prototype, sans-serif;
   color: black;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 15px;
   text-align: center;
 }
 
-// Conglomerates: claiming a milestone or funding an award also grants 1 Coordination -- shown
-// as "price -> [red arrow] [blue Coordination box]" right after the price badge. Both are real
-// elements (so the Coordination box can have its own ::after for the full bevel, matching the
-// icon everywhere else -- a single pseudo-element can't fit both an arrow AND a two-layer
-// bevel), but `position: absolute` on both takes them out of the pill's normal flow entirely,
-// so neither can push the row's width/height the way plain inline-block siblings did before
-// (that was the earlier bug: it forced the whole unclaimed-price pill onto its own line,
-// separate from the Milestones/Awards title above it).
 .milestone-award-arrow {
-  position: absolute;
-  // .milestone-award-price sits at left:80px (10px padding + 70px margin), 30px wide,
-  // but `transform: scale(0.8)` shrinks it toward its own center without moving that box,
-  // so its visual right edge lands at 107px (95 center +/- 12), not 100px -- the previous
-  // value here overlapped the price icon. Starting the arrow at 110px clears it.
-  left: 110px;
-  // .milestone-award-price's own visual vertical center (after its -3px margin-top and the
-  // 0.8 scale, both applied around its own center) works out to ~13px from the pill's top --
-  // top:5/1 below center these two on that same line instead of sitting visibly lower.
-  top: 5px;
+  flex: none;
   width: 15px;
   height: 15px;
   background-image: url(./assets/misc/short-arrow.png);
@@ -665,15 +671,14 @@ each(@players, {
 }
 
 .milestone-award-coordination {
-  position: absolute;
-  left: 128px;
-  top: 1px;
+  flex: none;
   width: 24px;
   height: 24px;
   box-sizing: border-box;
   border: 1px solid black;
   background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
   overflow: hidden;
+  position: relative;
 
   // Inner fill, inset from the bevel ring above: same bright-top/dark-bottom treatment as
   // the ring, one shade lighter/darker -- matches .card-resource-coordination/

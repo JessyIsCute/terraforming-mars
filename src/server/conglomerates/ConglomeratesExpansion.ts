@@ -382,7 +382,7 @@ export class ConglomeratesExpansion {
     return game.conglomerates.teams.map((team) => {
       const members = team.playerIds.map((id) => game.getPlayerById(id));
       const score = alreadyTeamScoped ? getScore(members[0]) : sum(members.map(getScore));
-      return {playerColors: members.map((member) => member.color), score};
+      return {playerColors: members.map((member) => member.color), teamColor: this.teamDisplayColor(members[0]), score};
     });
   }
 }

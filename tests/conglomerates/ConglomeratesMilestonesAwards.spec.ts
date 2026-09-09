@@ -121,6 +121,8 @@ describe('Conglomerates milestones and awards', () => {
       const team2 = terraformer.teamScores!.find((t) => t.playerColors.includes(player2.color))!;
       expect(team1.score).to.eq(45);
       expect(team2.score).to.eq(15);
+      expect(team1.teamColor).to.eq(ConglomeratesExpansion.teamDisplayColor(player1));
+      expect(team2.teamColor).to.eq(ConglomeratesExpansion.teamDisplayColor(player2));
     });
 
     it('does not include team scores when Conglomerates is off', () => {
