@@ -5,6 +5,20 @@
   border-radius: 8px;
   border: 2px solid transparent;
   padding: 2px;
+
+  // Scoped to this container specifically (not the bare .resource_icon class), since that
+  // class is also used well outside the player resource bar -- payment dialogs
+  // (PaymentUnit.vue, PaymentForm.vue), SelectResource.vue, etc. -- none of which were ever
+  // meant to be desaturated. This regressed once already: putting `filter: grayscale(0.3)`
+  // directly on .resource_icon itself (to let .resource_icon--coordination opt back out with
+  // its own `filter: none`) accidentally grayed out every payment icon in the game too.
+  .resource_icon {
+    filter: grayscale(0.3);
+  }
+
+  .resource_icon--coordination {
+    filter: none;
+  }
 }
 
 // Conglomerates: outline a player's own resource bar in their team's shared Turmoil delegate
@@ -70,10 +84,6 @@ each(@players, {
   height: 36px;
   display: inline-block;
   background-size: contain;
-  // Moved here from .resource_items_cont (the whole bar) so .resource_icon--coordination can
-  // opt back out below -- a filter on an ancestor rasterizes/desaturates its whole subtree,
-  // which a descendant's own `filter: none` can't undo, only a filter on the SAME element can.
-  filter: grayscale(0.3);
 }
 
 .resource_icon--rating {
@@ -123,11 +133,10 @@ each(@resource_types, {
 }
 // Conglomerates: no art asset, so CSS-only -- same blue-box/handshake styling as the
 // Coordination icon used elsewhere (card renders, the tag overview). The bevel relies on two
-// similar blues for contrast, which the bar's usual grayscale filter (see .resource_icon
-// above) crushes almost flat -- opt back out of it here since none of the other icons'
-// contrast depends on their own saturation the way this CSS-only one does.
+// similar blues for contrast, which the bar's own grayscale filter (see
+// .resource_items_cont .resource_icon above, and its .resource_icon--coordination override
+// right below it) would otherwise crush almost flat.
 .resource_icon--coordination {
-  filter: none;
   background-image: none;
   background: linear-gradient(to bottom, #2e58bf 50%, #0f2c6e 50%);
   border: 1px solid black;
