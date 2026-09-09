@@ -55,6 +55,23 @@ describe('SistemasSeebeck', () => {
     expect(player.cardsInHand).not.includes(nonMatch2);
   });
 
+  it('also matches a repeatable action that spends energy or heat, like Ironworks', () => {
+    // Most real energy/heat spenders (Ironworks' "spend 4 energy", Steelworks, etc.) cost
+    // it as their repeatable action, not their one-time play behavior - the initial draw
+    // filter must check both, or it finds almost nothing to draw into.
+    const actionMatch1 = fakeCard({actionBehavior: {spend: {energy: 4}}});
+    const actionMatch2 = fakeCard({actionBehavior: {spend: {heat: 2}}});
+    const nonMatch = fakeCard({behavior: {production: {heat: 1}}});
+    game.projectDeck.drawPile.push(actionMatch2, nonMatch, actionMatch1);
+
+    card.initialAction(player);
+    runAllActions(game);
+
+    expect(player.cardsInHand).includes(actionMatch1);
+    expect(player.cardsInHand).includes(actionMatch2);
+    expect(player.cardsInHand).not.includes(nonMatch);
+  });
+
   it('spend.energy can be paid with heat', () => {
     player.playedCards.push(card);
     player.energy = 1;

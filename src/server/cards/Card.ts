@@ -192,6 +192,9 @@ export abstract class Card implements ICard {
   public get behavior() {
     return this.properties.behavior;
   }
+  public get actionBehavior() {
+    return this.properties.action;
+  }
   public get cardCost() {
     return this.properties.cardCost;
   }

@@ -13,14 +13,21 @@ import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
 import {SelectAmount} from '../../inputs/SelectAmount';
 
-/** Whether a card's declarative behavior spends energy or heat - used by Sistemas
- * Seebeck's initial draw filter. Cards that merely grant energy or heat (production or
- * stock) don't count - only ones that use it as a cost. */
-function usesEnergyOrHeat(behavior: Behavior | undefined): boolean {
+/** Whether a single declarative behavior block spends energy or heat. */
+function spendsEnergyOrHeat(behavior: Behavior | undefined): boolean {
   if (behavior === undefined) {
     return false;
   }
   return behavior.spend?.energy !== undefined || behavior.spend?.heat !== undefined;
+}
+
+/** Whether a card spends energy or heat as a cost, either on play (`behavior`) or as its
+ * repeatable action (`actionBehavior`) - used by Sistemas Seebeck's initial draw filter.
+ * Most energy/heat spenders (e.g. Ironworks' "spend 4 energy") are the latter. Cards that
+ * merely grant energy or heat (production or stock) don't count - only ones that use it as
+ * a cost. */
+function usesEnergyOrHeat(card: {behavior?: Behavior, actionBehavior?: Behavior}): boolean {
+  return spendsEnergyOrHeat(card.behavior) || spendsEnergyOrHeat(card.actionBehavior);
 }
 
 export class SistemasSeebeck extends CorporationCard implements ICorporationCard {
@@ -49,7 +56,7 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
 
   public override initialAction(player: IPlayer): PlayerInput | undefined {
     player.game.defer(DrawCards.keepAll(player, 2, {
-      include: (card) => usesEnergyOrHeat(card.behavior),
+      include: (card) => usesEnergyOrHeat(card),
     }));
     return undefined;
   }

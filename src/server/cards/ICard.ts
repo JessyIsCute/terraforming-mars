@@ -236,6 +236,10 @@ export interface ICard {
 
   readonly behavior?: Behavior,
 
+  /** The card's repeatable action, as data - distinct from `action()`, the callable method
+   * (only present on IActionCard) that behavior actually executes. */
+  readonly actionBehavior?: Behavior,
+
   /**
    * Returns the contents of the card's production box.
    *
