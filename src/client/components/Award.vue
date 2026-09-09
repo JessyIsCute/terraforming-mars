@@ -13,7 +13,7 @@
           class="ma-team-score"
           :class="team.teamColor !== undefined ? `ma-team-score--${team.teamColor}` : ''"
           data-test="team-score"
-        >[{{ team.score }}]</span>
+        >{{ team.score }}</span>
       </div>
       <div v-if="showScores" class="ma-scores player_home_block--milestones-and-awards-scores">
         <template v-for="score in sortedScores" :key="score.color">
@@ -47,7 +47,7 @@ import {getAward} from '@/client/MilestoneAwardManifest';
 import {playerSymbol} from '@/client/utils/playerSymbol';
 import {Color} from '@/common/Color';
 import {fitTextWhenReady} from '@/client/utils/textFit';
-import {comparing, reversed} from '@/common/utils/Ordering';
+import {groupScoresByTeam} from '@/client/utils/groupScoresByTeam';
 
 type Refs = {
   name: HTMLElement | undefined;
@@ -101,7 +101,7 @@ export default defineComponent({
       return 'ma-name--' + this.award.name.replaceAll(' ', '-').replaceAll('.', '').toLowerCase();
     },
     sortedScores(): Array<AwardScore> {
-      return this.award.scores.toSorted(reversed(comparing((score) => score.score)));
+      return groupScoresByTeam(this.award.scores, this.award.teamScores);
     },
     description(): string {
       const base = getAward(this.award.name).description;

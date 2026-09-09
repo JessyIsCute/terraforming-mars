@@ -401,9 +401,12 @@ each(@players, {
     }
 
     // Conglomerates: each team's combined score for this milestone/award, shown as a row of
-    // "[total]" badges below the per-player scores -- same bracket notation as the Team
-    // Scores panel's own total (ConglomeratesTeams.vue), gold to visually distinguish a team
-    // total from an individual player's score.
+    // badges above the per-player scores. Each badge is sized and positioned to span exactly
+    // 2 player-score badges (.ma-score is 24px + 2px/2px margin = 28px per slot, so a team
+    // badge is 52px + 2px/2px margin = 56px = 2 slots) so it visually sits directly above its
+    // own two members' scores -- see the `sortedScores` computed, which groups and orders the
+    // player-score row by team (highest team leftmost) to match, instead of a flat individual
+    // ranking, so the alignment is actually correct and not just visually similar-sized.
     .ma-team-scores {
       display: block;
       width: 144px;
@@ -412,12 +415,14 @@ each(@players, {
 
     .ma-team-score {
       display: inline-block;
-      min-width: 24px;
+      width: 52px;
       height: 18px;
       line-height: 18px;
       border-radius: 2px;
       margin: 0 2px;
       padding: 0 2px;
+      box-sizing: border-box;
+      text-align: center;
       font-size: 13px;
       font-weight: bold;
       font-family: Prototype, sans-serif;

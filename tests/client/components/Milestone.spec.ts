@@ -116,7 +116,7 @@ describe('Milestone', () => {
     expect(wrapper.find('.ma-number-patch').exists()).to.be.false;
   });
 
-  it('shows a bracketed team score row when teamScores is set', () => {
+  it('shows a team score row when teamScores is set', () => {
     const milestone = createMilestone({claimed: false});
     milestone.teamScores = [
       {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
@@ -125,7 +125,32 @@ describe('Milestone', () => {
     const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});
 
     const rows = wrapper.findAll('[data-test=team-score]').map((w) => w.text());
-    expect(rows).to.deep.eq(['[9]', '[4]']);
+    expect(rows).to.deep.eq(['9', '4']);
+  });
+
+  it('groups player scores by team, highest team first, instead of a flat individual ranking', () => {
+    const milestone = createMilestone({
+      claimed: false,
+      scores: [
+        {color: 'red', score: 2, claimable: false},
+        {color: 'blue', score: 10, claimable: false},
+        {color: 'yellow', score: 6, claimable: false},
+        {color: 'green', score: 1, claimable: false},
+      ],
+    });
+    milestone.teamScores = [
+      // red+yellow team totals 8; blue+green team totals 11 -- blue+green should lead despite
+      // red individually outranking green.
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 8},
+      {playerColors: ['blue', 'green'], teamColor: 'blue', score: 11},
+    ];
+    const wrapper = mount(Milestone, {...globalConfig, props: {milestone, showScores: true}});
+
+    const colors = wrapper.findAll('[data-test=player-score]')
+      .filter((w) => /^\d+$/.test(w.text()))
+      .map((w) => w.classes().find((c) => c.startsWith('player_bg_color_'))?.replace('player_bg_color_', ''));
+    // blue+green (higher team total) first, yellow ranked above red within their own team.
+    expect(colors).to.deep.eq(['blue', 'green', 'yellow', 'red']);
   });
 
   it('does not show a team score row when teamScores is absent', () => {

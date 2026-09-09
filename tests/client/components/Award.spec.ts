@@ -133,7 +133,7 @@ describe('Award', () => {
     expect(wrapper.text()).to.not.include('between you and your teammate');
   });
 
-  it('shows a bracketed team score row when teamScores is set', () => {
+  it('shows a team score row when teamScores is set', () => {
     const award = createAward({funded: false});
     award.teamScores = [
       {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
@@ -142,7 +142,32 @@ describe('Award', () => {
     const wrapper = mount(Award, {...globalConfig, props: {award}});
 
     const rows = wrapper.findAll('[data-test=team-score]').map((w) => w.text());
-    expect(rows).to.deep.eq(['[9]', '[4]']);
+    expect(rows).to.deep.eq(['9', '4']);
+  });
+
+  it('groups player scores by team, highest team first, instead of a flat individual ranking', () => {
+    const award = createAward({
+      funded: false,
+      scores: [
+        {color: 'red', score: 2},
+        {color: 'blue', score: 10},
+        {color: 'yellow', score: 6},
+        {color: 'green', score: 1},
+      ],
+    });
+    award.teamScores = [
+      // red+yellow team totals 8; blue+green team totals 11 -- blue+green should lead despite
+      // red individually outranking green.
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 8},
+      {playerColors: ['blue', 'green'], teamColor: 'blue', score: 11},
+    ];
+    const wrapper = mount(Award, {...globalConfig, props: {award, showScores: true}});
+
+    const colors = wrapper.findAll('[data-test=player-score]')
+      .filter((w) => /^\d+$/.test(w.text()))
+      .map((w) => w.classes().find((c) => c.startsWith('player_bg_color_'))?.replace('player_bg_color_', ''));
+    // blue+green (higher team total) first, yellow ranked above red within their own team.
+    expect(colors).to.deep.eq(['blue', 'green', 'yellow', 'red']);
   });
 
   it('colors each team score with that team\'s own color and shows it above the player scores', () => {
