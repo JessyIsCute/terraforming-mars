@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {testGame} from '../TestGame';
 import {TestPlayer} from '../TestPlayer';
 import {IGame} from '../../src/server/IGame';
+import {IPlayer} from '../../src/server/IPlayer';
 import {Terraformer} from '../../src/server/milestones/Terraformer';
 import {milestoneManifest} from '../../src/server/milestones/Milestones';
 import {Banker} from '../../src/server/awards/Banker';
@@ -154,11 +155,11 @@ describe('Conglomerates milestones and awards', () => {
       // (11 and 5, respectively) is still reachable by two capped individual scores summed,
       // the same trap that made Generalist/Planetologist need a redefinition instead.
       const delegateCounts = new Map([[player1.id, 6], [player3.id, 5]]); // combined 11
-      const delegateScore = (p: TestPlayer) => delegateCounts.get(p.id) ?? 0;
+      const delegateScore = (p: IPlayer) => delegateCounts.get(p.id) ?? 0;
       expect(ConglomeratesExpansion.meetsTeamThreshold(player1, 7, delegateScore)).is.true;
 
       const landshaperScores = new Map([[player1.id, 3], [player3.id, 2]]); // combined 5
-      const landshaperScore = (p: TestPlayer) => landshaperScores.get(p.id) ?? 0;
+      const landshaperScore = (p: IPlayer) => landshaperScores.get(p.id) ?? 0;
       expect(ConglomeratesExpansion.meetsTeamThreshold(player1, 3, landshaperScore)).is.true;
     });
 
