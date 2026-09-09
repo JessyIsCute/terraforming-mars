@@ -6,7 +6,8 @@ import {IPlayer} from '../../IPlayer';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-/** Blue card: spend 1 energy to randomly hand the first-player marker to another player. */
+/** Blue card: spend 1 energy to randomly hand the first-player marker to any player,
+ * including the current one (so it can land back where it already was). */
 export class MusicalChairs extends Card implements IActionCard, IProjectCard {
   constructor() {
     super({
@@ -18,7 +19,7 @@ export class MusicalChairs extends Card implements IActionCard, IProjectCard {
       metadata: {
         cardNumber: 'X73',
         renderData: CardRenderer.builder((b) => {
-          b.action('Spend 1 energy to make a random player other than the current first player the new first player.', (eb) => {
+          b.action('Spend 1 energy to make a random player the new first player.', (eb) => {
             eb.energy(1).startAction.firstPlayer().asterix();
           });
         }),
@@ -33,8 +34,7 @@ export class MusicalChairs extends Card implements IActionCard, IProjectCard {
   public action(player: IPlayer) {
     const game = player.game;
     player.spendEnergy(1);
-    const candidates = game.players.filter((p) => p.id !== game.first.id);
-    const next = candidates[game.rng.nextInt(candidates.length)];
+    const next = game.players[game.rng.nextInt(game.players.length)];
     game.log('${0} used ${1} to shuffle the turn order', (b) => b.player(player).card(this));
     game.overrideFirstPlayer(next);
     return undefined;

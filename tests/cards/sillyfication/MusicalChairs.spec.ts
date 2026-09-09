@@ -33,15 +33,25 @@ describe('MusicalChairs', () => {
     expect(card.canAct(solo)).is.false;
   });
 
-  it('spends 1 energy and hands the first-player marker to a different player', () => {
+  it('spends 1 energy and hands the first-player marker to a random player', () => {
     player.energy = 2;
-    const before = game.first;
 
     card.action(player);
 
     expect(player.energy).to.eq(1);
-    expect(game.first).to.not.eq(before);
+    expect(game.players).to.include(game.first);
     expect(game.playersInGenerationOrder[0]).to.eq(game.first);
+  });
+
+  it('can reselect the already-current first player - it is not excluded from the pool', () => {
+    player.energy = 1;
+    game.overrideFirstPlayer(game.players[0]);
+    // Force the random pick to land on index 0, same as the current first player.
+    game.rng.nextInt = () => 0;
+
+    card.action(player);
+
+    expect(game.first).to.eq(game.players[0]);
   });
 
   it('with Sistemas Seebeck, heat covers an energy shortfall', () => {
