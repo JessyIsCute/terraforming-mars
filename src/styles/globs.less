@@ -276,6 +276,42 @@
   .global-numbers-temperature {
     each(@temperature-vals, .(@v) { .pin-and-rotate(@v); });
   }
+
+  // "Pegged past official max" indicator: a small counter badge showing how many extra steps
+  // beyond the official ceiling (8 for temperature, 14 for oxygen) the live value represents.
+  // Only rendered (see Board.vue's extraStepsBeyondOfficial()) once that count is > 0.
+  // Positioned just beyond each curve's top-most painted mark (val-8 / val-14), extrapolated one
+  // step further along that mark's own trajectory so it reads as a natural continuation of the
+  // spiral rather than a stray overlay.
+  .global-numbers-extra {
+    position: absolute;
+    min-width: 20px;
+    height: 18px;
+    line-height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #bb8760; // same accent as .val-is-active's ring, so it reads as linked to it
+    color: white;
+    font-family: Prototype, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 0 2px 1px rgba(0, 0, 0, .7);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .global-numbers-temperature-extra {
+    .global-numbers-extra();
+    // Extrapolated one step past val-8 (117px, 494px, -40deg) using the 6->8 delta.
+    margin: 97px 0 0 479px;
+  }
+
+  .global-numbers-oxygen-extra {
+    .global-numbers-extra();
+    // Extrapolated one step past val-14 (128px, 72px, 37deg) using the 13->14 delta.
+    margin: 103px 0 0 88px;
+  }
 }
 
 // Custom boards can be any size and can stretch the parameter ranges past the values

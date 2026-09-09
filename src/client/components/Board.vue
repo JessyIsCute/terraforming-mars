@@ -23,10 +23,12 @@
         <div class="global-numbers" :class="{'global-numbers--custom': isCustomBoard && !useStandardTrackLayout}">
             <div class="global-numbers-temperature">
                 <div :class="getScaleCSS(lvl)" v-for="(lvl, idx) in getValuesForParameter('temperature')" :key="idx">{{ lvl.strValue }}</div>
+                <div class="global-numbers-temperature-extra" v-if="extraStepsBeyondOfficial('temperature') > 0">+{{ extraStepsBeyondOfficial('temperature') }}</div>
             </div>
 
             <div class="global-numbers-oxygen">
                 <div :class="getScaleCSS(lvl)" v-for="(lvl, idx) in getValuesForParameter('oxygen')" :key="idx">{{ lvl.strValue }}</div>
+                <div class="global-numbers-oxygen-extra" v-if="extraStepsBeyondOfficial('oxygen') > 0">+{{ extraStepsBeyondOfficial('oxygen') }}</div>
             </div>
 
             <div class="global-numbers-venus" v-if="expansions.venus">
@@ -465,12 +467,21 @@ export default defineComponent({
         endValue = parameters.oxygen.max;
         step = parameters.oxygen.step;
         curValue = this.oxygen_level;
+        // A custom board may stretch the max past the official 14% -- the painted curve has no
+        // position for anything beyond that, so cap what gets rendered here (see
+        // extraStepsBeyondOfficial() for the "+N" counter that represents the rest).
+        if (this.useStandardTrackLayout) {
+          endValue = Math.min(endValue, DEFAULT_GLOBAL_PARAMETERS.oxygen.max);
+        }
         break;
       case 'temperature':
         startValue = parameters.temperature.min;
         endValue = parameters.temperature.max;
         step = parameters.temperature.step;
         curValue = this.temperature;
+        if (this.useStandardTrackLayout) {
+          endValue = Math.min(endValue, DEFAULT_GLOBAL_PARAMETERS.temperature.max);
+        }
         break;
       case 'venus':
         startValue = parameters.venus.min;
@@ -482,13 +493,32 @@ export default defineComponent({
         throw new Error('Wrong parameter to get values from: ' + targetParameter);
       }
 
+      // Once the real value has pushed past the (possibly capped) top of the curve, no rendered
+      // mark can equal it exactly -- peg the topmost mark active instead of leaving nothing lit.
+      const isPegged = curValue > endValue;
       for (let value = endValue; value >= startValue; value -= step) {
         strValue = (targetParameter === 'temperature' && value > 0) ? '+'+value : value.toString();
         values.push(
-          new GlobalParamLevel(value, value === curValue, strValue),
+          new GlobalParamLevel(value, value === curValue || (isPegged && value === endValue), strValue),
         );
       }
       return values;
+    },
+    // How many steps beyond the official max (8 for temperature, 14 for oxygen) the live value
+    // represents, for the "+N" counter next to a capped, pegged curve. 0 (nothing rendered, see
+    // template) unless the curve is actually in capped/pegged mode and the value has crossed it.
+    extraStepsBeyondOfficial(targetParameter: 'temperature' | 'oxygen'): number {
+      if (!this.useStandardTrackLayout) {
+        return 0;
+      }
+      const parameters = this.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS;
+      const track = parameters[targetParameter];
+      const official = DEFAULT_GLOBAL_PARAMETERS[targetParameter];
+      const curValue = targetParameter === 'temperature' ? this.temperature : this.oxygen_level;
+      if (track.max <= official.max || curValue <= official.max) {
+        return 0;
+      }
+      return Math.round((curValue - official.max) / track.step);
     },
     getScaleCSS(paramLevel: GlobalParamLevel): string {
       let css = 'global-numbers-value val-' + paramLevel.value + ' ';
@@ -529,6 +559,11 @@ export default defineComponent({
     // the plain flow-layout readout -- those are the only tracks with a painted curve at all, so
     // a board that only customizes oceans.max or heatForTemperature (neither of which has any
     // on-board art) has no reason to lose the curve for tracks it never touched.
+    //
+    // Temperature and oxygen get one further exception: a HIGHER max than official still keeps
+    // the curve (capped at the official mark, plus a "+N" counter -- see getValuesForParameter()/
+    // extraStepsBeyondOfficial()), since the painted diamond and hex-fit have nothing to do with
+    // parameter ranges. Venus, and any min/step deviation, still require an exact match.
     useStandardTrackLayout(): boolean {
       if (!this.isCustomBoard) {
         return false;
@@ -538,8 +573,10 @@ export default defineComponent({
       }
       const matchesDefault = (track: ParameterTrack, defaultTrack: ParameterTrack): boolean =>
         track.min === defaultTrack.min && track.max === defaultTrack.max && track.step === defaultTrack.step;
-      return matchesDefault(this.globalParameters.temperature, DEFAULT_GLOBAL_PARAMETERS.temperature) &&
-        matchesDefault(this.globalParameters.oxygen, DEFAULT_GLOBAL_PARAMETERS.oxygen) &&
+      const matchesOrExtendedMax = (track: ParameterTrack, defaultTrack: ParameterTrack): boolean =>
+        track.min === defaultTrack.min && track.step === defaultTrack.step && track.max >= defaultTrack.max;
+      return matchesOrExtendedMax(this.globalParameters.temperature, DEFAULT_GLOBAL_PARAMETERS.temperature) &&
+        matchesOrExtendedMax(this.globalParameters.oxygen, DEFAULT_GLOBAL_PARAMETERS.oxygen) &&
         matchesDefault(this.globalParameters.venus, DEFAULT_GLOBAL_PARAMETERS.venus);
     },
     oceanMax(): number {
