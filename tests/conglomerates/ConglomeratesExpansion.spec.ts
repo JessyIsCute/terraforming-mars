@@ -23,6 +23,16 @@ describe('ConglomeratesExpansion', () => {
       }
     });
 
+    it('always shows each Team Action\'s actual current Coordination cost, not just its unescalated base render', () => {
+      const [, player1] = testGame(4, {conglomeratesExpansion: true});
+      const givePatent = () => player1.getStandardProjectOption().cards.find((c) => c.name === CardName.GIVE_PATENT)!;
+
+      expect(givePatent().additionalProjectCosts?.conglomeratesCost).to.eq(2);
+
+      ConglomeratesExpansion.increaseTeamActionCost(player1, 'givePatent');
+      expect(givePatent().additionalProjectCosts?.conglomeratesCost).to.eq(3);
+    });
+
     it('are not offered in a player\'s action list when Conglomerates is off', () => {
       const [, player1] = testGame(4);
       const options = player1.getStandardProjectOption().cards.map((card) => card.name);
@@ -67,6 +77,25 @@ describe('ConglomeratesExpansion', () => {
     expect(player1.teammates()).to.be.empty;
     expect(player2.teammates()).to.be.empty;
     expect(player3.teammates().map((p) => p.id)).to.deep.eq([player4.id]);
+  });
+
+  it('keeps team-index 0 mapped to team-assignment value 0 regardless of which team appears first in the player array', () => {
+    // Regression: teams used to be built in Map-insertion order (whichever team-assignment
+    // value was encountered first while iterating `players`), not by the assignment value
+    // itself -- so when team 1's player happened to appear before team 0's (exactly what
+    // Random First Player's rotation can now do), the resulting internal teams[0]/teams[1]
+    // could end up swapped relative to what the Create Game form calls "Team 1"/"Team 2",
+    // silently swapping teamDisplayColor's fixed orange/purple between the two teams.
+    const [, player1, player2, player3, player4] = testGame(4, {
+      conglomeratesExpansion: true,
+      // Team-assignment value 1 appears at index 0 (before value 0 at index 1).
+      conglomeratesTeamAssignments: [1, 0, 1, 0],
+    });
+
+    expect(ConglomeratesExpansion.teamDisplayColor(player2)).to.eq('orange');
+    expect(ConglomeratesExpansion.teamDisplayColor(player4)).to.eq('orange');
+    expect(ConglomeratesExpansion.teamDisplayColor(player1)).to.eq('purple');
+    expect(ConglomeratesExpansion.teamDisplayColor(player3)).to.eq('purple');
   });
 
   it('falls back to table-order pairing when team assignments are the wrong length', () => {

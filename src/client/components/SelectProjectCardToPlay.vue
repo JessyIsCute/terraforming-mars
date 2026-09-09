@@ -4,6 +4,12 @@
   <label v-for="availableCard in cards" class="payments_cards" :key="availableCard.name">
     <input v-if="!availableCard.isDisabled" class="hidden" type="radio" v-model="cardName" :value="availableCard.name" >
     <Card class="cardbox" :card="availableCard" />
+    <div v-if="availableCard.additionalProjectCosts?.conglomeratesCost !== undefined" class="card-warning"
+      v-i18n="[availableCard.additionalProjectCosts.conglomeratesCost]"
+      data-test="conglomerates-cost"
+    >
+      This currently costs ${0} Coordination
+    </div>
   </label>
   <template v-if="card !== undefined && card.additionalProjectCosts">
     <div v-if="card.additionalProjectCosts.aeronGenomicsResources" class="card-warning"

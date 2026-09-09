@@ -45,11 +45,19 @@ export class ConglomeratesExpansion {
         group.push(player.id);
         groups.set(team, group);
       });
-      const teams: Array<ConglomeratesTeam> = [...groups.values()].map((playerIds) => ({
-        playerIds,
-        teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
-        bonusVictoryPoints: 0,
-      }));
+      // Sort by the team-assignment number itself, not Map insertion order (which reflects
+      // whichever team happens to appear first in `players`) -- otherwise the resulting
+      // `teams[0]`/`teams[1]` can end up swapped relative to what the Create Game form calls
+      // "Team 1"/"Team 2" whenever `players` isn't in its original, unrotated order (e.g.
+      // Random First Player now rotates the player array -- see CreateGameForm.vue), silently
+      // swapping which team gets teamDisplayColor's fixed orange/purple.
+      const teams: Array<ConglomeratesTeam> = [...groups.entries()]
+        .sort(([teamA], [teamB]) => teamA - teamB)
+        .map(([, playerIds]) => ({
+          playerIds,
+          teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
+          bonusVictoryPoints: 0,
+        }));
       return {teams};
     }
 

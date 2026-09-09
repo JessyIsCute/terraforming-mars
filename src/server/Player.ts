@@ -75,6 +75,7 @@ import {DeltaProjectPlayerModel} from '../common/models/DeltaProjectPlayerModel'
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
 import {ConglomeratesPlayerData} from '../common/conglomerates/ConglomeratesPlayerData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
+import {TeamActionCosts} from './conglomerates/ConglomeratesData';
 import {Counter} from './behavior/Counter';
 import {TRSource} from '../common/cards/TRSource';
 import {IParty} from './turmoil/parties/IParty';
@@ -1538,6 +1539,26 @@ export class Player implements IPlayer {
 
   public getStandardProjectOption(): SelectStandardProjectToPlay {
     const standardProjects: Array<IStandardProjectCard> = this.game.getStandardProjects();
+
+    // Conglomerates: the 3 Team Actions' Coordination cost climbs by 1 every time either
+    // teammate uses one, resetting each generation -- but each card's own icon always shows
+    // its unescalated base cost, since that's baked into static render data. Surface the
+    // actual current cost here so it's visible before confirming, not just discovered by
+    // trying to pay and coming up short.
+    const teamActionByCardName: Partial<Record<CardName, keyof TeamActionCosts>> = {
+      [CardName.GIVE_PATENT]: 'givePatent',
+      [CardName.FACILITY_SHARING]: 'facilitySharing',
+      [CardName.TEAM_DONATION]: 'donation',
+    };
+    for (const card of standardProjects) {
+      const action = teamActionByCardName[card.name];
+      if (action !== undefined) {
+        card.additionalProjectCosts = {
+          ...card.additionalProjectCosts,
+          conglomeratesCost: ConglomeratesExpansion.getTeamActionCost(this, action),
+        };
+      }
+    }
 
     return new SelectStandardProjectToPlay(
       this,

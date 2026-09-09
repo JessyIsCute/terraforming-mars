@@ -65,7 +65,7 @@ export function cardsToModel(
     }
     const playCardMetadata = options?.extras?.get(card.name);
 
-    if (isIProjectCard(card) && card.additionalProjectCosts) {
+    if ((isIProjectCard(card) || isIStandardProjectCard(card)) && card.additionalProjectCosts) {
       model.additionalProjectCosts = card.additionalProjectCosts;
     }
 
