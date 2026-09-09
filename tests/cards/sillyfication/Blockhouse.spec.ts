@@ -27,13 +27,13 @@ describe('Blockhouse', () => {
 
   it('makes steel worth 2 M€ extra when paying for a City-tagged card', () => {
     player.playedCards.push(card);
-    const cityCard = new CorporateStronghold(); // City+Building, cost 11
-    player.steel = 3;
+    const cityCard = new CorporateStronghold(); // City+Building, cost 11, taxed to 14 by Blockhouse's own effect
+    player.steel = 4;
     player.megaCredits = 0;
 
-    // 3 steel at the boosted value (2 base + 2 bonus = 4 each = 12) covers the cost of 11;
-    // at the un-boosted value (2 each = 6) it would not.
-    expect(() => player.checkPaymentAndPlayCard(cityCard, Payment.of({steel: 3}))).to.not.throw();
+    // 4 steel at the boosted value (2 base + 2 bonus = 4 each = 16) covers the taxed cost of 14;
+    // at the un-boosted value (2 each = 8) it would not.
+    expect(() => player.checkPaymentAndPlayCard(cityCard, Payment.of({steel: 4}))).to.not.throw();
   });
 
   it('does not boost steel for a City-tagged card without Blockhouse in play', () => {
@@ -92,12 +92,12 @@ describe('Blockhouse', () => {
     expect(opponent.getCardCost(cityCard)).to.eq(14);
   });
 
-  it('does not tax the Blockhouse owner\'s own City-tagged plays', () => {
+  it('also taxes the Blockhouse owner\'s own City-tagged plays', () => {
     const [, owner] = testGame(2);
     owner.playedCards.push(card);
     const cityCard = new CorporateStronghold();
 
-    expect(owner.getCardCost(cityCard)).to.eq(11);
+    expect(owner.getCardCost(cityCard)).to.eq(14);
   });
 
   it('does not tax a non-City card for an opponent', () => {
@@ -116,11 +116,11 @@ describe('Blockhouse', () => {
     expect(sp.getAdjustedCost(opponent)).to.eq(28);
   });
 
-  it('does not tax the Blockhouse owner\'s own City standard project use', () => {
+  it('also taxes the Blockhouse owner\'s own City standard project use', () => {
     const [, owner] = testGame(2);
     owner.playedCards.push(card);
     const sp = new CityStandardProject();
 
-    expect(sp.getAdjustedCost(owner)).to.eq(25);
+    expect(sp.getAdjustedCost(owner)).to.eq(28);
   });
 });

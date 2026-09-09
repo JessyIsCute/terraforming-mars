@@ -43,14 +43,12 @@ export abstract class StandardProjectCard extends Card implements IStandardProje
     const discount = discountFromCards + this.discount(player);
     let adjusted = Math.max(0, this.cost - discount);
 
-    // Tax effects from an opponent's card (e.g. Blockhouse), unlike
-    // getStandardProjectDiscount which only ever benefits the acting player's own use.
-    for (const opponent of player.game.players) {
-      if (opponent === player) {
-        continue;
-      }
-      for (const playedCard of opponent.tableau) {
-        adjusted += playedCard.getOpponentStandardProjectCostIncrease?.(opponent, player, this) ?? 0;
+    // Tax effects from a played card (e.g. Blockhouse), unlike getStandardProjectDiscount
+    // which only ever benefits the acting player's own use. Applies to every player's
+    // tableau, including the acting player's own.
+    for (const owner of player.game.players) {
+      for (const playedCard of owner.tableau) {
+        adjusted += playedCard.getStandardProjectCostIncrease?.(owner, player, this) ?? 0;
       }
     }
 
