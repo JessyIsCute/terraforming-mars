@@ -42,7 +42,9 @@
       :productionProtection="player.protectedProduction.heat"/>
     <div v-if="conglomeratesExpansion" class="resource_item resource_item--coordination" data-test="coordination-resource">
       <div class="resource_item_stock">
-        <i class="resource_icon resource_icon--coordination tooltip tooltip-bottom" :data-tooltip="$t('Coordination')"></i>
+        <i class="resource_icon resource_icon--coordination tooltip tooltip-bottom" :data-tooltip="$t('Coordination')">
+          <span class="resource_icon--coordination-fill"></span>
+        </i>
         <div class="resource_item_stock_count" data-test="stock-count">{{ player.conglomeratesData.coordination }}</div>
       </div>
       <div class="resource_item_prod">

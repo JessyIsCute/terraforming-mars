@@ -135,11 +135,17 @@ each(@resource_types, {
   position: relative;
   overflow: hidden;
 
-  &::after {
-    content: "";
+  // Real element, not `::after`: this icon (unlike the card-render/milestone versions) also
+  // carries `tooltip`/`tooltip-bottom` classes for its hover tooltip, and Spectre's tooltip
+  // CSS *also* uses `::after` on that same element for its bubble -- an element only has one
+  // `::after`, so the two rules were merging, with the tooltip library's own positioning
+  // (opacity:0 until hover, its own top/bottom offsets) winning over this inset fill and
+  // making it invisible. A real child element can't collide with a pseudo-element that way.
+  .resource_icon--coordination-fill {
     position: absolute;
     inset: 4px;
     background: linear-gradient(to bottom, #4a78e0 50%, #1f4682 50%);
+    display: block;
   }
 
   &::before {

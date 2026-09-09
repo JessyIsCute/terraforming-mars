@@ -28,6 +28,11 @@ describe('PlayerResources', () => {
     expect(box.exists()).to.be.true;
     expect(box.find('[data-test="stock-count"]').text()).to.eq('5');
     expect(box.find('[data-test="production"]').text()).to.eq('+2');
+    // The bevel's inner fill must be a real element, not `::after` -- this icon also carries
+    // `tooltip`/`tooltip-bottom` classes, whose own CSS uses `::after` for the hover bubble,
+    // and an element can only have one `::after` (the two rules were merging and the tooltip
+    // library's opacity:0/positioning was winning, making the fill invisible).
+    expect(box.find('.resource_icon--coordination-fill').exists()).to.be.true;
   });
 
   it('does not show a Coordination resource box when Conglomerates is off', () => {
