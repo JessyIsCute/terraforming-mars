@@ -128,6 +128,40 @@ describe('Conglomerates milestones and awards', () => {
       expect(variant.canClaim(player2)).is.false;
     });
 
+    it('One Giant Step9 (an expansion milestone) shows the real scaled number and claims exactly like One Giant Step', () => {
+      const variant = milestoneManifest.createOrThrow('One Giant Step9');
+      expect(variant.description).to.eq('Have 9 moon tags between you and your teammate');
+
+      player1.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      // player1 alone: 4 moon tags, short of even the base (unscaled) 6.
+      expect(variant.canClaim(player1)).is.false;
+
+      player3.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.MOON]}));
+      // Combined 9 -- meets the scaled threshold.
+      expect(variant.canClaim(player1)).is.true;
+    });
+
+    it('Lobbyist11 and Landshaper5: their scaled team thresholds stay achievable despite each player\'s own low individual cap', () => {
+      // Lobbyist's getScore is hard-capped at 7 per player (7 total delegates), and
+      // Landshaper's at 3 (three independent 0/1 flags) -- confirm the scaled TEAM threshold
+      // (11 and 5, respectively) is still reachable by two capped individual scores summed,
+      // the same trap that made Generalist/Planetologist need a redefinition instead.
+      const delegateCounts = new Map([[player1.id, 6], [player3.id, 5]]); // combined 11
+      const delegateScore = (p: TestPlayer) => delegateCounts.get(p.id) ?? 0;
+      expect(ConglomeratesExpansion.meetsTeamThreshold(player1, 7, delegateScore)).is.true;
+
+      const landshaperScores = new Map([[player1.id, 3], [player3.id, 2]]); // combined 5
+      const landshaperScore = (p: TestPlayer) => landshaperScores.get(p.id) ?? 0;
+      expect(ConglomeratesExpansion.meetsTeamThreshold(player1, 3, landshaperScore)).is.true;
+    });
+
     it('gives the claimer 1 Coordination when actually claimed', () => {
       player1.conglomeratesData.coordination = 5;
       player1.megaCredits = 20;

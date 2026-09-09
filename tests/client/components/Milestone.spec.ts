@@ -109,6 +109,15 @@ describe('Milestone', () => {
     expect(wrapper.find('.ma-name--builder12').exists()).to.be.true;
   });
 
+  it('patches the corner number for an expansion Conglomerates milestone variant too', () => {
+    const milestone = createMilestone({claimed: false});
+    milestone.name = 'Hoverlord11';
+    const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});
+
+    expect(wrapper.find('.ma-number-patch').text()).to.eq('11');
+    expect(wrapper.find('.ma-name--hoverlord11').exists()).to.be.true;
+  });
+
   it('does not show a number patch for a normal (non-Conglomerates) milestone', () => {
     const milestone = createMilestone({claimed: false});
     const wrapper = mount(Milestone, {...globalConfig, props: {milestone}});

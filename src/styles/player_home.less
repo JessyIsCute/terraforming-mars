@@ -536,7 +536,9 @@ each(@players, {
     // The per-variant left/top pair is the base image's own number badge position, measured
     // by pixel-analyzing each source PNG (a plain fixed offset doesn't work: the badge's
     // position varies a lot image to image, e.g. Terraformer's badge sits at x=8 while
-    // Capitalist's sits at x=27, both inside the same 140x83 frame).
+    // Capitalist's sits at x=27, both inside the same 140x83 frame). The 16 expansion
+    // milestones at the end of this list (hoverlord11 onward) use a 16/22 placeholder --
+    // the average of every measured position above -- pending an actual pixel measurement.
     @ma-name-conglomerates:
       agronomist6 agronomist 18 21, architect5 architect 18 21, builder12 builder 18 21,
       c-forester5 c-forester 25 22, capitalist96 capitalist 27 17, coastguard5 coastguard 3 23,
@@ -552,7 +554,13 @@ each(@players, {
       t-collector5 t-collector 10 26, tactician8 tactician 15 23, terra-pioneer8 terra-pioneer 28 20,
       terraformer53 terraformer 8 23, terran9 terran 25 20, tradesman5 tradesman 24 20,
       tropicalist5 tropicalist 23 21, tycoon23 tycoon 2 23, v-electrician6 v-electrician 25 20,
-      v-spacefarer6 v-spacefarer 18 23;
+      v-spacefarer6 v-spacefarer 18 23,
+      hoverlord11 hoverlord 16 22, hydrologist6 hydrologist 16 22, landshaper5 landshaper 16 22,
+      lobbyist11 lobbyist 16 22, lunarchitect9 lunarchitect 16 22, metallurgist9 metallurgist 16 22,
+      networker5 networker 16 22, one-giant-step9 one-giant-step 16 22, philantropist8 philantropist 16 22,
+      producer24 producer 16 22, purifier5 purifier 16 22, risktaker5 risktaker 16 22,
+      sponsor5 sponsor 16 22, thawer8 thawer 16 22, trader5 trader 16 22,
+      tunneler11 tunneler 16 22;
     each(@ma-name-conglomerates, {
       @variant: extract(@value, 1);
       @base: extract(@value, 2);

@@ -146,6 +146,25 @@ export const milestoneNames = [
   'Tycoon23',
   'V. Electrician6',
   'V. Spacefarer6',
+
+  // Conglomerates: the same treatment extended to expansion milestones (Venus, Turmoil,
+  // Moon, Ares, Underworld, and a few base-adjacent ones) that were missing it.
+  'Hoverlord11',
+  'Hydrologist6',
+  'Landshaper5',
+  'Lobbyist11',
+  'Lunarchitect9',
+  'Metallurgist9',
+  'Networker5',
+  'One Giant Step9',
+  'Philantropist8',
+  'Producer24',
+  'Purifier5',
+  'Risktaker5',
+  'Sponsor5',
+  'Thawer8',
+  'Trader5',
+  'Tunneler11',
 ] as const;
 
 export type MilestoneName = typeof milestoneNames[number];
