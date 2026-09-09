@@ -13,7 +13,7 @@ export class SteelPhobo extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.STEEL_PHOBO,
       tags: [Tag.SPACE, Tag.BUILDING],
-      cost: 13,
+      cost: 16,
 
       behavior: {
         // The DSL only supports a +1 step, so the second step is applied in bespokePlay.
