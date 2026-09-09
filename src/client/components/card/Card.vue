@@ -6,8 +6,10 @@
               <div v-if="showPlayerCube" :class="playerCubeClass"></div>
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
               <CardTags :tags="tags" />
-              <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
-              <div v-if="card.infectionAddedTag" class="infection-tag-glow"><CardTag :index="0" :type="card.infectionAddedTag" /></div>
+              <div v-if="card.mutationAddedTag || card.infectionAddedTag" class="card-extra-tags">
+                <div v-if="card.mutationAddedTag" class="mutation-tag-glow"><CardTag :index="0" :type="card.mutationAddedTag" /></div>
+                <div v-if="card.infectionAddedTag" class="infection-tag-glow"><CardTag :index="0" :type="card.infectionAddedTag" /></div>
+              </div>
           </div>
           <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated"/>
           <CardContent

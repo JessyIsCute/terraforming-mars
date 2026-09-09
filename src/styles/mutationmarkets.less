@@ -253,6 +253,36 @@
 .mutation-cost-glow .card-old-cost {
   animation: mutation-glow 2s ease-in-out infinite;
 }
+// Groups the mutation- and infection-added tag icons into a single flex item within
+// `.card-cost-and-tags` (which lays its children out with `justify-content:
+// space-between`) -- without this wrapper, going from just one of these icons to both
+// adds a whole extra space-between slot, visibly shifting the card's normal printed
+// tags (`.card-tags`) leftward to make room. Grouped here, the slot count stays fixed at
+// one regardless of whether 1 or 2 icons are inside it.
+.card-extra-tags {
+  display: flex;
+  gap: 2px;
+}
+// Smaller than a normal 40px printed tag (`.card-cost-and-tags .card-tags .card-tag` in
+// cards_v2.less) -- these are call-outs for an extra, non-printed tag, not part of the
+// card's real tag row, so they read better kept visually secondary. Same crop ratio as
+// the 40px version (background-size 50px, position -5px is a 25% oversize/crop each
+// side) scaled down to this size (28 * 1.25 = 35, 28 * -0.125 = -3.5).
+.mutation-tag-glow, .infection-tag-glow {
+  .card-tag {
+    box-shadow: @outline-shadow;
+    width: 28px;
+    height: 28px;
+    background-size: 35px;
+    background-position: -3.5px;
+    text-align: center;
+    border-radius: @radius_circle;
+    .raised-bevel();
+    background-color: white;
+    filter: brightness(0.9);
+    z-index: 2;
+  }
+}
 .mutation-tag-glow {
   display: inline-block;
   animation: mutation-tag-glow 2s ease-in-out infinite;

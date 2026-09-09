@@ -42,7 +42,7 @@ describe('MutationInfectionSimulator', () => {
   it('selecting a mutation carries it into the preview model, with a combined display name', async () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     const vm = wrapper.vm as any;
-    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
+    vm.selectedMutations = [MutationName.GIGANTIC_UNDERTAKINGS];
     await wrapper.vm.$nextTick();
 
     expect(vm.previewCardModel.mutationNames).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
@@ -53,7 +53,7 @@ describe('MutationInfectionSimulator', () => {
   it('selecting an infection carries it into the preview model', async () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     const vm = wrapper.vm as any;
-    vm.selectedInfection = InfectionName.COST_INFLATION;
+    vm.selectedInfections = [InfectionName.COST_INFLATION];
     await wrapper.vm.$nextTick();
 
     expect(vm.previewCardModel.infectionNames).to.deep.eq([InfectionName.COST_INFLATION]);
@@ -63,8 +63,8 @@ describe('MutationInfectionSimulator', () => {
   it('applies both a mutation and an infection at once, composing their cost effects', async () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     const vm = wrapper.vm as any;
-    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
-    vm.selectedInfection = InfectionName.COST_INFLATION;
+    vm.selectedMutations = [MutationName.GIGANTIC_UNDERTAKINGS];
+    vm.selectedInfections = [InfectionName.COST_INFLATION];
     await wrapper.vm.$nextTick();
 
     const model = vm.previewCardModel;
@@ -80,17 +80,33 @@ describe('MutationInfectionSimulator', () => {
     expect(model.calculatedCost).to.be.greaterThan(vm.baseCost + 4);
   });
 
-  it('mutationEffectIsRandomTag is true only for an addRandomTag-kind mutation', async () => {
+  it('allows multiple mutations and infections to be selected and applied together', async () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.selectedMutations = [MutationName.GIGANTIC_UNDERTAKINGS, MutationName.MINI_MUTATION];
+    vm.selectedInfections = [InfectionName.COST_INFLATION, InfectionName.VALUE_SIPHON];
+    await wrapper.vm.$nextTick();
+
+    const model = vm.previewCardModel;
+    expect(model.mutationNames).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS, MutationName.MINI_MUTATION]);
+    expect(model.infectionNames).to.deep.eq([InfectionName.COST_INFLATION, InfectionName.VALUE_SIPHON]);
+    expect(model.infectionVictoryPoints).to.eq(-1);
+    expect(model.combinedDisplayName).to.eq(
+      `Gigantic Mini Overpriced Siphoned ${vm.selectedCardName}`,
+    );
+  });
+
+  it('hasRandomTagMutation is true only when an addRandomTag-kind mutation is selected', async () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     const vm = wrapper.vm as any;
 
-    vm.selectedMutation = MutationName.SCIENCE_PATRON;
+    vm.selectedMutations = [MutationName.SCIENCE_PATRON];
     await wrapper.vm.$nextTick();
-    expect(vm.mutationEffectIsRandomTag).to.be.true;
+    expect(vm.hasRandomTagMutation).to.be.true;
 
-    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
+    vm.selectedMutations = [MutationName.GIGANTIC_UNDERTAKINGS];
     await wrapper.vm.$nextTick();
-    expect(vm.mutationEffectIsRandomTag).to.be.false;
+    expect(vm.hasRandomTagMutation).to.be.false;
   });
 
   it('rerollTag bumps rerollSeed', () => {
