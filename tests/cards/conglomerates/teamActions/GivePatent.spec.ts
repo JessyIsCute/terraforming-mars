@@ -59,13 +59,13 @@ describe('GivePatent', () => {
     expect(player.conglomeratesData.coordination).to.eq(3);
   });
 
-  it('escalates its cost after use, for both teammates', () => {
+  it('escalates its cost after use, only for the player who used it', () => {
     player.conglomeratesData.coordination = 5;
     card.payAndExecute(player, Payment.of({megacredits: 0}));
     runAllActions(game);
     cast(player.popWaitingFor(), SelectCard).cb([player.cardsInHand[0]]);
 
     expect(ConglomeratesExpansion.getTeamActionCost(player, 'givePatent')).to.eq(3);
-    expect(ConglomeratesExpansion.getTeamActionCost(teammate, 'givePatent')).to.eq(3);
+    expect(ConglomeratesExpansion.getTeamActionCost(teammate, 'givePatent')).to.eq(2);
   });
 });

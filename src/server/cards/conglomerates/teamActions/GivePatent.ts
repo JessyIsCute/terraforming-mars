@@ -16,7 +16,7 @@ export class GivePatent extends StandardProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.standardProject(
             'Give a card from your hand to your teammate. Increases this cost by 1 Coordination ' +
-            'for you and your teammates for the rest of the generation.', (eb) => {
+            'for you for the rest of the generation.', (eb) => {
               eb.coordination(2).startAction.cards(1, {teammate: true}).asterix();
             });
         }),

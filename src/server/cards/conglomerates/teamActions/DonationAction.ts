@@ -30,7 +30,7 @@ export class DonationAction extends StandardProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.standardProject(
             `Send ${DONATION_MC} M€ and ${DONATION_RESOURCE_AMOUNT} of a standard resource to your teammate. ` +
-            'Increases this cost by 1 Coordination for you and your teammates for the rest of the generation.', (eb) => {
+            'Increases this cost by 1 Coordination for you for the rest of the generation.', (eb) => {
               eb.coordination(1)
                 .megacredits(DONATION_MC, {size: Size.SMALL})
                 .wild(DONATION_RESOURCE_AMOUNT, {size: Size.SMALL})

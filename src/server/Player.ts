@@ -73,9 +73,8 @@ import {ChooseCards} from './deferredActions/ChooseCards';
 import {UnderworldPlayerData} from '../common/underworld/UnderworldPlayerData';
 import {DeltaProjectPlayerModel} from '../common/models/DeltaProjectPlayerModel';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
-import {ConglomeratesPlayerData} from '../common/conglomerates/ConglomeratesPlayerData';
+import {ConglomeratesPlayerData, TeamActionCosts} from '../common/conglomerates/ConglomeratesPlayerData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
-import {TeamActionCosts} from './conglomerates/ConglomeratesData';
 import {Counter} from './behavior/Counter';
 import {TRSource} from '../common/cards/TRSource';
 import {IParty} from './turmoil/parties/IParty';
@@ -1540,11 +1539,11 @@ export class Player implements IPlayer {
   public getStandardProjectOption(): SelectStandardProjectToPlay {
     const standardProjects: Array<IStandardProjectCard> = this.game.getStandardProjects();
 
-    // Conglomerates: the 3 Team Actions' Coordination cost climbs by 1 every time either
-    // teammate uses one, resetting each generation -- but each card's own icon always shows
-    // its unescalated base cost, since that's baked into static render data. Surface the
-    // actual current cost here so it's visible before confirming, not just discovered by
-    // trying to pay and coming up short.
+    // Conglomerates: each of the 3 Team Actions' Coordination cost climbs by 1 every time
+    // *this player* uses it (not their teammate), resetting each generation -- but each
+    // card's own icon always shows its unescalated base cost, since that's baked into static
+    // render data. Surface the actual current cost here so it's visible before confirming,
+    // not just discovered by trying to pay and coming up short.
     const teamActionByCardName: Partial<Record<CardName, keyof TeamActionCosts>> = {
       [CardName.GIVE_PATENT]: 'givePatent',
       [CardName.FACILITY_SHARING]: 'facilitySharing',
@@ -2143,7 +2142,9 @@ export class Player implements IPlayer {
 
     player.timer = Timer.deserialize(d.timer);
     player.underworldData = d.underworldData;
-    player.conglomeratesData = d.conglomeratesData ?? ConglomeratesExpansion.initializePlayer();
+    // Merge with defaults (not a plain ?? fallback) so an in-progress save from before
+    // teamActionCosts moved to per-player data still gets a valid value for it.
+    player.conglomeratesData = {...ConglomeratesExpansion.initializePlayer(), ...d.conglomeratesData};
 
     if (d.alliedParty !== undefined) {
       player._alliedParty = d.alliedParty;

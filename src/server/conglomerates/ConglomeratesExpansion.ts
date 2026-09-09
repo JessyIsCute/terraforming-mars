@@ -1,8 +1,8 @@
 import {IPlayer} from '../IPlayer';
 import {IGame} from '../IGame';
 import {PlayerId} from '../../common/Types';
-import {ConglomeratesData, ConglomeratesTeam, TeamActionCosts} from './ConglomeratesData';
-import {ConglomeratesPlayerData} from '../../common/conglomerates/ConglomeratesPlayerData';
+import {ConglomeratesData, ConglomeratesTeam} from './ConglomeratesData';
+import {ConglomeratesPlayerData, TeamActionCosts} from '../../common/conglomerates/ConglomeratesPlayerData';
 import {AwardScorer} from '../awards/AwardScorer';
 import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuilder';
 import {sum} from '../../common/utils/utils';
@@ -55,7 +55,6 @@ export class ConglomeratesExpansion {
         .sort(([teamA], [teamB]) => teamA - teamB)
         .map(([, playerIds]) => ({
           playerIds,
-          teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
           bonusVictoryPoints: 0,
         }));
       return {teams};
@@ -66,7 +65,6 @@ export class ConglomeratesExpansion {
     for (let i = 0; i < half; i++) {
       teams.push({
         playerIds: [players[i].id, players[i + half].id],
-        teamActionCosts: {...TEAM_ACTION_BASE_COSTS},
         bonusVictoryPoints: 0,
       });
     }
@@ -74,7 +72,7 @@ export class ConglomeratesExpansion {
   }
 
   public static initializePlayer(): ConglomeratesPlayerData {
-    return {coordination: 0};
+    return {coordination: 0, teamActionCosts: {...TEAM_ACTION_BASE_COSTS}};
   }
 
   public static getTeam(player: IPlayer): ConglomeratesTeam | undefined {
@@ -124,30 +122,20 @@ export class ConglomeratesExpansion {
   }
 
   public static getTeamActionCost(player: IPlayer, action: keyof TeamActionCosts): number {
-    const team = this.getTeam(player);
-    return team?.teamActionCosts[action] ?? TEAM_ACTION_BASE_COSTS[action];
+    return player.conglomeratesData.teamActionCosts[action];
   }
 
-  /** Raises `action`'s cost by 1 for both members of `player`'s team, for the rest of the generation. */
+  /** Raises `action`'s cost by 1 for `player` only -- not their teammate -- for the rest of the generation. */
   public static increaseTeamActionCost(player: IPlayer, action: keyof TeamActionCosts) {
-    const team = this.getTeam(player);
-    if (team === undefined) {
-      return;
-    }
-    team.teamActionCosts[action] += 1;
+    player.conglomeratesData.teamActionCosts[action] += 1;
   }
 
   /**
-   * Resets `player`'s team's Team Action costs back to base at the start of a new
-   * generation's production phase. Called once per team member (harmless -- resetting to
-   * the same base values twice is a no-op), from `Player.finishProductionPhase()`.
+   * Resets `player`'s own Team Action costs back to base at the start of a new generation's
+   * production phase, from `Player.finishProductionPhase()`.
    */
   public static resetTeamActionCosts(player: IPlayer) {
-    const team = this.getTeam(player);
-    if (team === undefined) {
-      return;
-    }
-    team.teamActionCosts = {...TEAM_ACTION_BASE_COSTS};
+    player.conglomeratesData.teamActionCosts = {...TEAM_ACTION_BASE_COSTS};
   }
 
   /** `player`'s team, as player ids including `player`. A teamless player is their own team of one. */

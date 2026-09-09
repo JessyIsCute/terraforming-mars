@@ -45,6 +45,6 @@ export type AdditionalProjectCosts = {
   aeronGenomicsResources?: number,
   /** Any predicted fees required to play this card because Reds are in power. */
   redsCost?: number,
-  /** Conglomerates: this Team Action's actual current Coordination cost, which climbs by 1 every time either teammate uses it, resetting each generation -- shown since the card's own icon always shows its unescalated base cost. */
+  /** Conglomerates: this Team Action's actual current Coordination cost, which climbs by 1 every time this player uses it (not their teammate), resetting each generation -- shown since the card's own icon always shows its unescalated base cost. */
   conglomeratesCost?: number,
 }

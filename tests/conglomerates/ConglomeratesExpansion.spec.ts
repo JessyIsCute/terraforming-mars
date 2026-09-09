@@ -128,20 +128,20 @@ describe('ConglomeratesExpansion', () => {
     expect(player1.conglomeratesData.coordination).to.eq(0);
   });
 
-  it('escalates a team action cost for both teammates after use', () => {
+  it('escalates a team action cost only for the player who used it, not their teammate', () => {
     const [, player1, , player3] = testGame(4, {conglomeratesExpansion: true});
     expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(2);
+    expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(2);
     ConglomeratesExpansion.increaseTeamActionCost(player1, 'givePatent');
     expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(3);
-    expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(3);
+    expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(2);
   });
 
   it('resets an escalated team action cost back to base at the start of the next generation', () => {
-    const [, player1, , player3] = testGame(4, {conglomeratesExpansion: true});
+    const [, player1] = testGame(4, {conglomeratesExpansion: true});
     ConglomeratesExpansion.increaseTeamActionCost(player1, 'givePatent');
     expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(3);
     player1.runProductionPhase();
     expect(ConglomeratesExpansion.getTeamActionCost(player1, 'givePatent')).to.eq(2);
-    expect(ConglomeratesExpansion.getTeamActionCost(player3, 'givePatent')).to.eq(2);
   });
 });
