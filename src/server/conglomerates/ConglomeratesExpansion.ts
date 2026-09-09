@@ -4,7 +4,6 @@ import {PlayerId} from '../../common/Types';
 import {ConglomeratesData, ConglomeratesTeam} from './ConglomeratesData';
 import {ConglomeratesPlayerData, TeamActionCosts} from '../../common/conglomerates/ConglomeratesPlayerData';
 import {AwardScorer} from '../awards/AwardScorer';
-import {VictoryPointsBreakdownBuilder} from '../game/VictoryPointsBreakdownBuilder';
 import {sum} from '../../common/utils/utils';
 import {TeamVictoryPointsBreakdown} from '../../common/conglomerates/TeamVictoryPointsBreakdown';
 import {ConglomeratesTeamModel, ConglomeratesTeamScore} from '../../common/models/ConglomeratesModel';
@@ -178,25 +177,23 @@ export class ConglomeratesExpansion {
   }
 
   /**
-   * Replaces the base game's per-player milestone/award VP for a Conglomerates game: each
-   * claimed milestone pays 8 VP to the claimer's whole team (not just the claimer), and each
-   * funded award pays 8 VP win-take-all to whichever team has the highest combined score
+   * Milestones/awards are team-only VP in a Conglomerates game -- never folded into an
+   * individual player's own getVictoryPoints() (see calculateVictoryPoints.ts, which skips
+   * its base-game per-player milestone/award VP entirely when Conglomerates is on). Each
+   * claimed milestone pays MILESTONE_TEAM_VP to the claimer's whole team, and each funded
+   * award pays AWARD_TEAM_VP win-take-all to whichever team has the highest combined score
    * (ties all win). The Coordination reward for claiming/funding is granted separately, at
    * the point of claiming/funding -- this only covers the VP side of the reward.
    */
-  public static calculateVictoryPoints(player: IPlayer, builder: VictoryPointsBreakdownBuilder) {
-    const game = player.game;
-    if (game.isSoloMode()) {
-      return;
-    }
-    const myTeam = this.teamPlayerIds(player);
-
+  private static teamMilestoneAndAwardVP(game: IGame, team: ConglomeratesTeam): {milestones: number, awards: number} {
+    let milestones = 0;
     for (const claimed of game.claimedMilestones) {
-      if (claimed.player !== undefined && myTeam.includes(claimed.player.id)) {
-        builder.setVictoryPoints('milestones', MILESTONE_TEAM_VP, 'Team claimed ${0} milestone', [claimed.milestone.name]);
+      if (claimed.player !== undefined && team.playerIds.includes(claimed.player.id)) {
+        milestones += MILESTONE_TEAM_VP;
       }
     }
 
+    let awards = 0;
     for (const fundedAward of game.fundedAwards) {
       const scorer = new AwardScorer(game, fundedAward.award);
       const teamScores = this.allTeamGroups(game).map((playerIds) => ({
@@ -204,26 +201,25 @@ export class ConglomeratesExpansion {
         score: sum(playerIds.map((id) => scorer.get(game.getPlayerById(id)))),
       }));
       const topScore = Math.max(...teamScores.map((t) => t.score));
-      const wonByMyTeam = teamScores.some((t) => t.score === topScore && t.playerIds.includes(player.id));
-      if (wonByMyTeam) {
-        builder.setVictoryPoints('awards', AWARD_TEAM_VP, 'Team won ${0} award (funded by ${1})', [fundedAward.award.name, fundedAward.player.name]);
+      const wonByThisTeam = teamScores.some((t) => t.score === topScore && t.playerIds.some((id) => team.playerIds.includes(id)));
+      if (wonByThisTeam) {
+        awards += AWARD_TEAM_VP;
       }
     }
+
+    return {milestones, awards};
   }
 
   /**
-   * The live team scoreboard: each member's personal VP (their own total, with the
-   * milestones/awards categories subtracted out -- those are already the *team's* full
-   * milestone/award VP, identically duplicated onto every member's own breakdown by
-   * `calculateVictoryPoints` above, so summing members' raw totals would double-count them),
-   * plus the team's milestone and award VP counted once, plus `bonuses` -- VP not attributed
-   * to an individual player, such as winning a Turmoil ruling (see `rewardRulingTeam`).
+   * The live team scoreboard, and the *only* place milestone/award VP is ever added up for a
+   * Conglomerates game: each member's own personal VP (their real total -- milestones/awards
+   * are never part of it, see calculateVictoryPoints.ts), plus the team's milestone and award
+   * VP, plus `bonuses` -- VP not attributed to an individual player, such as winning a
+   * Turmoil ruling (see `rewardRulingTeam`).
    */
   public static calculateTeamVictoryPoints(game: IGame, team: ConglomeratesTeam): TeamVictoryPointsBreakdown {
-    const memberBreakdowns = team.playerIds.map((id) => game.getPlayerById(id).getVictoryPoints());
-    const players = sum(memberBreakdowns.map((vp) => vp.total - vp.milestones - vp.awards));
-    const milestones = memberBreakdowns[0]?.milestones ?? 0;
-    const awards = memberBreakdowns[0]?.awards ?? 0;
+    const players = sum(team.playerIds.map((id) => game.getPlayerById(id).getVictoryPoints().total));
+    const {milestones, awards} = game.isSoloMode() ? {milestones: 0, awards: 0} : this.teamMilestoneAndAwardVP(game, team);
     const bonuses = team.bonusVictoryPoints ?? 0;
     return {
       players,

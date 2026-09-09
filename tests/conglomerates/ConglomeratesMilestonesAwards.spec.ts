@@ -50,13 +50,18 @@ describe('Conglomerates milestones and awards', () => {
       expect(milestone.canClaim(solo)).is.false;
     });
 
-    it('pays 8 VP to the whole team, not 5 to just the claimer', () => {
+    it('pays 8 VP to the team score, not to either player\'s own individual score', () => {
       const milestone = new Terraformer();
       game.claimedMilestones.push({player: player1, milestone});
 
-      expect(player1.getVictoryPoints().milestones).to.eq(8);
-      expect(player3.getVictoryPoints().milestones).to.eq(8); // teammate sees it too
-      expect(player2.getVictoryPoints().milestones).to.eq(0); // other team does not
+      // Team-only VP: neither teammate's own personal total includes it...
+      expect(player1.getVictoryPoints().milestones).to.eq(0);
+      expect(player3.getVictoryPoints().milestones).to.eq(0);
+      // ...it's added up exactly once, on the team breakdown.
+      const team = ConglomeratesExpansion.getTeam(player1)!;
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, team).milestones).to.eq(8);
+      const otherTeam = ConglomeratesExpansion.getTeam(player2)!;
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, otherTeam).milestones).to.eq(0);
     });
 
     it('the Terraformer53 variant shows the real scaled number and claims exactly like Terraformer', () => {
@@ -178,7 +183,7 @@ describe('Conglomerates milestones and awards', () => {
       expect(game.getAwardFundingCost()).to.eq(18);
     });
 
-    it('pays 8 VP win-take-all to the team with the best combined score', () => {
+    it('pays 8 VP win-take-all to the team with the best combined score, not to either player\'s own score', () => {
       const award = new Banker();
       game.fundAward(player1, award);
 
@@ -189,10 +194,16 @@ describe('Conglomerates milestones and awards', () => {
       player2.production.add(Resource.MEGACREDITS, 2);
       player4.production.add(Resource.MEGACREDITS, 2);
 
-      expect(player1.getVictoryPoints().awards).to.eq(8);
-      expect(player3.getVictoryPoints().awards).to.eq(8);
+      // Team-only VP: no individual player's own total includes it...
+      expect(player1.getVictoryPoints().awards).to.eq(0);
+      expect(player3.getVictoryPoints().awards).to.eq(0);
       expect(player2.getVictoryPoints().awards).to.eq(0);
       expect(player4.getVictoryPoints().awards).to.eq(0);
+      // ...it's added up exactly once, on the winning team's breakdown.
+      const winningTeam = ConglomeratesExpansion.getTeam(player1)!;
+      const losingTeam = ConglomeratesExpansion.getTeam(player2)!;
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, winningTeam).awards).to.eq(8);
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, losingTeam).awards).to.eq(0);
     });
 
     it('splits the 8 VP to both teams on a tie', () => {
@@ -204,8 +215,10 @@ describe('Conglomerates milestones and awards', () => {
       player2.production.add(Resource.MEGACREDITS, 3);
       player4.production.add(Resource.MEGACREDITS, 3);
 
-      expect(player1.getVictoryPoints().awards).to.eq(8);
-      expect(player2.getVictoryPoints().awards).to.eq(8);
+      const team1 = ConglomeratesExpansion.getTeam(player1)!;
+      const team2 = ConglomeratesExpansion.getTeam(player2)!;
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, team1).awards).to.eq(8);
+      expect(ConglomeratesExpansion.calculateTeamVictoryPoints(game, team2).awards).to.eq(8);
     });
 
     it('gives the funder 1 Coordination when actually funded', () => {

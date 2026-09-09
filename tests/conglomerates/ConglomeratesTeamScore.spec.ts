@@ -31,7 +31,7 @@ describe('Conglomerates team score', () => {
     expect(breakdown.total).to.eq(breakdown.players);
   });
 
-  it('counts claimed-milestone VP once at the team level, not once per member', () => {
+  it('counts claimed-milestone VP once at the team level, not on either member\'s own score', () => {
     const milestone = new Terraformer();
     player1.setTerraformRating(53);
     game.claimedMilestones.push({player: player1, milestone});
@@ -39,14 +39,13 @@ describe('Conglomerates team score', () => {
     const team = ConglomeratesExpansion.getTeam(player1)!;
     const breakdown = ConglomeratesExpansion.calculateTeamVictoryPoints(game, team);
 
-    // Each member's own getVictoryPoints() already includes the 8 milestone VP (Phase 2), so
-    // naively summing both totals would double-count it -- the team total must subtract one
-    // copy back out.
+    // Milestone VP is team-only -- neither member's own getVictoryPoints() includes it, so
+    // the team total is simply the sum of both members' own totals plus the milestone VP.
     expect(breakdown.milestones).to.eq(8);
-    expect(breakdown.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total - 8);
+    expect(breakdown.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total + 8);
   });
 
-  it('counts won-award VP once at the team level, not once per member', () => {
+  it('counts won-award VP once at the team level, not on either member\'s own score', () => {
     const award = new Banker();
     game.fundAward(player1, award);
     player1.production.add(Resource.MEGACREDITS, 5);
@@ -55,9 +54,9 @@ describe('Conglomerates team score', () => {
     const team = ConglomeratesExpansion.getTeam(player1)!;
     const breakdown = ConglomeratesExpansion.calculateTeamVictoryPoints(game, team);
 
-    // Same double-counting concern as milestones, above.
+    // Award VP is team-only too -- same reasoning as milestones, above.
     expect(breakdown.awards).to.eq(8);
-    expect(breakdown.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total - 8);
+    expect(breakdown.total).to.eq(player1.getVictoryPoints().total + player3.getVictoryPoints().total + 8);
   });
 
   it('builds a live model for every team with names, colors, and a breakdown', () => {

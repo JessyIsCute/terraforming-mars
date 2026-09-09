@@ -293,11 +293,13 @@ export default defineComponent({
       return `${paths.END_GAME_LOG}?id=${id}`;
     },
     playersInPlace(): Array<PublicPlayerModel> {
-      const sorted = this.viewModel.players.toSorted(function(a:PublicPlayerModel, b:PublicPlayerModel) {
-        if (a.victoryPointsBreakdown.total < b.victoryPointsBreakdown.total) {
+      const sorted = this.viewModel.players.toSorted((a: PublicPlayerModel, b: PublicPlayerModel) => {
+        const aScore = this.playerRankingScore(a);
+        const bScore = this.playerRankingScore(b);
+        if (aScore < bScore) {
           return -1;
         }
-        if (a.victoryPointsBreakdown.total > b.victoryPointsBreakdown.total) {
+        if (aScore > bScore) {
           return 1;
         }
         if (a.megacredits < b.megacredits) {
@@ -315,7 +317,7 @@ export default defineComponent({
       const firstWinner = sortedPlayers[0];
       const winners: PublicPlayerModel[] = [firstWinner];
       for (let i = 1; i < sortedPlayers.length; i++) {
-        if (sortedPlayers[i].victoryPointsBreakdown.total === firstWinner.victoryPointsBreakdown.total &&
+        if (this.playerRankingScore(sortedPlayers[i]) === this.playerRankingScore(firstWinner) &&
                     sortedPlayers[i].megacredits === firstWinner.megacredits) {
           winners.push(sortedPlayers[i]);
         }
@@ -410,6 +412,16 @@ export default defineComponent({
   methods: {
     cycleTileView(): void {
       this.tileView = nextTileView(this.tileView);
+    },
+    // Conglomerates: milestone/award VP is team-only and never folded into a player's own
+    // victoryPointsBreakdown.total (see ConglomeratesExpansion.calculateTeamVictoryPoints on
+    // the server) -- so ranking must compare each player's *team* total, not their own, or a
+    // team's shared milestone/award VP would silently vanish from who's declared the winner.
+    // Falls back to the player's own total when there's no team (not a Conglomerates game, or
+    // this player has no team entry).
+    playerRankingScore(player: PublicPlayerModel): number {
+      const team = this.game.conglomerates?.teams.find((t) => t.playerColors.includes(player.color));
+      return team?.victoryPoints.total ?? player.victoryPointsBreakdown.total;
     },
     getEndGamePlayerRowColorClass(color: Color): string {
       return playerColorClass(color, 'bg_transparent');

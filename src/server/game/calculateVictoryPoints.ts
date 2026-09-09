@@ -42,10 +42,10 @@ export function calculateVictoryPoints(player: IPlayer) {
   // Victory points from TR
   builder.setVictoryPoints('terraformRating', player.terraformRating);
 
-  // Victory points from awards and milestones
-  if (player.game.gameOptions.conglomeratesExpansion) {
-    ConglomeratesExpansion.calculateVictoryPoints(player, builder);
-  } else {
+  // Victory points from awards and milestones -- in a Conglomerates game these are team-only
+  // VP, never folded into an individual player's own total (see
+  // ConglomeratesExpansion.calculateTeamVictoryPoints, the sole place they're added up).
+  if (!player.game.gameOptions.conglomeratesExpansion) {
     giveAwards(player, builder);
     for (const milestone of player.game.claimedMilestones) {
       if (milestone.player !== undefined && milestone.player.id === player.id) {
@@ -126,9 +126,10 @@ export function calculateVictoryPoints(player: IPlayer) {
  * Not exported: `ConglomeratesExpansion` needs the equivalent for a teammate (to see how much
  * of their corruption is "leftover" after covering their own negative VP), but importing this
  * function here would put an edge from ConglomeratesExpansion back to this file, on top of the
- * existing edge the other way (`ConglomeratesExpansion.calculateVictoryPoints` above) -- that
- * cycle triggers a real "cannot access before initialization" crash at module load, so
- * `ConglomeratesExpansion.ts` keeps its own small copy of this instead of importing it.
+ * existing edge the other way (this file imports `ConglomeratesExpansion` above, for
+ * `teammateCorruptionAssist`) -- that cycle triggers a real "cannot access before
+ * initialization" crash at module load, so `ConglomeratesExpansion.ts` keeps its own small
+ * copy of this instead of importing it.
  */
 function calculateNegativeVP(player: IPlayer): number {
   let negativeVP = 0;
