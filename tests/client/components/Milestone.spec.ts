@@ -134,4 +134,20 @@ describe('Milestone', () => {
 
     expect(wrapper.find('[data-test=team-score]').exists()).to.be.false;
   });
+
+  it('colors each team score with that team\'s own color and shows it above the player scores', () => {
+    const milestone = createMilestone({claimed: true, scores: [{color: 'red', score: 2, claimable: false}]});
+    milestone.teamScores = [
+      {playerColors: ['red', 'yellow'], teamColor: 'red', score: 9},
+    ];
+    const wrapper = mount(Milestone, {...globalConfig, props: {milestone, showScores: true}});
+
+    expect(wrapper.find('[data-test=team-score]').classes()).to.include('ma-team-score--red');
+
+    const nameBlock = wrapper.find('.ma-name--milestones');
+    const teamScoresEl = nameBlock.find('.ma-team-scores').element;
+    const playerScoresEl = nameBlock.find('.ma-scores').element;
+    // DOCUMENT_POSITION_FOLLOWING (4) means teamScoresEl comes before playerScoresEl.
+    expect(teamScoresEl.compareDocumentPosition(playerScoresEl) & Node.DOCUMENT_POSITION_FOLLOWING).to.eq(4);
+  });
 });

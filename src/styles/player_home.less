@@ -613,7 +613,13 @@ each(@players, {
   color: #000;
   text-transform: uppercase;
   background: linear-gradient(to right, #e28c22, #ffcc64, #e28c22);
-  padding: 1px 33px 1px 10px;
+  // Symmetric padding: the old 33px right / 10px left split existed to leave room for the
+  // Coordination decoration when it was `position: absolute`-ed directly into that space.
+  // Now that it's a normal flex child of .milestone-award-price-row, an asymmetric padding
+  // just pushes the (correctly centered, within its own content box) row visually left of
+  // the pill's true bounds -- width is content-box (no box-sizing override here), so extra
+  // right padding adds space beyond, not inside, where the content actually centers.
+  padding: 1px 10px;
   width: 190px;
   letter-spacing: 1px;
   text-align: center;
@@ -663,10 +669,15 @@ each(@players, {
 
 .milestone-award-arrow {
   flex: none;
-  width: 15px;
-  height: 15px;
+  // short-arrow.png is 387x248 (not square) -- `background-size: 15px` only sets the width,
+  // so the height auto-scaled to ~9.6px and sat top-aligned in a 15x15 box, leaving empty
+  // space below it that made the arrow look both smaller and higher than it should. Sizing
+  // the box to the image's real ~1.56:1 ratio fills it completely, so flex's
+  // `align-items: center` on .milestone-award-price-row centers the actual visible glyph.
+  width: 22px;
+  height: 14px;
   background-image: url(./assets/misc/short-arrow.png);
-  background-size: 15px;
+  background-size: 22px 14px;
   background-repeat: no-repeat;
 }
 

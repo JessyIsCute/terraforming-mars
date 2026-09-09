@@ -6,6 +6,15 @@
     <div class="ma-name--milestones" :class="nameCss">
       <div v-if="conglomeratesNumberPatch !== undefined" class="ma-number-patch">{{ conglomeratesNumberPatch }}</div>
       <span ref="name" v-i18n>{{name}}</span>
+      <div v-if="milestone.teamScores !== undefined" class="ma-team-scores">
+        <span
+          v-for="(team, idx) in milestone.teamScores"
+          :key="idx"
+          class="ma-team-score"
+          :class="team.teamColor !== undefined ? `ma-team-score--${team.teamColor}` : ''"
+          data-test="team-score"
+        >[{{ team.score }}]</span>
+      </div>
       <div v-if="showScores" class="ma-scores player_home_block--milestones-and-awards-scores">
         <template v-for="score in sortedScores" :key="score.color">
           <p
@@ -22,14 +31,6 @@
           ></p>
       </template>
     </div>
-      <div v-if="milestone.teamScores !== undefined" class="ma-team-scores">
-        <span
-          v-for="(team, idx) in milestone.teamScores"
-          :key="idx"
-          class="ma-team-score"
-          data-test="team-score"
-        >[{{ team.score }}]</span>
-      </div>
     </div>
 
     <div v-if="showDescription" class="ma-description">
