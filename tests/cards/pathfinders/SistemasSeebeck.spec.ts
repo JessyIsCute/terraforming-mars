@@ -36,12 +36,13 @@ describe('SistemasSeebeck', () => {
     expect(player.megaCredits).eq(45);
   });
 
-  it('initial action draws until 2 cards that spend energy or heat are found, discarding the rest', () => {
+  it('initial action draws until 2 cards that spend energy are found, discarding the rest', () => {
     const match1 = fakeCard({behavior: {spend: {energy: 1}}});
-    // Merely granting energy/heat doesn't count - only spending it does.
+    // Merely granting energy doesn't count - only spending it does. Spending heat doesn't
+    // count either - only energy, for starters.
     const nonMatch1 = fakeCard({behavior: {production: {energy: 1}}});
-    const nonMatch2 = fakeCard({behavior: {stock: {heat: 2}}});
-    const match2 = fakeCard({behavior: {spend: {heat: 1}}});
+    const nonMatch2 = fakeCard({behavior: {spend: {heat: 2}}});
+    const match2 = fakeCard({behavior: {spend: {energy: 1}}});
     // drawPile.pop() draws from the end, so this order draws match1, then the two
     // non-matches, then match2.
     game.projectDeck.drawPile.push(match2, nonMatch2, nonMatch1, match1);
@@ -55,21 +56,23 @@ describe('SistemasSeebeck', () => {
     expect(player.cardsInHand).not.includes(nonMatch2);
   });
 
-  it('also matches a repeatable action that spends energy or heat, like Ironworks', () => {
-    // Most real energy/heat spenders (Ironworks' "spend 4 energy", Steelworks, etc.) cost
-    // it as their repeatable action, not their one-time play behavior - the initial draw
-    // filter must check both, or it finds almost nothing to draw into.
+  it('also matches a repeatable action that spends energy, like Ironworks', () => {
+    // Most real energy spenders (Ironworks' "spend 4 energy", Steelworks, etc.) cost it as
+    // their repeatable action, not their one-time play behavior - the initial draw filter
+    // must check both, or it finds almost nothing to draw into.
     const actionMatch1 = fakeCard({actionBehavior: {spend: {energy: 4}}});
-    const actionMatch2 = fakeCard({actionBehavior: {spend: {heat: 2}}});
-    const nonMatch = fakeCard({behavior: {production: {heat: 1}}});
-    game.projectDeck.drawPile.push(actionMatch2, nonMatch, actionMatch1);
+    const actionMatch2 = fakeCard({actionBehavior: {spend: {energy: 2}}});
+    const nonMatch1 = fakeCard({behavior: {production: {heat: 1}}});
+    const nonMatch2 = fakeCard({actionBehavior: {spend: {heat: 3}}});
+    game.projectDeck.drawPile.push(actionMatch2, nonMatch2, nonMatch1, actionMatch1);
 
     card.initialAction(player);
     runAllActions(game);
 
     expect(player.cardsInHand).includes(actionMatch1);
     expect(player.cardsInHand).includes(actionMatch2);
-    expect(player.cardsInHand).not.includes(nonMatch);
+    expect(player.cardsInHand).not.includes(nonMatch1);
+    expect(player.cardsInHand).not.includes(nonMatch2);
   });
 
   it('spend.energy can be paid with heat', () => {
