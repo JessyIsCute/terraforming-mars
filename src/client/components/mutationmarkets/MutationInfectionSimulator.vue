@@ -39,11 +39,11 @@
     <div class="mutation-sim-preview">
       <div class="mutation-sim-preview-column">
         <h3 v-i18n>Original</h3>
-        <Card :card="originalCardModel" auto-tall/>
+        <Card :card="originalCardModel" :key="'original-' + selectedCardName" auto-tall/>
       </div>
       <div class="mutation-sim-preview-column">
         <h3 v-i18n>With mutation/infection applied</h3>
-        <Card :card="previewCardModel" auto-tall/>
+        <Card :card="previewCardModel" :key="'preview-' + selectedCardName" auto-tall/>
       </div>
     </div>
   </div>

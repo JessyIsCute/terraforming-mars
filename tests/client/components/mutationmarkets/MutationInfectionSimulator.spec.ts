@@ -1,14 +1,35 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount, shallowMount} from '@vue/test-utils';
 import {expect} from 'chai';
 import {globalConfig} from '../getLocalVue';
 import MutationInfectionSimulator from '@/client/components/mutationmarkets/MutationInfectionSimulator.vue';
 import {MutationName} from '@/common/mutationmarkets/MutationName';
 import {InfectionName} from '@/common/mutationmarkets/InfectionName';
+import {CardName} from '@/common/cards/CardName';
 
 describe('MutationInfectionSimulator', () => {
   it('mounts without errors', () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     expect(wrapper.exists()).to.be.true;
+  });
+
+  it('actually swaps the rendered card (not just its displayed name) when a different card is picked', async () => {
+    // Regression test: Card.vue resolves its own face data (cost/tags/icons) once, in
+    // data(), from the `card.name` prop at mount time -- it does NOT reactively re-derive
+    // that if the prop's name later changes on the same component instance. A plain
+    // v-model-driven card switch (no :key) would silently keep showing the FIRST card's
+    // cost/art forever, with only text that reads `card.name` directly (the title) any
+    // different. Needs a full `mount` (not shallowMount) since the bug lives inside
+    // Card.vue's own internals, invisible to a stubbed child.
+    const wrapper = mount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.selectedCardName = CardName.ASTEROID_MINING;
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.card-asteroid-mining .card-cost').text()).to.eq('30');
+
+    vm.selectedCardName = CardName.BUSHES;
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.card-bushes .card-cost').text()).to.eq('10');
+    expect(wrapper.find('.card-asteroid-mining').exists()).to.be.false;
   });
 
   it('the original preview carries no mutation/infection at all', () => {
