@@ -186,6 +186,7 @@
 
       <section v-show="visibleMutationNames.length > 0 || visibleInfectionNames.length > 0">
         <h2 v-i18n>Mutation/Infections</h2>
+        <p><a href="mutation-simulator" v-i18n>Try the Mutation/Infection Simulator — preview any of these applied to any card</a></p>
         <div class="player_home_colony_cont">
           <div class="player_home_colony" v-for="mutationName in visibleMutationNames" :key="mutationName" v-memo="[mutationName]">
             <MutationCard :mutation="mutationName" />

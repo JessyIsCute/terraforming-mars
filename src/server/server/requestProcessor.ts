@@ -122,6 +122,7 @@ const handlers: Map<string, IHandler> = new Map(
     [paths.LOGIN, Login.INSTANCE],
     [paths.MAP_EDITOR, ServeApp.INSTANCE],
     [paths.MAP_LIBRARY, ServeApp.INSTANCE],
+    [paths.MUTATION_SIMULATOR, ServeApp.INSTANCE],
     [paths.API_MAP_LIBRARY, ApiMapLibrary.INSTANCE],
     [paths.API_MAP_LIBRARY_REVIEW, ApiMapLibraryReview.INSTANCE],
     [paths.API_LOGOUT, ApiLogout.INSTANCE],

@@ -32,6 +32,7 @@ export const paths = {
   LOGIN: 'login',
   MAP_EDITOR: 'map-editor',
   MAP_LIBRARY: 'map-library',
+  MUTATION_SIMULATOR: 'mutation-simulator',
   NEW_GAME: 'new-game',
   PLAYER: 'player',
   PLAYER_INPUT: 'player/input',

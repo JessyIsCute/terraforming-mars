@@ -1,0 +1,82 @@
+import {shallowMount} from '@vue/test-utils';
+import {expect} from 'chai';
+import {globalConfig} from '../getLocalVue';
+import MutationInfectionSimulator from '@/client/components/mutationmarkets/MutationInfectionSimulator.vue';
+import {MutationName} from '@/common/mutationmarkets/MutationName';
+import {InfectionName} from '@/common/mutationmarkets/InfectionName';
+
+describe('MutationInfectionSimulator', () => {
+  it('mounts without errors', () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    expect(wrapper.exists()).to.be.true;
+  });
+
+  it('the original preview carries no mutation/infection at all', () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    expect(vm.originalCardModel.mutationNames).to.be.undefined;
+    expect(vm.originalCardModel.infectionNames).to.be.undefined;
+  });
+
+  it('selecting a mutation carries it into the preview model, with a combined display name', async () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.previewCardModel.mutationNames).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
+    expect(vm.previewCardModel.combinedDisplayName).to.contain(vm.selectedCardName);
+    expect(vm.previewCardModel.mutationHighlight).to.deep.eq({cost: true, vp: true});
+  });
+
+  it('selecting an infection carries it into the preview model', async () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.selectedInfection = InfectionName.COST_INFLATION;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.previewCardModel.infectionNames).to.deep.eq([InfectionName.COST_INFLATION]);
+    expect(vm.previewCardModel.calculatedCost).to.eq(vm.baseCost + 4);
+  });
+
+  it('applies both a mutation and an infection at once, composing their cost effects', async () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
+    vm.selectedInfection = InfectionName.COST_INFLATION;
+    await wrapper.vm.$nextTick();
+
+    const model = vm.previewCardModel;
+    expect(model.mutationNames).to.deep.eq([MutationName.GIGANTIC_UNDERTAKINGS]);
+    expect(model.infectionNames).to.deep.eq([InfectionName.COST_INFLATION]);
+    expect(model.mutationVictoryPoints).to.be.greaterThan(0);
+    // Gigantic Undertakings' cost increase is applied to baseCost first, then Cost
+    // Inflation's flat +4 on top -- matches Card.ts's
+    // InfectionEffects.applyCost(MutationEffects.applyCost(...)) composition order. The
+    // exact clamped delta amounts are covered precisely in mutationInfectionPreview.spec.ts;
+    // here it's enough to confirm both effects actually stack rather than one overwriting
+    // the other.
+    expect(model.calculatedCost).to.be.greaterThan(vm.baseCost + 4);
+  });
+
+  it('mutationEffectIsRandomTag is true only for an addRandomTag-kind mutation', async () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+
+    vm.selectedMutation = MutationName.SCIENCE_PATRON;
+    await wrapper.vm.$nextTick();
+    expect(vm.mutationEffectIsRandomTag).to.be.true;
+
+    vm.selectedMutation = MutationName.GIGANTIC_UNDERTAKINGS;
+    await wrapper.vm.$nextTick();
+    expect(vm.mutationEffectIsRandomTag).to.be.false;
+  });
+
+  it('rerollTag bumps rerollSeed', () => {
+    const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
+    const vm = wrapper.vm as any;
+    const before = vm.rerollSeed;
+    vm.rerollTag();
+    expect(vm.rerollSeed).to.eq(before + 1);
+  });
+});
