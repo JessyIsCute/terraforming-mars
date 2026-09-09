@@ -26,8 +26,8 @@ export class SharedKnowledge extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'T20',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When an opponent draws their second card of a generation, draw 1 card.', (eb) => {
-            eb.cards(2, {all, digit}).startEffect.cards(1);
+          b.effect('When an opponent draws their third card of a generation, draw 1 card.', (eb) => {
+            eb.cards(3, {all, digit}).startEffect.cards(1);
           });
         }),
         description: 'Requires 4 science tags.',
@@ -46,7 +46,7 @@ export class SharedKnowledge extends Card implements IProjectCard {
     const before = this.data[drawingPlayer.id] ?? 0;
     const after = before + count;
     this.data[drawingPlayer.id] = after;
-    if (before < 2 && after >= 2) {
+    if (before < 3 && after >= 3) {
       cardOwner.drawCard();
     }
   }

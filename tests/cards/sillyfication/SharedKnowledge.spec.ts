@@ -22,8 +22,11 @@ describe('SharedKnowledge', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('draws a card when an opponent draws their second card of the generation', () => {
+  it('draws a card when an opponent draws their third card of the generation', () => {
     player.cardsInHand = [];
+
+    card.onCardsDrawn(player, player2, 1);
+    expect(player.cardsInHand).has.lengthOf(0);
 
     card.onCardsDrawn(player, player2, 1);
     expect(player.cardsInHand).has.lengthOf(0);
@@ -36,9 +39,9 @@ describe('SharedKnowledge', () => {
     expect(player.cardsInHand).has.lengthOf(1);
   });
 
-  it('triggers exactly once when the 2nd card arrives in a single multi-card draw', () => {
+  it('triggers exactly once when the 3rd card arrives in a single multi-card draw', () => {
     player.cardsInHand = [];
-    card.onCardsDrawn(player, player2, 3);
+    card.onCardsDrawn(player, player2, 4);
     expect(player.cardsInHand).has.lengthOf(1);
   });
 
@@ -50,13 +53,13 @@ describe('SharedKnowledge', () => {
 
   it('resets the count at the start of each generation', () => {
     player.cardsInHand = [];
-    card.onCardsDrawn(player, player2, 2);
+    card.onCardsDrawn(player, player2, 3);
     expect(player.cardsInHand).has.lengthOf(1);
 
     card.onProductionPhase(player);
     player.cardsInHand = [];
 
-    card.onCardsDrawn(player, player2, 1);
+    card.onCardsDrawn(player, player2, 2);
     expect(player.cardsInHand).has.lengthOf(0);
     card.onCardsDrawn(player, player2, 1);
     expect(player.cardsInHand).has.lengthOf(1);
