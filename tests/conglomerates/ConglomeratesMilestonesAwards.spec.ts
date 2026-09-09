@@ -8,9 +8,10 @@ import {Banker} from '../../src/server/awards/Banker';
 import {Resource} from '../../src/common/Resource';
 import {OrOptions} from '../../src/server/inputs/OrOptions';
 import {cast} from '../../src/common/utils/utils';
-import {runAllActions} from '../TestingUtils';
+import {runAllActions, fakeCard} from '../TestingUtils';
 import {Server} from '../../src/server/models/ServerModel';
 import {ConglomeratesExpansion} from '../../src/server/conglomerates/ConglomeratesExpansion';
+import {Tag} from '../../src/common/cards/Tag';
 
 describe('Conglomerates milestones and awards', () => {
   let game: IGame;
@@ -86,6 +87,36 @@ describe('Conglomerates milestones and awards', () => {
         player3.production.add(resource, 1);
       }
       expect(variant.getScore(player1)).to.eq(6);
+      expect(variant.canClaim(player1)).is.true;
+
+      // player2 (other team) does not count toward player1's team.
+      expect(variant.canClaim(player2)).is.false;
+    });
+
+    it('Diversifier10 unions the team\'s distinct tags instead of a 1.5x scale (which would be an unreachable 12)', () => {
+      const variant = milestoneManifest.createOrThrow('Diversifier10');
+      expect(variant.description).to.eq('Have 10 different tags in play between you and your teammate');
+
+      // player1 alone: 6 distinct tags.
+      player1.playedCards.push(fakeCard({tags: [Tag.BUILDING]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.SPACE]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.SCIENCE]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.POWER]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.EARTH]}));
+      player1.playedCards.push(fakeCard({tags: [Tag.JOVIAN]}));
+      expect(variant.getScore(player1)).to.eq(6);
+      expect(variant.canClaim(player1)).is.false;
+
+      // player3 (teammate): 6 distinct tags, 2 of which (Building, Space) overlap with
+      // player1's - a naive sum (6 + 6 = 12) would double-count those, but the real union
+      // is only 10.
+      player3.playedCards.push(fakeCard({tags: [Tag.BUILDING]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.SPACE]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.PLANT]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.MICROBE]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.ANIMAL]}));
+      player3.playedCards.push(fakeCard({tags: [Tag.CITY]}));
+      expect(variant.getScore(player1)).to.eq(10);
       expect(variant.canClaim(player1)).is.true;
 
       // player2 (other team) does not count toward player1's team.

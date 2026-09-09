@@ -72,6 +72,7 @@ import {Tactician4} from './modular/Tactician4';
 import {Briber} from './Briber';
 import {conglomeratesVariant} from './conglomerates/ConglomeratesMilestoneVariant';
 import {GeneralistConglomerates} from './conglomerates/GeneralistConglomerates';
+import {DiversifierConglomerates} from './conglomerates/DiversifierConglomerates';
 
 /**
  * Maps each board milestone to its Conglomerates-scaled sibling (1.5x threshold, rounded up,
@@ -87,6 +88,9 @@ import {GeneralistConglomerates} from './conglomerates/GeneralistConglomerates';
  * a 0-6 count of "productions increased at all," also hard-capped at 6, so it's redefined
  * instead (see GeneralistConglomerates): your team's COMBINED production of each of the 6
  * resources must be at least 2.
+ * `Diversifier` is also NOT a straight 1.5x scale (that would be an unreachable 12, since a
+ * base game only has 10 distinct tags) -- see DiversifierConglomerates, which unions the
+ * team's distinct tags directly and claims at 10, the real ceiling.
  */
 export const CONGLOMERATES_MILESTONE_MAP: Partial<Record<MilestoneName, MilestoneName>> = {
   'Agronomist': 'Agronomist6',
@@ -218,7 +222,7 @@ export const milestoneManifest: MAManifest<MilestoneName, IMilestone> = {
     'Capitalist96': {Factory: conglomeratesVariant('Capitalist96', 'Have 96 M€ between you and your teammate', () => new Capitalist()), compatibility: 'conglomerates'},
     'Coastguard5': {Factory: conglomeratesVariant('Coastguard5', 'Own 5 tiles adjacent to oceans between you and your teammate', () => new Coastguard()), compatibility: 'conglomerates'},
     'Colonizer6': {Factory: conglomeratesVariant('Colonizer6', 'Have 6 colonies between you and your teammate', () => new Colonizer()), compatibility: 'conglomerates'},
-    'Diversifier10': {Factory: conglomeratesVariant('Diversifier10', 'Have 10 different tags in play between you and your teammate', () => new Diversifier()), compatibility: 'conglomerates'},
+    'Diversifier10': {Factory: DiversifierConglomerates, compatibility: 'conglomerates'},
     'Ecologist6': {Factory: conglomeratesVariant('Ecologist6', 'Have 6 bio tags in play between you and your teammate (plant, microbe and animal tags count as bio tags)', () => new Ecologist()), compatibility: 'conglomerates'},
     'Economizer8': {Factory: conglomeratesVariant('Economizer8', 'Have 8 heat production between you and your teammate', () => new Economizer()), compatibility: 'conglomerates'},
     'Energizer9': {Factory: conglomeratesVariant('Energizer9', 'Have 9 energy production between you and your teammate', () => new Energizer()), compatibility: 'conglomerates'},
