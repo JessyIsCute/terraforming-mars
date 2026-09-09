@@ -346,7 +346,7 @@ export class MutationMarkets {
       (content) => MutationMarkets.qualifiesFor(content, winner, card));
     for (const content of qualifying) {
       if (content.kind === 'mutation') {
-        const applied = MutationEffects.apply(card, content.mutation, game.rng);
+        const applied = MutationEffects.apply(card, content.mutation, game.rng, game.gameOptions.expansions);
         card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
       } else {
         const applied = InfectionEffects.apply(content.infection);

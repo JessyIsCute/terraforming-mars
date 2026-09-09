@@ -14,18 +14,18 @@ describe('MutationMarkets on-play effects (grantResourceOnPlay / grantProduction
     [/* game */, player] = testGame(2);
   });
 
-  it('grants a flat resource on play (Greenery Keeper / Animal Warden / Space Visionary style)', () => {
+  it('grants a flat resource on play (Greenery Keeper style)', () => {
     const card = fakeCard({mutations: [{mutation: MutationName.GREENERY_KEEPER}]});
     player.plants = 0;
     MutationMarkets.applyOnPlayEffects(player, card);
     expect(player.plants).to.eq(2);
   });
 
-  it('grants a production step on play (Ocean Surveyor / Steel Baron style)', () => {
-    const card = fakeCard({mutations: [{mutation: MutationName.STEEL_BARON}]});
-    const before = player.production.steel;
+  it('grants a production step on play (Ocean Surveyor style)', () => {
+    const card = fakeCard({mutations: [{mutation: MutationName.OCEAN_SURVEYOR}]});
+    const before = player.production.heat;
     MutationMarkets.applyOnPlayEffects(player, card);
-    expect(player.production.steel).to.eq(before + 1);
+    expect(player.production.heat).to.eq(before + 1);
   });
 
   it('grants a M€ rebate on play when convertType lands on an Active card', () => {

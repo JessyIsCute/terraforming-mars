@@ -1,4 +1,5 @@
 import {Resource} from '../Resource';
+import {Tag} from '../cards/Tag';
 
 /**
  * The permanent, ongoing effect a mutation applies to the project card it covers, once won.
@@ -14,6 +15,12 @@ export type MutationEffect =
   | {kind: 'none'}
   /** Adds one random tag the card doesn't already have (Tag Diversifier / "Diverse"). */
   | {kind: 'addRandomTag'}
+  /**
+   * Adds a specific, fixed tag -- for a mutation whose own win requirement is already
+   * tied to one tag family (e.g. Science Patron requires Science tags, so it grants one),
+   * rather than picking randomly like Tag Diversifier.
+   */
+  | {kind: 'addSpecificTag', tag: Tag}
   /**
    * Adjusts the card's cost by `percent` of its base cost (negative for a discount,
    * positive for a surcharge), with the absolute change clamped to

@@ -96,13 +96,17 @@ describe('MutationInfectionSimulator', () => {
     );
   });
 
-  it('hasRandomTagMutation is true only when an addRandomTag-kind mutation is selected', async () => {
+  it('hasRandomTagMutation is true only when an addRandomTag-kind mutation is selected -- not addSpecificTag', async () => {
     const wrapper = shallowMount(MutationInfectionSimulator, {...globalConfig});
     const vm = wrapper.vm as any;
 
-    vm.selectedMutations = [MutationName.SCIENCE_PATRON];
+    vm.selectedMutations = [MutationName.TAG_DIVERSIFIER];
     await wrapper.vm.$nextTick();
     expect(vm.hasRandomTagMutation).to.be.true;
+
+    vm.selectedMutations = [MutationName.SCIENCE_PATRON];
+    await wrapper.vm.$nextTick();
+    expect(vm.hasRandomTagMutation).to.be.false;
 
     vm.selectedMutations = [MutationName.GIGANTIC_UNDERTAKINGS];
     await wrapper.vm.$nextTick();

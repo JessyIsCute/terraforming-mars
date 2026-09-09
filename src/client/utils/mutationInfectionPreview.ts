@@ -13,7 +13,7 @@ import {INFECTION_DEFINITIONS} from '@/common/mutationmarkets/InfectionDefinitio
  * market wins, and the simulator lets you pick more than one at once to preview that).
  */
 export type MutationsPreview = {
-  /** From the first selected addRandomTag-kind mutation only, matching ModelUtils.ts's `card.mutations.find(...)`. */
+  /** From the first selected addRandomTag/addSpecificTag-kind mutation only, matching ModelUtils.ts's `card.mutations.find(...)`. */
   chosenTag?: Tag,
   highlight: {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean},
   victoryPoints: number,
@@ -55,13 +55,19 @@ export function previewMutations(mutations: ReadonlyArray<MutationName>, baseCos
 
   for (const mutation of mutations) {
     const effect = MUTATION_DEFINITIONS[mutation].effect;
+    // Only the first addRandomTag/addSpecificTag-kind pick gets a badge -- matches
+    // ModelUtils.ts's cardsToModel(), which surfaces card.mutations.find(...)'s single
+    // result even when more than one applied mutation could have set chosenTag.
     if (effect.kind === 'addRandomTag') {
       highlight.tag = true;
-      // Only the first addRandomTag-kind pick gets a badge -- matches ModelUtils.ts's
-      // cardsToModel(), which surfaces card.mutations.find(...)'s single result even
-      // when more than one applied mutation could have set chosenTag.
       if (chosenTag === undefined) {
         chosenTag = pickRandomTag(existingTags);
+      }
+    }
+    if (effect.kind === 'addSpecificTag') {
+      highlight.tag = true;
+      if (chosenTag === undefined) {
+        chosenTag = effect.tag;
       }
     }
     if (effect.kind === 'costPercent') {

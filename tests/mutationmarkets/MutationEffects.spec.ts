@@ -1,7 +1,8 @@
 import {expect} from 'chai';
 import {MutationEffects} from '../../src/server/mutationmarkets/MutationEffects';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
-import {Tag} from '../../src/common/cards/Tag';
+import {Tag, ALL_TAGS} from '../../src/common/cards/Tag';
+import {Expansion} from '../../src/common/cards/GameModule';
 import {fakeCard} from '../TestingUtils';
 import {SeededRandom} from '../../src/common/utils/Random';
 import {TestPlayer} from '../TestPlayer';
@@ -90,9 +91,14 @@ describe('MutationEffects', () => {
   });
 
   describe('apply', () => {
+    let expansions: Record<Expansion, boolean>;
+    beforeEach(() => {
+      [{gameOptions: {expansions}}] = testGame(2);
+    });
+
     it('Tag Diversifier chooses a random tag the card does not already have', () => {
       const card = fakeCard({tags: [Tag.SCIENCE, Tag.PLANT, Tag.BUILDING, Tag.ANIMAL, Tag.CITY]});
-      const applied = MutationEffects.apply(card, MutationName.TAG_DIVERSIFIER, rng);
+      const applied = MutationEffects.apply(card, MutationName.TAG_DIVERSIFIER, rng, expansions);
       expect(applied.mutation).to.eq(MutationName.TAG_DIVERSIFIER);
       expect(applied.chosenTag).is.not.undefined;
       expect(card.tags).to.not.include(applied.chosenTag);
@@ -102,8 +108,44 @@ describe('MutationEffects', () => {
 
     it('Gigantic Undertakings and Mini Mutation carry no chosen tag', () => {
       const card = fakeCard({tags: []});
-      expect(MutationEffects.apply(card, MutationName.GIGANTIC_UNDERTAKINGS, rng).chosenTag).is.undefined;
-      expect(MutationEffects.apply(card, MutationName.MINI_MUTATION, rng).chosenTag).is.undefined;
+      expect(MutationEffects.apply(card, MutationName.GIGANTIC_UNDERTAKINGS, rng, expansions).chosenTag).is.undefined;
+      expect(MutationEffects.apply(card, MutationName.MINI_MUTATION, rng, expansions).chosenTag).is.undefined;
+    });
+
+    it('addSpecificTag mutations always grant their own fixed tag, no randomness involved', () => {
+      const card = fakeCard({tags: []});
+      expect(MutationEffects.apply(card, MutationName.SCIENCE_PATRON, rng, expansions).chosenTag).to.eq(Tag.SCIENCE);
+      expect(MutationEffects.apply(card, MutationName.HEAT_BANKER, rng, expansions).chosenTag).to.eq(Tag.POWER);
+      expect(MutationEffects.apply(card, MutationName.STEEL_BARON, rng, expansions).chosenTag).to.eq(Tag.BUILDING);
+      expect(MutationEffects.apply(card, MutationName.ANIMAL_WARDEN, rng, expansions).chosenTag).to.eq(Tag.ANIMAL);
+      expect(MutationEffects.apply(card, MutationName.SPACE_VISIONARY, rng, expansions).chosenTag).to.eq(Tag.SPACE);
+    });
+
+    it('Tag Diversifier never picks a tag whose expansion is disabled', () => {
+      // Default testGame(2) has every expansion disabled except corpera -- Venus, Moon,
+      // Mars/Clone (Pathfinders), and Crime (Underworld) tags should never come up.
+      const gated = [Tag.VENUS, Tag.MOON, Tag.MARS, Tag.CLONE, Tag.CRIME];
+      for (let i = 0; i < 30; i++) {
+        const card = fakeCard({tags: []});
+        const applied = MutationEffects.apply(card, MutationName.TAG_DIVERSIFIER, rng, expansions);
+        expect(gated).to.not.include(applied.chosenTag);
+      }
+    });
+
+    it('falls back to a base tag, never a disabled-expansion one, when every available tag is already present', () => {
+      const allButMoon = ALL_TAGS.filter((t) => t !== Tag.WILD && t !== Tag.EVENT && t !== Tag.INFECTED && t !== Tag.MOON);
+      const card = fakeCard({tags: allButMoon});
+      const applied = MutationEffects.apply(card, MutationName.TAG_DIVERSIFIER, rng, expansions);
+      expect(applied.chosenTag).to.not.eq(Tag.MOON);
+    });
+
+    it('allows a gated tag once its expansion is enabled', () => {
+      const [{gameOptions: {expansions: moonExpansions}}] = testGame(2, {moonExpansion: true});
+      // The card already has every other real tag -- Moon is the only remaining candidate.
+      const allButMoon = ALL_TAGS.filter((t) => t !== Tag.WILD && t !== Tag.EVENT && t !== Tag.INFECTED && t !== Tag.MOON);
+      const card = fakeCard({tags: allButMoon});
+      const applied = MutationEffects.apply(card, MutationName.TAG_DIVERSIFIER, rng, moonExpansions);
+      expect(applied.chosenTag).to.eq(Tag.MOON);
     });
   });
 });

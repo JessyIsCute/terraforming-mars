@@ -2,6 +2,8 @@ import {ICard} from '../cards/ICard';
 import {IPlayer} from '../IPlayer';
 import {Tag} from '../../common/cards/Tag';
 import {ALL_TAGS} from '../../common/cards/Tag';
+import {TAG_REQUIRES_EXPANSION} from '../../common/cards/TagExpansions';
+import {Expansion} from '../../common/cards/GameModule';
 import {CardType} from '../../common/cards/CardType';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
@@ -18,21 +20,35 @@ export class MutationEffects {
   private constructor() {}
 
   /** Builds the record to store on a won card, choosing a random outcome where the mutation calls for one. */
-  public static apply(card: ICard, mutation: MutationName, rng: Random): AppliedMutation {
+  public static apply(card: ICard, mutation: MutationName, rng: Random, expansions: Record<Expansion, boolean>): AppliedMutation {
     const effect = MUTATION_DEFINITIONS[mutation].effect;
     if (effect.kind === 'addRandomTag') {
-      return {mutation, chosenTag: MutationEffects.chooseRandomTag(card, rng)};
+      return {mutation, chosenTag: MutationEffects.chooseRandomTag(card, rng, expansions)};
+    }
+    if (effect.kind === 'addSpecificTag') {
+      return {mutation, chosenTag: effect.tag};
     }
     return {mutation};
   }
 
-  private static chooseRandomTag(card: ICard, rng: Random): Tag {
+  private static tagAvailable(tag: Tag, expansions: Record<Expansion, boolean>): boolean {
+    const requiredExpansion = TAG_REQUIRES_EXPANSION[tag];
+    return requiredExpansion === undefined || expansions[requiredExpansion] === true;
+  }
+
+  private static chooseRandomTag(card: ICard, rng: Random, expansions: Record<Expansion, boolean>): Tag {
     const existing = new Set(card.tags);
-    // Tag.INFECTED is reserved for the Infection mechanic -- never a Tag Diversifier outcome.
-    const candidates = ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.EVENT && tag !== Tag.INFECTED && !existing.has(tag));
+    // Tag.INFECTED is reserved for the Infection mechanic -- never a Tag Diversifier
+    // outcome. Tags whose theme belongs to a disabled expansion (Moon, Venus, Mars/Clone
+    // from Pathfinders, Crime from Underworld) are excluded too -- no point handing out a
+    // tag whose cards/mechanics aren't even in this game's pool.
+    const candidates = ALL_TAGS.filter((tag) =>
+      tag !== Tag.WILD && tag !== Tag.EVENT && tag !== Tag.INFECTED &&
+      !existing.has(tag) && MutationEffects.tagAvailable(tag, expansions));
     if (candidates.length === 0) {
-      // Every tag already present (essentially impossible) -- fall back to any non-wild tag.
-      return ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.INFECTED)[0];
+      // Every available tag already present (essentially impossible) -- fall back to any
+      // non-wild, non-infected, expansion-available tag.
+      return ALL_TAGS.filter((tag) => tag !== Tag.WILD && tag !== Tag.INFECTED && MutationEffects.tagAvailable(tag, expansions))[0];
     }
     return candidates[rng.nextInt(candidates.length)];
   }
@@ -141,7 +157,7 @@ export class MutationEffects {
     const highlight: {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean} = {};
     for (const applied of card.mutations) {
       const effect = MUTATION_DEFINITIONS[applied.mutation].effect;
-      if (effect.kind === 'addRandomTag') {
+      if (effect.kind === 'addRandomTag' || effect.kind === 'addSpecificTag') {
         highlight.tag = true;
       }
       if (effect.kind === 'costPercent') {

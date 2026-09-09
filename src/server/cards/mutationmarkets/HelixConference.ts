@@ -28,8 +28,8 @@ import {Size} from '../../../common/cards/render/Size';
 // Deliberately effect-triggered, not action-based, and unrelated to Underworld
 // corruption, as a positive counterpart to Blacklab Cartel's opponent-targeting Infect.
 export class HelixConference extends CorporationCard implements ICorporationCard {
-  // A representative spread across the three effect families a mutation can have
-  // (addRandomTag / costPercent+VP / convertType) -- arbitrary otherwise, since every
+  // A representative spread across three effect families a mutation can have
+  // (addSpecificTag / costPercent+VP / convertType) -- arbitrary otherwise, since every
   // mutation works correctly on a card still in hand.
   private static readonly MUTATION_CHOICES: ReadonlyArray<MutationName> = [
     MutationName.SCIENCE_PATRON,
@@ -117,7 +117,7 @@ export class HelixConference extends CorporationCard implements ICorporationCard
       const definition = MUTATION_DEFINITIONS[mutation];
       orOptions.options.push(
         new SelectOption(`${definition.prefix}: ${describeMutationEffect(definition.effect)}`, 'Mutate').andThen(() => {
-          const applied = MutationEffects.apply(card, mutation, game.rng);
+          const applied = MutationEffects.apply(card, mutation, game.rng, game.gameOptions.expansions);
           card.mutations = card.mutations === undefined ? [applied] : [...card.mutations, applied];
           game.log('${0} mutated ${1} with ${2}', (b) => b.player(player).card(card).string(definition.name));
           return undefined;

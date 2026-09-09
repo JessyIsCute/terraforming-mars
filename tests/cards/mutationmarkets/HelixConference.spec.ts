@@ -84,7 +84,8 @@ describe('HelixConference', () => {
     mutationChoice.options[0].cb(undefined);
     expect(target.mutations).has.lengthOf(1);
     expect(target.mutations![0].mutation).to.eq(MutationName.SCIENCE_PATRON);
-    expect(target.mutations![0].chosenTag).is.not.undefined;
+    // Science Patron grants its own fixed tag (addSpecificTag), not a random one.
+    expect(target.mutations![0].chosenTag).to.eq(Tag.SCIENCE);
   });
 
   it('offers exactly Science Patron, Gigantic Undertakings, and Building Mogul, in that order', () => {

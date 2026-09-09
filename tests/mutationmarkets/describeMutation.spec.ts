@@ -16,6 +16,7 @@ describe('describeMutation', () => {
   it('describes effects', () => {
     expect(describeMutationEffect({kind: 'none'})).to.eq('');
     expect(describeMutationEffect({kind: 'addRandomTag'})).to.eq('Gains a random new tag');
+    expect(describeMutationEffect({kind: 'addSpecificTag', tag: Tag.SCIENCE})).to.eq('Gains a Science tag');
     expect(describeMutationEffect({kind: 'costPercent', percent: -30, minAbsDelta: 3, maxAbsDelta: 12})).to.eq('Cost -30%');
     expect(describeMutationEffect({kind: 'costPercent', percent: 50, minAbsDelta: 3, maxAbsDelta: 12, vpPerAbsDelta: 3})).to.eq('Cost +50%, gains VP');
     expect(describeMutationEffect({kind: 'nestedCopy', percent: -40, minAbsDelta: 3, maxAbsDelta: 12})).to.eq('Playing it grants a 40% cheaper copy');

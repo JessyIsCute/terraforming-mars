@@ -26,11 +26,19 @@ describe('mutationInfectionPreview', () => {
   });
 
   describe('previewMutations', () => {
-    it('addRandomTag (Science Patron): sets the tag highlight and a chosen tag, leaves cost/VP untouched', () => {
-      const result = previewMutations([MutationName.SCIENCE_PATRON], 20, [Tag.SCIENCE]);
+    it('addRandomTag (Tag Diversifier): sets the tag highlight and a chosen tag, leaves cost/VP untouched', () => {
+      const result = previewMutations([MutationName.TAG_DIVERSIFIER], 20, [Tag.SCIENCE]);
       expect(result.highlight).to.deep.eq({tag: true});
       expect(result.chosenTag).to.not.be.undefined;
       expect(result.chosenTag).to.not.eq(Tag.SCIENCE);
+      expect(result.cost).to.eq(20);
+      expect(result.victoryPoints).to.eq(0);
+    });
+
+    it('addSpecificTag (Science Patron): always grants its own fixed tag, no randomness', () => {
+      const result = previewMutations([MutationName.SCIENCE_PATRON], 20, [Tag.BUILDING]);
+      expect(result.highlight).to.deep.eq({tag: true});
+      expect(result.chosenTag).to.eq(Tag.SCIENCE);
       expect(result.cost).to.eq(20);
       expect(result.victoryPoints).to.eq(0);
     });
@@ -92,13 +100,23 @@ describe('mutationInfectionPreview', () => {
       expect(result.victoryPoints).to.eq(3); // only Gigantic Undertakings has a vpPerAbsDelta
     });
 
-    it('only the first addRandomTag-kind mutation in the list gets a chosen tag badge', () => {
-      // Tag Diversifier and Science Patron are both addRandomTag -- matches
-      // ModelUtils.ts's cardsToModel(), which surfaces only the first match via
-      // card.mutations.find(...) even when more than one mutation could set chosenTag.
-      const result = previewMutations([MutationName.TAG_DIVERSIFIER, MutationName.SCIENCE_PATRON], 20, []);
+    it('only the first tag-granting mutation in the list gets a chosen tag badge, whether random or specific', () => {
+      // Tag Diversifier (addRandomTag) and Science Patron (addSpecificTag) both grant a
+      // tag -- matches ModelUtils.ts's cardsToModel(), which surfaces only the first
+      // match via card.mutations.find(...) even when more than one mutation in the list
+      // could set chosenTag.
+      // Science already present so Tag Diversifier's random pick (which goes first, and
+      // so should win) can never coincidentally land on Science too -- keeps the
+      // "not Science Patron's fixed pick" assertion below from ever being flaky.
+      const result = previewMutations([MutationName.TAG_DIVERSIFIER, MutationName.SCIENCE_PATRON], 20, [Tag.SCIENCE]);
       expect(result.chosenTag).to.not.be.undefined;
+      expect(result.chosenTag).to.not.eq(Tag.SCIENCE); // Tag Diversifier (first) wins, not Science Patron's fixed pick
       expect(result.highlight).to.deep.eq({tag: true});
+    });
+
+    it('the second entry\'s fixed tag wins when it comes before any random pick', () => {
+      const result = previewMutations([MutationName.SCIENCE_PATRON, MutationName.TAG_DIVERSIFIER], 20, []);
+      expect(result.chosenTag).to.eq(Tag.SCIENCE);
     });
   });
 

@@ -44,6 +44,8 @@ export function describeMutationEffect(effect: MutationEffect): string {
     return '';
   case 'addRandomTag':
     return 'Gains a random new tag';
+  case 'addSpecificTag':
+    return `Gains a ${capitalize(effect.tag)} tag`;
   case 'costPercent': {
     const sign = effect.percent >= 0 ? '+' : '';
     const vp = effect.vpPerAbsDelta !== undefined ? ', gains VP' : '';

@@ -56,45 +56,48 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     name: MutationName.HEAT_BANKER,
     prefix: 'Thermal',
     requirement: {tag: Tag.POWER, count: 3},
-    // Cost +25% (clamped to +2..+8), and +1 VP for every 4 M€ of that increase: a
-    // thermal asset that appreciates in value.
-    effect: {kind: 'costPercent', percent: 25, minAbsDelta: 2, maxAbsDelta: 8, vpPerAbsDelta: 4},
+    // On-theme: grants the same tag its requirement is built on.
+    effect: {kind: 'addSpecificTag', tag: Tag.POWER},
   },
   [MutationName.STEEL_BARON]: {
     name: MutationName.STEEL_BARON,
     prefix: 'Reinforced',
     requirement: {tag: Tag.BUILDING, count: 4},
-    // On-theme: +1 steel production the first time it's played.
-    effect: {kind: 'grantProductionOnPlay', resource: Resource.STEEL, amount: 1},
+    // On-theme: grants the same tag its requirement is built on.
+    effect: {kind: 'addSpecificTag', tag: Tag.BUILDING},
   },
   [MutationName.SCIENCE_PATRON]: {
     name: MutationName.SCIENCE_PATRON,
     prefix: 'Sponsored',
     requirement: {tag: Tag.SCIENCE, count: 3},
-    // A research patron funds a second line of inquiry: adds one random tag the card
-    // doesn't already have (same mechanic as Tag Diversifier, different requirement).
-    effect: {kind: 'addRandomTag'},
+    // A research patron funds a second line of inquiry: grants the same tag its
+    // requirement is built on (unlike Tag Diversifier's uniqueTags requirement, this one
+    // has an obvious specific tag to give instead of picking randomly).
+    effect: {kind: 'addSpecificTag', tag: Tag.SCIENCE},
   },
   [MutationName.ANIMAL_WARDEN]: {
     name: MutationName.ANIMAL_WARDEN,
     prefix: 'Sheltered',
     requirement: {tag: Tag.ANIMAL, count: 2},
-    // A sheltered habitat: +1 plant the first time it's played.
-    effect: {kind: 'grantResourceOnPlay', resource: Resource.PLANTS, amount: 1},
+    // On-theme: grants the same tag its requirement is built on.
+    effect: {kind: 'addSpecificTag', tag: Tag.ANIMAL},
   },
   [MutationName.BUILDING_MOGUL]: {
     name: MutationName.BUILDING_MOGUL,
     prefix: 'Monumental',
     requirement: {tag: Tag.BUILDING, count: 6},
     // A project so significant it changes the nature of the work: flips Automated <-> Event.
+    // Kept distinct from Steel Baron's addSpecificTag(BUILDING) (same requirement family,
+    // different reward) rather than converted to match -- convertType has no other user,
+    // and this is the more interesting of the two Building-tag mutations to keep as-is.
     effect: {kind: 'convertType'},
   },
   [MutationName.SPACE_VISIONARY]: {
     name: MutationName.SPACE_VISIONARY,
     prefix: 'Orbital',
     requirement: {tag: Tag.SPACE, count: 4},
-    // On-theme: +2 titanium the first time it's played.
-    effect: {kind: 'grantResourceOnPlay', resource: Resource.TITANIUM, amount: 2},
+    // On-theme: grants the same tag its requirement is built on.
+    effect: {kind: 'addSpecificTag', tag: Tag.SPACE},
   },
   [MutationName.NESTED_MUTATION]: {
     name: MutationName.NESTED_MUTATION,
