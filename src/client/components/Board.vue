@@ -362,7 +362,7 @@ import {SpaceId} from '@/common/Types';
 import {TileView} from '@/client/components/board/TileView';
 import {BoardName} from '@/common/boards/BoardName';
 import {customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
-import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig} from '@/common/GlobalParameterConfig';
+import {DEFAULT_GLOBAL_PARAMETERS, GlobalParametersConfig, ParameterTrack} from '@/common/GlobalParameterConfig';
 import {LEGENDS} from '@/client/components/Legends';
 import {Expansion} from '@/common/cards/GameModule';
 import {SpaceName} from '@/common/boards/SpaceName';
@@ -525,10 +525,22 @@ export default defineComponent({
     },
     // A custom board that uses the official parameter tracks keeps the painted Mars image and
     // its curved temperature/oxygen/Venus scales, and the hex grid is scaled to fit inside
-    // that curve. Only a board with stretched/custom parameters falls back to the plain
-    // flow-layout readout.
+    // that curve. Only a board that actually stretches temperature/oxygen/Venus falls back to
+    // the plain flow-layout readout -- those are the only tracks with a painted curve at all, so
+    // a board that only customizes oceans.max or heatForTemperature (neither of which has any
+    // on-board art) has no reason to lose the curve for tracks it never touched.
     useStandardTrackLayout(): boolean {
-      return this.isCustomBoard && this.globalParameters === undefined;
+      if (!this.isCustomBoard) {
+        return false;
+      }
+      if (this.globalParameters === undefined) {
+        return true;
+      }
+      const matchesDefault = (track: ParameterTrack, defaultTrack: ParameterTrack): boolean =>
+        track.min === defaultTrack.min && track.max === defaultTrack.max && track.step === defaultTrack.step;
+      return matchesDefault(this.globalParameters.temperature, DEFAULT_GLOBAL_PARAMETERS.temperature) &&
+        matchesDefault(this.globalParameters.oxygen, DEFAULT_GLOBAL_PARAMETERS.oxygen) &&
+        matchesDefault(this.globalParameters.venus, DEFAULT_GLOBAL_PARAMETERS.venus);
     },
     oceanMax(): number {
       return this.globalParameters?.oceans.max ?? constants.MAX_OCEAN_TILES;

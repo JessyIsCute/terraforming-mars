@@ -168,6 +168,29 @@ describe('Board', () => {
     expect(spaceWrappers).to.have.length(2);
   });
 
+  it('keeps the painted Mars + curved tracks when only oceans.max is customized', () => {
+    const wrapper = shallowMount(Board, {
+      ...globalConfig,
+      props: {
+        spaces: customSpaces, expansions: DEFAULT_EXPANSIONS, tileView: 'show', venusScaleLevel: 0, boardName: BoardName.CUSTOM,
+        globalParameters: {
+          temperature: {min: -30, max: 8, step: 2, bonuses: []},
+          oxygen: {min: 0, max: 14, step: 1, bonuses: []},
+          venus: {min: 0, max: 30, step: 2, bonuses: []},
+          oceans: {max: 3},
+          heatForTemperature: 8,
+        },
+      },
+    });
+    expect(wrapper.find('.board-without-venus').exists()).to.be.true;
+    expect(wrapper.find('.board-cont--custom').exists()).to.be.false;
+    expect(wrapper.find('.global-numbers--custom').exists()).to.be.false;
+    expect(wrapper.find('#main_board').attributes('style') ?? '').to.match(/scale\(/);
+    // The oceans readout itself is always a plain count/max text, curved layout or not -- it
+    // just needs to reflect the customized max, which it does regardless of this fix.
+    expect(wrapper.find('.global-numbers-oceans').text()).to.contain('0/3');
+  });
+
   it('drops the painting for a plain readout when parameters are stretched', () => {
     const wrapper = shallowMount(Board, {
       ...globalConfig,
