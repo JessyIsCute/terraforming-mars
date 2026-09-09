@@ -25,17 +25,12 @@ describe('Conglomerates Turmoil', () => {
   });
 
   describe('teamDisplayColor', () => {
-    it('assigns each team a standard player color that no actual player is using', () => {
-      // testGame colors players blue, red, yellow, green (in that order) -- so the unused
-      // colors, in PLAYER_COLORS order, are black then purple.
-      const usedColors = [player1.color, player2.color, player3.color, player4.color];
+    it('assigns team 1 orange and team 2 purple, fixed regardless of the players\' own colors', () => {
       const teamAColor = ConglomeratesExpansion.teamDisplayColor(player1);
       const teamBColor = ConglomeratesExpansion.teamDisplayColor(player2);
 
-      expect(teamAColor).to.eq('black');
+      expect(teamAColor).to.eq('orange');
       expect(teamBColor).to.eq('purple');
-      expect(usedColors).to.not.include(teamAColor);
-      expect(usedColors).to.not.include(teamBColor);
       expect(ConglomeratesExpansion.teamDisplayColor(player3)).to.eq(teamAColor);
       expect(ConglomeratesExpansion.teamDisplayColor(player4)).to.eq(teamBColor);
     });

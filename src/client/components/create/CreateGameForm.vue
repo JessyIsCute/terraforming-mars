@@ -511,7 +511,7 @@
                                           <div class="create-game-page-color-row">
                                               <template v-for="color in PLAYER_COLORS" :key="color">
                                                 <div>
-                                                  <input type="radio" :value="color" :name="'playerColor' + (index + 1)" v-model="newPlayer.color" :id="'radioBox' + color + (index + 1)">
+                                                  <input type="radio" :value="color" :name="'playerColor' + (index + 1)" v-model="newPlayer.color" :id="'radioBox' + color + (index + 1)" :disabled="expansions.conglomerates">
                                                   <label :for="'radioBox' + color + (index + 1)">
                                                       <div :class="'create-game-colorbox '+getPlayerCubeColorClass(color)"></div>
                                                   </label>
@@ -521,7 +521,7 @@
                                           <div v-if="expansions.conglomerates" class="form-group">
                                               <label class="form-label">
                                                   <span v-i18n>Team</span>
-                                                  <select class="form-select form-inline" v-model.number="newPlayer.team">
+                                                  <select class="form-select form-inline" v-model.number="newPlayer.team" @change="forceConglomeratesColors()">
                                                       <option v-for="team in conglomeratesTeamNumbers()" :key="team" :value="team">{{ $t('Team') }} {{ team + 1 }}</option>
                                                   </select>
                                               </label>
@@ -1035,6 +1035,32 @@ export default defineComponent({
       this.getPlayers().forEach((player, index) => {
         player.team = index % half;
       });
+      this.forceConglomeratesColors();
+    },
+    // Team 1 (index 0) is always red+yellow, team 2 (index 1) is always green+blue -- fixed,
+    // not left to each player's own color pick, so a team's colors are consistent from game
+    // to game. Different from the server's fixed orange/purple team *display* colors
+    // (ConglomeratesExpansion.teamDisplayColor) on purpose, so neither ever collides with an
+    // individual player's own color. Re-run whenever a team assignment changes (including a
+    // manual edit via the Team dropdown), not just on the default recompute.
+    forceConglomeratesColors() {
+      const teamPlayerColors: Array<Array<Color>> = [['red', 'yellow'], ['green', 'blue']];
+      const countByTeam = new Map<number, number>();
+      this.getPlayers().forEach((player) => {
+        if (player.team === undefined) {
+          return;
+        }
+        const team: number = player.team;
+        const colors = teamPlayerColors[team];
+        if (colors === undefined) {
+          return;
+        }
+        const slot = countByTeam.get(team) ?? 0;
+        countByTeam.set(team, slot + 1);
+        if (slot < colors.length) {
+          player.color = colors[slot];
+        }
+      });
     },
     isRandomMAEnabled(): boolean {
       return this.randomMA !== RandomMAOptionType.NONE;
@@ -1187,6 +1213,9 @@ export default defineComponent({
       }
 
       if (this.expansions.conglomerates) {
+        // Final safety net: colors are locked to team in the UI, but re-enforce here too in
+        // case settings were restored from an older save (see forceConglomeratesColors).
+        this.forceConglomeratesColors();
         if (this.playersCount < 2 || this.playersCount % 2 !== 0) {
           alert(this.$t('Conglomerates requires an even number of players, split into teams of 2'));
           return undefined;

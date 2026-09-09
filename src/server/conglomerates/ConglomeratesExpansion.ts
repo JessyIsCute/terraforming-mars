@@ -276,10 +276,16 @@ export class ConglomeratesExpansion {
   }
 
   /**
-   * The shared delegate color for `player`'s team in Turmoil: one of the 8 standard
-   * `PLAYER_COLORS` that no player in this game is actually using, assigned by team index --
-   * no new colors needed. Undefined if `player` is teamless, or if every color is already
-   * taken by an actual player (not possible in 2v2, but a graceful fallback for larger games).
+   * The shared delegate color for `player`'s team in Turmoil (and everywhere else a team's
+   * color is shown, e.g. the resource bar outline, the team score panel): team 1 is always
+   * orange, team 2 is always purple -- fixed, not derived from what colors the players
+   * themselves picked, so the same two colors mean "team" consistently across every game.
+   * Paired with the Create Game form always assigning team 1 red+yellow and team 2 green+blue
+   * (CreateGameForm.vue's `forceConglomeratesColors`), orange/purple never collide with an
+   * individual player's own color in the standard 2v2 case. For a 3rd+ team (not otherwise
+   * supported yet), falls back to the old dynamic pick -- an unused `PLAYER_COLORS` entry,
+   * excluding orange/purple so it can't collide with either fixed team either.
+   * Undefined if `player` is teamless, or if every fallback color is already taken.
    */
   public static teamDisplayColor(player: IPlayer): Color | undefined {
     const game = player.game;
@@ -291,9 +297,13 @@ export class ConglomeratesExpansion {
     if (index === -1) {
       return undefined;
     }
-    const usedColors = new Set(game.players.map((p) => p.color));
+    const fixedTeamColors: Array<Color> = ['orange', 'purple'];
+    if (index < fixedTeamColors.length) {
+      return fixedTeamColors[index];
+    }
+    const usedColors = new Set([...game.players.map((p) => p.color), ...fixedTeamColors]);
     const availableColors = PLAYER_COLORS.filter((color) => !usedColors.has(color));
-    return availableColors[index];
+    return availableColors[index - fixedTeamColors.length];
   }
 
   /**

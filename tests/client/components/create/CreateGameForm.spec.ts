@@ -209,6 +209,44 @@ describe('CreateGameForm', () => {
     expect(vm.players.slice(0, 4).map((p: any) => p.team)).to.deep.eq([0, 1, 0, 1]);
   });
 
+  it('forces team 1 to red+yellow and team 2 to green+blue when the expansion is toggled on', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    // Default table-order pairing: players 0&2 are team 1, players 1&3 are team 2.
+    expect(vm.players.slice(0, 4).map((p: any) => p.color)).to.deep.eq(['red', 'green', 'yellow', 'blue']);
+  });
+
+  it('re-forces colors when a player\'s team is changed via the dropdown', async () => {
+    const wrapper = shallowMount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    // Swap player 0 onto team 2 (index 1) -- player 2 becomes the sole/first team-1 member.
+    vm.players[0].team = 1;
+    vm.forceConglomeratesColors();
+
+    expect(vm.players[2].color).to.eq('red');
+  });
+
+  it('locks the color picker while Conglomerates is on', async () => {
+    const wrapper = mount(CreateGameForm, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.playersCount = 4;
+    vm.expansions.conglomerates = true;
+    await wrapper.vm.$nextTick();
+
+    const colorInputs = wrapper.findAll('input[type=radio][name=playerColor1]');
+    expect(colorInputs.length).to.be.greaterThan(0);
+    expect(colorInputs.every((input) => (input.element as HTMLInputElement).disabled)).to.be.true;
+  });
+
   it('recomputes Conglomerates teams when the player count changes', async () => {
     const wrapper = shallowMount(CreateGameForm, {...globalConfig});
     const vm = wrapper.vm as any;
