@@ -3101,42 +3101,19 @@
       border-radius: 14px 2px 2px 2px;
       .raised-bevel();
     }
-    // MutationMarkets: unlike prelude/ceo labels, this never coexists with either of
-    // them, but it DOES always coexist with the M€ cost circle -- a market-mutated card
-    // is always a plain project card (Automated/Active/Event), and those are exactly the
-    // types that show the cost circle (Prelude/CEO/Corporation don't). The cost circle
-    // occupies roughly the top-left 40x40px (accounting for `.card-cost-and-tags`'s -10px
-    // negative margins), so this is shifted right to clear it instead of reusing prelude/
-    // ceo's left:4px.
-    .mutated-label {
-      position: absolute;
-      text-transform: uppercase;
-      top: 15px;
-      left: 48px;
-      margin: 0px;
-      width: 46px;
-      height: 15px;
-      line-height: 16px;
-      text-align: center;
-      font-size: 9px;
-      font-weight: bold;
-      color: #06180d;
-      box-shadow: @outline-shadow;
-      background: linear-gradient(-60deg, #1b5e20 10%, #69f0ae, #1b5e20 90%);
-      border-radius: 10px 2px 2px 2px;
-      .raised-bevel();
-    }
   }
-  // MutationMarkets: Blacklab Cartel's red "Infected" ribbon. Deliberately NOT nested
-  // inside `.card-title` like `.mutated-label`/`.prelude-label`/`.ceo-label` -- those all
-  // anchor with `top:`, which is fine for a fixed-position ribbon near the title, but a
-  // card's height is variable (`.filterDiv` sets no fixed height), so this instead sits
-  // here as a sibling of `.card-title`/`.card-expansion`, positioned with `bottom:`
-  // relative to `.card-container` directly, the same way `.card-points`/
+  // MutationMarkets: the green "Mutated" and red "Infected" ribbons sit side by side,
+  // bottom-left. Deliberately NOT nested inside `.card-title` like `.prelude-label`/
+  // `.ceo-label` -- those anchor with `top:`, fine for a fixed-position ribbon near the
+  // title, but a card's height is variable (`.filterDiv` sets no fixed height), so both
+  // instead sit here as siblings of `.card-title`/`.card-expansion`, positioned with
+  // `bottom:` relative to `.card-container` directly, the same way `.card-points`/
   // `.card-resources-counter` reliably reach the card's actual bottom corners regardless
-  // of content length. Placed bottom-left so it never overlaps `.mutated-label` (which
-  // stays up near the cost circle) even when a card carries both at once.
-  .infected-label {
+  // of content length. Mutated takes the left slot, Infected the next one over --
+  // mirrored border-radius (rounded corner on the outside of each, top-left for Mutated,
+  // top-right for Infected) so the pair reads as one tucked-together shape when both
+  // apply to the same card.
+  .mutated-label {
     position: absolute;
     text-transform: uppercase;
     bottom: 32px;
@@ -3148,10 +3125,29 @@
     text-align: center;
     font-size: 9px;
     font-weight: bold;
+    color: #06180d;
+    box-shadow: @outline-shadow;
+    background: linear-gradient(-60deg, #1b5e20 10%, #69f0ae, #1b5e20 90%);
+    border-radius: 10px 2px 2px 2px;
+    z-index: 3;
+    .raised-bevel();
+  }
+  .infected-label {
+    position: absolute;
+    text-transform: uppercase;
+    bottom: 32px;
+    left: 52px;
+    margin: 0px;
+    width: 46px;
+    height: 15px;
+    line-height: 16px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
     color: #fff;
     box-shadow: @outline-shadow;
     background: linear-gradient(-60deg, #7f0000 10%, #ff5252, #7f0000 90%);
-    border-radius: 10px 2px 2px 2px;
+    border-radius: 2px 10px 2px 2px;
     z-index: 3;
     .raised-bevel();
   }

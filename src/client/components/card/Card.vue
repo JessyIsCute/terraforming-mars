@@ -7,7 +7,7 @@
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
               <CardTags :tags="tags" :mutationAddedTag="card.mutationAddedTag" />
           </div>
-          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :mutated="mutated"/>
+          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName"/>
           <CardContent
               :metadata="cardMetadata"
               :requirements="cardRequirements"
@@ -16,6 +16,7 @@
               :mutationText="mutationEffectText"
               :infectionText="infectionEffectText" />
       </div>
+      <div v-if="mutated" class="mutated-label">Mutated</div>
       <div v-if="infected" class="infected-label">Infected</div>
       <CardExpansion :expansion="cardExpansion" :isCorporation="isCorporationCard" :isResourceCard="isResourceCard" :compatibility="cardCompatibility" />
       <CardResourceCounter v-if="hasResourceType" :amount="resourceAmount" :type="resourceType" />

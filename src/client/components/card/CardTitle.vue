@@ -3,7 +3,6 @@
     <div v-if="isPrelude()" class="prelude-label">prelude</div>
     <div v-if="isCorporation()" class="corporation-label">corporation</div>
     <div v-if="isCeo()" class="ceo-label">CEO</div>
-    <div v-if="mutated" class="mutated-label">Mutated</div>
     <CardCorporationLogo v-if="isCorporation()" :title="title"/>
     <div v-else ref="title" :class="getClasses()">{{ displayTitleWithoutSuffix }}</div>
   </div>
@@ -39,10 +38,6 @@ export default defineComponent({
     displayTitle: {
       type: String,
       default: undefined,
-    },
-    mutated: {
-      type: Boolean,
-      default: false,
     },
   },
   components: {

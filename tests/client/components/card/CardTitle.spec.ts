@@ -17,7 +17,7 @@ describe('CardTitle', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders the real title with no displayTitle/mutated props', () => {
+  it('renders the real title with no displayTitle prop', () => {
     const wrapper = shallowMount(CardTitle, {
       ...globalConfig,
       props: {
@@ -26,21 +26,17 @@ describe('CardTitle', () => {
       },
     });
     expect(wrapper.text()).to.contain('Gigantic Asteroid');
-    expect(wrapper.find('.mutated-label').exists()).to.be.false;
   });
 
-  it('renders displayTitle in place of title, and the Mutated ribbon, when mutated', () => {
+  it('renders displayTitle in place of title', () => {
     const wrapper = shallowMount(CardTitle, {
       ...globalConfig,
       props: {
         title: 'Gigantic Asteroid' as CardName,
         type: CardType.AUTOMATED,
         displayTitle: 'Diverse Gigantic Asteroid',
-        mutated: true,
       },
     });
     expect(wrapper.text()).to.contain('Diverse Gigantic Asteroid');
-    expect(wrapper.find('.mutated-label').exists()).to.be.true;
-    expect(wrapper.find('.mutated-label').text()).to.eq('Mutated');
   });
 });
