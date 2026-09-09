@@ -2,6 +2,10 @@ import {GameModule} from '@/common/cards/GameModule';
 
 export const WIKI = 'https://github.com/terraforming-mars/terraforming-mars/wiki';
 
+// Conglomerates isn't part of the upstream project, so its rules page lives on this fork's
+// own wiki instead of the shared one above.
+export const FORK_WIKI = 'https://github.com/JessyIsCute/terraforming-mars/wiki';
+
 export const RULEBOOK_URLS: Record<GameModule, string> = {
   base: `${WIKI}/Rulebooks`,
   corpera: `${WIKI}/Rulebooks`,
@@ -23,7 +27,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   betterMars: `${WIKI}/Community`,
   customCards: `${WIKI}/Community`,
   mutationMarkets: `${WIKI}/Community`,
-  conglomerates: `${WIKI}/Community`,
+  conglomerates: `${FORK_WIKI}/Conglomerates`,
 };
 
 export const WIKI_URLS = {

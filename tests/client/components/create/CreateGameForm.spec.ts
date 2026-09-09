@@ -48,6 +48,15 @@ describe('CreateGameForm', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
+  it('links the Conglomerates checkbox to its rules page on this fork\'s own wiki', () => {
+    // Conglomerates isn't part of the upstream project, so unlike the other expansions'
+    // (whose info icons link to the shared upstream wiki), its link must point at this
+    // fork's own wiki instead.
+    const wrapper = mount(CreateGameForm, {...globalConfig});
+    const link = wrapper.find('#conglomerates-checkbox').element.nextElementSibling!.querySelector('a');
+    expect(link?.getAttribute('href')).to.eq('https://github.com/JessyIsCute/terraforming-mars/wiki/Conglomerates');
+  });
+
   it('keeps the randomMA and agendas toggle checkboxes in sync with restored state', async () => {
     // Regression: these two checkboxes toggle their bound value via @change instead of
     // v-model, so restoring settings (e.g. after a page refresh) updated the underlying data

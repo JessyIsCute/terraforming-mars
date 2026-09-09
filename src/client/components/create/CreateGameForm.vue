@@ -203,7 +203,7 @@
                             <input type="checkbox" name="conglomerates" id="conglomerates-checkbox" v-model="expansions.conglomerates">
                             <label for="conglomerates-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-conglomerates"></div>
-                                <span v-i18n>Conglomerates</span>&nbsp;<span title="A fan expansion: 2v2 team play">(&#945;)</span>
+                                <span v-i18n>Conglomerates</span>&nbsp;<span title="A fan expansion: 2v2 team play">(&#945;)</span>&nbsp;<a :href="wikiUrls.conglomerates" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
                         </div>
 
