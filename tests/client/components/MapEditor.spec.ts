@@ -206,6 +206,22 @@ describe('MapEditor', () => {
     expect(disabled.length).to.be.greaterThan(0);
   });
 
+  it('shows a bump icon matching its kind, and updates it when the kind is changed', async () => {
+    const wrapper = mount(MapEditor, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.customParams = true;
+    await wrapper.vm.$nextTick();
+    vm.params.temperature.bonuses.push({value: -24, kind: 'heatProduction', amount: 1});
+    await wrapper.vm.$nextTick();
+
+    const icon = wrapper.find('.map-editor-bump-icon');
+    expect(icon.classes()).to.include('map-editor-bump-icon--heatProduction');
+
+    await wrapper.find('.map-editor-bump select').setValue('tr');
+    expect(wrapper.find('.map-editor-bump-icon').classes()).to.include('map-editor-bump-icon--tr');
+    expect(wrapper.find('.map-editor-bump-icon').classes()).to.not.include('map-editor-bump-icon--heatProduction');
+  });
+
   describe('opening a Map Library entry (MapLibraryRow.vue\'s "Open in editor" hand-off)', () => {
     afterEach(() => {
       window.history.pushState(null, '', '/');
