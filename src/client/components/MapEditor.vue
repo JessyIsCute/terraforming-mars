@@ -78,6 +78,7 @@
               step <input type="number" v-model.number="params[key].step" min="1">
               <div v-for="(bonus, i) in params[key].bonuses" :key="i" class="map-editor-bump">
                 @<input type="number" v-model.number="bonus.value">
+                <i class="map-editor-bump-icon" :class="'map-editor-bump-icon--' + bonus.kind" :title="bonus.kind"></i>
                 <select v-model="bonus.kind">
                   <option v-for="k in bonusKinds" :key="k" :value="k">{{ k }}</option>
                 </select>
@@ -758,6 +759,24 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     input[type=number] { width: 52px; }
   }
   .map-editor-bump { margin-left: 12px; font-size: 12px; }
+
+  // Small icon reflecting a bump's kind, so the dropdown text isn't the only way to tell what a
+  // bonus actually grants at a glance. Reuses the same real resource/tile art the game itself
+  // uses for these concepts -- no new assets needed.
+  .map-editor-bump-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+  }
+  .map-editor-bump-icon--ocean { background-image: url("/assets/tiles/ocean.png"); }
+  .map-editor-bump-icon--temperature { background-image: url("/assets/global-parameters/temperature.png"); }
+  .map-editor-bump-icon--heatProduction { background-image: url("/assets/resources/heat.png"); }
+  .map-editor-bump-icon--card { background-image: url("/assets/resources/card.png"); }
+  .map-editor-bump-icon--tr { background-image: url("/assets/resources/tr.png"); }
 
   .map-editor-canvas {
     flex: 1;
