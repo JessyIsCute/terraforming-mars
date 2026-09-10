@@ -7,7 +7,7 @@ import {toName} from '../../../src/common/utils/utils';
 describe('Sillyfication module', () => {
   it('only offers Sillyfication cards when sillyficationExpansion is on', () => {
     const off: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, sillyficationExpansion: false};
-    const on: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, sillyficationExpansion: true};
+    const on: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, sillyficationExpansion: true, pathfindersExpansion: true};
 
     const offPool = [
       ...new GameCards(off).getProjectCards().map(toName),
@@ -37,6 +37,14 @@ describe('Sillyfication module', () => {
 
     expect(new GameCards(withoutUnderworld).getPreludeCards().map(toName)).to.not.contain(CardName.MARKET_CRASH);
     expect(new GameCards(withUnderworld).getPreludeCards().map(toName)).to.contain(CardName.MARKET_CRASH);
+  });
+
+  it('only offers Mars Homestead Act (a Mars-tagged prelude) when pathfindersExpansion is also on', () => {
+    const withoutPathfinders: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, sillyficationExpansion: true, pathfindersExpansion: false};
+    const withPathfinders: GameOptions = {...DEFAULT_GAME_OPTIONS, corporateEra: true, preludeExtension: true, sillyficationExpansion: true, pathfindersExpansion: true};
+
+    expect(new GameCards(withoutPathfinders).getPreludeCards().map(toName)).to.not.contain(CardName.MARS_HOMESTEAD_ACT);
+    expect(new GameCards(withPathfinders).getPreludeCards().map(toName)).to.contain(CardName.MARS_HOMESTEAD_ACT);
   });
 
   it('only offers Epsilon Dample when deltaProjectExpansion is also on', () => {

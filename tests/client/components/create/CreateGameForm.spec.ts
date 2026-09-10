@@ -48,13 +48,21 @@ describe('CreateGameForm', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('links the Conglomerates checkbox to its rules page on this fork\'s own wiki', () => {
-    // Conglomerates isn't part of the upstream project, so unlike the other expansions'
-    // (whose info icons link to the shared upstream wiki), its link must point at this
+  it('links each fan expansion checkbox to its own rules page on this fork\'s own wiki', () => {
+    // None of these are part of the upstream project, so unlike the official expansions'
+    // (whose info icons link to the shared upstream wiki), their links must point at this
     // fork's own wiki instead.
     const wrapper = mount(CreateGameForm, {...globalConfig});
-    const link = wrapper.find('#conglomerates-checkbox').element.nextElementSibling!.querySelector('a');
-    expect(link?.getAttribute('href')).to.eq('https://github.com/JessyIsCute/terraforming-mars/wiki/Conglomerates');
+    const expected: Record<string, string> = {
+      'conglomerates-checkbox': 'Conglomerates',
+      'sillyfication-checkbox': 'Sillyfication',
+      'betterMars-checkbox': 'BetterMars',
+      'mutationMarkets-checkbox': 'MutationMarkets',
+    };
+    for (const [id, page] of Object.entries(expected)) {
+      const link = wrapper.find(`#${id}`).element.nextElementSibling!.querySelector('a');
+      expect(link?.getAttribute('href')).to.eq(`https://github.com/JessyIsCute/terraforming-mars/wiki/${page}`);
+    }
   });
 
   it('keeps the randomMA and agendas toggle checkboxes in sync with restored state', async () => {

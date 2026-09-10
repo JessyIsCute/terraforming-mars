@@ -132,7 +132,8 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.SLOW_START]: {Factory: SlowStart, compatibility: 'prelude'},
     [CardName.PRELUDE_GAMBIT]: {Factory: PreludeGambit, compatibility: 'prelude'},
     [CardName.BALANCE]: {Factory: Balance, compatibility: 'prelude'},
-    [CardName.MARS_HOMESTEAD_ACT]: {Factory: MarsHomesteadAct, compatibility: 'prelude'},
+    // Carries a Mars tag - a Pathfinders concept - so it also needs that expansion.
+    [CardName.MARS_HOMESTEAD_ACT]: {Factory: MarsHomesteadAct, compatibility: ['prelude', 'pathfinders']},
     [CardName.INSIDER_TRADING]: {Factory: InsiderTrading, compatibility: ['prelude', 'underworld']},
     [CardName.MARKET_CRASH]: {Factory: MarketCrash, compatibility: ['prelude', 'underworld']},
   },

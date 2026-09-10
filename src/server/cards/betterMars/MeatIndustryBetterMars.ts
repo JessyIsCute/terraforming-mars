@@ -18,7 +18,7 @@ export class MeatIndustryBetterMars extends MeatIndustry {
   }
 
   public override get cost() {
-    return super.cost + 1;
+    return super.cost - 3;
   }
 
   public override get metadata() {
