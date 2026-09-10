@@ -4,14 +4,16 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
+import {digit} from '../Options';
 
 export class CounterfeitCertificates extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.COUNTERFEIT_CERTIFICATES) {
+  constructor(name: CardName = CardName.COUNTERFEIT_CERTIFICATES, heat: number = 1) {
     super({
       name,
       type: CardType.EVENT,
       tags: [Tag.EARTH],
-      cost: 0,
+      cost: 2,
+      reserveUnits: {heat},
       victoryPoints: -1,
 
       behavior: {
@@ -21,9 +23,10 @@ export class CounterfeitCertificates extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM05',
         renderData: CardRenderer.builder((b) => {
+          b.minus().heat(heat, {digit}).plainText(`Spend ${heat} heat.`, /** parens */ true).br;
           b.tr(3);
         }),
-        description: 'Gain 3 TR (forged terraforming credentials).',
+        description: `Spend ${heat} heat. Gain 3 TR (forged terraforming credentials).`,
       },
     });
   }
@@ -31,12 +34,12 @@ export class CounterfeitCertificates extends Card implements IProjectCard {
 
 export class CounterfeitCertificatesII extends CounterfeitCertificates {
   constructor() {
-    super(CardName.COUNTERFEIT_CERTIFICATES_II);
+    super(CardName.COUNTERFEIT_CERTIFICATES_II, 2);
   }
 }
 
 export class CounterfeitCertificatesIII extends CounterfeitCertificates {
   constructor() {
-    super(CardName.COUNTERFEIT_CERTIFICATES_III);
+    super(CardName.COUNTERFEIT_CERTIFICATES_III, 3);
   }
 }

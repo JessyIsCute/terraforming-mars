@@ -1,20 +1,18 @@
 import {IProjectCard} from '../cards/IProjectCard';
-import {BlackMarketPrice} from '../../common/blackmarket/BlackMarketPrice';
 
 export const BLACK_MARKET_SLOT_COUNT = 5;
 
 /**
  * One slot is one design's "stack": `variantIndex` (0,1,2) is which of the design's 3
- * printings is currently on top, and `price` is that printing's resolved price (rolled once,
- * at reveal time, for a `variable` design -- see `resolveBlackMarketPrice`). Buying the
- * card reveals the SAME design's next printing underneath (variantIndex + 1) until the
+ * printings is currently on top -- each printing carries its own price on the card itself
+ * (`card.cost`/`card.reserveUnits`; see BlackMarketCardManifest.ts's doc comment). Doing the
+ * project reveals the SAME design's next printing underneath (variantIndex + 1) until the
  * stack runs out, at which point a fresh, previously-unseen design takes this slot's place.
  */
 export type BlackMarketSlot = {
   card: IProjectCard;
   designIndex: number;
   variantIndex: number;
-  price: BlackMarketPrice;
 } | undefined;
 
 /**
@@ -28,8 +26,8 @@ export type BlackMarketData = {
   designQueue: Array<number>;
 };
 
-/** On-disk shape: identical to the live shape -- nothing here needs reconstruction beyond the card instance itself. */
+/** On-disk shape: a slot's card is reconstructed on load from `BLACK_MARKET_DESIGNS[designIndex].printings[variantIndex]`. */
 export type SerializedBlackMarketData = {
-  slots: Array<{designIndex: number, variantIndex: number, price: BlackMarketPrice} | undefined>;
+  slots: Array<{designIndex: number, variantIndex: number} | undefined>;
   designQueue: Array<number>;
 };

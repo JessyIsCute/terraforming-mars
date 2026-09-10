@@ -1,5 +1,6 @@
 import {expect} from 'chai';
-import {ClassifiedResearch, ClassifiedResearchII, ClassifiedResearchIII} from '@/server/cards/blackmarket/ClassifiedResearch';
+import {ClassifiedResearch, ClassifiedResearchII, CLASSIFIED_RESEARCH_MIN_COST, CLASSIFIED_RESEARCH_MAX_COST} from '@/server/cards/blackmarket/ClassifiedResearch';
+import {CardName} from '@/common/cards/CardName';
 import {Tag} from '@/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -13,9 +14,13 @@ describe('ClassifiedResearch', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats and no printed price -- the market owns it', () => {
+  it('defaults to the minimum listed price, and a rolled price bypasses the shared properties cache', () => {
+    expect(card.cost).to.eq(CLASSIFIED_RESEARCH_MIN_COST);
+    expect(new ClassifiedResearch(CardName.CLASSIFIED_RESEARCH, CLASSIFIED_RESEARCH_MAX_COST).cost).to.eq(CLASSIFIED_RESEARCH_MAX_COST);
+  });
+
+  it('has the printed tag and VP', () => {
     expect(card.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
-    expect(card.cost).to.eq(0);
     expect(card.victoryPoints).to.eq(-1);
   });
 
@@ -25,12 +30,10 @@ describe('ClassifiedResearch', () => {
     expect(player.cardsInHand).has.lengthOf(1);
   });
 
-  it('printings II and III are distinct CardNames with identical stats', () => {
-    const printings = [card, new ClassifiedResearchII(), new ClassifiedResearchIII()];
-    expect(new Set(printings.map((c) => c.name)).size).to.eq(3);
-    for (const printing of printings) {
-      expect(printing.cost).to.eq(0);
-      expect(printing.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
-    }
+  it('the II printing is a distinct CardName sharing the same behavior', () => {
+    const printing = new ClassifiedResearchII();
+    expect(printing.name).to.not.eq(CardName.CLASSIFIED_RESEARCH);
+    expect(printing.cost).to.eq(CLASSIFIED_RESEARCH_MIN_COST);
+    expect(printing.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
   });
 });

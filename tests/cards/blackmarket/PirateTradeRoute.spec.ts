@@ -13,15 +13,22 @@ describe('PirateTradeRoute', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats and no printed price -- the market owns it', () => {
+  it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.SPACE]);
     expect(card.cost).to.eq(0);
+    expect(card.reserveUnits).deep.include({steel: 1, titanium: 1});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play gains 5 M€', () => {
+  it('play spends 1 steel and 1 titanium and gains 5 M€', () => {
+    player.steel = 1;
+    player.titanium = 1;
     const before = player.megaCredits;
+
     card.play(player);
+
+    expect(player.steel).to.eq(0);
+    expect(player.titanium).to.eq(0);
     expect(player.megaCredits).to.eq(before + 5);
   });
 });

@@ -43,6 +43,18 @@ describe('CardTags', () => {
     expect(tags[1].classes()).to.not.include('mutation-tag-glow');
   });
 
+  it('never renders Tag.INFECTED as its own (icon-less, invisible) tag -- the red ribbon already says so', () => {
+    const wrapper = mount(CardTags, {
+      ...globalConfig,
+      props: {
+        tags: [Tag.SPACE, Tag.INFECTED],
+      },
+    });
+    const tags = wrapper.findAll('.card-tag');
+    expect(tags).to.have.lengthOf(1);
+    expect(tags[0].classes()).to.include('tag-space');
+  });
+
   it('falls back to the asterisk overflow tag once 4 printed tags plus the added one exceeds the cap', () => {
     const wrapper = mount(CardTags, {
       ...globalConfig,

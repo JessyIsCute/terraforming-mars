@@ -12,21 +12,12 @@ describe('BlackMarketSlot', () => {
     expect(wrapper.findComponent({name: 'Card'}).exists()).to.be.false;
   });
 
-  it('renders the card and its market-owned price when a slot is present', () => {
+  it('renders the card when a slot is present', () => {
     const wrapper = shallowMount(BlackMarketSlot, {
       ...globalConfig,
-      props: {marketSlot: {card: {name: CardName.SMUGGLED_REACTOR_CORE}, price: {titanium: 2}}},
+      props: {card: {name: CardName.SMUGGLED_REACTOR_CORE}},
     });
     expect(wrapper.findComponent({name: 'Card'}).exists()).to.be.true;
-    expect(wrapper.find('.black-market-price-badge').text()).to.eq('2 titanium');
-  });
-
-  it('formats a mixed M€ + non-M€ price', () => {
-    const wrapper = shallowMount(BlackMarketSlot, {
-      ...globalConfig,
-      props: {marketSlot: {card: {name: CardName.COUNTERFEIT_CERTIFICATES}, price: {megacredits: 2, heat: 1}}},
-    });
-    expect(wrapper.find('.black-market-price-badge').text()).to.eq('2 M€, 1 heat');
   });
 
   it('plays and then clears the entrance animation when the card is replaced', async () => {
@@ -34,11 +25,11 @@ describe('BlackMarketSlot', () => {
     try {
       const wrapper = shallowMount(BlackMarketSlot, {
         ...globalConfig,
-        props: {marketSlot: {card: {name: CardName.SMUGGLED_REACTOR_CORE}, price: {titanium: 2}}},
+        props: {card: {name: CardName.SMUGGLED_REACTOR_CORE}},
       });
       expect(wrapper.classes()).to.not.include('black-market-slot--entering-right');
 
-      await wrapper.setProps({marketSlot: {card: {name: CardName.STOLEN_BLUEPRINTS}, price: {steel: 2}}});
+      await wrapper.setProps({card: {name: CardName.STOLEN_BLUEPRINTS}});
       expect(wrapper.classes()).to.include('black-market-slot--entering-right');
 
       vi.advanceTimersByTime(1000);

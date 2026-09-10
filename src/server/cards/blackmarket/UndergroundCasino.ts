@@ -7,12 +7,12 @@ import {CardRenderer} from '../render/CardRenderer';
 
 /** Requires Underworld (registered with `compatibility: 'underworld'`) since it prints a Crime tag. */
 export class UndergroundCasino extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.UNDERGROUND_CASINO) {
+  constructor(name: CardName = CardName.UNDERGROUND_CASINO, cost: number = 10) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.CRIME, Tag.BUILDING],
-      cost: 0,
+      cost,
       victoryPoints: -1,
 
       behavior: {
@@ -32,12 +32,12 @@ export class UndergroundCasino extends Card implements IProjectCard {
 
 export class UndergroundCasinoII extends UndergroundCasino {
   constructor() {
-    super(CardName.UNDERGROUND_CASINO_II);
+    super(CardName.UNDERGROUND_CASINO_II, 11);
   }
 }
 
 export class UndergroundCasinoIII extends UndergroundCasino {
   constructor() {
-    super(CardName.UNDERGROUND_CASINO_III);
+    super(CardName.UNDERGROUND_CASINO_III, 12);
   }
 }

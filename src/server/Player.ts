@@ -1802,21 +1802,21 @@ export class Player implements IPlayer {
       action.options.push(bidOptions);
     }
 
-    // Black Market: buy a market card directly for its listed price (paid to the market
-    // itself, not the card -- see BlackMarket.ts's doc comment)
+    // Black Market: do a project publicly available on the market, resolving it immediately
+    // like playing it from hand, for its own printed price
     const blackMarketData = this.game.blackMarketData;
     if (blackMarketData !== undefined) {
       const affordableSlots = blackMarketData.slots
         .map((slot, slotIndex) => ({slot, slotIndex}))
-        .filter(({slot}) => slot !== undefined && slot.card.canPlay(this) && this.stock.has(Units.of(slot.price)));
+        .filter(({slot}) => slot !== undefined && slot.card.canPlay(this));
       if (affordableSlots.length > 0) {
-        const buyOptions = new OrOptions().setTitle('Buy from the Black Market');
+        const buyOptions = new OrOptions().setTitle('Do a project on the Black Market');
         for (const {slot, slotIndex} of affordableSlots) {
           if (slot === undefined) {
             continue;
           }
           buyOptions.options.push(
-            new SelectOption(`Buy ${slot.card.name} for ${BlackMarket.describePrice(slot)}`, 'Buy')
+            new SelectOption(`Do ${slot.card.name} on the Black Market for ${BlackMarket.describePrice(slot.card)}`, 'Do it')
               .andThen(() => {
                 BlackMarket.buy(this.game, this, slotIndex);
                 return undefined;

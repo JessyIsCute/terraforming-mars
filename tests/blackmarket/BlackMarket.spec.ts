@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {BlackMarket} from '@/server/blackmarket/BlackMarket';
 import {BLACK_MARKET_SLOT_COUNT} from '@/server/blackmarket/BlackMarketData';
 import {BLACK_MARKET_DESIGNS} from '@/server/cards/blackmarket/BlackMarketCardManifest';
-import {SmuggledReactorCore} from '@/server/cards/blackmarket/SmuggledReactorCore';
+import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII} from '@/server/cards/blackmarket/SmuggledReactorCore';
 import {CounterfeitCertificates} from '@/server/cards/blackmarket/CounterfeitCertificates';
 import {CardName} from '@/common/cards/CardName';
 import {IGame} from '@/server/IGame';
@@ -51,9 +51,9 @@ describe('BlackMarket', () => {
     expect(activeDesigns).to.include(UNDERGROUND_CASINO_DESIGN);
   });
 
-  it('buy deducts the market-owned price, adds the card to the tableau, and reveals the same design\'s next printing', () => {
+  it('buy deducts the card\'s own printed price via the normal play pipeline, adds it to the tableau, and reveals the same design\'s next printing', () => {
     const data = game.blackMarketData!;
-    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0, price: {titanium: 2}};
+    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
     player.titanium = 2;
 
     BlackMarket.buy(game, player, 0);
@@ -68,20 +68,14 @@ describe('BlackMarket', () => {
   });
 
   it('a fixed-price design\'s price escalates by variant (2 / 3 / 4 titanium)', () => {
-    const data = game.blackMarketData!;
-    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0, price: {titanium: 2}};
-    player.titanium = 100;
-
-    BlackMarket.buy(game, player, 0);
-    expect(data.slots[0]!.price).to.deep.eq({titanium: 3});
-
-    BlackMarket.buy(game, player, 0);
-    expect(data.slots[0]!.price).to.deep.eq({titanium: 4});
+    expect(new SmuggledReactorCore().reserveUnits).to.deep.include({titanium: 2});
+    expect(new SmuggledReactorCoreII().reserveUnits).to.deep.include({titanium: 3});
+    expect(new SmuggledReactorCoreIII().reserveUnits).to.deep.include({titanium: 4});
   });
 
-  it('buying through a whole stack (3 printings) never collides, then rotates to a new design', () => {
+  it('doing the whole stack (3 printings) never collides, then rotates to a new design', () => {
     const data = game.blackMarketData!;
-    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0, price: {titanium: 2}};
+    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
     // Only this design is left in the queue, so the slot goes empty once its stack (3 printings) is exhausted.
     data.designQueue = [];
     player.titanium = 100;
@@ -100,7 +94,7 @@ describe('BlackMarket', () => {
 
   it('rotates to a fresh design once a stack empties, if one remains in the queue', () => {
     const data = game.blackMarketData!;
-    data.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 2, price: {titanium: 4}};
+    data.slots[0] = {card: new SmuggledReactorCore(CardName.SMUGGLED_REACTOR_CORE_III, 4), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 2};
     data.designQueue = [COUNTERFEIT_CERTIFICATES_DESIGN];
     player.titanium = 4;
 
@@ -119,13 +113,12 @@ describe('BlackMarket', () => {
     expect(serialized.designQueue).deep.eq(data.designQueue);
 
     const deserialized = BlackMarket.deserialize(serialized)!;
-    expect(deserialized.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, price: s.price}))
-      .deep.eq(data.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, price: s.price}));
+    expect(deserialized.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, name: s.card.name}))
+      .deep.eq(data.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, name: s.card.name}));
     expect(deserialized.designQueue).deep.eq(data.designQueue);
   });
 
-  it('describePrice formats a mixed M€ + non-M€ bundle', () => {
-    const slot = {card: new CounterfeitCertificates(), designIndex: COUNTERFEIT_CERTIFICATES_DESIGN, variantIndex: 0, price: {megacredits: 2, heat: 1}};
-    expect(BlackMarket.describePrice(slot)).to.eq('2 M€, 1 heat');
+  it('describePrice formats a mixed M€ + non-M€ bundle straight off the card', () => {
+    expect(BlackMarket.describePrice(new CounterfeitCertificates())).to.eq('2 M€, 1 heat');
   });
 });

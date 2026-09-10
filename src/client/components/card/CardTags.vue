@@ -36,10 +36,15 @@ export default defineComponent({
   },
   computed: {
     allTags(): Array<Tag> {
+      // Tag.INFECTED has no icon of its own (the red "Infected" ribbon already says so --
+      // see mutationmarkets.less) but stays in `card.tags` for real tag-counting (milestones,
+      // awards, corp bonuses). Rendering it here would leave an invisible, empty CardTag
+      // still taking up a slot in this row.
+      const printedTags = this.tags.filter((tag) => tag !== Tag.INFECTED);
       if (this.mutationAddedTag === undefined) {
-        return this.tags;
+        return printedTags;
       }
-      return [...this.tags, this.mutationAddedTag];
+      return [...printedTags, this.mutationAddedTag];
     },
   },
   methods: {

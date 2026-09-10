@@ -13,15 +13,20 @@ describe('StolenBlueprints', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats and no printed price -- the market owns it', () => {
+  it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.BUILDING, Tag.BUILDING]);
     expect(card.cost).to.eq(0);
+    expect(card.reserveUnits).deep.include({steel: 2});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play draws a card', () => {
+  it('play spends 2 steel and draws a card', () => {
+    player.steel = 2;
     expect(player.cardsInHand).has.lengthOf(0);
+
     card.play(player);
+
+    expect(player.steel).to.eq(0);
     expect(player.cardsInHand).has.lengthOf(1);
   });
 });

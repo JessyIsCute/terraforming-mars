@@ -3,7 +3,7 @@
     <BlackMarketSlot
       v-for="(slot, index) in market.slots"
       :key="index"
-      :marketSlot="slot" />
+      :card="slot" />
   </div>
 </template>
 

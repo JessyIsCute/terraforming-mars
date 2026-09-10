@@ -13,9 +13,9 @@ describe('UndergroundCasino', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats, including the Crime tag, and no printed price -- the market owns it', () => {
+  it('has the printed stats, including the Crime tag', () => {
     expect(card.tags).deep.eq([Tag.CRIME, Tag.BUILDING]);
-    expect(card.cost).to.eq(0);
+    expect(card.cost).to.eq(10);
     expect(card.victoryPoints).to.eq(-1);
   });
 
