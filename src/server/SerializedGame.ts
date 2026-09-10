@@ -16,6 +16,7 @@ import {SerializedDeck} from './cards/SerializedDeck';
 import {UnderworldData} from './underworld/UnderworldData';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {SerializedMutationMarketData} from './mutationmarkets/MutationMarketData';
+import {SerializedBlackMarketData} from './blackmarket/BlackMarketData';
 import {AwardName} from '../common/ma/AwardName';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {MilestoneName} from '../common/ma/MilestoneName';
@@ -73,6 +74,7 @@ export type SerializedGame = {
     undoCount: number;
     underworldData: UnderworldData;
     mutationMarketData?: SerializedMutationMarketData;
+    blackMarketData?: SerializedBlackMarketData;
     conglomerates?: ConglomeratesData;
     venusScaleLevel: number;
     verminInEffect: boolean;

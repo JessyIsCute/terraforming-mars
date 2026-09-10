@@ -21,6 +21,7 @@ import {SILLYFICATION_CARD_MANIFEST} from './sillyfication/SillyficationCardMani
 import {BETTER_MARS_CARD_MANIFEST} from './betterMars/BetterMarsCardManifest';
 import {CONGLOMERATES_CARD_MANIFEST} from './conglomerates/ConglomeratesCardManifest';
 import {MUTATIONMARKETS_CARD_MANIFEST} from './mutationmarkets/MutationMarketsCardManifest';
+import {BLACKMARKET_CARD_MANIFEST} from './blackmarket/BlackMarketCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -43,4 +44,5 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BETTER_MARS_CARD_MANIFEST,
   CONGLOMERATES_CARD_MANIFEST,
   MUTATIONMARKETS_CARD_MANIFEST,
+  BLACKMARKET_CARD_MANIFEST,
 ];

@@ -19,6 +19,7 @@ export const EXPANSIONS = [
   'customCards',
   'mutationMarkets',
   'conglomerates',
+  'blackMarket',
 ] as const;
 
 export const GAME_MODULES = [
@@ -51,6 +52,7 @@ export const MODULE_NAMES = {
   customCards: 'Custom Cards',
   mutationMarkets: 'MutationMarkets',
   conglomerates: 'Conglomerates',
+  blackMarket: 'Black Market',
 } satisfies Record<GameModule, string>;
 
 export const DEFAULT_EXPANSIONS = {
@@ -74,4 +76,5 @@ export const DEFAULT_EXPANSIONS = {
   customCards: false,
   mutationMarkets: false,
   conglomerates: false,
+  blackMarket: false,
 } satisfies Record<Expansion, boolean>;

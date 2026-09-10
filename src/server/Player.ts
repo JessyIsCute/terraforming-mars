@@ -30,6 +30,7 @@ import {SelectProjectCardToPlay} from './inputs/SelectProjectCardToPlay';
 import {SelectOption} from './inputs/SelectOption';
 import {SelectAmount} from './inputs/SelectAmount';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
+import {BlackMarket} from './blackmarket/BlackMarket';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -1799,6 +1800,29 @@ export class Player implements IPlayer {
           }));
       }
       action.options.push(bidOptions);
+    }
+
+    // Black Market: buy a market card directly for its listed price
+    const blackMarketData = this.game.blackMarketData;
+    if (blackMarketData !== undefined) {
+      const affordableSlots = blackMarketData.slots
+        .map((card, slotIndex) => ({card, slotIndex}))
+        .filter(({card}) => card !== undefined && card.canPlay(this));
+      if (affordableSlots.length > 0) {
+        const buyOptions = new OrOptions().setTitle('Buy from the Black Market');
+        for (const {card, slotIndex} of affordableSlots) {
+          if (card === undefined) {
+            continue;
+          }
+          buyOptions.options.push(
+            new SelectOption(`Buy ${card.name} for ${BlackMarket.describePrice(card)}`, 'Buy')
+              .andThen(() => {
+                BlackMarket.buy(this.game, this, slotIndex);
+                return undefined;
+              }));
+        }
+        action.options.push(buyOptions);
+      }
     }
 
     // Add delegates

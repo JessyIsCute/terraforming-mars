@@ -28,6 +28,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   customCards: `${WIKI}/Community`,
   mutationMarkets: `${FORK_WIKI}/MutationMarkets`,
   conglomerates: `${FORK_WIKI}/Conglomerates`,
+  blackMarket: `${FORK_WIKI}/Black-Market`,
 };
 
 export const WIKI_URLS = {

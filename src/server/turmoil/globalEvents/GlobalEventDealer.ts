@@ -80,6 +80,7 @@ export class GlobalEventDealer {
       mutationMarkets: gameOptions.mutationMarketsExpansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       conglomerates: gameOptions.conglomeratesExpansion,
+      blackMarket: gameOptions.blackMarketExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

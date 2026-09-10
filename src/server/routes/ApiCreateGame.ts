@@ -126,6 +126,7 @@ export class ApiCreateGame extends Handler {
         moonExpansion: gameReq.expansions.moon,
         moonStandardProjectVariant: gameReq.moonStandardProjectVariant,
         mutationMarketsExpansion: gameReq.expansions.mutationMarkets,
+        blackMarketExpansion: gameReq.expansions.blackMarket,
         moonStandardProjectVariant1: gameReq.moonStandardProjectVariant1,
         pathfindersExpansion: gameReq.expansions.pathfinders,
         politicalAgendasExtension: gameReq.politicalAgendasExtension,

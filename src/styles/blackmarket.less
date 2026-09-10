@@ -1,0 +1,33 @@
+// Black Market: a plain, always-full 5-card grid, bought directly for a fixed/rolled price
+// -- no bidding, no mutation/infection layering. Much simpler than MutationMarkets'
+// 3-row layout since there's nothing to visually cover/align against.
+
+@bm-card-width: 180px;
+
+.black-market {
+  display: grid;
+  grid-template-columns: repeat(5, @bm-card-width);
+  gap: 6px;
+  margin: 20px 0;
+}
+
+.black-market-slot {
+  position: relative;
+}
+
+// Same `zoom` trick as MutationMarkets' own card-scale-wrapper -- shrinks paint and layout
+// box together so the grid cell doesn't need separately-computed dimensions, and disables
+// interaction since this is a read-only market preview, not a hand of playable cards.
+.black-market-card-scale-wrapper {
+  zoom: 0.75;
+  margin: 0 10px;
+  pointer-events: none;
+}
+
+@keyframes black-market-slide-in-right {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.black-market-slot--entering-right {
+  animation: black-market-slide-in-right 0.6s ease-out;
+}

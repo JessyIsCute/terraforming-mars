@@ -93,6 +93,7 @@ export class JSONProcessor {
       customCards: json_constants.CUSTOM_CARDS_EXPANSION,
       mutationMarkets: json_constants.MUTATION_MARKETS_EXPANSION,
       conglomerates: json_constants.CONGLOMERATES_EXPANSION,
+      blackMarket: json_constants.BLACK_MARKET_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

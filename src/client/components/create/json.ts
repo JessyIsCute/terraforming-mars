@@ -26,3 +26,4 @@ export const BETTER_MARS_EXPANSION = 'betterMarsExpansion';
 export const CUSTOM_CARDS_EXPANSION = 'customCardsExpansion';
 export const MUTATION_MARKETS_EXPANSION = 'mutationMarketsExpansion';
 export const CONGLOMERATES_EXPANSION = 'conglomeratesExpansion';
+export const BLACK_MARKET_EXPANSION = 'blackMarketExpansion';

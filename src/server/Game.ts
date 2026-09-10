@@ -73,6 +73,8 @@ import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
 import {MutationMarketData} from './mutationmarkets/MutationMarketData';
+import {BlackMarket} from './blackmarket/BlackMarket';
+import {BlackMarketData} from './blackmarket/BlackMarketData';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -173,6 +175,7 @@ export class Game implements IGame, Logger {
   public pathfindersData: PathfindersData | undefined;
   public underworldData: UnderworldData = UnderworldExpansion.initializeGameWithoutUnderworld();
   public mutationMarketData: MutationMarketData | undefined;
+  public blackMarketData: BlackMarketData | undefined;
   public conglomerates: ConglomeratesData = ConglomeratesExpansion.initializeEmpty();
   public inTurmoil: boolean = false;
 
@@ -303,6 +306,7 @@ export class Game implements IGame, Logger {
         customCards: partialOptions.customCardsExpansion ?? false,
         mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
         conglomerates: partialOptions.conglomeratesExpansion ?? false,
+        blackMarket: partialOptions.blackMarketExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -387,6 +391,10 @@ export class Game implements IGame, Logger {
 
     if (gameOptions.mutationMarketsExpansion) {
       game.mutationMarketData = MutationMarkets.initialize(game);
+    }
+
+    if (gameOptions.blackMarketExpansion) {
+      game.blackMarketData = BlackMarket.initialize(game);
     }
 
     if (gameOptions.conglomeratesExpansion) {
@@ -561,6 +569,9 @@ export class Game implements IGame, Logger {
     }
     if (this.mutationMarketData !== undefined) {
       result.mutationMarketData = MutationMarkets.serialize(this.mutationMarketData);
+    }
+    if (this.blackMarketData !== undefined) {
+      result.blackMarketData = BlackMarket.serialize(this.blackMarketData);
     }
     if (this.clonedGamedId !== undefined) {
       result.clonedGamedId = this.clonedGamedId;
@@ -1879,6 +1890,9 @@ export class Game implements IGame, Logger {
     }
     if (d.mutationMarketData !== undefined && gameOptions.mutationMarketsExpansion === true) {
       game.mutationMarketData = MutationMarkets.deserialize(d.mutationMarketData);
+    }
+    if (d.blackMarketData !== undefined && gameOptions.blackMarketExpansion === true) {
+      game.blackMarketData = BlackMarket.deserialize(d.blackMarketData);
     }
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);

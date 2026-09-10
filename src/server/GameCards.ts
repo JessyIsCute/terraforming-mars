@@ -27,6 +27,7 @@ import {UNDERWORLD_CARD_MANIFEST} from './cards/underworld/UnderworldCardManifes
 import {SILLYFICATION_CARD_MANIFEST} from './cards/sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManifest';
 import {CONGLOMERATES_CARD_MANIFEST} from './cards/conglomerates/ConglomeratesCardManifest';
+import {BLACKMARKET_CARD_MANIFEST} from './cards/blackmarket/BlackMarketCardManifest';
 import {DELTA_PROJECT_CARD_MANIFEST} from './cards/delta/DeltaProjectCardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
@@ -70,6 +71,12 @@ export class GameCards {
       [gameOptions.sillyficationExpansion, SILLYFICATION_CARD_MANIFEST],
       [gameOptions.betterMarsExpansion, BETTER_MARS_CARD_MANIFEST],
       [gameOptions.conglomeratesExpansion, CONGLOMERATES_CARD_MANIFEST],
+      // Every Black Market card is `instantiate: false` (never dealt from the shared
+      // ProjectDeck -- BlackMarket.ts deals its own dedicated pool directly by name), so this
+      // entry contributes nothing to getProjectCards(); it's here only for consistency with
+      // every other module and in case future manifest-wide processing (cardsToRemove, etc.)
+      // ever depends on a module's manifest being present here.
+      [gameOptions.blackMarketExpansion, BLACKMARKET_CARD_MANIFEST],
       // DeltaProject's own card (the prelude) is force-dealt directly in Game.ts, not drawn
       // from this pool - but other cards depending on the expansion (e.g. Epsilon Dample,
       // via its `compatibility: 'deltaProject'`) still need this manifest present here.

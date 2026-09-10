@@ -205,6 +205,12 @@
                                 <div class="create-game-expansion-icon expansion-icon-conglomerates"></div>
                                 <span v-i18n>Conglomerates</span>&nbsp;<span title="A fan expansion: 2v2 team play">(&#945;)</span>&nbsp;<a :href="wikiUrls.conglomerates" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
+
+                            <input type="checkbox" name="blackMarket" id="blackMarket-checkbox" v-model="expansions.blackMarket">
+                            <label for="blackMarket-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-blackMarket"></div>
+                                <span v-i18n>Black Market</span>&nbsp;<span title="A fan expansion: buy bespoke illegal project cards from a persistent 5-slot market for a fixed price">(&#945;)</span>&nbsp;<a :href="wikiUrls.blackMarket" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">

@@ -50,6 +50,7 @@ export type GameOptions = {
   customCardsExpansion: boolean;
   mutationMarketsExpansion: boolean;
   conglomeratesExpansion: boolean;
+  blackMarketExpansion: boolean;
   /** One team-index per player (same order as the player list), chosen at game creation. Undefined falls back to pairing by table order. */
   conglomeratesTeamAssignments: Array<number> | undefined;
 
@@ -131,6 +132,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     customCards: false,
     mutationMarkets: false,
     conglomerates: false,
+    blackMarket: false,
   },
   fastModeOption: false,
   includeFanMA: false,
@@ -167,6 +169,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   customCardsExpansion: false,
   mutationMarketsExpansion: false,
   conglomeratesExpansion: false,
+  blackMarketExpansion: false,
   conglomeratesTeamAssignments: undefined,
   undoOption: false,
   venusNextExtension: false,

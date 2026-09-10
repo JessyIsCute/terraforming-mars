@@ -34,6 +34,7 @@ import {GlobalParameter} from '../common/GlobalParameter';
 import {UnderworldData} from './underworld/UnderworldData';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {MutationMarketData} from './mutationmarkets/MutationMarketData';
+import {BlackMarketData} from './blackmarket/BlackMarketData';
 import {OrOptions} from './inputs/OrOptions';
 import {IStandardProjectCard} from './cards/IStandardProjectCard';
 
@@ -92,6 +93,7 @@ export interface IGame extends Logger {
   pathfindersData: PathfindersData | undefined;
   underworldData: UnderworldData;
   mutationMarketData: MutationMarketData | undefined;
+  blackMarketData: BlackMarketData | undefined;
   conglomerates: ConglomeratesData;
 
   // Card-specific data
