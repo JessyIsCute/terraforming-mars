@@ -12,5 +12,4 @@ export enum MutationName {
   SPACE_VISIONARY = 'Space Visionary',
   GIGANTIC_UNDERTAKINGS = 'Gigantic Undertakings',
   MINI_MUTATION = 'Mini Mutation',
-  NESTED_MUTATION = 'Nested Mutation',
 }

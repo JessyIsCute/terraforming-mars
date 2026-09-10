@@ -27,9 +27,9 @@ describe('MutationCard', () => {
   it('renders a different mutation correctly', () => {
     const wrapper = shallowMount(MutationCard, {
       ...globalConfig,
-      props: {mutation: MutationName.NESTED_MUTATION},
+      props: {mutation: MutationName.HEAT_BANKER},
     });
-    expect(wrapper.text()).to.contain('Nested Mutation');
-    expect(wrapper.text()).to.contain('Playing it grants a 40% cheaper copy');
+    expect(wrapper.text()).to.contain('Heat Banker');
+    expect(wrapper.text()).to.contain('Gains a Power tag');
   });
 });

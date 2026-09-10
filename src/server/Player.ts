@@ -173,10 +173,6 @@ export class Player implements IPlayer {
   // MutationMarkets: Gigantic Undertakings / Mini Mutation requirements
   public expensiveCardsPlayed: number = 0;
   public cheapCardsPlayed: number = 0;
-  // MutationMarkets: Nested Mutation requirement -- length of the current same-generation
-  // run of cards each played for less than the previous one; reset each generation.
-  public cardCostStreak: number = 0;
-  public previousPlayedCardCost: number | undefined = undefined;
   // For Playwrights corp.
   // removedFromPlayCards is a bit of a misname: it's a temporary storage for
   // cards that provide 'next card' discounts. This will clear between turns.
@@ -925,12 +921,6 @@ export class Player implements IPlayer {
       if (selectedCard.cost < 7) {
         this.cheapCardsPlayed++;
       }
-      if (this.previousPlayedCardCost !== undefined && selectedCard.cost < this.previousPlayedCardCost) {
-        this.cardCostStreak++;
-      } else {
-        this.cardCostStreak = 1;
-      }
-      this.previousPlayedCardCost = selectedCard.cost;
     }
 
     // Play the card
@@ -2017,8 +2007,6 @@ export class Player implements IPlayer {
       warmongerCards: this.warmongerCards,
       expensiveCardsPlayed: this.expensiveCardsPlayed,
       cheapCardsPlayed: this.cheapCardsPlayed,
-      cardCostStreak: this.cardCostStreak,
-      previousPlayedCardCost: this.previousPlayedCardCost,
       // Playwrights
       removedFromPlayCards: this.removedFromPlayCards.map(toName),
       // Standard Technology: Underworld
@@ -2100,8 +2088,6 @@ export class Player implements IPlayer {
     player.warmongerCards = d.warmongerCards ?? 0;
     player.expensiveCardsPlayed = d.expensiveCardsPlayed ?? 0;
     player.cheapCardsPlayed = d.cheapCardsPlayed ?? 0;
-    player.cardCostStreak = d.cardCostStreak ?? 0;
-    player.previousPlayedCardCost = d.previousPlayedCardCost;
     player.tags.extraScienceTags = d.scienceTagCount;
     player.tags.extraPlantTags = d.plantTagCount;
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;

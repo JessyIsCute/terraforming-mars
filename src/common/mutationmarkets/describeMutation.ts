@@ -16,9 +16,6 @@ export function describeMutationRequirement(descriptor: CardRequirementDescripto
   if (descriptor.cheapCardsPlayed !== undefined) {
     return `${descriptor.cheapCardsPlayed} cards played costing <7 M€`;
   }
-  if (descriptor.cardCostStreak !== undefined) {
-    return `${descriptor.cardCostStreak} cards played in a row, each cheaper`;
-  }
   if (descriptor.cities !== undefined) {
     return `${descriptor.cities} cities`;
   }
@@ -51,8 +48,6 @@ export function describeMutationEffect(effect: MutationEffect): string {
     const vp = effect.vpPerAbsDelta !== undefined ? ', gains VP' : '';
     return `Cost ${sign}${effect.percent}%${vp}`;
   }
-  case 'nestedCopy':
-    return `Playing it grants a ${Math.abs(effect.percent)}% cheaper copy`;
   case 'grantResourceOnPlay':
     return `Gain ${effect.amount} ${capitalize(effect.resource)} on play`;
   case 'grantProductionOnPlay':

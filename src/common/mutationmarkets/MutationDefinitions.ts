@@ -4,7 +4,7 @@ import {Tag} from '../cards/Tag';
 import {Resource} from '../Resource';
 
 /**
- * The mutation card manifest. All 12 mutations have a real ongoing card effect --
+ * The mutation card manifest. All 11 mutations have a real ongoing card effect --
  * winning an auction gets you the card with that effect applied, nothing more (there's
  * no separate one-time payout).
  */
@@ -98,15 +98,5 @@ export const MUTATION_DEFINITIONS: Record<MutationName, MutationDefinition> = {
     requirement: {tag: Tag.SPACE, count: 4},
     // On-theme: grants the same tag its requirement is built on.
     effect: {kind: 'addSpecificTag', tag: Tag.SPACE},
-  },
-  [MutationName.NESTED_MUTATION]: {
-    name: MutationName.NESTED_MUTATION,
-    prefix: 'Nested',
-    // 3 cards (including events) played this generation, each cheaper than the last.
-    requirement: {cardCostStreak: 3},
-    // Doesn't touch this card's own cost/tags/VP; the first time it's *played*, the
-    // player receives a fresh, separately-discounted copy of it instead (-40%, clamped
-    // -3..-12) -- see MutationEffects.nestedCopyDelta / Player.playCard.
-    effect: {kind: 'nestedCopy', percent: -40, minAbsDelta: 3, maxAbsDelta: 12},
   },
 };

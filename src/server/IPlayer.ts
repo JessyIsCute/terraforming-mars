@@ -149,8 +149,6 @@ export interface IPlayer {
   warmongerCards: number;
   expensiveCardsPlayed: number;
   cheapCardsPlayed: number;
-  cardCostStreak: number;
-  previousPlayedCardCost: number | undefined;
   // For Playwrights corp.
   // removedFromPlayCards is a bit of a misname: it's a temporary storage for
   // cards that provide 'next card' discounts. This will clear between turns.

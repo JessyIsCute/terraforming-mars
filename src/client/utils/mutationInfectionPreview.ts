@@ -15,7 +15,7 @@ import {INFECTION_DEFINITIONS} from '@/common/mutationmarkets/InfectionDefinitio
 export type MutationsPreview = {
   /** From the first selected addRandomTag/addSpecificTag-kind mutation only, matching ModelUtils.ts's `card.mutations.find(...)`. */
   chosenTag?: Tag,
-  highlight: {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean},
+  highlight: {tag?: boolean, cost?: boolean, vp?: boolean},
   victoryPoints: number,
   cost: number,
 };
@@ -79,9 +79,6 @@ export function previewMutations(mutations: ReadonlyArray<MutationName>, baseCos
         highlight.vp = true;
         victoryPoints += Math.floor(Math.abs(costDelta(effect, baseCost)) / effect.vpPerAbsDelta);
       }
-    }
-    if (effect.kind === 'nestedCopy') {
-      highlight.nested = true;
     }
   }
 

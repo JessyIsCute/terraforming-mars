@@ -943,10 +943,6 @@ export class Game implements IGame, Logger {
         player.preservationProgram = true;
       }
       player.trThisGeneration = 0;
-      // MutationMarkets: Nested Mutation's cost-streak requirement only counts a run of
-      // cards played within the same generation.
-      player.cardCostStreak = 0;
-      player.previousPlayedCardCost = undefined;
       player.actionsTakenAtGenerationStart = player.actionsTakenThisGame;
       // Little Dutch Boy's blockade only lasts for the generation it was placed in.
       if (player.deltaProjectData) {

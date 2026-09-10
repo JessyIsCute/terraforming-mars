@@ -28,16 +28,6 @@ export type MutationEffect =
    * `floor(delta / vpPerAbsDelta)` victory points (Gigantic Undertakings).
    */
   | {kind: 'costPercent', percent: number, minAbsDelta: number, maxAbsDelta: number, vpPerAbsDelta?: number}
-  /**
-   * Doesn't change the mutated card's own cost/tags/VP at all. Instead, the first time
-   * it's *played* (not when won), the player receives a fresh, separate copy of the
-   * same card discounted by `percent` of its base cost (clamped to
-   * [minAbsDelta, maxAbsDelta], same formula as `costPercent`). The granted copy is a
-   * plain discounted instance (its discount is baked into `AppliedMutation.bakedCostDelta`,
-   * not this effect kind) so playing IT does not spawn yet another copy -- no infinite
-   * nesting dolls.
-   */
-  | {kind: 'nestedCopy', percent: number, minAbsDelta: number, maxAbsDelta: number}
   /** The first time the won card is played, the owner gains a flat amount of `resource`. */
   | {kind: 'grantResourceOnPlay', resource: Resource, amount: number}
   /** The first time the won card is played, the owner's `resource` production goes up by `amount`. */

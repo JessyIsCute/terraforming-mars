@@ -8,7 +8,6 @@ import {CardType} from '../../common/cards/CardType';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../common/mutationmarkets/MutationDefinitions';
-import {MutationEffect} from '../../common/mutationmarkets/MutationEffect';
 import {Random} from '../../common/utils/Random';
 
 /**
@@ -76,18 +75,8 @@ export class MutationEffects {
       if (effect.kind === 'costPercent') {
         cost += MutationEffects.costDelta(effect, baseCost);
       }
-      // Nested Mutation: a flat adjustment already computed and baked into this specific
-      // spawned-copy instance, independent of `mutation`'s own effect kind.
-      if (applied.bakedCostDelta !== undefined) {
-        cost += applied.bakedCostDelta;
-      }
     }
     return Math.max(cost, 0);
-  }
-
-  /** The cost delta a fresh copy spawned by Nested Mutation's `nestedCopy` effect should be given (see `AppliedMutation.bakedCostDelta`). */
-  public static nestedCopyDelta(baseCost: number, effect: Extract<MutationEffect, {kind: 'nestedCopy'}>): number {
-    return MutationEffects.costDelta(effect, baseCost);
   }
 
   /** The extra victory points a mutated card is worth, independent of its own printed VP formula. */
@@ -150,11 +139,11 @@ export class MutationEffects {
    * Derived purely from each applied mutation's `effect.kind` (see the doc comment on
    * `MutationEffect`) so the client never needs its own copy of this mapping.
    */
-  public static highlightsFor(card: ICard): {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean} | undefined {
+  public static highlightsFor(card: ICard): {tag?: boolean, cost?: boolean, vp?: boolean} | undefined {
     if (card.mutations === undefined || card.mutations.length === 0) {
       return undefined;
     }
-    const highlight: {tag?: boolean, cost?: boolean, vp?: boolean, nested?: boolean} = {};
+    const highlight: {tag?: boolean, cost?: boolean, vp?: boolean} = {};
     for (const applied of card.mutations) {
       const effect = MUTATION_DEFINITIONS[applied.mutation].effect;
       if (effect.kind === 'addRandomTag' || effect.kind === 'addSpecificTag') {
@@ -165,12 +154,6 @@ export class MutationEffects {
         if (effect.vpPerAbsDelta !== undefined) {
           highlight.vp = true;
         }
-      }
-      if (effect.kind === 'nestedCopy') {
-        highlight.nested = true;
-      }
-      if (applied.bakedCostDelta !== undefined) {
-        highlight.cost = true;
       }
     }
     return highlight;

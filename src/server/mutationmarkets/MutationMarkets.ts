@@ -8,10 +8,8 @@ import {Color} from '../../common/Color';
 import {PlayerId} from '../../common/Types';
 import {Resource} from '../../common/Resource';
 import {newProjectCard} from '../createCard';
-import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {MutationName} from '../../common/mutationmarkets/MutationName';
 import {MUTATION_DEFINITIONS} from '../../common/mutationmarkets/MutationDefinitions';
-import {MutationEffect} from '../../common/mutationmarkets/MutationEffect';
 import {MutationEffects} from './MutationEffects';
 import {InfectionName} from '../../common/mutationmarkets/InfectionName';
 import {InfectionEffects} from './InfectionEffects';
@@ -188,9 +186,9 @@ export class MutationMarkets {
 
   /**
    * Called when `card` is played. Applies every "on play" mutation effect currently
-   * applied to it: Nested Mutation's discounted copy, a flat resource/production grant,
-   * and (only for `convertType` landing on an Active card, where the type flip itself
-   * doesn't apply -- see `MutationEffects.applyType`) the M€ rebate fallback.
+   * applied to it: a flat resource/production grant, and (only for `convertType` landing
+   * on an Active card, where the type flip itself doesn't apply -- see
+   * `MutationEffects.applyType`) the M€ rebate fallback.
    */
   public static applyOnPlayEffects(player: IPlayer, card: ICard): void {
     if (card.mutations === undefined) {
@@ -199,9 +197,6 @@ export class MutationMarkets {
     for (const applied of card.mutations) {
       const effect = MUTATION_DEFINITIONS[applied.mutation].effect;
       switch (effect.kind) {
-      case 'nestedCopy':
-        MutationMarkets.grantNestedCopy(player, card, applied, effect);
-        break;
       case 'grantResourceOnPlay':
         player.stock.add(effect.resource, effect.amount, {log: true});
         break;
@@ -218,25 +213,6 @@ export class MutationMarkets {
   }
 
   /**
-   * Nested Mutation: grants a fresh, separately-discounted copy of `card` to `player`'s
-   * hand. A copy carries only a baked-in cost delta (`AppliedMutation.bakedCostDelta`),
-   * not the `nestedCopy` effect itself, so playing the copy doesn't spawn yet another one.
-   */
-  private static grantNestedCopy(player: IPlayer, card: ICard, applied: AppliedMutation, effect: Extract<MutationEffect, {kind: 'nestedCopy'}>): void {
-    if (applied.bakedCostDelta !== undefined) {
-      return;
-    }
-    const copy = newProjectCard(card.name);
-    if (copy === undefined) {
-      return;
-    }
-    const delta = MutationEffects.nestedCopyDelta(copy.baseCost ?? 0, effect);
-    copy.mutations = [{mutation: applied.mutation, bakedCostDelta: delta}];
-    player.cardsInHand.push(copy);
-    player.game.log('${0} received a discounted copy of ${1} from Nested Mutation', (b) => b.player(player).card(copy));
-  }
-
-  /**
    * Each player's current numeric progress toward a mutation's requirement, for the
    * market UI's Milestones/Awards-style live counter. `undefined` for requirement kinds
    * with no natural running count (boolean-only checks like `chairman`/`party`).
@@ -247,9 +223,9 @@ export class MutationMarkets {
       return undefined;
     }
     // None of the InequalityRequirement subclasses MutationDefinitions actually uses
-    // (uniqueTags, expensiveCardsPlayed, cheapCardsPlayed, cardCostStreak, cities,
-    // greeneries, oceans, tag, production) read the `card` parameter -- it's only there
-    // for card-specific requirements (e.g. a card's own tags), which mutations don't use.
+    // (uniqueTags, expensiveCardsPlayed, cheapCardsPlayed, cities, greeneries, oceans,
+    // tag, production) read the `card` parameter -- it's only there for card-specific
+    // requirements (e.g. a card's own tags), which mutations don't use.
     const noCard = undefined as unknown as IProjectCard;
     return game.players.map((player) => ({color: player.color, score: compiled.getScore(player, noCard)}));
   }

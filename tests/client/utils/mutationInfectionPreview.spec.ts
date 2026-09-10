@@ -77,12 +77,6 @@ describe('mutationInfectionPreview', () => {
       expect(result.highlight).to.deep.eq({});
     });
 
-    it('nestedCopy (Nested Mutation): sets the nested highlight, no cost/VP change on this card itself', () => {
-      const result = previewMutations([MutationName.NESTED_MUTATION], 20, []);
-      expect(result.highlight).to.deep.eq({nested: true});
-      expect(result.cost).to.eq(20);
-    });
-
     it('an empty list changes nothing', () => {
       const result = previewMutations([], 20, []);
       expect(result.highlight).to.deep.eq({});

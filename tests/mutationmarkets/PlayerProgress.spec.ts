@@ -39,17 +39,6 @@ describe('MutationMarkets.playerProgressFor', () => {
     ]);
   });
 
-  it('reports the new cardCostStreak progress', () => {
-    player.cardCostStreak = 2;
-
-    const progress = MutationMarkets.playerProgressFor(game, {cardCostStreak: 3});
-
-    expect(progress).to.deep.eq([
-      {color: player.color, score: 2},
-      {color: player2.color, score: 0},
-    ]);
-  });
-
   it('returns undefined for a requirement kind with no natural running count', () => {
     expect(MutationMarkets.playerProgressFor(game, {plantsRemoved: true})).is.undefined;
   });

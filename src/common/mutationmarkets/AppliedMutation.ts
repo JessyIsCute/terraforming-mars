@@ -7,14 +7,6 @@ import {Tag} from '../cards/Tag';
  */
 export type AppliedMutation = {
   mutation: MutationName,
-  /** Only set for mutations with a randomized outcome (Tag Diversifier's chosen tag). */
+  /** Only set for mutations with a chosen tag (Tag Diversifier's random pick, or a fixed addSpecificTag). */
   chosenTag?: Tag,
-  /**
-   * A flat cost adjustment already computed and baked into THIS specific card instance,
-   * independent of `mutation`'s own effect kind. Used only for a copy spawned by Nested
-   * Mutation's `nestedCopy` effect: its presence is also the signal that this instance is
-   * itself a spawned copy, so it won't spawn a further copy when played (no infinite
-   * nesting dolls).
-   */
-  bakedCostDelta?: number,
 };

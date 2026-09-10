@@ -93,7 +93,5 @@ export interface SerializedPlayer extends DeprecatedFields{
   warmongerCards: number;
   expensiveCardsPlayed?: number;
   cheapCardsPlayed?: number;
-  cardCostStreak?: number;
-  previousPlayedCardCost?: number;
   withinDeflectionZone: boolean;
 }

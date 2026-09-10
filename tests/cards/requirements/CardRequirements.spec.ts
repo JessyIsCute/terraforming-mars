@@ -82,15 +82,6 @@ describe('CardRequirements', () => {
     expect(satisfies(requirements, player)).eq(true);
   });
 
-  it('satisfies properly for cardCostStreak', () => {
-    const requirements = {cardCostStreak: 3};
-    expect(satisfies(requirements, player)).eq(false);
-    player.cardCostStreak = 2;
-    expect(satisfies(requirements, player)).eq(false);
-    player.cardCostStreak = 3;
-    expect(satisfies(requirements, player)).eq(true);
-  });
-
   it('satisfies properly for temperature max', () => {
     const requirements = {temperature: -10, max: true};
     expect(satisfies(requirements, player)).eq(true);
