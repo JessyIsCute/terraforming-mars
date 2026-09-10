@@ -30,16 +30,16 @@ describe('InfectionCard', () => {
       props: {infection: InfectionName.POWER_DRAIN},
     });
     expect(wrapper.text()).to.contain('Power Drain');
-    expect(wrapper.text()).to.contain('Lose 2 Energy on play');
+    expect(wrapper.text()).to.contain('Costs 2 Energy to play');
   });
 
-  it('renders one of the newer resource-drain infections correctly', () => {
+  it('renders one of the newer resource-cost infections correctly', () => {
     const wrapper = shallowMount(InfectionCard, {
       ...globalConfig,
       props: {infection: InfectionName.TITANIUM_CORROSION},
     });
     expect(wrapper.text()).to.contain('Titanium Corrosion');
     expect(wrapper.text()).to.contain('Corroded');
-    expect(wrapper.text()).to.contain('Lose 1 Titanium on play');
+    expect(wrapper.text()).to.contain('Costs 1 Titanium to play');
   });
 });

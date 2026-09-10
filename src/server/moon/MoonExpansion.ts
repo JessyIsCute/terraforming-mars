@@ -309,7 +309,13 @@ export class MoonExpansion {
 
     steel = Math.max(steel, 0);
     titanium = Math.max(titanium, 0);
-    return Units.of({steel, titanium, heat, plants});
+    // energy/megacredits pass through unadjusted -- no Moon card reduces those, but they
+    // must still survive this reconstruction (previously dropped here entirely, silently
+    // zeroing e.g. Asteroid Resources' `reserveUnits: {energy: 3}` for this specific
+    // computation -- harmless there since it separately enforces the cost via
+    // `behavior.spend`, but MutationMarkets' resourceCostOnPlay infections rely on this
+    // function alone).
+    return Units.of({steel, titanium, heat, plants, energy: reserveUnits.energy, megacredits: reserveUnits.megacredits});
   }
 
   public static calculateVictoryPoints(player: IPlayer, builder: VictoryPointsBreakdownBuilder): void {

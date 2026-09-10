@@ -135,7 +135,7 @@ describe('mutationInfectionPreview', () => {
       expect(result.cost).to.eq(20);
     });
 
-    it('resourceDrainOnPlay (Power Drain): no highlight, no cost/VP change -- the drain only fires when actually played', () => {
+    it('resourceCostOnPlay (Power Drain): no highlight, no M€ cost/VP change -- it\'s a separate mandatory resource requirement', () => {
       const result = previewInfections([InfectionName.POWER_DRAIN], 20);
       expect(result.highlight).to.deep.eq({});
       expect(result.cost).to.eq(20);

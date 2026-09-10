@@ -30,7 +30,6 @@ import {SelectProjectCardToPlay} from './inputs/SelectProjectCardToPlay';
 import {SelectOption} from './inputs/SelectOption';
 import {SelectAmount} from './inputs/SelectAmount';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
-import {InfectionEffects} from './mutationmarkets/InfectionEffects';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -966,10 +965,12 @@ export class Player implements IPlayer {
     // MutationMarkets on-play effects: must run after the removal above -- a Nested
     // Mutation copy granted here shares the same CardName as `selectedCard`, and the
     // removal step matches by name, so granting it any earlier would have it immediately
-    // stripped back out of hand.
+    // stripped back out of hand. Infections have no on-play hook of their own anymore --
+    // a resourceCostOnPlay infection's cost is folded into reserveUnits instead (see
+    // InfectionEffects.applyReserveUnits), so it's already been required and deducted by
+    // this point via the same path as a real Moon reserve cost, above.
     if (selectedCard.type !== CardType.PROXY) {
       MutationMarkets.applyOnPlayEffects(this, selectedCard);
-      InfectionEffects.applyOnPlayEffects(this, selectedCard);
     }
 
     switch (cardAction) {

@@ -11,5 +11,10 @@ export type InfectionEffect =
   | {kind: 'costIncrease', amount: number}
   /** -amount VP, e.g. 1. Uncapped -- can push the card's total VP negative. */
   | {kind: 'victoryPointPenalty', amount: number}
-  /** Loses `amount` of `resource` from stock (not production) the first time it's played. */
-  | {kind: 'resourceDrainOnPlay', resource: Resource, amount: number};
+  /**
+   * A mandatory extra cost of `amount` `resource`, paid (and required) the moment the
+   * card is played -- exactly like a Moon card's `reserveUnits` (e.g. Mare Imbrium Mine's
+   * "Spend 1 titanium"). The card cannot be played at all without enough of `resource` in
+   * stock; unlike a plain M€ cost, this can't be substituted with steel/titanium/etc.
+   */
+  | {kind: 'resourceCostOnPlay', resource: Resource, amount: number};

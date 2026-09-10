@@ -103,6 +103,12 @@ export function previewInfections(infections: ReadonlyArray<InfectionName>, base
       highlight.vp = true;
       victoryPoints -= effect.amount;
     }
+    // resourceCostOnPlay deliberately left unhandled here: it's a separate mandatory
+    // resource requirement (folded into a real card's reserveUnits, not its M€ cost/VP),
+    // which this simulator has no way to preview since Card.vue resolves a static,
+    // per-class ClientCard with no live `reserveUnits` override -- but Card.vue's own
+    // infectionEffectText computed already shows its description line regardless,
+    // reading straight from card.infectionNames/INFECTION_DEFINITIONS.
   }
 
   return {highlight, victoryPoints, cost: Math.max(cost, 0)};

@@ -11,7 +11,7 @@ export function describeInfectionEffect(effect: InfectionEffect): string {
     return `Cost +${effect.amount} M€`;
   case 'victoryPointPenalty':
     return `-${effect.amount} VP`;
-  case 'resourceDrainOnPlay':
-    return `Lose ${effect.amount} ${capitalize(effect.resource)} on play`;
+  case 'resourceCostOnPlay':
+    return `Costs ${effect.amount} ${capitalize(effect.resource)} to play (can't be played without it)`;
   }
 }

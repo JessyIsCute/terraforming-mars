@@ -170,7 +170,7 @@ describe('Card', () => {
     expect(wrapper.find('.mutated-label').exists()).to.be.false;
     const description = wrapper.find('.infection-glow.card-description');
     expect(description.exists()).to.be.true;
-    expect(description.text()).to.eq('Lose 2 Energy on play');
+    expect(description.text()).to.eq('Costs 2 Energy to play (can\'t be played without it)');
   });
 
   it('renders red cost glow for an infection with a cost highlight', () => {
@@ -203,7 +203,7 @@ describe('Card', () => {
     expect(wrapper.find('.mutated-label').exists()).to.be.true;
     expect(wrapper.find('.infected-label').exists()).to.be.true;
     expect(wrapper.find('.mutation-glow.card-description').text()).to.eq('Gain 2 Plants on play');
-    expect(wrapper.find('.infection-glow.card-description').text()).to.eq('Lose 2 Energy on play');
+    expect(wrapper.find('.infection-glow.card-description').text()).to.eq('Costs 2 Energy to play (can\'t be played without it)');
   });
 
   it('throws if a card is neither in the static manifest nor carries customCard fallback data', () => {

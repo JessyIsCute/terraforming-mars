@@ -245,7 +245,7 @@ export abstract class Card implements ICard {
     return this.properties.cardDiscount;
   }
   public get reserveUnits(): Units {
-    return this.properties.reserveUnits || Units.EMPTY;
+    return InfectionEffects.applyReserveUnits(this, this.properties.reserveUnits || Units.EMPTY);
   }
   public get tr(): TRSource | undefined {
     return this.properties.tr;

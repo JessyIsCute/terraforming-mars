@@ -100,7 +100,7 @@ describe('MutationMarketMutationSlot', () => {
       props: {marketSlot: infectionSlotFor(InfectionName.POWER_DRAIN), gridColumn: '1 / span 2'},
     });
     expect(wrapper.text()).to.contain('Power Drain');
-    expect(wrapper.text()).to.contain('Lose 2 Energy on play');
+    expect(wrapper.text()).to.contain('Costs 2 Energy to play');
     expect(wrapper.text()).to.not.contain('Needs:');
     expect(wrapper.find('.infection-market-mutation-label').exists()).to.be.true;
     expect(wrapper.find('.mutation-market-mutation-label').exists()).to.be.false;

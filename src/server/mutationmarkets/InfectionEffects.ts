@@ -1,6 +1,6 @@
 import {ICard} from '../cards/ICard';
-import {IPlayer} from '../IPlayer';
 import {Tag} from '../../common/cards/Tag';
+import {Units} from '../../common/Units';
 import {AppliedInfection} from '../../common/mutationmarkets/AppliedInfection';
 import {InfectionName} from '../../common/mutationmarkets/InfectionName';
 import {INFECTION_DEFINITIONS} from '../../common/mutationmarkets/InfectionDefinitions';
@@ -86,22 +86,26 @@ export class InfectionEffects {
     return highlight;
   }
 
-  /** Called when `card` is played. Applies every `resourceDrainOnPlay` infection currently applied to it. */
-  public static applyOnPlayEffects(player: IPlayer, card: ICard): void {
-    if (card.infections === undefined) {
-      return;
+  /**
+   * Folds every `resourceCostOnPlay` infection's resource requirement into `baseReserveUnits`
+   * -- the same "must have it, and it's spent the moment the card is played, not
+   * substitutable for M€" mechanic a Moon card's `reserveUnits` already uses (e.g. Mare
+   * Imbrium Mine's "Spend 1 titanium"). Reusing that pipeline means the existing
+   * affordability gate (`Player.canPlay`) and deduction (`Card.play`'s
+   * `player.stock.deductUnits(MoonExpansion.adjustedReserveCosts(...))`) apply here for
+   * free -- no separate on-play hook needed.
+   */
+  public static applyReserveUnits(card: ICard, baseReserveUnits: Units): Units {
+    if (card.infections === undefined || card.infections.length === 0) {
+      return baseReserveUnits;
     }
+    let units = baseReserveUnits;
     for (const applied of card.infections) {
       const effect = INFECTION_DEFINITIONS[applied.infection].effect;
-      if (effect.kind === 'resourceDrainOnPlay') {
-        // Drain at most what the player actually has -- Stock.add's own clamp path
-        // logs an "illegal state" warning, which is meant to catch bugs, not model an
-        // intentional "drain what's there" effect.
-        const amountToLose = Math.min(player.stock[effect.resource], effect.amount);
-        if (amountToLose > 0) {
-          player.stock.deduct(effect.resource, amountToLose, {log: true});
-        }
+      if (effect.kind === 'resourceCostOnPlay') {
+        units = {...units, [effect.resource]: units[effect.resource] + effect.amount};
       }
     }
+    return units;
   }
 }

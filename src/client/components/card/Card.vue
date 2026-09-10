@@ -170,14 +170,16 @@ export default defineComponent({
       return (this.card.mutationVictoryPoints ?? 0) + (this.card.infectionVictoryPoints ?? 0);
     },
     // Infections don't get the render-tree "merge into an existing icon" treatment
-    // mutations do (see mergeMutationGrantIntoRenderData) -- resourceDrainOnPlay always
-    // shows as its own description line. costIncrease/victoryPointPenalty need no line
-    // at all, same reasoning as mutations' costPercent: already visible via the glowing
-    // cost number and VP badge (infectionHighlight.cost/vp).
+    // mutations do (see mergeMutationGrantIntoRenderData) -- resourceCostOnPlay always
+    // shows as its own description line, since there's no per-card reserve-cost icon to
+    // overlay on an already-existing card face the way a purpose-built Moon card has one
+    // baked into its own renderData. costIncrease/victoryPointPenalty need no line at
+    // all, same reasoning as mutations' costPercent: already visible via the glowing cost
+    // number and VP badge (infectionHighlight.cost/vp).
     infectionEffectText(): string {
       return (this.card.infectionNames ?? [])
         .map((name) => INFECTION_DEFINITIONS[name].effect)
-        .filter((effect) => effect.kind === 'resourceDrainOnPlay')
+        .filter((effect) => effect.kind === 'resourceCostOnPlay')
         .map((effect) => describeInfectionEffect(effect))
         .filter((text) => text !== '')
         .join('; ');

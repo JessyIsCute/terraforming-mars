@@ -2,9 +2,11 @@ import {expect} from 'chai';
 import {InfectionEffects} from '../../src/server/mutationmarkets/InfectionEffects';
 import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {Tag} from '../../src/common/cards/Tag';
+import {Units} from '../../src/common/Units';
 import {fakeCard} from '../TestingUtils';
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
+import {PowerPlant} from '../../src/server/cards/base/PowerPlant';
 
 describe('InfectionEffects', () => {
   describe('applyCost', () => {
@@ -94,44 +96,27 @@ describe('InfectionEffects', () => {
       expect(InfectionEffects.highlightsFor(card)).to.deep.eq({vp: true});
     });
 
-    it('marks neither for Power Drain (a pure on-play effect)', () => {
+    it('marks neither for Power Drain (a mandatory resource cost, not a cost/VP change)', () => {
       const card = fakeCard({infections: [{infection: InfectionName.POWER_DRAIN}]});
       expect(InfectionEffects.highlightsFor(card)).to.deep.eq({});
     });
   });
 
-  describe('applyOnPlayEffects', () => {
-    let player: TestPlayer;
-    beforeEach(() => {
-      [/* game */, player] = testGame(2);
-    });
-
-    it('drains the full amount when the player has enough', () => {
-      player.energy = 5;
-      const card = fakeCard({infections: [{infection: InfectionName.POWER_DRAIN}]});
-      InfectionEffects.applyOnPlayEffects(player, card);
-      expect(player.energy).to.eq(3); // Power Drain: -2 Energy
-    });
-
-    it('caps the drain at what the player actually has, without going negative', () => {
-      player.energy = 1;
-      const card = fakeCard({infections: [{infection: InfectionName.POWER_DRAIN}]});
-      InfectionEffects.applyOnPlayEffects(player, card);
-      expect(player.energy).to.eq(0);
-    });
-
-    it('does nothing for a card with no infections', () => {
-      player.energy = 5;
+  describe('applyReserveUnits', () => {
+    it('leaves reserveUnits untouched with no infections', () => {
       const card = fakeCard({});
-      InfectionEffects.applyOnPlayEffects(player, card);
-      expect(player.energy).to.eq(5);
+      expect(InfectionEffects.applyReserveUnits(card, Units.EMPTY)).to.deep.eq(Units.EMPTY);
     });
 
-    it('does nothing for cost/VP-only infections (no on-play resource effect)', () => {
-      player.megaCredits = 10;
+    it('adds Power Drain\'s energy requirement on top of the card\'s own reserveUnits', () => {
+      const card = fakeCard({infections: [{infection: InfectionName.POWER_DRAIN}]});
+      const result = InfectionEffects.applyReserveUnits(card, Units.of({titanium: 1}));
+      expect(result).to.deep.eq(Units.of({titanium: 1, energy: 2}));
+    });
+
+    it('does nothing for cost/VP-only infections (no resource requirement)', () => {
       const card = fakeCard({infections: [{infection: InfectionName.COST_INFLATION}, {infection: InfectionName.VALUE_SIPHON}]});
-      InfectionEffects.applyOnPlayEffects(player, card);
-      expect(player.megaCredits).to.eq(10);
+      expect(InfectionEffects.applyReserveUnits(card, Units.EMPTY)).to.deep.eq(Units.EMPTY);
     });
 
     for (const {infection, field, amount} of [
@@ -140,13 +125,47 @@ describe('InfectionEffects', () => {
       {infection: InfectionName.TITANIUM_CORROSION, field: 'titanium' as const, amount: 1},
       {infection: InfectionName.HEAT_LOSS, field: 'heat' as const, amount: 2},
     ]) {
-      it(`${infection} drains ${amount} ${field} on play`, () => {
-        player[field] = 5;
+      it(`${infection} requires and costs ${amount} ${field} to play`, () => {
         const card = fakeCard({infections: [{infection}]});
-        InfectionEffects.applyOnPlayEffects(player, card);
-        expect(player[field]).to.eq(5 - amount);
+        const result = InfectionEffects.applyReserveUnits(card, Units.EMPTY);
+        expect(result[field]).to.eq(amount);
       });
     }
+
+    it('sums resource costs from multiple infections on the same resource', () => {
+      const card = fakeCard({infections: [{infection: InfectionName.STEEL_RUST}, {infection: InfectionName.STEEL_RUST}]});
+      const result = InfectionEffects.applyReserveUnits(card, Units.EMPTY);
+      expect(result.steel).to.eq(4);
+    });
+  });
+
+  // Integration coverage using a real Card subclass (fakeCard's canPlay/play are hand-rolled
+  // stubs that don't go through Card.ts's actual reserveUnits getter or its play()'s
+  // player.stock.deductUnits(MoonExpansion.adjustedReserveCosts(...)) call -- Power Plant is
+  // a plain, requirement-free, no-reserveUnits base card, so its own printed properties add
+  // no confounding variables to what's actually under test here.
+  describe('reserveUnits gates and pays for playing an infected card, via the same mechanism as a Moon reserve cost', () => {
+    let player: TestPlayer;
+    beforeEach(() => {
+      [/* game */, player] = testGame(2);
+      player.megaCredits = 20;
+    });
+
+    it('is unplayable without enough of the required resource', () => {
+      const card = new PowerPlant();
+      card.infections = [{infection: InfectionName.POWER_DRAIN}];
+      player.energy = 1;
+      expect(player.canPlay(card)).is.false;
+    });
+
+    it('becomes playable, and play() deducts the resource, once the player has enough', () => {
+      const card = new PowerPlant();
+      card.infections = [{infection: InfectionName.POWER_DRAIN}];
+      player.energy = 2;
+      expect(player.canPlay(card)).is.true;
+      card.play(player);
+      expect(player.energy).to.eq(0);
+    });
   });
 
   describe('apply', () => {
