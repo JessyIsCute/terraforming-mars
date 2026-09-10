@@ -367,11 +367,13 @@ const SYMBOL_IS_SUPERSCRIPT: ReadonlySet<CardRenderSymbolType> = new Set([
   CardRenderSymbolType.BRACKET_OPEN, CardRenderSymbolType.BRACKET_CLOSE,
 ]);
 // Tags that only make sense alongside a specific expansion -- adding one of these for the
-// first time auto-enables that expansion's compatibility checkbox (never auto-disables it).
+// first time auto-enables that expansion's compatibility checkbox, and removing its last
+// instance auto-disables it again (unless another present tag still implies the same one).
 const TAG_IMPLIES_EXPANSION: Partial<Record<Tag, Expansion>> = {
   [Tag.CRIME]: 'underworld',
   [Tag.MOON]: 'moon',
   [Tag.MARS]: 'pathfinders',
+  [Tag.VENUS]: 'venus',
 };
 const SIZES: ReadonlyArray<Size> = [Size.TINY, Size.SMALL, Size.MEDIUM, Size.LARGE];
 const ALL_CARD_RESOURCES: ReadonlyArray<CardResource> = Object.values(CardResource);
@@ -686,6 +688,19 @@ export default defineComponent({
       const idx = this.tags.indexOf(t);
       if (idx >= 0) {
         this.tags.splice(idx, 1);
+      }
+      // Undo the auto-add from addTag() once this was the last instance of the tag -- but only
+      // if no other remaining tag still implies the same expansion (e.g. Moon and Mars both
+      // present, only Moon removed: pathfinders' own requirement shouldn't be touched, and
+      // nothing here maps to the same expansion twice, but a future mapping might).
+      if (!this.tags.includes(t)) {
+        const impliedExpansion = TAG_IMPLIES_EXPANSION[t];
+        if (impliedExpansion !== undefined && !this.tags.some((other) => TAG_IMPLIES_EXPANSION[other] === impliedExpansion)) {
+          const compatIdx = this.compatibility.indexOf(impliedExpansion);
+          if (compatIdx >= 0) {
+            this.compatibility.splice(compatIdx, 1);
+          }
+        }
       }
     },
     onChipDragStart(row: number, index: number): void {
