@@ -89,7 +89,7 @@ import {BoardName} from '../common/boards/BoardName';
 import {SpaceType} from '../common/boards/SpaceType';
 import {ICard} from './cards/ICard';
 import {generateGameName} from './GameName';
-import {byKey} from '@/common/utils/Ordering';
+import {comparing} from '@/common/utils/Ordering';
 
 // Can be overridden by tests
 let createGameLog: () => Array<LogMessage> = () => [];
@@ -97,6 +97,15 @@ let createGameLog: () => Array<LogMessage> = () => [];
 export function setGameLog(f: () => Array<LogMessage>) {
   createGameLog = f;
 }
+
+// Conglomerates: negative sort keys for the 3 Team Actions, used by getStandardProjects()
+// below to keep them grouped together (in this fixed order) instead of scattered among
+// other standard projects that happen to share the same real M€ cost.
+const TEAM_ACTION_SORT_KEY: Partial<Record<CardName, number>> = {
+  [CardName.GIVE_PATENT]: -3,
+  [CardName.FACILITY_SHARING]: -2,
+  [CardName.TEAM_DONATION]: -1,
+};
 
 export class Game implements IGame, Logger {
   public readonly id: GameId;
@@ -1749,7 +1758,13 @@ export class Game implements IGame, Logger {
           return true;
         }
       })
-      .toSorted(byKey('cost'));
+      // Sorted by cost, except the 3 Conglomerates Team Actions: they're 0/0/4 M€, which
+      // would otherwise scatter them among unrelated same-cost standard projects (e.g.
+      // Collusion Standard Project also costs 0) instead of keeping them together as the
+      // single related group they are. Negative sort keys guarantee they sort before every
+      // real (non-negative) cost, in a fixed relative order, with no risk of a tie against
+      // an actual project's cost.
+      .toSorted(comparing((card) => TEAM_ACTION_SORT_KEY[card.name] ?? card.cost));
   }
 
   public log(message: string, f?: (builder: LogMessageBuilder) => void, options?: {reservedFor?: IPlayer}) {

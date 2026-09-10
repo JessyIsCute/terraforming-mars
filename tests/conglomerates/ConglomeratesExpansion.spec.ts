@@ -23,6 +23,20 @@ describe('ConglomeratesExpansion', () => {
       }
     });
 
+    it('are grouped together, adjacent, in the standard projects list', () => {
+      // Regression: getStandardProjects() sorts by M€ cost, and Give Patent/Facility Access
+      // are both 0 M€ -- the same cost as e.g. Collusion Standard Project -- so a plain
+      // cost-sort could scatter the 3 Team Actions among unrelated same-cost projects instead
+      // of keeping them together as the one related group they actually are.
+      const [game] = testGame(4, {conglomeratesExpansion: true, underworldExpansion: true, turmoilExtension: true});
+      const names = game.getStandardProjects().map((card) => card.name);
+      const indices = TEAM_ACTION_NAMES.map((name) => names.indexOf(name));
+      expect(indices.every((i) => i >= 0)).is.true;
+      const sortedIndices = [...indices].sort((a, b) => a - b);
+      expect(indices).to.deep.eq(sortedIndices, 'expected to already be in ascending order');
+      expect(sortedIndices[2] - sortedIndices[0]).to.eq(2, 'expected the 3 to be consecutive');
+    });
+
     it('always shows each Team Action\'s actual current Coordination cost, not just its unescalated base render', () => {
       const [, player1] = testGame(4, {conglomeratesExpansion: true});
       const givePatent = () => player1.getStandardProjectOption().cards.find((c) => c.name === CardName.GIVE_PATENT)!;
