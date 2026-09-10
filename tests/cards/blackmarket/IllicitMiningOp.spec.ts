@@ -13,15 +13,20 @@ describe('IllicitMiningOp', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats and no printed price -- the market owns it', () => {
+  it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.BUILDING]);
     expect(card.cost).to.eq(0);
+    expect(card.reserveUnits).deep.include({energy: 2});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play gains 3 steel', () => {
+  it('play spends 2 energy and gains 3 steel', () => {
+    player.energy = 2;
     expect(player.steel).to.eq(0);
+
     card.play(player);
+
+    expect(player.energy).to.eq(0);
     expect(player.steel).to.eq(3);
   });
 });

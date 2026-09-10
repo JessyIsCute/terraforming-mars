@@ -14,16 +14,21 @@ describe('CounterfeitCertificates', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats and no printed price -- the market owns it', () => {
+  it('has the printed stats', () => {
     expect(card.type).to.eq(CardType.EVENT);
     expect(card.tags).deep.eq([Tag.EARTH]);
-    expect(card.cost).to.eq(0);
+    expect(card.cost).to.eq(2);
+    expect(card.reserveUnits).deep.include({heat: 1});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play gains 3 TR', () => {
+  it('play spends 1 heat and gains 3 TR', () => {
+    player.heat = 1;
     const before = player.terraformRating;
+
     card.play(player);
+
+    expect(player.heat).to.eq(0);
     expect(player.terraformRating).to.eq(before + 3);
   });
 });

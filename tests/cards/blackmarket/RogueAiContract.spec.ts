@@ -1,5 +1,6 @@
 import {expect} from 'chai';
-import {RogueAiContract} from '@/server/cards/blackmarket/RogueAiContract';
+import {RogueAiContract, ROGUE_AI_CONTRACT_MIN_COST, ROGUE_AI_CONTRACT_MAX_COST} from '@/server/cards/blackmarket/RogueAiContract';
+import {CardName} from '@/common/cards/CardName';
 import {Tag} from '@/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
@@ -11,8 +12,9 @@ describe('RogueAiContract', () => {
     [, player] = testGame(2);
   });
 
-  it('has no printed price -- the market owns it', () => {
-    expect(new RogueAiContract().cost).to.eq(0);
+  it('defaults to the minimum listed price, and a rolled price bypasses the shared properties cache', () => {
+    expect(new RogueAiContract().cost).to.eq(ROGUE_AI_CONTRACT_MIN_COST);
+    expect(new RogueAiContract(CardName.ROGUE_AI_CONTRACT, ROGUE_AI_CONTRACT_MAX_COST).cost).to.eq(ROGUE_AI_CONTRACT_MAX_COST);
   });
 
   it('has the printed tag and VP', () => {

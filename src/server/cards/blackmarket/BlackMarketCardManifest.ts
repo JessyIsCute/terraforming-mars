@@ -1,7 +1,6 @@
 import {CardName} from '../../../common/cards/CardName';
+import {IProjectCard} from '../IProjectCard';
 import {ModuleManifest} from '../ModuleManifest';
-import {BlackMarketPrice} from '../../../common/blackmarket/BlackMarketPrice';
-import {Random} from '../../../common/utils/Random';
 import {ClassifiedResearch, ClassifiedResearchII, ClassifiedResearchIII} from './ClassifiedResearch';
 import {UraniumSmuggle, UraniumSmuggleII, UraniumSmuggleIII} from './UraniumSmuggle';
 import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII} from './SmuggledReactorCore';
@@ -77,78 +76,84 @@ export const BLACKMARKET_CARD_MANIFEST = new ModuleManifest({
 });
 
 /**
- * A design's price lives here, on the market, not on the card (`Card.ts`'s own `cost`/
- * `reserveUnits` are always 0/empty for every Black Market card -- see each card file).
- * `fixed` gives each of the 3 printings its own price, read off by the printing's index in
- * `BlackMarketDesign.printings` -- by convention listed cheapest-to-priciest, so a design's
- * stack gets pricier as it's bought down (the escalation the user asked for). `variable`
- * rolls a fresh M€ price in `[minCost, maxCost]` every time any printing of that design is
- * revealed, independent of which printing it is.
+ * Price lives on the card itself again (each printing's own `cost`/`reserveUnits`, set via
+ * its constructor's numeric param) -- this table exists only so `BlackMarket.ts` knows, for
+ * a `fixed` design, which literal param each of the 3 printings defaults to anyway (used
+ * only to describe the design when initially picking a card off the queue -- the printing's
+ * OWN constructor default already bakes in the right value), and for a `variable` design,
+ * what range to roll a fresh param from every time any printing is revealed.
  */
 export type BlackMarketPriceSpec =
-  | {kind: 'fixed', variants: readonly [BlackMarketPrice, BlackMarketPrice, BlackMarketPrice]}
+  | {kind: 'fixed', variants: readonly [number, number, number]}
   | {kind: 'variable', minCost: number, maxCost: number};
-
-export function resolveBlackMarketPrice(spec: BlackMarketPriceSpec, variantIndex: number, rng: Random): BlackMarketPrice {
-  if (spec.kind === 'variable') {
-    return {megacredits: spec.minCost + rng.nextInt(spec.maxCost - spec.minCost + 1)};
-  }
-  return spec.variants[variantIndex];
-}
 
 export type BlackMarketDesign = {
   /** The 3 CardName printings, in reveal order -- see CardName.ts's Black Market comment. */
   printings: readonly [CardName, CardName, CardName];
   price: BlackMarketPriceSpec;
+  /** Constructs `name` with the given numeric price param (a resource count for `fixed`, an M€ cost for `variable`). */
+  build: (name: CardName, param: number) => IProjectCard;
 };
 
 export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
   {
     printings: [CardName.CLASSIFIED_RESEARCH, CardName.CLASSIFIED_RESEARCH_II, CardName.CLASSIFIED_RESEARCH_III],
     price: {kind: 'variable', minCost: 7, maxCost: 9},
+    build: (name, cost) => new ClassifiedResearch(name, cost),
   },
   {
     printings: [CardName.URANIUM_SMUGGLE, CardName.URANIUM_SMUGGLE_II, CardName.URANIUM_SMUGGLE_III],
     price: {kind: 'variable', minCost: 8, maxCost: 11},
+    build: (name, cost) => new UraniumSmuggle(name, cost),
   },
   {
     printings: [CardName.SMUGGLED_REACTOR_CORE, CardName.SMUGGLED_REACTOR_CORE_II, CardName.SMUGGLED_REACTOR_CORE_III],
-    price: {kind: 'fixed', variants: [{titanium: 2}, {titanium: 3}, {titanium: 4}]},
+    price: {kind: 'fixed', variants: [2, 3, 4]},
+    build: (name, titanium) => new SmuggledReactorCore(name, titanium),
   },
   {
     printings: [CardName.POACHED_SPECIMENS, CardName.POACHED_SPECIMENS_II, CardName.POACHED_SPECIMENS_III],
-    price: {kind: 'fixed', variants: [{plants: 1, energy: 2}, {plants: 2, energy: 2}, {plants: 3, energy: 2}]},
+    price: {kind: 'fixed', variants: [1, 2, 3]},
+    build: (name, plants) => new PoachedSpecimens(name, plants),
   },
   {
     printings: [CardName.COUNTERFEIT_CERTIFICATES, CardName.COUNTERFEIT_CERTIFICATES_II, CardName.COUNTERFEIT_CERTIFICATES_III],
-    price: {kind: 'fixed', variants: [{megacredits: 2, heat: 1}, {megacredits: 2, heat: 2}, {megacredits: 2, heat: 3}]},
+    price: {kind: 'fixed', variants: [1, 2, 3]},
+    build: (name, heat) => new CounterfeitCertificates(name, heat),
   },
   {
     printings: [CardName.BLACK_ICE_HACKER, CardName.BLACK_ICE_HACKER_II, CardName.BLACK_ICE_HACKER_III],
-    price: {kind: 'fixed', variants: [{energy: 3}, {energy: 4}, {energy: 5}]},
+    price: {kind: 'fixed', variants: [3, 4, 5]},
+    build: (name, energy) => new BlackIceHacker(name, energy),
   },
   {
     printings: [CardName.PIRATE_TRADE_ROUTE, CardName.PIRATE_TRADE_ROUTE_II, CardName.PIRATE_TRADE_ROUTE_III],
-    price: {kind: 'fixed', variants: [{steel: 1, titanium: 1}, {steel: 1, titanium: 2}, {steel: 1, titanium: 3}]},
+    price: {kind: 'fixed', variants: [1, 2, 3]},
+    build: (name, titanium) => new PirateTradeRoute(name, titanium),
   },
   {
     printings: [CardName.UNDERGROUND_CASINO, CardName.UNDERGROUND_CASINO_II, CardName.UNDERGROUND_CASINO_III],
-    price: {kind: 'fixed', variants: [{megacredits: 10}, {megacredits: 11}, {megacredits: 12}]},
+    price: {kind: 'fixed', variants: [10, 11, 12]},
+    build: (name, cost) => new UndergroundCasino(name, cost),
   },
   {
     printings: [CardName.BOOTLEG_TERRAFORMING_FORMULA, CardName.BOOTLEG_TERRAFORMING_FORMULA_II, CardName.BOOTLEG_TERRAFORMING_FORMULA_III],
     price: {kind: 'variable', minCost: 6, maxCost: 9},
+    build: (name, cost) => new BootlegTerraformingFormula(name, cost),
   },
   {
     printings: [CardName.STOLEN_BLUEPRINTS, CardName.STOLEN_BLUEPRINTS_II, CardName.STOLEN_BLUEPRINTS_III],
-    price: {kind: 'fixed', variants: [{steel: 2}, {steel: 3}, {steel: 4}]},
+    price: {kind: 'fixed', variants: [2, 3, 4]},
+    build: (name, steel) => new StolenBlueprints(name, steel),
   },
   {
     printings: [CardName.ILLICIT_MINING_OP, CardName.ILLICIT_MINING_OP_II, CardName.ILLICIT_MINING_OP_III],
-    price: {kind: 'fixed', variants: [{energy: 2}, {energy: 3}, {energy: 4}]},
+    price: {kind: 'fixed', variants: [2, 3, 4]},
+    build: (name, energy) => new IllicitMiningOp(name, energy),
   },
   {
     printings: [CardName.ROGUE_AI_CONTRACT, CardName.ROGUE_AI_CONTRACT_II, CardName.ROGUE_AI_CONTRACT_III],
     price: {kind: 'variable', minCost: 10, maxCost: 14},
+    build: (name, cost) => new RogueAiContract(name, cost),
   },
 ];
