@@ -13,21 +13,18 @@ describe('BlackIceHacker', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats', () => {
+  it('has the printed stats and no printed price -- the market owns it', () => {
     expect(card.tags).deep.eq([Tag.SCIENCE]);
     expect(card.cost).to.eq(0);
-    expect(card.reserveUnits).deep.include({energy: 3});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play spends 3 energy, draws a card, and gains 2 M€', () => {
-    player.energy = 3;
+  it('play draws a card and gains 2 M€', () => {
     const beforeMc = player.megaCredits;
     expect(player.cardsInHand).has.lengthOf(0);
 
     card.play(player);
 
-    expect(player.energy).to.eq(0);
     expect(player.cardsInHand).has.lengthOf(1);
     expect(player.megaCredits).to.eq(beforeMc + 2);
   });

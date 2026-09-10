@@ -1,5 +1,7 @@
 import {CardName} from '../../../common/cards/CardName';
 import {ModuleManifest} from '../ModuleManifest';
+import {BlackMarketPrice} from '../../../common/blackmarket/BlackMarketPrice';
+import {Random} from '../../../common/utils/Random';
 import {ClassifiedResearch, ClassifiedResearchII, ClassifiedResearchIII} from './ClassifiedResearch';
 import {UraniumSmuggle, UraniumSmuggleII, UraniumSmuggleIII} from './UraniumSmuggle';
 import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII} from './SmuggledReactorCore';
@@ -74,18 +76,79 @@ export const BLACKMARKET_CARD_MANIFEST = new ModuleManifest({
   },
 });
 
-/** Every Black Market printing's `CardName`, grouped by design -- the market's shuffled draw pile. */
-export const BLACK_MARKET_PRINTINGS: ReadonlyArray<ReadonlyArray<CardName>> = [
-  [CardName.CLASSIFIED_RESEARCH, CardName.CLASSIFIED_RESEARCH_II, CardName.CLASSIFIED_RESEARCH_III],
-  [CardName.URANIUM_SMUGGLE, CardName.URANIUM_SMUGGLE_II, CardName.URANIUM_SMUGGLE_III],
-  [CardName.SMUGGLED_REACTOR_CORE, CardName.SMUGGLED_REACTOR_CORE_II, CardName.SMUGGLED_REACTOR_CORE_III],
-  [CardName.POACHED_SPECIMENS, CardName.POACHED_SPECIMENS_II, CardName.POACHED_SPECIMENS_III],
-  [CardName.COUNTERFEIT_CERTIFICATES, CardName.COUNTERFEIT_CERTIFICATES_II, CardName.COUNTERFEIT_CERTIFICATES_III],
-  [CardName.BLACK_ICE_HACKER, CardName.BLACK_ICE_HACKER_II, CardName.BLACK_ICE_HACKER_III],
-  [CardName.PIRATE_TRADE_ROUTE, CardName.PIRATE_TRADE_ROUTE_II, CardName.PIRATE_TRADE_ROUTE_III],
-  [CardName.UNDERGROUND_CASINO, CardName.UNDERGROUND_CASINO_II, CardName.UNDERGROUND_CASINO_III],
-  [CardName.BOOTLEG_TERRAFORMING_FORMULA, CardName.BOOTLEG_TERRAFORMING_FORMULA_II, CardName.BOOTLEG_TERRAFORMING_FORMULA_III],
-  [CardName.STOLEN_BLUEPRINTS, CardName.STOLEN_BLUEPRINTS_II, CardName.STOLEN_BLUEPRINTS_III],
-  [CardName.ILLICIT_MINING_OP, CardName.ILLICIT_MINING_OP_II, CardName.ILLICIT_MINING_OP_III],
-  [CardName.ROGUE_AI_CONTRACT, CardName.ROGUE_AI_CONTRACT_II, CardName.ROGUE_AI_CONTRACT_III],
+/**
+ * A design's price lives here, on the market, not on the card (`Card.ts`'s own `cost`/
+ * `reserveUnits` are always 0/empty for every Black Market card -- see each card file).
+ * `fixed` gives each of the 3 printings its own price, read off by the printing's index in
+ * `BlackMarketDesign.printings` -- by convention listed cheapest-to-priciest, so a design's
+ * stack gets pricier as it's bought down (the escalation the user asked for). `variable`
+ * rolls a fresh M€ price in `[minCost, maxCost]` every time any printing of that design is
+ * revealed, independent of which printing it is.
+ */
+export type BlackMarketPriceSpec =
+  | {kind: 'fixed', variants: readonly [BlackMarketPrice, BlackMarketPrice, BlackMarketPrice]}
+  | {kind: 'variable', minCost: number, maxCost: number};
+
+export function resolveBlackMarketPrice(spec: BlackMarketPriceSpec, variantIndex: number, rng: Random): BlackMarketPrice {
+  if (spec.kind === 'variable') {
+    return {megacredits: spec.minCost + rng.nextInt(spec.maxCost - spec.minCost + 1)};
+  }
+  return spec.variants[variantIndex];
+}
+
+export type BlackMarketDesign = {
+  /** The 3 CardName printings, in reveal order -- see CardName.ts's Black Market comment. */
+  printings: readonly [CardName, CardName, CardName];
+  price: BlackMarketPriceSpec;
+};
+
+export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
+  {
+    printings: [CardName.CLASSIFIED_RESEARCH, CardName.CLASSIFIED_RESEARCH_II, CardName.CLASSIFIED_RESEARCH_III],
+    price: {kind: 'variable', minCost: 7, maxCost: 9},
+  },
+  {
+    printings: [CardName.URANIUM_SMUGGLE, CardName.URANIUM_SMUGGLE_II, CardName.URANIUM_SMUGGLE_III],
+    price: {kind: 'variable', minCost: 8, maxCost: 11},
+  },
+  {
+    printings: [CardName.SMUGGLED_REACTOR_CORE, CardName.SMUGGLED_REACTOR_CORE_II, CardName.SMUGGLED_REACTOR_CORE_III],
+    price: {kind: 'fixed', variants: [{titanium: 2}, {titanium: 3}, {titanium: 4}]},
+  },
+  {
+    printings: [CardName.POACHED_SPECIMENS, CardName.POACHED_SPECIMENS_II, CardName.POACHED_SPECIMENS_III],
+    price: {kind: 'fixed', variants: [{plants: 1, energy: 2}, {plants: 2, energy: 2}, {plants: 3, energy: 2}]},
+  },
+  {
+    printings: [CardName.COUNTERFEIT_CERTIFICATES, CardName.COUNTERFEIT_CERTIFICATES_II, CardName.COUNTERFEIT_CERTIFICATES_III],
+    price: {kind: 'fixed', variants: [{megacredits: 2, heat: 1}, {megacredits: 2, heat: 2}, {megacredits: 2, heat: 3}]},
+  },
+  {
+    printings: [CardName.BLACK_ICE_HACKER, CardName.BLACK_ICE_HACKER_II, CardName.BLACK_ICE_HACKER_III],
+    price: {kind: 'fixed', variants: [{energy: 3}, {energy: 4}, {energy: 5}]},
+  },
+  {
+    printings: [CardName.PIRATE_TRADE_ROUTE, CardName.PIRATE_TRADE_ROUTE_II, CardName.PIRATE_TRADE_ROUTE_III],
+    price: {kind: 'fixed', variants: [{steel: 1, titanium: 1}, {steel: 1, titanium: 2}, {steel: 1, titanium: 3}]},
+  },
+  {
+    printings: [CardName.UNDERGROUND_CASINO, CardName.UNDERGROUND_CASINO_II, CardName.UNDERGROUND_CASINO_III],
+    price: {kind: 'fixed', variants: [{megacredits: 10}, {megacredits: 11}, {megacredits: 12}]},
+  },
+  {
+    printings: [CardName.BOOTLEG_TERRAFORMING_FORMULA, CardName.BOOTLEG_TERRAFORMING_FORMULA_II, CardName.BOOTLEG_TERRAFORMING_FORMULA_III],
+    price: {kind: 'variable', minCost: 6, maxCost: 9},
+  },
+  {
+    printings: [CardName.STOLEN_BLUEPRINTS, CardName.STOLEN_BLUEPRINTS_II, CardName.STOLEN_BLUEPRINTS_III],
+    price: {kind: 'fixed', variants: [{steel: 2}, {steel: 3}, {steel: 4}]},
+  },
+  {
+    printings: [CardName.ILLICIT_MINING_OP, CardName.ILLICIT_MINING_OP_II, CardName.ILLICIT_MINING_OP_III],
+    price: {kind: 'fixed', variants: [{energy: 2}, {energy: 3}, {energy: 4}]},
+  },
+  {
+    printings: [CardName.ROGUE_AI_CONTRACT, CardName.ROGUE_AI_CONTRACT_II, CardName.ROGUE_AI_CONTRACT_III],
+    price: {kind: 'variable', minCost: 10, maxCost: 14},
+  },
 ];

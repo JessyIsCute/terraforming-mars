@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class PoachedSpecimens extends Card implements IProjectCard {
   constructor(name: CardName = CardName.POACHED_SPECIMENS) {
@@ -13,7 +12,6 @@ export class PoachedSpecimens extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.ANIMAL],
       cost: 0,
-      reserveUnits: {plants: 1, energy: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +21,9 @@ export class PoachedSpecimens extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM04',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(1, {digit}).nbsp.minus().energy(2, {digit}).plainText('Spend 1 plant and 2 energy.', /** parens */ true).br;
           b.megacredits(6);
         }),
-        description: 'Spend 1 plant and 2 energy. Gain 6 M€ (sell poached wildlife on the black market).',
+        description: 'Gain 6 M€ (sell poached wildlife on the black market).',
       },
     });
   }

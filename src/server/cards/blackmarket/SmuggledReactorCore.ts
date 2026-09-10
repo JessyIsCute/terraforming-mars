@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class SmuggledReactorCore extends Card implements IProjectCard {
   constructor(name: CardName = CardName.SMUGGLED_REACTOR_CORE) {
@@ -13,7 +12,6 @@ export class SmuggledReactorCore extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.POWER, Tag.BUILDING],
       cost: 0,
-      reserveUnits: {titanium: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +21,9 @@ export class SmuggledReactorCore extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM03',
         renderData: CardRenderer.builder((b) => {
-          b.minus().titanium(2, {digit}).plainText('Spend 2 titanium.', /** parens */ true).br;
           b.production((pb) => pb.energy(2));
         }),
-        description: 'Spend 2 titanium. Raise your energy production 2 steps.',
+        description: 'Raise your energy production 2 steps.',
       },
     });
   }

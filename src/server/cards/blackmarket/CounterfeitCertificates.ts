@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class CounterfeitCertificates extends Card implements IProjectCard {
   constructor(name: CardName = CardName.COUNTERFEIT_CERTIFICATES) {
@@ -12,21 +11,19 @@ export class CounterfeitCertificates extends Card implements IProjectCard {
       name,
       type: CardType.EVENT,
       tags: [Tag.EARTH],
-      cost: 2,
-      reserveUnits: {heat: 1},
+      cost: 0,
       victoryPoints: -1,
 
       behavior: {
-        tr: 2,
+        tr: 3,
       },
 
       metadata: {
         cardNumber: 'BM05',
         renderData: CardRenderer.builder((b) => {
-          b.minus().heat(1, {digit}).plainText('Spend 1 heat.', /** parens */ true).br;
-          b.tr(2);
+          b.tr(3);
         }),
-        description: 'Spend 1 heat. Gain 2 TR (forged terraforming credentials).',
+        description: 'Gain 3 TR (forged terraforming credentials).',
       },
     });
   }

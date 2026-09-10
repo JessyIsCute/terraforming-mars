@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class IllicitMiningOp extends Card implements IProjectCard {
   constructor(name: CardName = CardName.ILLICIT_MINING_OP) {
@@ -13,7 +12,6 @@ export class IllicitMiningOp extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.BUILDING],
       cost: 0,
-      reserveUnits: {energy: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +21,9 @@ export class IllicitMiningOp extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM11',
         renderData: CardRenderer.builder((b) => {
-          b.minus().energy(2, {digit}).plainText('Spend 2 energy.', /** parens */ true).br;
           b.steel(3);
         }),
-        description: 'Spend 2 energy. Gain 3 steel.',
+        description: 'Gain 3 steel.',
       },
     });
   }

@@ -5,14 +5,8 @@ import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 
-export const BOOTLEG_TERRAFORMING_FORMULA_MIN_COST = 6;
-export const BOOTLEG_TERRAFORMING_FORMULA_MAX_COST = 9;
-
-/** Variable-cost design -- see UraniumSmuggle.ts's doc comment for why `cost` is an overridden getter. */
 export class BootlegTerraformingFormula extends Card implements IProjectCard {
-  private readonly rolledCost: number;
-
-  constructor(name: CardName = CardName.BOOTLEG_TERRAFORMING_FORMULA, cost: number = BOOTLEG_TERRAFORMING_FORMULA_MIN_COST) {
+  constructor(name: CardName = CardName.BOOTLEG_TERRAFORMING_FORMULA) {
     super({
       name,
       type: CardType.AUTOMATED,
@@ -32,11 +26,6 @@ export class BootlegTerraformingFormula extends Card implements IProjectCard {
         description: 'Raise your plant production 1 step.',
       },
     });
-    this.rolledCost = cost;
-  }
-
-  public override get cost(): number {
-    return this.rolledCost;
   }
 }
 

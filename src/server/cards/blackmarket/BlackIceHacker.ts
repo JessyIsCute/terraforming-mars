@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class BlackIceHacker extends Card implements IProjectCard {
   constructor(name: CardName = CardName.BLACK_ICE_HACKER) {
@@ -13,7 +12,6 @@ export class BlackIceHacker extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE],
       cost: 0,
-      reserveUnits: {energy: 3},
       victoryPoints: -1,
 
       behavior: {
@@ -24,10 +22,9 @@ export class BlackIceHacker extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM06',
         renderData: CardRenderer.builder((b) => {
-          b.minus().energy(3, {digit}).plainText('Spend 3 energy.', /** parens */ true).br;
           b.cards(1).nbsp.megacredits(2);
         }),
-        description: 'Spend 3 energy. Draw a card and gain 2 M€.',
+        description: 'Draw a card and gain 2 M€.',
       },
     });
   }

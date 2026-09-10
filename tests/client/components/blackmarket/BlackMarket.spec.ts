@@ -16,8 +16,8 @@ describe('BlackMarket', () => {
       props: {
         market: {
           slots: [
-            {name: CardName.SMUGGLED_REACTOR_CORE},
-            {name: CardName.STOLEN_BLUEPRINTS},
+            {card: {name: CardName.SMUGGLED_REACTOR_CORE}, price: {titanium: 2}},
+            {card: {name: CardName.STOLEN_BLUEPRINTS}, price: {steel: 2}},
             undefined,
             undefined,
             undefined,

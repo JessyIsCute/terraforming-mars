@@ -1,134 +1,98 @@
 import {IGame} from '../IGame';
 import {IPlayer} from '../IPlayer';
-import {IProjectCard} from '../cards/IProjectCard';
-import {CardName} from '../../common/cards/CardName';
 import {newProjectCard} from '../createCard';
 import {isCompatibleWith} from '../cards/CardFactorySpec';
 import {inplaceShuffle} from '../utils/shuffle';
-import {BLACKMARKET_CARD_MANIFEST, BLACK_MARKET_PRINTINGS} from '../cards/blackmarket/BlackMarketCardManifest';
-import {UraniumSmuggle, URANIUM_SMUGGLE_MIN_COST, URANIUM_SMUGGLE_MAX_COST} from '../cards/blackmarket/UraniumSmuggle';
-import {
-  BootlegTerraformingFormula,
-  BOOTLEG_TERRAFORMING_FORMULA_MIN_COST,
-  BOOTLEG_TERRAFORMING_FORMULA_MAX_COST,
-} from '../cards/blackmarket/BootlegTerraformingFormula';
-import {RogueAiContract, ROGUE_AI_CONTRACT_MIN_COST, ROGUE_AI_CONTRACT_MAX_COST} from '../cards/blackmarket/RogueAiContract';
-import {BlackMarketData, BLACK_MARKET_SLOT_COUNT, SerializedBlackMarketData} from './BlackMarketData';
 import {Units} from '../../common/Units';
-
-const UNIT_LABELS: Record<keyof Units, string> = {
-  megacredits: 'M€',
-  steel: 'steel',
-  titanium: 'titanium',
-  plants: 'plant',
-  energy: 'energy',
-  heat: 'heat',
-};
+import {BlackMarketPrice, describeBlackMarketPrice} from '../../common/blackmarket/BlackMarketPrice';
+import {BLACKMARKET_CARD_MANIFEST, BLACK_MARKET_DESIGNS, resolveBlackMarketPrice} from '../cards/blackmarket/BlackMarketCardManifest';
+import {BlackMarketData, BlackMarketSlot, BLACK_MARKET_SLOT_COUNT, SerializedBlackMarketData} from './BlackMarketData';
 
 /**
  * Black Market: a persistent 5-slot market of bespoke project cards, bought directly for a
- * fixed or once-rolled price (no bidding, no mutation/infection layering -- see
- * MutationMarkets for that). See CardName.ts's Black Market comment and
- * BlackMarketCardManifest.ts's doc comment for how "replayable" (buying the same design more
- * than once) is made safe without touching the shared project deck.
+ * price set by the market itself (no bidding, no mutation/infection layering -- see
+ * MutationMarkets for that). Every Black Market card's own `cost`/`reserveUnits` are always
+ * 0/empty (see each card file) -- the price the player actually pays lives entirely here, in
+ * `BlackMarketSlot.price`, deducted directly by `buy()` rather than through the card's own
+ * play-cost pipeline. See CardName.ts's Black Market comment and
+ * BlackMarketCardManifest.ts's doc comments for how "replayable" (buying the same design
+ * more than once) and per-printing pricing are made safe/possible without touching the
+ * shared project deck or Card.ts's shared properties cache.
  */
 export class BlackMarket {
   private constructor() {}
 
   public static initialize(game: IGame): BlackMarketData {
-    const drawPile: Array<CardName> = [];
-    for (const printings of BLACK_MARKET_PRINTINGS) {
-      const factory = BLACKMARKET_CARD_MANIFEST.projectCards[printings[0]];
-      if (factory !== undefined && !isCompatibleWith(factory, game.gameOptions)) {
-        continue;
-      }
-      drawPile.push(...printings);
-    }
-    inplaceShuffle(drawPile, game.rng);
+    const designQueue = BLACK_MARKET_DESIGNS
+      .map((_design, index) => index)
+      .filter((index) => BlackMarket.isDesignCompatible(index, game));
+    inplaceShuffle(designQueue, game.rng);
 
     const data: BlackMarketData = {
       slots: new Array(BLACK_MARKET_SLOT_COUNT).fill(undefined),
-      drawPile,
+      designQueue,
     };
     for (let i = 0; i < BLACK_MARKET_SLOT_COUNT; i++) {
-      data.slots[i] = BlackMarket.dealSlot(game, data);
+      data.slots[i] = BlackMarket.startStack(game, data);
     }
     return data;
   }
 
   /**
-   * Buys the card at `slotIndex` for `player`: `player.playCard` enforces and deducts both
-   * the M€ `cost` and the non-M€ `reserveUnits` bundle (no substitution, entirely via the
-   * normal play pipeline -- see Card.ts's `play()`), resolves the card's behavior, and adds
-   * it to the player's tableau. The slot is immediately refilled.
+   * Buys the card at `slotIndex` for `player`: the market's own price is deducted directly
+   * (no substitution -- the price is exactly this bundle), then the card is played through
+   * the normal pipeline (behavior, tags, VP, tableau) with no further payment. The same
+   * design's next printing (a fresh instance, distinct CardName -- see BlackMarketData.ts)
+   * takes over the slot, or a new design if the stack just ran out.
    */
   public static buy(game: IGame, player: IPlayer, slotIndex: number): void {
     const data = BlackMarket.dataOrThrow(game);
-    const card = data.slots[slotIndex];
-    if (card === undefined) {
+    const slot = data.slots[slotIndex];
+    if (slot === undefined) {
       throw new Error(`No Black Market card at slot ${slotIndex}`);
     }
-    player.playCard(card);
-    data.slots[slotIndex] = BlackMarket.dealSlot(game, data);
+    player.stock.deductUnits(Units.of(slot.price));
+    player.playCard(slot.card);
+    data.slots[slotIndex] = BlackMarket.nextSlot(game, data, slot);
   }
 
-  private static dealSlot(game: IGame, data: BlackMarketData): IProjectCard | undefined {
-    const name = data.drawPile.pop();
-    if (name === undefined) {
+  /** A short, human-readable price label for a slot's price, e.g. "2 titanium" or "2 M€, 1 heat". */
+  public static describePrice(slot: BlackMarketSlot): string {
+    return slot === undefined ? '' : describeBlackMarketPrice(slot.price);
+  }
+
+  private static isDesignCompatible(designIndex: number, game: IGame): boolean {
+    const name = BLACK_MARKET_DESIGNS[designIndex].printings[0];
+    const factory = BLACKMARKET_CARD_MANIFEST.projectCards[name];
+    return factory === undefined || isCompatibleWith(factory, game.gameOptions);
+  }
+
+  /** Pulls the next not-yet-shown design off the queue and reveals its first (cheapest) printing, or leaves the slot empty if none remain. */
+  private static startStack(game: IGame, data: BlackMarketData): BlackMarketSlot {
+    const designIndex = data.designQueue.pop();
+    if (designIndex === undefined) {
       return undefined;
     }
-    return BlackMarket.buildCard(name, game);
+    return BlackMarket.buildSlot(game, designIndex, 0);
   }
 
-  /**
-   * Constructs the printing named `name`. Every design is constructible via the normal
-   * manifest factory (`newProjectCard`), which is all that's needed for fixed-price designs
-   * (and for reconstructing any design on game reload -- see the variable-cost classes' own
-   * doc comments for why that resets a rolled price to its default). The 3 variable-cost
-   * designs additionally get a fresh roll here, at the moment they're actually dealt.
-   */
-  private static buildCard(name: CardName, game: IGame): IProjectCard {
-    switch (name) {
-    case CardName.URANIUM_SMUGGLE:
-    case CardName.URANIUM_SMUGGLE_II:
-    case CardName.URANIUM_SMUGGLE_III:
-      return new UraniumSmuggle(name, URANIUM_SMUGGLE_MIN_COST + game.rng.nextInt(URANIUM_SMUGGLE_MAX_COST - URANIUM_SMUGGLE_MIN_COST + 1));
-    case CardName.BOOTLEG_TERRAFORMING_FORMULA:
-    case CardName.BOOTLEG_TERRAFORMING_FORMULA_II:
-    case CardName.BOOTLEG_TERRAFORMING_FORMULA_III:
-      return new BootlegTerraformingFormula(
-        name, BOOTLEG_TERRAFORMING_FORMULA_MIN_COST + game.rng.nextInt(BOOTLEG_TERRAFORMING_FORMULA_MAX_COST - BOOTLEG_TERRAFORMING_FORMULA_MIN_COST + 1));
-    case CardName.ROGUE_AI_CONTRACT:
-    case CardName.ROGUE_AI_CONTRACT_II:
-    case CardName.ROGUE_AI_CONTRACT_III:
-      return new RogueAiContract(name, ROGUE_AI_CONTRACT_MIN_COST + game.rng.nextInt(ROGUE_AI_CONTRACT_MAX_COST - ROGUE_AI_CONTRACT_MIN_COST + 1));
-    default: {
-      const card = newProjectCard(name);
-      if (card === undefined) {
-        throw new Error(`Unknown Black Market card ${name}`);
-      }
-      return card;
+  /** After a purchase: the same design's next printing if the stack isn't exhausted yet, otherwise a fresh design (or empty, if none remain). */
+  private static nextSlot(game: IGame, data: BlackMarketData, bought: NonNullable<BlackMarketSlot>): BlackMarketSlot {
+    if (bought.variantIndex < 2) {
+      return BlackMarket.buildSlot(game, bought.designIndex, bought.variantIndex + 1);
     }
-    }
+    return BlackMarket.startStack(game, data);
   }
 
-  /** A short, human-readable price label for `card`, e.g. "2 titanium" or "2 M€, 1 heat". */
-  public static describePrice(card: IProjectCard): string {
-    const parts: Array<string> = [];
-    if (card.cost > 0) {
-      parts.push(`${card.cost} M€`);
+  private static buildSlot(game: IGame, designIndex: number, variantIndex: number): BlackMarketSlot {
+    const design = BLACK_MARKET_DESIGNS[designIndex];
+    const name = design.printings[variantIndex];
+    const card = newProjectCard(name);
+    if (card === undefined) {
+      throw new Error(`Unknown Black Market card ${name}`);
     }
-    const reserveUnits = card.reserveUnits ?? Units.EMPTY;
-    for (const key of Units.keys) {
-      if (key === 'megacredits') {
-        continue;
-      }
-      const amount = reserveUnits[key];
-      if (amount > 0) {
-        parts.push(`${amount} ${UNIT_LABELS[key]}`);
-      }
-    }
-    return parts.length > 0 ? parts.join(', ') : 'free';
+    const price = resolveBlackMarketPrice(design.price, variantIndex, game.rng);
+    return {card, designIndex, variantIndex, price};
   }
 
   private static dataOrThrow(game: IGame): BlackMarketData {
@@ -143,8 +107,8 @@ export class BlackMarket {
       return undefined;
     }
     return {
-      slots: data.slots.map((card) => card?.name),
-      drawPile: data.drawPile,
+      slots: data.slots.map((slot) => slot === undefined ? undefined : {designIndex: slot.designIndex, variantIndex: slot.variantIndex, price: slot.price}),
+      designQueue: data.designQueue,
     };
   }
 
@@ -153,19 +117,20 @@ export class BlackMarket {
       return undefined;
     }
     return {
-      slots: data.slots.map((name) => BlackMarket.deserializeSlot(name)),
-      drawPile: data.drawPile,
+      slots: data.slots.map((slot) => BlackMarket.deserializeSlot(slot)),
+      designQueue: data.designQueue,
     };
   }
 
-  private static deserializeSlot(name: CardName | undefined): IProjectCard | undefined {
-    if (name === undefined) {
+  private static deserializeSlot(slot: {designIndex: number, variantIndex: number, price: BlackMarketPrice} | undefined): BlackMarketSlot {
+    if (slot === undefined) {
       return undefined;
     }
+    const name = BLACK_MARKET_DESIGNS[slot.designIndex].printings[slot.variantIndex];
     const card = newProjectCard(name);
     if (card === undefined) {
-      throw new Error(`Unknown Black Market project card ${name}`);
+      throw new Error(`Unknown Black Market card ${name}`);
     }
-    return card;
+    return {card, designIndex: slot.designIndex, variantIndex: slot.variantIndex, price: slot.price};
   }
 }

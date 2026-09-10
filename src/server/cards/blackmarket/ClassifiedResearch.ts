@@ -11,7 +11,7 @@ export class ClassifiedResearch extends Card implements IProjectCard {
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE, Tag.SCIENCE],
-      cost: 5,
+      cost: 0,
       victoryPoints: -1,
 
       behavior: {

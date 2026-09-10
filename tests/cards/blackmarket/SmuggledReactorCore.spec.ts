@@ -13,20 +13,16 @@ describe('SmuggledReactorCore', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats', () => {
+  it('has the printed stats and no printed price -- the market owns it', () => {
     expect(card.tags).deep.eq([Tag.POWER, Tag.BUILDING]);
     expect(card.cost).to.eq(0);
-    expect(card.reserveUnits).deep.include({titanium: 2});
+    expect(card.reserveUnits).to.deep.eq({megacredits: 0, steel: 0, titanium: 0, plants: 0, energy: 0, heat: 0});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play spends 2 titanium and raises energy production 2 steps', () => {
-    player.titanium = 2;
+  it('play raises energy production 2 steps', () => {
     expect(player.production.energy).to.eq(0);
-
     card.play(player);
-
-    expect(player.titanium).to.eq(0);
     expect(player.production.energy).to.eq(2);
   });
 });

@@ -4,7 +4,6 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
-import {digit} from '../Options';
 
 export class StolenBlueprints extends Card implements IProjectCard {
   constructor(name: CardName = CardName.STOLEN_BLUEPRINTS) {
@@ -13,7 +12,6 @@ export class StolenBlueprints extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.BUILDING, Tag.BUILDING],
       cost: 0,
-      reserveUnits: {steel: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +21,9 @@ export class StolenBlueprints extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM10',
         renderData: CardRenderer.builder((b) => {
-          b.minus().steel(2, {digit}).plainText('Spend 2 steel.', /** parens */ true).br;
           b.cards(1);
         }),
-        description: 'Spend 2 steel. Draw a card.',
+        description: 'Draw a card.',
       },
     });
   }

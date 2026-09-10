@@ -13,9 +13,9 @@ describe('ClassifiedResearch', () => {
     [, player] = testGame(2);
   });
 
-  it('has the printed stats', () => {
+  it('has the printed stats and no printed price -- the market owns it', () => {
     expect(card.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
-    expect(card.cost).to.eq(5);
+    expect(card.cost).to.eq(0);
     expect(card.victoryPoints).to.eq(-1);
   });
 
@@ -29,7 +29,7 @@ describe('ClassifiedResearch', () => {
     const printings = [card, new ClassifiedResearchII(), new ClassifiedResearchIII()];
     expect(new Set(printings.map((c) => c.name)).size).to.eq(3);
     for (const printing of printings) {
-      expect(printing.cost).to.eq(5);
+      expect(printing.cost).to.eq(0);
       expect(printing.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
     }
   });

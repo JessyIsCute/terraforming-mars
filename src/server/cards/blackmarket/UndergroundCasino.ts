@@ -12,19 +12,19 @@ export class UndergroundCasino extends Card implements IProjectCard {
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.CRIME, Tag.BUILDING],
-      cost: 10,
+      cost: 0,
       victoryPoints: -1,
 
       behavior: {
-        production: {megacredits: 2},
+        production: {megacredits: 4},
       },
 
       metadata: {
         cardNumber: 'BM08',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.megacredits(2));
+          b.production((pb) => pb.megacredits(4));
         }),
-        description: 'Raise your M€ production 2 steps.',
+        description: 'Raise your M€ production 4 steps.',
       },
     });
   }
