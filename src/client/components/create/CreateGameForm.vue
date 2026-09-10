@@ -179,13 +179,13 @@
                             <input type="checkbox" name="sillyfication" id="sillyfication-checkbox" v-model="expansions.sillyfication">
                             <label for="sillyfication-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-sillyfication"></div>
-                                <span v-i18n>Sillyfication</span>&nbsp;<span title="A silly fan expansion">(&#945;)</span>
+                                <span v-i18n>Sillyfication</span>&nbsp;<span title="A silly fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.sillyfication" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
                             <input type="checkbox" name="betterMars" id="betterMars-checkbox" v-model="expansions.betterMars">
                             <label for="betterMars-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-betterMars"></div>
-                                <span v-i18n>BetterMars</span>&nbsp;<span title="A fan expansion: Mars-flavoured card variants">(&#945;)</span>
+                                <span v-i18n>BetterMars</span>&nbsp;<span title="A fan expansion: Mars-flavoured card variants">(&#945;)</span>&nbsp;<a :href="wikiUrls.betterMars" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
                             <input type="checkbox" name="customCards" id="customCards-checkbox" v-model="expansions.customCards">
@@ -197,7 +197,7 @@
                             <input type="checkbox" name="mutationMarkets" id="mutationMarkets-checkbox" v-model="expansions.mutationMarkets">
                             <label for="mutationMarkets-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-mutationMarkets"></div>
-                                <span v-i18n>MutationMarkets</span>&nbsp;<span title="A fan expansion: bid on project cards permanently enhanced by mutations">(&#945;)</span>
+                                <span v-i18n>MutationMarkets</span>&nbsp;<span title="A fan expansion: bid on project cards permanently enhanced by mutations">(&#945;)</span>&nbsp;<a :href="wikiUrls.mutationMarkets" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
                             <input type="checkbox" name="conglomerates" id="conglomerates-checkbox" v-model="expansions.conglomerates">

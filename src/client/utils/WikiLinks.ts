@@ -23,10 +23,10 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   starwars: `${WIKI}/StarWars`,
   underworld: `${WIKI}/Underworld`,
   deltaProject: `${WIKI}/Delta-Project`,
-  sillyfication: `${WIKI}/Community`,
-  betterMars: `${WIKI}/Community`,
+  sillyfication: `${FORK_WIKI}/Sillyfication`,
+  betterMars: `${FORK_WIKI}/BetterMars`,
   customCards: `${WIKI}/Community`,
-  mutationMarkets: `${WIKI}/Community`,
+  mutationMarkets: `${FORK_WIKI}/MutationMarkets`,
   conglomerates: `${FORK_WIKI}/Conglomerates`,
 };
 
