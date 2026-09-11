@@ -1,6 +1,6 @@
 <template>
   <div class="black-market-slot" :class="entranceClass">
-    <div v-if="card !== undefined" class="black-market-card-theme black-market-card-scale-wrapper">
+    <div v-if="card !== undefined" class="black-market-card-scale-wrapper">
       <Card :card="card" :autoTall="true" />
     </div>
   </div>

@@ -8,12 +8,12 @@ import {GlobalParameter} from '../../../common/GlobalParameter';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 
-/** Mid-game tier (unlocks generation 4+): skims heat off your own temperature increases -- mirrors HomeostasisBureau.ts's `onGlobalParameterIncrease` hook (M€ there, heat here). An "Effect:" card, so it's blue (ACTIVE) like HomeostasisBureau/VenusWaystation, even though it has no repeatable action. */
+/** Mid-game tier (unlocks generation 4+): skims heat off your own temperature increases -- mirrors HomeostasisBureau.ts's `onGlobalParameterIncrease` hook (M€ there, heat here). */
 export class ThermalSkimOperation extends Card implements IProjectCard {
   constructor(name: CardName = CardName.THERMAL_SKIM_OPERATION, cost: number = 5) {
     super({
       name,
-      type: CardType.ACTIVE,
+      type: CardType.AUTOMATED,
       tags: [Tag.POWER],
       cost,
       victoryPoints: -1,
@@ -29,7 +29,7 @@ export class ThermalSkimOperation extends Card implements IProjectCard {
           b.br;
           b.heat(2);
         }),
-        description: 'Gain 2 heat.',
+        description: 'Gain 2 heat. When you raise the temperature, gain 1 heat.',
       },
     });
   }

@@ -45,20 +45,3 @@
 .black-market-slot--entering-right {
   animation: black-market-slide-in-right 0.6s ease-out;
 }
-
-// A grey, dealer's-table look for Black Market cards -- distinct from every other card's
-// cream/white printed-paper background (`.filterDiv`, `src/styles/cards.less`). Grey (not
-// dark) is deliberate: the card's own render tree has many small nested elements (requirement
-// badges, render-item text) that print plain black text with no easy single override point,
-// so a grey (rather than dark) background keeps all of that legible without touching it.
-// `.raised-bevel()` (`src/styles/mixins.less`) hardcodes a light near-white top/left border
-// meant for a light card -- overridden to black here so it doesn't stand out as a stray white
-// frame. The cost badge, tag icons, and VP badge are self-contained art/gradients left
-// untouched, as is the type-colored title ribbon (green for AUTOMATED, orange for EVENT) --
-// still a useful at-a-glance card-type indicator elsewhere in the game.
-.black-market-card-theme {
-  .filterDiv {
-    background: linear-gradient(to bottom right, #707070, #8c8c8c, #707070, #7a7a7a, #707070);
-    border-color: black;
-  }
-}
