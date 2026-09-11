@@ -15,15 +15,15 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
     super({
       name: CardName.NEREID_BIOSYSTEMS,
       tags: [Tag.JOVIAN, Tag.MICROBE],
-      startingMegaCredits: 35,
+      startingMegaCredits: 46,
       resourceType: CardResource.MICROBE,
       initialActionText: 'Draw 1 card with a Jovian tag and 1 card with a Microbe tag',
 
       metadata: {
         cardNumber: 'XC4',
-        description: 'You start with 35 M€. As your first action, draw 1 card with a Jovian tag and 1 card with a Microbe tag.',
+        description: 'You start with 46 M€. As your first action, draw 1 card with a Jovian tag and 1 card with a Microbe tag.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(35).nbsp.cards(1, {secondaryTag: Tag.JOVIAN}).nbsp.cards(1, {secondaryTag: Tag.MICROBE}).br;
+          b.megacredits(46).nbsp.cards(1, {secondaryTag: Tag.JOVIAN}).nbsp.cards(1, {secondaryTag: Tag.MICROBE}).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.MEDIUM);
             ce.br;

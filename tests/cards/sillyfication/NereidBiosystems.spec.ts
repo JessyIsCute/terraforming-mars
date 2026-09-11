@@ -22,8 +22,8 @@ describe('NereidBiosystems', () => {
     expect(card.tags).to.deep.eq([Tag.JOVIAN, Tag.MICROBE]);
   });
 
-  it('starts with 35 M€', () => {
-    expect(card.startingMegaCredits).to.eq(35);
+  it('starts with 46 M€', () => {
+    expect(card.startingMegaCredits).to.eq(46);
   });
 
   it('initial action draws 1 Jovian-tag card and 1 Microbe-tag card', () => {
