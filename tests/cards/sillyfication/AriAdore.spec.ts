@@ -17,8 +17,8 @@ describe('AriAdore', () => {
     player.megaCredits = 0;
   });
 
-  it('costs 28 and scores 2 VP', () => {
-    expect(card.cost).to.eq(28);
+  it('costs 26 and scores 2 VP', () => {
+    expect(card.cost).to.eq(26);
     expect(card.getVictoryPoints(player)).to.eq(2);
   });
 

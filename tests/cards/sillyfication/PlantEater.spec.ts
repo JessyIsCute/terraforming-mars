@@ -22,7 +22,7 @@ describe('PlantEater', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('converts plants to twice as many M€', () => {
+  it('converts plants to 3 times as many M€', () => {
     player.plants = 5;
     player.megaCredits = 0;
 
@@ -31,6 +31,6 @@ describe('PlantEater', () => {
     selectAmount.cb(3);
 
     expect(player.plants).to.eq(2);
-    expect(player.megaCredits).to.eq(6);
+    expect(player.megaCredits).to.eq(9);
   });
 });

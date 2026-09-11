@@ -14,19 +14,30 @@ describe('Venuphile', () => {
     player.playedCards.push(card);
   });
 
-  it('discounts Venus cards by your Venus tag count', () => {
+  it('discounts Venus cards 1 M€ for every 2 Venus tags you have', () => {
     player.tagsForTest = {venus: 3};
     const venusCard = {tags: [Tag.VENUS]} as any;
     const otherCard = {tags: [Tag.EARTH]} as any;
 
-    expect(card.getCardDiscount(player, venusCard)).to.eq(3);
+    expect(card.getCardDiscount(player, venusCard)).to.eq(1);
     expect(card.getCardDiscount(player, otherCard)).to.eq(0);
   });
 
+  it('rounds the discount down', () => {
+    player.tagsForTest = {venus: 4};
+    const venusCard = {tags: [Tag.VENUS]} as any;
+
+    expect(card.getCardDiscount(player, venusCard)).to.eq(2);
+  });
+
   it('caps the discount at 5 M€', () => {
-    player.tagsForTest = {venus: 8};
+    player.tagsForTest = {venus: 16};
     const venusCard = {tags: [Tag.VENUS]} as any;
 
     expect(card.getCardDiscount(player, venusCard)).to.eq(5);
+  });
+
+  it('declares a static Venus card discount for the tag-discount badge', () => {
+    expect(card.cardDiscount).to.deep.eq({tag: Tag.VENUS, amount: 5, per: 'card'});
   });
 });

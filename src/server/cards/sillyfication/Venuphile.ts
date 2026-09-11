@@ -12,14 +12,18 @@ export class Venuphile extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.VENUPHILE,
       tags: [Tag.VENUS],
-      cost: 18,
+      cost: 17,
       victoryPoints: 1,
+
+      // A static cap, purely so this shows up alongside other cards' discounts in the
+      // Venus tag's discount badge; the real, dynamic amount is computed below.
+      cardDiscount: {tag: Tag.VENUS, amount: 5, per: 'card'},
 
       metadata: {
         cardNumber: 'T03',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When you play a Venus tag, you pay 1 M€ less for each Venus tag you have, to a maximum of 5 M€.', (eb) => {
-            eb.tag(Tag.VENUS).startEffect.megacredits(1).slash().tag(Tag.VENUS);
+          b.effect('When you play a Venus tag, you pay 1 M€ less for every 2 Venus tags you have, to a maximum of 5 M€.', (eb) => {
+            eb.tag(Tag.VENUS).startEffect.megacredits(1).slash().tag(Tag.VENUS, 2);
           });
         }),
       },
@@ -30,6 +34,6 @@ export class Venuphile extends Card implements IProjectCard {
     if (!card.tags.includes(Tag.VENUS)) {
       return 0;
     }
-    return Math.min(player.tags.count(Tag.VENUS), 5);
+    return Math.min(Math.floor(player.tags.count(Tag.VENUS) / 2), 5);
   }
 }

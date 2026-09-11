@@ -15,7 +15,7 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.URANUS_SEA_CREATURES,
       tags: [Tag.ANIMAL, Tag.JOVIAN],
-      cost: 12,
+      cost: 16,
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}},
 

@@ -25,7 +25,7 @@ export class ProjectImitators extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.cards(1).asterix().nbsp.megacredits(-5, {digit});
         }),
-        description: 'Copy an automated card another player has played into your hand. It costs 5 M€ less this generation.',
+        description: 'Copy an AUTOMATED card another player has played into your hand. It costs 5 M€ less this generation.',
       },
     });
   }

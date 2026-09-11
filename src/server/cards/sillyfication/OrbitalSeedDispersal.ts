@@ -11,7 +11,7 @@ export class OrbitalSeedDispersal extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       name: CardName.ORBITAL_SEED_DISPERSAL,
       tags: [Tag.PLANT, Tag.SPACE],
-      cost: 13,
+      cost: 12,
 
       behavior: {
         production: {plants: 1},

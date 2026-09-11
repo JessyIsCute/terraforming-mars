@@ -17,7 +17,7 @@ export class AriAdore extends Card implements IProjectCard {
     super({
       type: CardType.ACTIVE,
       name: CardName.ARI_ADORE,
-      cost: 28,
+      cost: 26,
       victoryPoints: 2,
 
       metadata: {

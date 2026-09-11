@@ -14,7 +14,7 @@ export class GlobalEnergyInfrastructure extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.GLOBAL_ENERGY_INFRASTRUCTURE,
       tags: [Tag.POWER],
-      cost: 20,
+      cost: 22,
 
       requirements: {tag: Tag.POWER, count: 2},
 
