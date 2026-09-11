@@ -37,6 +37,9 @@ export function cardsToModel(
     if (card.name === CardName.MARS_DIRECT) {
       discount = [{tag: Tag.MARS, amount: player.tags.count(Tag.MARS)}];
     }
+    if (card.name === CardName.VENUPHILE) {
+      discount = [{tag: Tag.VENUS, amount: Math.min(Math.floor(player.tags.count(Tag.VENUS) / 2), 5)}];
+    }
 
     let calculatedCost = card.cost;
     if (options.showCalculatedCost) {

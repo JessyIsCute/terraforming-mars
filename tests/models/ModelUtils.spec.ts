@@ -3,6 +3,7 @@ import {cardsToModel} from '../../src/server/models/ModelUtils';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
 import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {Tag} from '../../src/common/cards/Tag';
+import {Venuphile} from '../../src/server/cards/sillyfication/Venuphile';
 import {fakeCard} from '../TestingUtils';
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
@@ -96,5 +97,18 @@ describe('cardsToModel', () => {
     const [model] = cardsToModel(player, [card]);
 
     expect(model.combinedDisplayName).is.undefined;
+  });
+
+  it('recalculates Venuphile\'s discount live from the player\'s current Venus tag count', () => {
+    const card = new Venuphile();
+
+    player.tagsForTest = {venus: 3};
+    expect(cardsToModel(player, [card])[0].discount).to.deep.eq([{tag: Tag.VENUS, amount: 1}]);
+
+    player.tagsForTest = {venus: 4};
+    expect(cardsToModel(player, [card])[0].discount).to.deep.eq([{tag: Tag.VENUS, amount: 2}]);
+
+    player.tagsForTest = {venus: 16};
+    expect(cardsToModel(player, [card])[0].discount).to.deep.eq([{tag: Tag.VENUS, amount: 5}]);
   });
 });

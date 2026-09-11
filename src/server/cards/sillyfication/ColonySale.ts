@@ -13,15 +13,15 @@ export class ColonySale extends Card implements IProjectCard {
     super({
       type: CardType.AUTOMATED,
       name: CardName.COLONY_SALE,
-      cost: 4,
+      cost: 5,
 
       requirements: {colonies: 1},
       metadata: {
         cardNumber: 'X54',
         renderData: CardRenderer.builder((b) => {
-          b.colonyTile().arrow().megacredits(5);
+          b.colonyTile().arrow().megacredits(17);
         }),
-        description: 'Requires that you have a colony. Sell one of your colonies for 5 M€. The tile keeps the spot occupied - a neutral colony takes it, and it does nothing.',
+        description: 'Requires that you have a colony. Sell one of your colonies for 17 M€. The tile keeps the spot occupied - a neutral colony takes it, and it does nothing.',
       },
     });
   }
@@ -35,7 +35,7 @@ export class ColonySale extends Card implements IProjectCard {
           colony.colonies[idx] = NEUTRAL_COLONY_OWNER;
         }
         player.game.log('${0} sold their colony on ${1} - a neutral colony takes the spot', (b) => b.player(player).colony(colony));
-        player.stock.add(Resource.MEGACREDITS, 5, {log: true, from: {card: this}});
+        player.stock.add(Resource.MEGACREDITS, 17, {log: true, from: {card: this}});
         return undefined;
       });
   }

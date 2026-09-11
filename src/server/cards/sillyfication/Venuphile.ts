@@ -15,10 +15,6 @@ export class Venuphile extends Card implements IProjectCard {
       cost: 17,
       victoryPoints: 1,
 
-      // A static cap, purely so this shows up alongside other cards' discounts in the
-      // Venus tag's discount badge; the real, dynamic amount is computed below.
-      cardDiscount: {tag: Tag.VENUS, amount: 5, per: 'card'},
-
       metadata: {
         cardNumber: 'T03',
         renderData: CardRenderer.builder((b) => {

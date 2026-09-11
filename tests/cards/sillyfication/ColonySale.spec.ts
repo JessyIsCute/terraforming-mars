@@ -51,7 +51,7 @@ describe('ColonySale', () => {
     expect(selectColony.colonies).deep.eq([ganymede]);
   });
 
-  it('sells the colony for 5 M€ and leaves the slot occupied by a neutral colony', () => {
+  it('sells the colony for 17 M€ and leaves the slot occupied by a neutral colony', () => {
     ganymede.colonies = [player2.id, player.id];
     const mcBefore = player.megaCredits;
 
@@ -59,7 +59,7 @@ describe('ColonySale', () => {
     selectColony.cb(ganymede);
     runAllActions(game);
 
-    expect(player.megaCredits).eq(mcBefore + 5);
+    expect(player.megaCredits).eq(mcBefore + 17);
     // The slot count is unchanged (still taken) - only the owner is gone.
     expect(ganymede.colonies).deep.eq([player2.id, NEUTRAL_COLONY_OWNER]);
   });

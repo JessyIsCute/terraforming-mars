@@ -36,8 +36,4 @@ describe('Venuphile', () => {
 
     expect(card.getCardDiscount(player, venusCard)).to.eq(5);
   });
-
-  it('declares a static Venus card discount for the tag-discount badge', () => {
-    expect(card.cardDiscount).to.deep.eq({tag: Tag.VENUS, amount: 5, per: 'card'});
-  });
 });
