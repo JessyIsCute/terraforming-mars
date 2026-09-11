@@ -6,35 +6,35 @@ import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
-/** Late-game tier (unlocks generation 7+): a big lump-sum heat-to-M€ conversion -- distinct from Geothermal Kickback's smaller M€ *production* by paying out a one-time windfall instead. */
-export class VentTapSyndicate extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.VENT_TAP_SYNDICATE, heat: number = 4) {
+/** Late-game tier (unlocks generation 7+): a big heat-to-energy-production conversion. */
+export class IllicitFusionPlant extends Card implements IProjectCard {
+  constructor(name: CardName = CardName.ILLICIT_FUSION_PLANT, heat: number = 5) {
     super({
       name,
       type: CardType.AUTOMATED,
-      tags: [Tag.POWER],
+      tags: [Tag.POWER, Tag.BUILDING],
       cost: 0,
       reserveUnits: {heat},
       victoryPoints: -2,
 
       behavior: {
-        stock: {megacredits: 14},
+        production: {energy: 3},
       },
 
       metadata: {
-        cardNumber: 'BM22',
+        cardNumber: 'BM40',
         renderData: CardRenderer.builder((b) => {
           b.minus().heat(heat, {digit}).plainText(`Spend ${heat} heat.`, /** parens */ true).br;
-          b.megacredits(14);
+          b.production((pb) => pb.energy(3));
         }),
-        description: `Spend ${heat} heat. Gain 14 M€.`,
+        description: `Spend ${heat} heat. Raise your energy production 3 steps (an unlicensed fusion core, running hotter than it should).`,
       },
     });
   }
 }
 
-export class VentTapSyndicateII extends VentTapSyndicate {
+export class IllicitFusionPlantII extends IllicitFusionPlant {
   constructor() {
-    super(CardName.VENT_TAP_SYNDICATE_II, 5);
+    super(CardName.ILLICIT_FUSION_PLANT_II, 6);
   }
 }

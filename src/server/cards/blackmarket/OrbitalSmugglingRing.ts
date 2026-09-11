@@ -18,16 +18,15 @@ export class OrbitalSmugglingRing extends ActionCard implements IProjectCard {
       action: {
         spend: {titanium: 1},
         global: {venus: 1},
-        stock: {megacredits: 2},
       },
 
       metadata: {
         cardNumber: 'BM28',
         renderData: CardRenderer.builder((b) => {
-          b.action('Spend 1 titanium to raise Venus 1 step and gain 2 M€.',
-            (eb) => eb.startAction.titanium(1).arrow().venus(1).nbsp.megacredits(2));
+          b.action('Spend 1 titanium to raise Venus 1 step.',
+            (eb) => eb.startAction.titanium(1).arrow().venus(1));
         }),
-        description: 'Spend 1 titanium to raise Venus 1 step and gain 2 M€ (smuggle contraband into Venus\'s cloud cities).',
+        description: 'Spend 1 titanium to raise Venus 1 step (smuggle contraband into Venus\'s cloud cities).',
       },
     });
   }
@@ -36,11 +35,5 @@ export class OrbitalSmugglingRing extends ActionCard implements IProjectCard {
 export class OrbitalSmugglingRingII extends OrbitalSmugglingRing {
   constructor() {
     super(CardName.ORBITAL_SMUGGLING_RING_II, 10);
-  }
-}
-
-export class OrbitalSmugglingRingIII extends OrbitalSmugglingRing {
-  constructor() {
-    super(CardName.ORBITAL_SMUGGLING_RING_III, 11);
   }
 }

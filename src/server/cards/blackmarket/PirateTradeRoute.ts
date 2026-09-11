@@ -43,3 +43,9 @@ export class PirateTradeRouteIII extends PirateTradeRoute {
     super(CardName.PIRATE_TRADE_ROUTE_III, 3);
   }
 }
+
+export class PirateTradeRouteIV extends PirateTradeRoute {
+  constructor() {
+    super(CardName.PIRATE_TRADE_ROUTE_IV, 4);
+  }
+}

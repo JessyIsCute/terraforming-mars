@@ -40,3 +40,9 @@ export class BootlegTerraformingFormulaIII extends BootlegTerraformingFormula {
     super(CardName.BOOTLEG_TERRAFORMING_FORMULA_III, 6);
   }
 }
+
+export class BootlegTerraformingFormulaIV extends BootlegTerraformingFormula {
+  constructor() {
+    super(CardName.BOOTLEG_TERRAFORMING_FORMULA_IV, 7);
+  }
+}

@@ -41,3 +41,9 @@ export class UndergroundCasinoIII extends UndergroundCasino {
     super(CardName.UNDERGROUND_CASINO_III, 12);
   }
 }
+
+export class UndergroundCasinoIV extends UndergroundCasino {
+  constructor() {
+    super(CardName.UNDERGROUND_CASINO_IV, 13);
+  }
+}

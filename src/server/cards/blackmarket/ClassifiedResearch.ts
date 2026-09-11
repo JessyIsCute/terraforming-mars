@@ -41,3 +41,9 @@ export class ClassifiedResearchIII extends ClassifiedResearch {
     super(CardName.CLASSIFIED_RESEARCH_III, 9);
   }
 }
+
+export class ClassifiedResearchIV extends ClassifiedResearch {
+  constructor() {
+    super(CardName.CLASSIFIED_RESEARCH_IV, 10);
+  }
+}

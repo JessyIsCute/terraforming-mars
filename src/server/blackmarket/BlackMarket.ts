@@ -136,9 +136,10 @@ export class BlackMarket {
     return BlackMarket.buildSlot(designIndex, 0);
   }
 
-  /** After a purchase: the same design's next printing if the stack isn't exhausted yet, otherwise a fresh design from the same row (or empty, if none remain). */
+  /** After a purchase: the same design's next printing if the stack isn't exhausted yet, otherwise a fresh design from the same row (or empty, if none remain). Stack depth varies by tier (early=4, mid=3, late=2 printings), so this reads the design's own printings length rather than assuming 3. */
   private static nextSlot(row: BlackMarketRowData, bought: NonNullable<BlackMarketSlot>): BlackMarketSlot {
-    if (bought.variantIndex < 2) {
+    const design = BLACK_MARKET_DESIGNS[bought.designIndex];
+    if (bought.variantIndex < design.printings.length - 1) {
       return BlackMarket.buildSlot(bought.designIndex, bought.variantIndex + 1);
     }
     return BlackMarket.startStack(row);

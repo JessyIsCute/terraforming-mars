@@ -41,3 +41,9 @@ export class UraniumSmuggleIII extends UraniumSmuggle {
     super(CardName.URANIUM_SMUGGLE_III, 10);
   }
 }
+
+export class UraniumSmuggleIV extends UraniumSmuggle {
+  constructor() {
+    super(CardName.URANIUM_SMUGGLE_IV, 11);
+  }
+}

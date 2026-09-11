@@ -38,9 +38,3 @@ export class BlackMarketTerraformerII extends BlackMarketTerraformer {
     super(CardName.BLACK_MARKET_TERRAFORMER_II, 6);
   }
 }
-
-export class BlackMarketTerraformerIII extends BlackMarketTerraformer {
-  constructor() {
-    super(CardName.BLACK_MARKET_TERRAFORMER_III, 7);
-  }
-}

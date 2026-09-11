@@ -43,3 +43,9 @@ export class CounterfeitCertificatesIII extends CounterfeitCertificates {
     super(CardName.COUNTERFEIT_CERTIFICATES_III, 3);
   }
 }
+
+export class CounterfeitCertificatesIV extends CounterfeitCertificates {
+  constructor() {
+    super(CardName.COUNTERFEIT_CERTIFICATES_IV, 4);
+  }
+}

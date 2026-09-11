@@ -43,3 +43,9 @@ export class SmuggledReactorCoreIII extends SmuggledReactorCore {
     super(CardName.SMUGGLED_REACTOR_CORE_III, 3);
   }
 }
+
+export class SmuggledReactorCoreIV extends SmuggledReactorCore {
+  constructor() {
+    super(CardName.SMUGGLED_REACTOR_CORE_IV, 4);
+  }
+}

@@ -43,3 +43,9 @@ export class IllicitMiningOpIII extends IllicitMiningOp {
     super(CardName.ILLICIT_MINING_OP_III, 3, 6);
   }
 }
+
+export class IllicitMiningOpIV extends IllicitMiningOp {
+  constructor() {
+    super(CardName.ILLICIT_MINING_OP_IV, 4, 7);
+  }
+}

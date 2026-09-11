@@ -43,3 +43,9 @@ export class StolenBlueprintsIII extends StolenBlueprints {
     super(CardName.STOLEN_BLUEPRINTS_III, 3);
   }
 }
+
+export class StolenBlueprintsIV extends StolenBlueprints {
+  constructor() {
+    super(CardName.STOLEN_BLUEPRINTS_IV, 4);
+  }
+}

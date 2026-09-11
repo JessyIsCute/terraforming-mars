@@ -44,3 +44,9 @@ export class BlackIceHackerIII extends BlackIceHacker {
     super(CardName.BLACK_ICE_HACKER_III, 4);
   }
 }
+
+export class BlackIceHackerIV extends BlackIceHacker {
+  constructor() {
+    super(CardName.BLACK_ICE_HACKER_IV, 5);
+  }
+}

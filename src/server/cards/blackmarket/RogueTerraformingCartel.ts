@@ -38,9 +38,3 @@ export class RogueTerraformingCartelII extends RogueTerraformingCartel {
     super(CardName.ROGUE_TERRAFORMING_CARTEL_II, 5);
   }
 }
-
-export class RogueTerraformingCartelIII extends RogueTerraformingCartel {
-  constructor() {
-    super(CardName.ROGUE_TERRAFORMING_CARTEL_III, 6);
-  }
-}

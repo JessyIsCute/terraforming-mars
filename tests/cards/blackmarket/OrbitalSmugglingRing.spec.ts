@@ -31,15 +31,13 @@ describe('OrbitalSmugglingRing', () => {
     expect(card.canAct(player)).is.true;
   });
 
-  it('action spends 1 titanium, raises Venus 1 step, and gains 2 M€', () => {
+  it('action spends 1 titanium and raises Venus 1 step', () => {
     player.titanium = 1;
-    const beforeMc = player.megaCredits;
     const beforeVenus = game.getVenusScaleLevel();
 
     card.action(player);
 
     expect(player.titanium).to.eq(0);
-    expect(player.megaCredits).to.eq(beforeMc + 2);
     expect(game.getVenusScaleLevel()).to.eq(beforeVenus + 2);
   });
 });

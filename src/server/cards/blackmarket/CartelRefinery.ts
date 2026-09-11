@@ -12,7 +12,7 @@ export class CartelRefinery extends Card implements IProjectCard {
     super({
       name,
       type: CardType.AUTOMATED,
-      tags: [Tag.POWER, Tag.PLANT],
+      tags: [Tag.PLANT],
       cost,
       reserveUnits: {steel},
       victoryPoints: -2,
@@ -37,11 +37,5 @@ export class CartelRefinery extends Card implements IProjectCard {
 export class CartelRefineryII extends CartelRefinery {
   constructor() {
     super(CardName.CARTEL_REFINERY_II, 2, 4);
-  }
-}
-
-export class CartelRefineryIII extends CartelRefinery {
-  constructor() {
-    super(CardName.CARTEL_REFINERY_III, 3, 5);
   }
 }

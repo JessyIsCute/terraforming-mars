@@ -43,3 +43,9 @@ export class PoachedSpecimensIII extends PoachedSpecimens {
     super(CardName.POACHED_SPECIMENS_III, 9);
   }
 }
+
+export class PoachedSpecimensIV extends PoachedSpecimens {
+  constructor() {
+    super(CardName.POACHED_SPECIMENS_IV, 10);
+  }
+}

@@ -38,9 +38,3 @@ export class BlacksiteExcavationII extends BlacksiteExcavation {
     super(CardName.BLACKSITE_EXCAVATION_II, 2);
   }
 }
-
-export class BlacksiteExcavationIII extends BlacksiteExcavation {
-  constructor() {
-    super(CardName.BLACKSITE_EXCAVATION_III, 3);
-  }
-}

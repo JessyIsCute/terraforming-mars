@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {BlackMarket} from '@/server/blackmarket/BlackMarket';
 import {BLACK_MARKET_ROW_SLOT_COUNT} from '@/server/blackmarket/BlackMarketData';
 import {BLACK_MARKET_DESIGNS} from '@/server/cards/blackmarket/BlackMarketCardManifest';
-import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII} from '@/server/cards/blackmarket/SmuggledReactorCore';
+import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII, SmuggledReactorCoreIV} from '@/server/cards/blackmarket/SmuggledReactorCore';
 import {CounterfeitCertificates} from '@/server/cards/blackmarket/CounterfeitCertificates';
 import {OreForOxygenRacket} from '@/server/cards/blackmarket/OreForOxygenRacket';
 import {CardName} from '@/common/cards/CardName';
@@ -118,28 +118,30 @@ describe('BlackMarket', () => {
     }
   });
 
-  it('doing the whole stack (3 printings) never collides, then rotates to a new design within the same tier', () => {
+  it('doing the whole stack (4 printings) never collides, then rotates to a new design within the same tier', () => {
     const data = game.blackMarketData!;
     data.early.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
-    // Only this design is left in the queue, so the slot goes empty once its stack (3 printings) is exhausted.
+    // Only this design is left in the queue, so the slot goes empty once its stack (4 printings) is exhausted.
     data.early.designQueue = [];
     player.titanium = 100;
 
     expect(() => {
       BlackMarket.buy(game, player, 'early', 0); // variant 0 -> 1
       BlackMarket.buy(game, player, 'early', 0); // variant 1 -> 2
-      BlackMarket.buy(game, player, 'early', 0); // variant 2 -> stack exhausted, no design left
+      BlackMarket.buy(game, player, 'early', 0); // variant 2 -> 3
+      BlackMarket.buy(game, player, 'early', 0); // variant 3 -> stack exhausted, no design left
     }).to.not.throw();
 
     expect(player.playedCards.has(CardName.SMUGGLED_REACTOR_CORE)).is.true;
     expect(player.playedCards.has(CardName.SMUGGLED_REACTOR_CORE_II)).is.true;
     expect(player.playedCards.has(CardName.SMUGGLED_REACTOR_CORE_III)).is.true;
+    expect(player.playedCards.has(CardName.SMUGGLED_REACTOR_CORE_IV)).is.true;
     expect(data.early.slots[0]).is.undefined;
   });
 
   it('rotates to a fresh design once a stack empties, if one remains in the queue', () => {
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new SmuggledReactorCore(CardName.SMUGGLED_REACTOR_CORE_III, 3), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 2};
+    data.early.slots[0] = {card: new SmuggledReactorCoreIV(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 3};
     data.early.designQueue = [COUNTERFEIT_CERTIFICATES_DESIGN];
     player.titanium = 4;
 

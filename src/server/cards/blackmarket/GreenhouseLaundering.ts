@@ -38,9 +38,3 @@ export class GreenhouseLaunderingII extends GreenhouseLaundering {
     super(CardName.GREENHOUSE_LAUNDERING_II, 7, 9);
   }
 }
-
-export class GreenhouseLaunderingIII extends GreenhouseLaundering {
-  constructor() {
-    super(CardName.GREENHOUSE_LAUNDERING_III, 8, 10);
-  }
-}
