@@ -15,13 +15,13 @@ describe('BlackIceHacker', () => {
 
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.SCIENCE]);
-    expect(card.cost).to.eq(0);
-    expect(card.reserveUnits).deep.include({energy: 3});
+    expect(card.cost).to.eq(1);
+    expect(card.reserveUnits).deep.include({energy: 2});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play spends 3 energy, draws a card, and gains 2 M€', () => {
-    player.energy = 3;
+  it('play spends 2 energy, draws a card, and gains 2 M€', () => {
+    player.energy = 2;
     const beforeMc = player.megaCredits;
     expect(player.cardsInHand).has.lengthOf(0);
 

@@ -5,26 +5,13 @@ import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 
-export const CLASSIFIED_RESEARCH_MIN_COST = 7;
-export const CLASSIFIED_RESEARCH_MAX_COST = 9;
-
-/**
- * A variable-cost Black Market design: the price shown here (7) is only the default used
- * when reconstructed with no override (e.g. on game reload) -- `BlackMarket.ts` rolls the
- * real price once, at deal time, via the `cost` constructor param, and it's exposed through
- * an overridden `cost` getter so it never touches `Card.ts`'s shared, `CardName`-keyed
- * properties cache (which would otherwise make every future instance of this printing reuse
- * whichever cost happened to be rolled first).
- */
 export class ClassifiedResearch extends Card implements IProjectCard {
-  private readonly rolledCost: number;
-
-  constructor(name: CardName = CardName.CLASSIFIED_RESEARCH, cost: number = CLASSIFIED_RESEARCH_MIN_COST) {
+  constructor(name: CardName = CardName.CLASSIFIED_RESEARCH, cost: number = 7) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE, Tag.SCIENCE],
-      cost: 0,
+      cost,
       victoryPoints: -1,
 
       behavior: {
@@ -39,23 +26,18 @@ export class ClassifiedResearch extends Card implements IProjectCard {
         description: 'Draw a card.',
       },
     });
-    this.rolledCost = cost;
-  }
-
-  public override get cost(): number {
-    return this.rolledCost;
   }
 }
 
 /** A second "printing" of Classified Research -- see CardName.ts's Black Market comment for why. */
 export class ClassifiedResearchII extends ClassifiedResearch {
   constructor() {
-    super(CardName.CLASSIFIED_RESEARCH_II);
+    super(CardName.CLASSIFIED_RESEARCH_II, 8);
   }
 }
 
 export class ClassifiedResearchIII extends ClassifiedResearch {
   constructor() {
-    super(CardName.CLASSIFIED_RESEARCH_III);
+    super(CardName.CLASSIFIED_RESEARCH_III, 9);
   }
 }

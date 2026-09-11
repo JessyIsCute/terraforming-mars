@@ -7,12 +7,12 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class BlackIceHacker extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.BLACK_ICE_HACKER, energy: number = 3) {
+  constructor(name: CardName = CardName.BLACK_ICE_HACKER, energy: number = 2) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE],
-      cost: 0,
+      cost: 1,
       reserveUnits: {energy},
       victoryPoints: -1,
 
@@ -35,12 +35,12 @@ export class BlackIceHacker extends Card implements IProjectCard {
 
 export class BlackIceHackerII extends BlackIceHacker {
   constructor() {
-    super(CardName.BLACK_ICE_HACKER_II, 4);
+    super(CardName.BLACK_ICE_HACKER_II, 3);
   }
 }
 
 export class BlackIceHackerIII extends BlackIceHacker {
   constructor() {
-    super(CardName.BLACK_ICE_HACKER_III, 5);
+    super(CardName.BLACK_ICE_HACKER_III, 4);
   }
 }

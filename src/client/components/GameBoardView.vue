@@ -1,5 +1,10 @@
 <!-- Common widgets between player and spectator views -->
 <template>
+  <template v-if="game.blackMarket">
+    <a class="hotkey-target"></a>
+    <BlackMarket :market="game.blackMarket"/>
+  </template>
+
   <a name="board" class="player_home_anchor hotkey-target"></a>
   <Board
     :spaces="game.spaces"
@@ -38,11 +43,6 @@
   <template v-if="game.mutationMarket">
     <a class="hotkey-target"></a>
     <MutationMarket :market="game.mutationMarket"/>
-  </template>
-
-  <template v-if="game.blackMarket">
-    <a class="hotkey-target"></a>
-    <BlackMarket :market="game.blackMarket"/>
   </template>
 
   <div v-if="players.length > 1" class="player_home_block--milestones-and-awards">

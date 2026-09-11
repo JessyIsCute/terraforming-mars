@@ -1,14 +1,28 @@
-// Black Market: a plain, always-full 5-card grid, bought directly for a fixed/rolled price
-// -- no bidding, no mutation/infection layering. Much simpler than MutationMarkets'
-// 3-row layout since there's nothing to visually cover/align against.
+// Black Market: 3 stacked era rows (early/mid/late), each a plain 4-card grid, bought
+// directly for a fixed price -- no bidding, no mutation/infection layering. Mid/late are
+// only rendered once unlocked (BlackMarket.vue's v-if), so this file never needs to know
+// about that -- it just lays out however many rows happen to be present.
 
 @bm-card-width: 180px;
 
 .black-market {
-  display: grid;
-  grid-template-columns: repeat(5, @bm-card-width);
-  gap: 6px;
   margin: 20px 0;
+}
+
+.black-market-row {
+  margin-bottom: 10px;
+}
+
+.black-market-row-label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.black-market-row-slots {
+  display: grid;
+  grid-template-columns: repeat(4, @bm-card-width);
+  gap: 6px;
 }
 
 .black-market-slot {
@@ -32,22 +46,19 @@
   animation: black-market-slide-in-right 0.6s ease-out;
 }
 
-// A dark, dealer's-table look for Black Market cards -- distinct from every other card's
-// light printed-paper background. `.filterDiv` (the card's own outer background gradient,
-// `src/styles/cards.less`) and `.card-title`/`.card-content` (its title bar and effect-text
-// color, `src/styles/cards_v2.less`) are the only pieces that assume a light background;
-// the cost badge, tag icons, and VP badge are all self-contained art/gradients that already
-// read fine over a dark background, so they're deliberately left untouched. The type-colored
-// title ribbon (green for AUTOMATED, orange for EVENT) is also left as-is -- it's still a
-// useful at-a-glance card-type indicator elsewhere in the game.
+// A grey, dealer's-table look for Black Market cards -- distinct from every other card's
+// cream/white printed-paper background (`.filterDiv`, `src/styles/cards.less`). Grey (not
+// dark) is deliberate: the card's own render tree has many small nested elements (requirement
+// badges, render-item text) that print plain black text with no easy single override point,
+// so a grey (rather than dark) background keeps all of that legible without touching it.
+// `.raised-bevel()` (`src/styles/mixins.less`) hardcodes a light near-white top/left border
+// meant for a light card -- overridden to black here so it doesn't stand out as a stray white
+// frame. The cost badge, tag icons, and VP badge are self-contained art/gradients left
+// untouched, as is the type-colored title ribbon (green for AUTOMATED, orange for EVENT) --
+// still a useful at-a-glance card-type indicator elsewhere in the game.
 .black-market-card-theme {
   .filterDiv {
-    background: linear-gradient(to bottom right, #1c0f0f, #2e1616, #1c0f0f, #241212, #1c0f0f);
-  }
-  .card-title {
-    color: #f0e0e0;
-  }
-  .card-content {
-    color: #f0e0e0;
+    background: linear-gradient(to bottom right, #707070, #8c8c8c, #707070, #7a7a7a, #707070);
+    border-color: black;
   }
 }

@@ -10,21 +10,38 @@ describe('BlackMarket', () => {
     expect(wrapper.find('.black-market').exists()).to.be.false;
   });
 
-  it('renders one slot per market card', () => {
+  it('always renders the early row, one slot per card', () => {
     const wrapper = shallowMount(BlackMarket, {
       ...globalConfig,
       props: {
         market: {
-          slots: [
+          early: [
             {name: CardName.SMUGGLED_REACTOR_CORE},
             {name: CardName.STOLEN_BLUEPRINTS},
             undefined,
             undefined,
-            undefined,
           ],
+          mid: undefined,
+          late: undefined,
         },
       },
     });
-    expect(wrapper.findAllComponents({name: 'BlackMarketSlot'})).to.have.lengthOf(5);
+    expect(wrapper.findAllComponents({name: 'BlackMarketSlot'})).to.have.lengthOf(4);
+    expect(wrapper.findAll('.black-market-row')).to.have.lengthOf(1);
+  });
+
+  it('renders the mid row once unlocked, and the late row only once that unlocks too', () => {
+    const wrapper = shallowMount(BlackMarket, {
+      ...globalConfig,
+      props: {
+        market: {
+          early: [{name: CardName.SMUGGLED_REACTOR_CORE}, undefined, undefined, undefined],
+          mid: [{name: CardName.ORE_FOR_OXYGEN_RACKET}, undefined, undefined, undefined],
+          late: undefined,
+        },
+      },
+    });
+    expect(wrapper.findAll('.black-market-row')).to.have.lengthOf(2);
+    expect(wrapper.findAllComponents({name: 'BlackMarketSlot'})).to.have.lengthOf(8);
   });
 });

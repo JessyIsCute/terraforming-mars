@@ -947,6 +947,7 @@ export class Game implements IGame, Logger {
     this.generation++;
     this.log('Generation ${0}', (b) => b.forNewGeneration().number(this.generation));
     this.setNextFirstPlayer();
+    BlackMarket.onGenerationStart(this);
 
     this.players.forEach((player) => {
       player.hasIncreasedTerraformRatingThisGeneration = false;

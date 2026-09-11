@@ -7,7 +7,7 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class IllicitMiningOp extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.ILLICIT_MINING_OP, energy: number = 2) {
+  constructor(name: CardName = CardName.ILLICIT_MINING_OP, energy: number = 2, steel: number = 4) {
     super({
       name,
       type: CardType.AUTOMATED,
@@ -17,16 +17,16 @@ export class IllicitMiningOp extends Card implements IProjectCard {
       victoryPoints: -1,
 
       behavior: {
-        stock: {steel: 3},
+        stock: {steel},
       },
 
       metadata: {
         cardNumber: 'BM11',
         renderData: CardRenderer.builder((b) => {
           b.minus().energy(energy, {digit}).plainText(`Spend ${energy} energy.`, /** parens */ true).br;
-          b.steel(3);
+          b.steel(steel);
         }),
-        description: `Spend ${energy} energy. Gain 3 steel.`,
+        description: `Spend ${energy} energy. Gain ${steel} steel.`,
       },
     });
   }
@@ -34,12 +34,12 @@ export class IllicitMiningOp extends Card implements IProjectCard {
 
 export class IllicitMiningOpII extends IllicitMiningOp {
   constructor() {
-    super(CardName.ILLICIT_MINING_OP_II, 3);
+    super(CardName.ILLICIT_MINING_OP_II, 3, 5);
   }
 }
 
 export class IllicitMiningOpIII extends IllicitMiningOp {
   constructor() {
-    super(CardName.ILLICIT_MINING_OP_III, 4);
+    super(CardName.ILLICIT_MINING_OP_III, 4, 6);
   }
 }

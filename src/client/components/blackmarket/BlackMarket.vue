@@ -1,9 +1,23 @@
 <template>
   <div v-if="market !== undefined" class="black-market">
-    <BlackMarketSlot
-      v-for="(slot, index) in market.slots"
-      :key="index"
-      :card="slot" />
+    <div class="black-market-row">
+      <div class="black-market-row-label">Early Game</div>
+      <div class="black-market-row-slots">
+        <BlackMarketSlot v-for="(slot, index) in market.early" :key="'early-' + index" :card="slot" />
+      </div>
+    </div>
+    <div v-if="market.mid !== undefined" class="black-market-row">
+      <div class="black-market-row-label">Mid Game</div>
+      <div class="black-market-row-slots">
+        <BlackMarketSlot v-for="(slot, index) in market.mid" :key="'mid-' + index" :card="slot" />
+      </div>
+    </div>
+    <div v-if="market.late !== undefined" class="black-market-row">
+      <div class="black-market-row-label">Late Game</div>
+      <div class="black-market-row-slots">
+        <BlackMarketSlot v-for="(slot, index) in market.late" :key="'late-' + index" :card="slot" />
+      </div>
+    </div>
   </div>
 </template>
 

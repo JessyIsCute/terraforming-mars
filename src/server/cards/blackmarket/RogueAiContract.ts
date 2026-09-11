@@ -5,19 +5,13 @@ import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 
-export const ROGUE_AI_CONTRACT_MIN_COST = 10;
-export const ROGUE_AI_CONTRACT_MAX_COST = 14;
-
-/** Variable-cost design -- see UraniumSmuggle.ts's doc comment for why `cost` is an overridden getter. */
 export class RogueAiContract extends Card implements IProjectCard {
-  private readonly rolledCost: number;
-
-  constructor(name: CardName = CardName.ROGUE_AI_CONTRACT, cost: number = ROGUE_AI_CONTRACT_MIN_COST) {
+  constructor(name: CardName = CardName.ROGUE_AI_CONTRACT, cost: number = 8) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE],
-      cost: 0,
+      cost,
       victoryPoints: -2,
 
       behavior: {
@@ -32,22 +26,17 @@ export class RogueAiContract extends Card implements IProjectCard {
         description: 'Draw 3 cards.',
       },
     });
-    this.rolledCost = cost;
-  }
-
-  public override get cost(): number {
-    return this.rolledCost;
   }
 }
 
 export class RogueAiContractII extends RogueAiContract {
   constructor() {
-    super(CardName.ROGUE_AI_CONTRACT_II);
+    super(CardName.ROGUE_AI_CONTRACT_II, 9);
   }
 }
 
 export class RogueAiContractIII extends RogueAiContract {
   constructor() {
-    super(CardName.ROGUE_AI_CONTRACT_III);
+    super(CardName.ROGUE_AI_CONTRACT_III, 10);
   }
 }

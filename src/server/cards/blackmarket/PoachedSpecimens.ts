@@ -7,26 +7,26 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class PoachedSpecimens extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.POACHED_SPECIMENS, plants: number = 1) {
+  constructor(name: CardName = CardName.POACHED_SPECIMENS, megacredits: number = 7) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.ANIMAL],
       cost: 0,
-      reserveUnits: {plants, energy: 2},
+      reserveUnits: {energy: 1},
       victoryPoints: -1,
 
       behavior: {
-        stock: {megacredits: 6},
+        stock: {megacredits},
       },
 
       metadata: {
         cardNumber: 'BM04',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(plants, {digit}).nbsp.minus().energy(2, {digit}).plainText(`Spend ${plants} plant and 2 energy.`, /** parens */ true).br;
-          b.megacredits(6);
+          b.minus().energy(1, {digit}).plainText('Spend 1 energy.', /** parens */ true).br;
+          b.megacredits(megacredits);
         }),
-        description: `Spend ${plants} plant and 2 energy. Gain 6 M€ (sell poached wildlife on the black market).`,
+        description: `Spend 1 energy. Gain ${megacredits} M€ (sell poached wildlife on the black market).`,
       },
     });
   }
@@ -34,12 +34,12 @@ export class PoachedSpecimens extends Card implements IProjectCard {
 
 export class PoachedSpecimensII extends PoachedSpecimens {
   constructor() {
-    super(CardName.POACHED_SPECIMENS_II, 2);
+    super(CardName.POACHED_SPECIMENS_II, 8);
   }
 }
 
 export class PoachedSpecimensIII extends PoachedSpecimens {
   constructor() {
-    super(CardName.POACHED_SPECIMENS_III, 3);
+    super(CardName.POACHED_SPECIMENS_III, 9);
   }
 }

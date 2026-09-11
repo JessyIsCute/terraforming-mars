@@ -31,6 +31,8 @@ import {SelectOption} from './inputs/SelectOption';
 import {SelectAmount} from './inputs/SelectAmount';
 import {MutationMarkets} from './mutationmarkets/MutationMarkets';
 import {BlackMarket} from './blackmarket/BlackMarket';
+import {BlackMarketSlot} from './blackmarket/BlackMarketData';
+import {BlackMarketTier} from './cards/blackmarket/BlackMarketCardManifest';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -1803,22 +1805,29 @@ export class Player implements IPlayer {
     }
 
     // Black Market: do a project publicly available on the market, resolving it immediately
-    // like playing it from hand, for its own printed price
+    // like playing it from hand, for its own printed price. Rows unlock progressively
+    // (early from the start, mid/late at their generation threshold) -- see BlackMarket.ts.
     const blackMarketData = this.game.blackMarketData;
     if (blackMarketData !== undefined) {
-      const affordableSlots = blackMarketData.slots
-        .map((slot, slotIndex) => ({slot, slotIndex}))
-        .filter(({slot}) => slot !== undefined && slot.card.canPlay(this));
+      const affordableSlots: Array<{tier: BlackMarketTier, slot: NonNullable<BlackMarketSlot>, slotIndex: number}> = [];
+      for (const tier of ['early', 'mid', 'late'] as const) {
+        const row = blackMarketData[tier];
+        if (row === undefined) {
+          continue;
+        }
+        row.slots.forEach((slot, slotIndex) => {
+          if (slot !== undefined && slot.card.canPlay(this)) {
+            affordableSlots.push({tier, slot, slotIndex});
+          }
+        });
+      }
       if (affordableSlots.length > 0) {
         const buyOptions = new OrOptions().setTitle('Do a project on the Black Market');
-        for (const {slot, slotIndex} of affordableSlots) {
-          if (slot === undefined) {
-            continue;
-          }
+        for (const {tier, slot, slotIndex} of affordableSlots) {
           buyOptions.options.push(
             new SelectOption(`Do ${slot.card.name} on the Black Market for ${BlackMarket.describePrice(slot.card)}`, 'Do it')
               .andThen(() => {
-                BlackMarket.buy(this.game, this, slotIndex);
+                BlackMarket.buy(this.game, this, tier, slotIndex);
                 return undefined;
               }));
         }
