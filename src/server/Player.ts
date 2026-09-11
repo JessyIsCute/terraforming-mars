@@ -1816,7 +1816,7 @@ export class Player implements IPlayer {
           continue;
         }
         row.slots.forEach((slot, slotIndex) => {
-          if (slot !== undefined && slot.card.canPlay(this)) {
+          if (slot !== undefined && !row.sold[slotIndex] && BlackMarket.canAfford(this, slot.card)) {
             affordableSlots.push({tier, slot, slotIndex});
           }
         });

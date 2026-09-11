@@ -3,12 +3,12 @@ import {IProjectCard} from '../cards/IProjectCard';
 export const BLACK_MARKET_ROW_SLOT_COUNT = 4;
 
 /**
- * One slot is one design's "stack": `variantIndex` (0,1,2) is which of the design's 3
- * printings is currently on top -- each printing carries its own price on the card itself
- * (`card.cost`/`card.reserveUnits`; see BlackMarketCardManifest.ts's doc comment). Doing the
- * project reveals the SAME design's next printing underneath (variantIndex + 1) until the
- * stack runs out, at which point a fresh, previously-unseen design (from the same tier) takes
- * this slot's place.
+ * One slot tracks one design's printing: `variantIndex` is which of the design's printings
+ * (4/3/2 depending on tier -- see BlackMarketCardManifest.ts) it currently holds. Doing the
+ * project no longer reveals a replacement in the same slot -- the slot just goes empty (see
+ * `BlackMarketRowData.sold`) until the whole row advances at the next generation's end
+ * (`BlackMarket.onGenerationEnd`), at which point every slot -- bought or not -- moves on to
+ * the same design's next printing, or a fresh design once its printings run out.
  */
 export type BlackMarketSlot = {
   card: IProjectCard;
@@ -17,8 +17,15 @@ export type BlackMarketSlot = {
 } | undefined;
 
 export type BlackMarketRowData = {
-  /** Length BLACK_MARKET_ROW_SLOT_COUNT. Always dealt full unless the tier's design pool has been fully exhausted. */
+  /**
+   * Length BLACK_MARKET_ROW_SLOT_COUNT. Keeps tracking a bought slot's design/printing
+   * internally (so `onGenerationEnd` knows what to advance from) even while `sold[i]` hides
+   * it from the market for the rest of the generation. `undefined` only once that slot's
+   * design pool is permanently exhausted.
+   */
   slots: Array<BlackMarketSlot>;
+  /** `sold[i]` is true once `slots[i]` has been bought this generation -- hidden from display/purchase until the next `onGenerationEnd` sweep resets it. */
+  sold: Array<boolean>;
   /** Indices into BLACK_MARKET_DESIGNS (this row's tier only) not yet shown, shuffled once when the row unlocks. */
   designQueue: Array<number>;
 };
@@ -37,6 +44,7 @@ export type BlackMarketData = {
 
 export type SerializedBlackMarketRowData = {
   slots: Array<{designIndex: number, variantIndex: number} | undefined>;
+  sold: Array<boolean>;
   designQueue: Array<number>;
 };
 

@@ -5,6 +5,8 @@ import {newProjectCard} from '../createCard';
 import {isCompatibleWith} from '../cards/CardFactorySpec';
 import {inplaceShuffle} from '../utils/shuffle';
 import {Units} from '../../common/Units';
+import {Payment} from '../../common/inputs/Payment';
+import {MoonExpansion} from '../moon/MoonExpansion';
 import {
   BLACKMARKET_CARD_MANIFEST,
   BLACK_MARKET_DESIGNS,
@@ -32,13 +34,16 @@ const UNIT_LABELS: Record<keyof Units, string> = {
 /**
  * Black Market: a persistent market of bespoke project cards, split into 3 era rows --
  * early (from the start), mid (generation 4+), late (generation 7+) -- each with its own
- * 4-slot stack-based supply, revealed as the game reaches that generation. There's no bidding
- * and no mutation/infection layering (see MutationMarkets for that) -- you just do the
- * project right there, publicly, for its own printed price (M€ via `cost`, everything else
- * via `reserveUnits`, exactly like any other card's play cost). See CardName.ts's Black
- * Market comment and BlackMarketCardManifest.ts's doc comments for how "replayable" (doing
- * the same design more than once) and per-printing pricing are made safe/possible without
- * touching the shared project deck or Card.ts's shared properties cache.
+ * 4-slot supply, revealed as the game reaches that generation. There's no bidding and no
+ * mutation/infection layering (see MutationMarkets for that) -- you just do the project right
+ * there, publicly, for its own printed price (M€ via `cost`, everything else via
+ * `reserveUnits`, exactly like any other card's play cost). A bought slot just goes empty for
+ * the rest of the generation; the whole row -- bought slots and unsold ones alike -- advances
+ * to the next item in its list only at generation end (`onGenerationEnd`, mirroring
+ * MutationMarkets' own end-of-generation refresh). See CardName.ts's Black Market comment and
+ * BlackMarketCardManifest.ts's doc comments for how "replayable" (doing the same design more
+ * than once) and per-printing pricing are made safe/possible without touching the shared
+ * project deck or Card.ts's shared properties cache.
  */
 export class BlackMarket {
   private constructor() {}
@@ -69,21 +74,73 @@ export class BlackMarket {
   }
 
   /**
-   * Does the project at `tier`/`slotIndex` for `player`: `player.playCard` enforces and
-   * deducts both the M€ `cost` and the non-M€ `reserveUnits` bundle (no substitution) exactly
-   * like playing any other card, then resolves its behavior and adds it to the player's
-   * tableau. The same design's next printing (a fresh instance, distinct CardName -- see
-   * BlackMarketData.ts) takes over the slot, or a new design (same tier) if the stack just
-   * ran out.
+   * Called as the current generation ends, before `onGenerationStart` runs for the next one --
+   * mirrors MutationMarkets' own generation-end refresh. Every slot in every unlocked row
+   * advances to the next item in its list (the same design's next printing, or a fresh design
+   * once its printings run out), whether that slot was bought this generation or just sat
+   * there unsold -- and a bought (`sold`) slot reappears for the new generation.
+   */
+  public static onGenerationEnd(game: IGame): void {
+    const data = game.blackMarketData;
+    if (data === undefined) {
+      return;
+    }
+    BlackMarket.advanceRow(data.early);
+    if (data.mid !== undefined) {
+      BlackMarket.advanceRow(data.mid);
+    }
+    if (data.late !== undefined) {
+      BlackMarket.advanceRow(data.late);
+    }
+  }
+
+  private static advanceRow(row: BlackMarketRowData): void {
+    for (let i = 0; i < row.slots.length; i++) {
+      const current = row.slots[i];
+      row.slots[i] = current === undefined ? undefined : BlackMarket.nextSlot(row, current);
+      row.sold[i] = false;
+    }
+  }
+
+  /**
+   * Whether `player` can do `card` right now: the card's own normal requirements (tags,
+   * production/global-parameter gates, etc. -- `Card.canPlay`) plus a plain, no-substitution
+   * balance check against its real price -- `getCardCost` (M€, after any discounts like
+   * Corrupt Office's) and its `reserveUnits` bundle (adjusted for Moon habitat rates, same as
+   * a normal play). Deliberately bypasses `Player.canPlay`'s usual alternate-payment options
+   * (Building-tag steel, Space-tag titanium, etc.) -- Black Market prices are meant to be paid
+   * exactly as printed, and mixing in substitution here would let this check say "affordable"
+   * while `buy`'s straight M€ `Payment` below still comes up short.
+   */
+  public static canAfford(player: IPlayer, card: IProjectCard): boolean {
+    const cost = player.getCardCost(card);
+    const reserveUnits = MoonExpansion.adjustedReserveCosts(player, card);
+    if (!player.stock.has(Units.of({...reserveUnits, megacredits: cost}))) {
+      return false;
+    }
+    return card.canPlay(player, {cost, reserveUnits});
+  }
+
+  /**
+   * Does the project at `tier`/`slotIndex` for `player`: pays the card's own printed price --
+   * `getCardCost` (M€, after any discounts like Corrupt Office's) via a plain `Payment`, plus
+   * the non-M€ `reserveUnits` bundle (no substitution), deducted by the normal play pipeline --
+   * then resolves its behavior and adds it to the player's tableau. The slot just goes empty
+   * (`sold[slotIndex] = true`) for the rest of the generation; it only reappears (as the same
+   * design's next printing, or a fresh design) once the whole row advances at generation end.
    */
   public static buy(game: IGame, player: IPlayer, tier: BlackMarketTier, slotIndex: number): void {
     const row = BlackMarket.rowOrThrow(game, tier);
     const slot = row.slots[slotIndex];
-    if (slot === undefined) {
+    if (slot === undefined || row.sold[slotIndex]) {
       throw new Error(`No Black Market card at ${tier}[${slotIndex}]`);
     }
-    player.playCard(slot.card);
-    row.slots[slotIndex] = BlackMarket.nextSlot(row, slot);
+    if (!BlackMarket.canAfford(player, slot.card)) {
+      throw new Error(`Cannot afford ${slot.card.name}`);
+    }
+    const cost = player.getCardCost(slot.card);
+    player.playCard(slot.card, Payment.of({megacredits: cost}));
+    row.sold[slotIndex] = true;
   }
 
   /** A short, human-readable price label for a card's own printed price, e.g. "2 titanium" or "2 M€, 1 heat". */
@@ -119,6 +176,7 @@ export class BlackMarket {
 
     const row: BlackMarketRowData = {
       slots: new Array(BLACK_MARKET_ROW_SLOT_COUNT).fill(undefined),
+      sold: new Array(BLACK_MARKET_ROW_SLOT_COUNT).fill(false),
       designQueue,
     };
     for (let i = 0; i < BLACK_MARKET_ROW_SLOT_COUNT; i++) {
@@ -178,6 +236,7 @@ export class BlackMarket {
   private static serializeRow(row: BlackMarketRowData): SerializedBlackMarketRowData {
     return {
       slots: row.slots.map((slot) => slot === undefined ? undefined : {designIndex: slot.designIndex, variantIndex: slot.variantIndex}),
+      sold: row.sold,
       designQueue: row.designQueue,
     };
   }
@@ -196,6 +255,7 @@ export class BlackMarket {
   private static deserializeRow(row: SerializedBlackMarketRowData): BlackMarketRowData {
     return {
       slots: row.slots.map((slot) => BlackMarket.deserializeSlot(slot)),
+      sold: row.sold,
       designQueue: row.designQueue,
     };
   }

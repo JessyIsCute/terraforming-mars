@@ -896,6 +896,7 @@ export class Game implements IGame, Logger {
     this.endGenerationForColonies();
     UnderworldExpansion.endGeneration(this);
     MutationMarkets.onGenerationEnd(this);
+    BlackMarket.onGenerationEnd(this);
 
     Turmoil.ifTurmoil(this, (turmoil) => {
       // this.phase = Phase.TURMOIL;

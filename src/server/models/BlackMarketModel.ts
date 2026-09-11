@@ -18,7 +18,7 @@ export function createBlackMarketModel(game: IGame): BlackMarketModel | undefine
 }
 
 function rowModel(row: BlackMarketRowData): BlackMarketRowModel {
-  return row.slots.map((slot) => slotModel(slot?.card));
+  return row.slots.map((slot, index) => row.sold[index] ? undefined : slotModel(slot?.card));
 }
 
 function slotModel(card: IProjectCard | undefined): CardModel | undefined {
