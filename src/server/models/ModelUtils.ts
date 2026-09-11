@@ -40,6 +40,7 @@ export function cardsToModel(
     if (card.name === CardName.VENUPHILE) {
       discount = [{tag: Tag.VENUS, amount: Math.min(Math.floor(player.tags.count(Tag.VENUS) / 2), 5)}];
     }
+    const inSpireResources = card.renderStoredResources?.();
 
     let calculatedCost = card.cost;
     if (options.showCalculatedCost) {
@@ -57,6 +58,7 @@ export function cardsToModel(
       bonusResource: isIProjectCard(card) ? card.bonusResource : undefined,
       discount: discount,
       cloneTag: isICloneTagCard(card) ? card.cloneTag : undefined,
+      inSpireResources,
     };
     if (isIStandardProjectCard(card)) {
       model.standardProjectCanPayWith = card.canPayWith(player);

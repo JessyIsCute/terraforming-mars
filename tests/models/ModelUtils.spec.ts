@@ -4,6 +4,7 @@ import {MutationName} from '../../src/common/mutationmarkets/MutationName';
 import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {Tag} from '../../src/common/cards/Tag';
 import {Venuphile} from '../../src/server/cards/sillyfication/Venuphile';
+import {InSpire} from '../../src/server/cards/pathfinders/InSpire';
 import {fakeCard} from '../TestingUtils';
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
@@ -110,5 +111,20 @@ describe('cardsToModel', () => {
 
     player.tagsForTest = {venus: 16};
     expect(cardsToModel(player, [card])[0].discount).to.deep.eq([{tag: Tag.VENUS, amount: 5}]);
+  });
+
+  it('carries InSpire\'s currently stored resources over to the model, empty by default', () => {
+    const card = new InSpire();
+
+    expect(cardsToModel(player, [card])[0].inSpireResources).to.deep.eq([]);
+
+    card.data = {steel: 1, microbe: 2};
+    const items = cardsToModel(player, [card])[0].inSpireResources;
+    expect(items).has.lengthOf(2);
+  });
+
+  it('leaves inSpireResources undefined for every other card', () => {
+    const card = fakeCard({});
+    expect(cardsToModel(player, [card])[0].inSpireResources).is.undefined;
   });
 });

@@ -11,6 +11,7 @@ import {CardMetadata} from '../cards/CardMetadata';
 import {CardRequirementDescriptor} from '../cards/CardRequirementDescriptor';
 import {MutationName} from '../mutationmarkets/MutationName';
 import {InfectionName} from '../mutationmarkets/InfectionName';
+import {ICardRenderItem} from '../cards/render/Types';
 
 /**
  * The face-of-card data `Card.vue` needs but can't find in the client's compiled static
@@ -57,4 +58,5 @@ export interface CardModel {
     infectionHighlight?: {cost?: boolean, vp?: boolean}; // MutationMarkets: which parts of the card get the infected-red glow
     infectionVictoryPoints?: number; // MutationMarkets: VP penalty from infections, on top of the card's own printed VP formula (and any mutationVictoryPoints)
     infectionNames?: ReadonlyArray<InfectionName>; // MutationMarkets: which infection(s) are applied to this card, so the client can describe their effect(s)
+    inSpireResources?: ReadonlyArray<ICardRenderItem>; // InSpire (Pathfinders): the resources currently stored on this card
 }

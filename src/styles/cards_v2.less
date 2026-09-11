@@ -3219,6 +3219,51 @@ each(@parties, {
   }
 }
 
+// InSpire (Pathfinders): the resources currently stored on this card - a dark strip
+// tucked at the bottom of the card face so it reads as "held here", not as a production
+// change (which uses these same steel/titanium/energy/plants/M€ icons elsewhere).
+.in-spire-resources {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+
+  .card-item-container {
+    display: inline-flex;
+    align-items: center;
+  }
+  // Steel/titanium/energy/plants/M€ ignore the small-size modifier at this item type (see
+  // CardRenderItemComponent's componentClassArray), so their default 30px render size has
+  // to be forced down here instead.
+  .card-resource {
+    width: 16px !important;
+    height: 16px !important;
+    background-size: 16px !important;
+    font-size: 11px !important;
+    line-height: 16px !important;
+    margin: 0 1px !important;
+  }
+  .card-res-amount {
+    color: white;
+    font-size: 11px;
+  }
+}
+.in-spire-resources-label {
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+
 // resources.less also has a variable called resource_types.
 @card_resource_types: microbe, animal, science, floater, fighter, camp,
   asteroid, disease, preservation, data, syndicate-fleet, cube,

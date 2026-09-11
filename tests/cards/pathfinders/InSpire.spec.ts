@@ -10,6 +10,8 @@ import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {OrOptions} from '../../../src/server/inputs/OrOptions';
 import {cast} from '../../../src/common/utils/utils';
+import {CardRenderItemType} from '../../../src/common/cards/render/CardRenderItemType';
+import {CardResource} from '../../../src/common/CardResource';
 
 describe('InSpire', () => {
   let card: InSpire;
@@ -137,6 +139,26 @@ describe('InSpire', () => {
     const options = cast(player.popWaitingFor(), OrOptions);
     options.options[0].cb(); // Add: 1 -> 2
     expect(player.popWaitingFor()).is.undefined;
+  });
+
+  it('a card with two DIFFERENT tags triggers both rules, not just one', () => {
+    card.onCardPlayed(player, fakeCard({tags: [Tag.BUILDING, Tag.SCIENCE]}));
+    runAllActions(game);
+
+    expect(card.data.steel).to.eq(1);
+    expect(card.data.megacredits).to.eq(1);
+  });
+
+  it('renderStoredResources reflects the current data, empty when nothing is stored', () => {
+    expect(card.renderStoredResources()).to.deep.eq([]);
+
+    card.onCardPlayed(player, fakeCard({tags: [Tag.BUILDING, Tag.MICROBE]}));
+    runAllActions(game);
+
+    const items = card.renderStoredResources();
+    expect(items).has.lengthOf(2);
+    expect(items[0]).to.include({type: CardRenderItemType.STEEL, amount: 1});
+    expect(items[1]).to.include({type: CardRenderItemType.RESOURCE, amount: 1, resource: CardResource.MICROBE});
   });
 
   it('the Science tag redistributes into M€ production', () => {

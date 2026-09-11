@@ -13,6 +13,9 @@ import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
 import {Priority} from '../../deferredActions/Priority';
 import {Size} from '../../../common/cards/render/Size';
 import {digit} from '../Options';
+import {CardRenderItem} from '../render/CardRenderItem';
+import {CardRenderItemType} from '../../../common/cards/render/CardRenderItemType';
+import {ICardRenderItem} from '../../../common/cards/render/Types';
 
 type ResourceKey = 'steel' | 'titanium' | 'energy' | 'plants' | 'megacredits' | 'microbe' | 'animal' | 'data' | 'floater';
 
@@ -47,6 +50,14 @@ const CARD_RESOURCE: Partial<Record<ResourceKey, CardResource>> = {
   animal: CardResource.ANIMAL,
   data: CardResource.DATA,
   floater: CardResource.FLOATER,
+};
+
+const STANDARD_ITEM_TYPE: Partial<Record<ResourceKey, CardRenderItemType>> = {
+  steel: CardRenderItemType.STEEL,
+  titanium: CardRenderItemType.TITANIUM,
+  energy: CardRenderItemType.ENERGY,
+  plants: CardRenderItemType.PLANTS,
+  megacredits: CardRenderItemType.MEGACREDITS,
 };
 
 const MAX_PER_TYPE = 2;
@@ -107,6 +118,36 @@ export class InSpire extends CorporationCard implements ICorporationCard {
 
   private setStored(key: ResourceKey, value: number): void {
     this.data = {...this.getCounts(), [key]: value};
+  }
+
+  /** The resources currently stored on this card, as render items - shown directly on the
+   * card face in the client (see ModelUtils.ts / CardExtraContent.vue), since otherwise
+   * there's no way for a player to see what this card is currently holding. */
+  public renderStoredResources(): ReadonlyArray<ICardRenderItem> {
+    const items: Array<ICardRenderItem> = [];
+    for (const rule of RULES) {
+      const stored = this.getStored(rule.key);
+      if (stored === 0) {
+        continue;
+      }
+      const itemType = STANDARD_ITEM_TYPE[rule.key];
+      if (itemType !== undefined) {
+        const item = new CardRenderItem(itemType, stored, {size: Size.SMALL});
+        if (rule.key === 'megacredits') {
+          // Match the .megacredits() builder: show the count inside the coin, not as
+          // repeated icons.
+          item.amountInside = true;
+          item.showDigit = undefined;
+        }
+        items.push(item);
+        continue;
+      }
+      const cardResource = CARD_RESOURCE[rule.key];
+      if (cardResource !== undefined) {
+        items.push(new CardRenderItem(CardRenderItemType.RESOURCE, stored, {size: Size.SMALL, resource: cardResource}));
+      }
+    }
+    return items;
   }
 
   private canRedistribute(player: IPlayer, key: ResourceKey): boolean {

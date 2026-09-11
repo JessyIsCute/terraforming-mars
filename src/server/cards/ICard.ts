@@ -18,6 +18,7 @@ import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescr
 import {OneOrArray} from '../../common/utils/types';
 import {JSONValue} from '../../common/Types';
 import {IStandardProjectCard} from './IStandardProjectCard';
+import {ICardRenderItem} from '../../common/cards/render/Types';
 import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
 import {AppliedInfection} from '../../common/mutationmarkets/AppliedInfection';
 import {Warning} from '../../common/cards/Warning';
@@ -239,6 +240,13 @@ export interface ICard {
   /** The card's repeatable action, as data - distinct from `action()`, the callable method
    * (only present on IActionCard) that behavior actually executes. */
   readonly actionBehavior?: Behavior,
+
+  /**
+   * Render items describing resources currently stored on this card, for cards (like
+   * InSpire) whose stored-resource state isn't just `resourceCount`/`resourceType` and so
+   * doesn't otherwise show up anywhere in the client - see ModelUtils.ts / CardModel.
+   */
+  renderStoredResources?(): ReadonlyArray<ICardRenderItem>,
 
   /**
    * Returns the contents of the card's production box.
