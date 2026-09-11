@@ -87,14 +87,45 @@ describe('CardMaker', () => {
     expect(vm.compatibility).to.include('pathfinders');
   });
 
-  it('does not duplicate an auto-enabled compatibility on a second copy of the tag, and does not remove it when the tag is removed', async () => {
+  it('does not duplicate an auto-enabled compatibility on a second copy of the tag, and keeps it while any instance of the tag remains', async () => {
     const wrapper = shallowMount(CardMaker, {...globalConfig});
     const vm = wrapper.vm as any;
     vm.addTag(Tag.CRIME);
     vm.addTag(Tag.CRIME);
     vm.removeTag(Tag.CRIME);
     await wrapper.vm.$nextTick();
+    expect(vm.tagCount(Tag.CRIME)).eq(1);
     expect(vm.compatibility.filter((e: string) => e === 'underworld')).to.deep.eq(['underworld']);
+  });
+
+  it('removing the last instance of a tag that implied an expansion disables that compatibility again', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.CRIME);
+    vm.removeTag(Tag.CRIME);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.not.include('underworld');
+  });
+
+  it('does not disable an unrelated, manually-picked compatibility when removing a tag', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.compatibility.push('venus');
+    vm.addTag(Tag.CRIME);
+    vm.removeTag(Tag.CRIME);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.deep.eq(['venus']);
+  });
+
+  it('adding the Venus tag auto-enables Venus compatibility', async () => {
+    const wrapper = shallowMount(CardMaker, {...globalConfig});
+    const vm = wrapper.vm as any;
+    vm.addTag(Tag.VENUS);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.include('venus');
+    vm.removeTag(Tag.VENUS);
+    await wrapper.vm.$nextTick();
+    expect(vm.compatibility).to.not.include('venus');
   });
 
   it('a curated stock effect becomes part of the behavior', async () => {
