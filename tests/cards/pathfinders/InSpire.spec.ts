@@ -58,10 +58,11 @@ describe('InSpire', () => {
     runAllActions(game);
     // At the cap, "add" is no longer legal - only "take" is, so it resolves without a choice.
     expect(player.popWaitingFor()).is.undefined;
-    expect(player.production.steel).eq(1);
+    expect(player.steel).eq(1);
+    expect(player.production.steel).eq(0);
   });
 
-  it('redistributing a standard-resource type increases production', () => {
+  it('redistributing a standard-resource type gives stock, never production', () => {
     card.onCardPlayed(player, fakeCard({tags: [Tag.POWER]}));
     runAllActions(game); // auto-add energy: 0 -> 1
 
@@ -70,7 +71,8 @@ describe('InSpire', () => {
     const options = cast(player.popWaitingFor(), OrOptions);
     options.options[1].cb(); // Take
 
-    expect(player.production.energy).eq(1);
+    expect(player.energy).eq(1);
+    expect(player.production.energy).eq(0);
   });
 
   it('redistributing a card-resource type adds it to an eligible played card', () => {
@@ -161,16 +163,18 @@ describe('InSpire', () => {
     expect(items[1]).to.include({type: CardRenderItemType.RESOURCE, amount: 1, resource: CardResource.MICROBE});
   });
 
-  it('the Science tag redistributes into M€ production', () => {
+  it('the Science tag redistributes into M€ stock, not production', () => {
     card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
     runAllActions(game); // auto-add: 0 -> 1
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.SCIENCE]}));
     runAllActions(game);
     const options = cast(player.popWaitingFor(), OrOptions);
-    const before = player.production.megacredits;
+    const before = player.megaCredits;
+    const productionBefore = player.production.megacredits;
     options.options[1].cb(); // Take
 
-    expect(player.production.megacredits).eq(before + 1);
+    expect(player.megaCredits).eq(before + 1);
+    expect(player.production.megacredits).eq(productionBefore);
   });
 });

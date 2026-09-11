@@ -66,8 +66,9 @@ const MAX_PER_TYPE = 2;
  * tag (Building/steel, Space/titanium, Power/energy, Plant/plants, Microbe, Animal,
  * Science/M€, Mars/data, Jovian-or-Venus/floater). Whenever a played card carries one of
  * these tags, its owner either banks a unit of the matching type on this card, or (once
- * this card holds at least one) cashes one out - onto production for the five
- * stock-resource types, or onto an eligible card for the four card-resource types. */
+ * this card holds at least one) cashes one out - straight into stock for the five
+ * standard-resource types (never production), or onto an eligible card for the four
+ * card-resource types. */
 export class InSpire extends CorporationCard implements ICorporationCard {
   public data: Partial<Record<ResourceKey, number>> = {};
 
@@ -83,7 +84,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
 
       metadata: {
         cardNumber: 'PfC98', // Renumber
-        description: 'You start with 43 M€ and 3 M€ production. When you play a given tag, put a corresponding resource on this card, or (if it already has one) take a corresponding resource from this card and put it on a card you play or on the production board - or, if you cannot, on any other eligible card. You can keep at most 2 resources of a given type on this card.',
+        description: 'You start with 43 M€ and 3 M€ production. When you play a given tag, put a corresponding resource on this card, or (if it already has one) take a corresponding resource from this card and gain it - or, for microbes/animals/data/floaters, add it to an eligible card instead. You can keep at most 2 resources of a given type on this card.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(43, {digit}).nbsp.production((pb) => pb.megacredits(3)).br;
           b.corpBox('effect', (ce) => {
@@ -169,7 +170,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
 
     const standardResource = STANDARD_RESOURCE[rule.key];
     if (standardResource !== undefined) {
-      player.production.add(standardResource, 1, {log: true});
+      player.stock.add(standardResource, 1, {log: true});
       return;
     }
     const cardResource = CARD_RESOURCE[rule.key];
