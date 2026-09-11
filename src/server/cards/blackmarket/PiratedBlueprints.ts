@@ -24,7 +24,6 @@ export class PiratedBlueprints extends Card implements IProjectCard {
             eb.tag(Tag.BUILDING).startEffect.megacredits(-1);
           });
         }),
-        description: 'When you play a Building tag, you pay 1 M€ less for it (photocopied blueprints, missing half the specs).',
       },
     });
   }

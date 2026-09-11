@@ -24,7 +24,6 @@ export class CorruptOffice extends Card implements IProjectCard {
             eb.tag(Tag.CRIME).startEffect.megacredits(-2);
           });
         }),
-        description: 'When you play a Crime tag, you pay 2 M€ less for it (bribe the right officials, look the other way).',
       },
     });
   }

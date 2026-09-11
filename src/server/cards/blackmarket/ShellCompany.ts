@@ -24,7 +24,6 @@ export class ShellCompany extends Card implements IProjectCard {
             eb.tag(Tag.EARTH).startEffect.megacredits(-1);
           });
         }),
-        description: 'When you play an Earth tag, you pay 1 M€ less for it (a paper company that exists only to launder invoices).',
       },
     });
   }
