@@ -31,8 +31,8 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
               eb.tag(Tag.JOVIAN).startEffect.tag(Tag.MICROBE);
             });
             ce.br;
-            ce.effect('When you play a card with a Jovian tag, including this, add 2 microbes to any card.', (eb) => {
-              eb.tag(Tag.JOVIAN).startEffect.resource(CardResource.MICROBE, {amount: 2}).asterix();
+            ce.effect('When you play a card with a microbe tag, including this, add 1 microbe to any card.', (eb) => {
+              eb.tag(Tag.MICROBE).startEffect.resource(CardResource.MICROBE).asterix();
             });
             ce.br;
             ce.effect('When paying for a card with a Jovian tag, microbes here may be used as 2 M€ each.', (eb) => {
@@ -51,9 +51,12 @@ export class NereidBiosystems extends CorporationCard implements ICorporationCar
   }
 
   public onCardPlayed(player: IPlayer, card: ICard) {
-    const jovianTags = player.tags.cardTagCount(card, Tag.JOVIAN);
-    if (jovianTags > 0) {
-      player.game.defer(new AddResourcesToCard(player, CardResource.MICROBE, {count: jovianTags * 2}));
+    // cardTagCount already counts a Jovian tag here as a microbe tag too (see Tags.ts'
+    // Nereid Biosystems hook), so this fires for either - a card with both (like this
+    // corp itself) counts twice, same as any other two-relevant-tags card would.
+    const microbeTags = player.tags.cardTagCount(card, Tag.MICROBE);
+    if (microbeTags > 0) {
+      player.game.defer(new AddResourcesToCard(player, CardResource.MICROBE, {count: microbeTags}));
     }
   }
 }

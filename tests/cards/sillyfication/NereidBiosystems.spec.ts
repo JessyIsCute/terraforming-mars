@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {NereidBiosystems} from '../../../src/server/cards/sillyfication/NereidBiosystems';
 import {GanymedeColony} from '../../../src/server/cards/base/GanymedeColony';
+import {RegolithEaters} from '../../../src/server/cards/base/RegolithEaters';
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
 import {Tag} from '../../../src/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
@@ -45,9 +46,7 @@ describe('NereidBiosystems', () => {
     expect(player.tags.cardHasTag(new GanymedeColony(), Tag.MICROBE)).is.true;
   });
 
-  it('adds 2 microbes to any card when a Jovian tag is played, including its own', () => {
-    player.megaCredits = 0;
-
+  it('adds 1 microbe per relevant tag - its own play counts twice (real Jovian + real Microbe)', () => {
     card.onCardPlayed(player, card);
     runAllActions(player.game);
 
@@ -55,7 +54,21 @@ describe('NereidBiosystems', () => {
     expect(card.resourceCount).to.eq(2);
   });
 
-  it('does not add microbes for a card without a Jovian tag', () => {
+  it('adds only 1 microbe for a Jovian-only card (no real Microbe tag)', () => {
+    card.onCardPlayed(player, new GanymedeColony());
+    runAllActions(player.game);
+
+    expect(card.resourceCount).to.eq(1);
+  });
+
+  it('also triggers for a Microbe-tagged card with no Jovian tag - the buff', () => {
+    card.onCardPlayed(player, new RegolithEaters());
+    runAllActions(player.game);
+
+    expect(card.resourceCount).to.eq(1);
+  });
+
+  it('does not add microbes for a card without a Jovian or microbe tag', () => {
     card.onCardPlayed(player, new MicroCredits());
     runAllActions(player.game);
 
