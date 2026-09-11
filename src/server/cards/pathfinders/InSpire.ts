@@ -9,7 +9,6 @@ import {CardResource} from '../../../common/CardResource';
 import {Resource} from '../../../common/Resource';
 import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
-import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
 import {Priority} from '../../deferredActions/Priority';
 import {Size} from '../../../common/cards/render/Size';
 import {digit} from '../Options';
@@ -67,8 +66,9 @@ const MAX_PER_TYPE = 2;
  * Science/M€, Mars/data, Jovian-or-Venus/floater). Whenever a played card carries one of
  * these tags, its owner either banks a unit of the matching type on this card, or (once
  * this card holds at least one) cashes one out - straight into stock for the five
- * standard-resource types (never production), or onto an eligible card for the four
- * card-resource types. */
+ * standard-resource types (never production), or onto the card that just triggered this
+ * for the four card-resource types (never a different, unrelated card already in the
+ * tableau) - if that specific card can't hold it, the unit just stays on InSpire. */
 export class InSpire extends CorporationCard implements ICorporationCard {
   public data: Partial<Record<ResourceKey, number>> = {};
 
@@ -84,7 +84,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
 
       metadata: {
         cardNumber: 'PfC98', // Renumber
-        description: 'You start with 43 M€ and 3 M€ production. When you play a given tag, put a corresponding resource on this card, or (if it already has one) take a corresponding resource from this card and gain it - or, for microbes/animals/data/floaters, add it to an eligible card instead. You can keep at most 2 resources of a given type on this card.',
+        description: 'You start with 43 M€ and 3 M€ production. When you play a given tag, put a corresponding resource on this card, or (if it already has one) take a corresponding resource from this card and gain it - or, for microbes/animals/data/floaters, add it to the card you just played, if it can hold that resource. You can keep at most 2 resources of a given type on this card.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(43, {digit}).nbsp.production((pb) => pb.megacredits(3)).br;
           b.corpBox('effect', (ce) => {
@@ -151,10 +151,14 @@ export class InSpire extends CorporationCard implements ICorporationCard {
     return items;
   }
 
-  private canRedistribute(player: IPlayer, key: ResourceKey): boolean {
+  /** For a card-resource type, only the card that just triggered this rule is a legal
+   * target - never some other, unrelated card already in the tableau. If that specific
+   * card isn't an eligible resource card, the unit just stays on InSpire instead of
+   * prompting a broader "pick any eligible card" choice. */
+  private canRedistribute(key: ResourceKey, card: ICard): boolean {
     const cardResource = CARD_RESOURCE[key];
     if (cardResource !== undefined) {
-      return player.getResourceCards(cardResource).length > 0;
+      return card.resourceType === cardResource;
     }
     return true;
   }
@@ -164,7 +168,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
     player.game.log('${0} added ${1} to InSpire', (b) => b.player(player).string(rule.label));
   }
 
-  private redistribute(player: IPlayer, rule: Rule): void {
+  private redistribute(player: IPlayer, rule: Rule, card: ICard): void {
     this.setStored(rule.key, this.getStored(rule.key) - 1);
     player.game.log('${0} took ${1} from InSpire', (b) => b.player(player).string(rule.label));
 
@@ -175,22 +179,22 @@ export class InSpire extends CorporationCard implements ICorporationCard {
     }
     const cardResource = CARD_RESOURCE[rule.key];
     if (cardResource !== undefined) {
-      player.game.defer(new AddResourcesToCard(player, cardResource, {count: 1}));
+      player.addResourceTo(card, {log: true});
     }
   }
 
-  private triggerRule(player: IPlayer, rule: Rule): void {
+  private triggerRule(player: IPlayer, rule: Rule, card: ICard): void {
     player.defer(() => {
       const stored = this.getStored(rule.key);
       const canAdd = stored < MAX_PER_TYPE;
-      const canTake = stored > 0 && this.canRedistribute(player, rule.key);
+      const canTake = stored > 0 && this.canRedistribute(rule.key, card);
 
       if (canAdd && !canTake) {
         this.addStored(player, rule);
         return undefined;
       }
       if (!canAdd && canTake) {
-        this.redistribute(player, rule);
+        this.redistribute(player, rule, card);
         return undefined;
       }
       if (!canAdd && !canTake) {
@@ -202,7 +206,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
           return undefined;
         }),
         new SelectOption(`Take ${rule.label} from InSpire`, 'Take').andThen(() => {
-          this.redistribute(player, rule);
+          this.redistribute(player, rule, card);
           return undefined;
         }),
       ).setTitle('Select an option for InSpire');
@@ -213,7 +217,7 @@ export class InSpire extends CorporationCard implements ICorporationCard {
     for (const rule of RULES) {
       const count = player.tags.cardTagCount(card, [...rule.tags]);
       for (let i = 0; i < count; i++) {
-        this.triggerRule(player, rule);
+        this.triggerRule(player, rule, card);
       }
     }
   }

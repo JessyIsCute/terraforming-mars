@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {InSpire} from '../../../src/server/cards/pathfinders/InSpire';
 import {Tag} from '../../../src/common/cards/Tag';
 import {RegolithEaters} from '../../../src/server/cards/base/RegolithEaters';
+import {Ants} from '../../../src/server/cards/base/Ants';
 import {Fish} from '../../../src/server/cards/base/Fish';
 import {Dirigibles} from '../../../src/server/cards/venusNext/Dirigibles';
 import {testGame} from '../../TestGame';
@@ -75,66 +76,85 @@ describe('InSpire', () => {
     expect(player.production.energy).eq(0);
   });
 
-  it('redistributing a card-resource type adds it to an eligible played card', () => {
-    const microbeCard = new RegolithEaters();
-    player.playedCards.push(microbeCard);
+  it('redistributing a card-resource type adds it to the card that just triggered it, not some other played card', () => {
+    // A microbe-resource card sitting in the tableau from earlier - NOT the trigger for
+    // this play, so it must not be a legal target.
+    const earlierMicrobeCard = new Ants();
+    player.playedCards.push(earlierMicrobeCard);
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.MICROBE]}));
     runAllActions(game); // auto-add microbe: 0 -> 1
 
-    card.onCardPlayed(player, fakeCard({tags: [Tag.MICROBE]}));
+    // The second microbe tag comes from playing RegolithEaters itself - the take, if
+    // chosen, must land on THIS instance, not the earlier one.
+    const triggeringMicrobeCard = new RegolithEaters();
+    player.playedCards.push(triggeringMicrobeCard);
+    card.onCardPlayed(player, triggeringMicrobeCard);
     runAllActions(game);
     const options = cast(player.popWaitingFor(), OrOptions);
     options.options[1].cb(); // Take
     runAllActions(game);
 
-    expect(microbeCard.resourceCount).eq(1);
+    expect(triggeringMicrobeCard.resourceCount).eq(1);
+    expect(earlierMicrobeCard.resourceCount).eq(0);
   });
 
-  it('without an eligible card, a card-resource type just keeps auto-adding up to the cap', () => {
+  it('when the just-played card cannot hold the resource, it just keeps auto-adding up to the cap - never a broader "any eligible card" choice', () => {
+    // An eligible Animal-resource card exists (Fish), but it's not the card that's about
+    // to trigger the second Animal tag below - it must not be offered as a target.
+    player.playedCards.push(new Fish());
+
     card.onCardPlayed(player, fakeCard({tags: [Tag.ANIMAL]}));
     runAllActions(game); // stored 0 -> 1, auto-added (the only legal option at 0 anyway)
     expect(player.popWaitingFor()).is.undefined;
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.ANIMAL]}));
     runAllActions(game);
-    // No eligible Animal-resource card exists, so "take" isn't offered even at stored=1 -
-    // it just adds again instead, up to the cap.
+    // The triggering card itself (a bare fakeCard, no resourceType) can't hold it, so
+    // "take" isn't offered even at stored=1 - it just adds again instead, up to the cap.
     expect(player.popWaitingFor()).is.undefined;
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.ANIMAL]}));
     runAllActions(game);
-    // Now at the cap (2) with still no eligible card - nothing legal to do, so this no-ops.
+    // Now at the cap (2), still not a legal target - nothing legal to do, so this no-ops
+    // and the unit just stays on InSpire.
     expect(player.popWaitingFor()).is.undefined;
+    expect(card.data.animal).eq(2);
   });
 
-  it('once an eligible card exists, taking becomes an option again', () => {
-    player.playedCards.push(new Fish());
+  it('when the just-played card itself is animal-resource-eligible, taking becomes an option', () => {
     card.onCardPlayed(player, fakeCard({tags: [Tag.ANIMAL]}));
     runAllActions(game); // stored 0 -> 1, auto-added (still the only option at stored=0)
 
-    card.onCardPlayed(player, fakeCard({tags: [Tag.ANIMAL]}));
+    const fish = new Fish();
+    player.playedCards.push(fish);
+    card.onCardPlayed(player, fish);
     runAllActions(game);
     const options = cast(player.popWaitingFor(), OrOptions);
     expect(options.options).has.lengthOf(2);
+    options.options[1].cb(); // Take
+    runAllActions(game);
+    expect(fish.resourceCount).eq(1);
   });
 
   it('Jovian and Venus both trigger the floater rule', () => {
-    player.playedCards.push(new Dirigibles());
-
     card.onCardPlayed(player, fakeCard({tags: [Tag.JOVIAN]}));
     runAllActions(game); // auto-add: 0 -> 1
 
-    card.onCardPlayed(player, fakeCard({tags: [Tag.VENUS]}));
+    // Dirigibles (Tag.VENUS, resourceType FLOATER) is both the trigger and the only legal
+    // target for the "take" branch.
+    const dirigibles = new Dirigibles();
+    player.playedCards.push(dirigibles);
+    card.onCardPlayed(player, dirigibles);
     runAllActions(game);
     const options = cast(player.popWaitingFor(), OrOptions);
     expect(options.options.map((o) => o.title)).deep.eq(['Add a floater to InSpire', 'Take a floater from InSpire']);
   });
 
   it('a card with both Jovian and Venus tags triggers the floater rule twice', () => {
-    player.playedCards.push(new Dirigibles());
-
-    card.onCardPlayed(player, fakeCard({tags: [Tag.JOVIAN, Tag.VENUS]}));
+    // resourceType FLOATER so the second trigger's "take" branch has a legal target: itself.
+    const twiceTaggedCard = fakeCard({tags: [Tag.JOVIAN, Tag.VENUS], resourceType: CardResource.FLOATER});
+    card.onCardPlayed(player, twiceTaggedCard);
     runAllActions(game); // first trigger auto-adds: 0 -> 1
 
     // The second trigger (still queued from the same onCardPlayed call) now offers a choice.
