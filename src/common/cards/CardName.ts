@@ -702,7 +702,7 @@ export enum CardName {
   MICROBITIC = 'Microbitic',
   RESEARCH_PHASE = 'Research Phase',
   BLOCKHOUSE = 'Blockhouse',
-  MULLIGANGS = 'Mulligangs',
+  MULLIGANS = 'Mulligans',
   MULLIGENS = 'Mulligens',
   SAND_CLAIM = 'Sand Claim',
 

@@ -1,18 +1,18 @@
 import {expect} from 'chai';
-import {Mulligangs} from '../../../src/server/cards/sillyfication/Mulligangs';
+import {Mulligans} from '../../../src/server/cards/sillyfication/Mulligans';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {runAllActions} from '../../TestingUtils';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
 import {cast} from '../../../src/common/utils/utils';
 
-describe('Mulligangs', () => {
-  let card: Mulligangs;
+describe('Mulligans', () => {
+  let card: Mulligans;
   let player: TestPlayer;
   let player2: TestPlayer;
 
   beforeEach(() => {
-    card = new Mulligangs();
+    card = new Mulligans();
     [/* game */, player, player2] = testGame(2);
   });
 

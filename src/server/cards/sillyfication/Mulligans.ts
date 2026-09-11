@@ -9,11 +9,11 @@ import {DiscardCards} from '../../deferredActions/DiscardCards';
 import {DrawCards} from '../../deferredActions/DrawCards';
 import {Priority} from '../../deferredActions/Priority';
 
-export class Mulligangs extends Card implements IProjectCard {
+export class Mulligans extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.AUTOMATED,
-      name: CardName.MULLIGANGS,
+      name: CardName.MULLIGANS,
       tags: [Tag.SCIENCE],
       cost: 14,
       victoryPoints: 1,

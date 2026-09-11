@@ -110,7 +110,7 @@ import {Microbetronics} from './Microbetronics';
 import {Microbitic} from './Microbitic';
 import {ResearchPhase} from './ResearchPhase';
 import {Blockhouse} from './Blockhouse';
-import {Mulligangs} from './Mulligangs';
+import {Mulligans} from './Mulligans';
 import {Mulligens} from './Mulligens';
 import {SandClaim} from './SandClaim';
 
@@ -232,7 +232,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.MICROBITIC]: {Factory: Microbitic},
     [CardName.RESEARCH_PHASE]: {Factory: ResearchPhase},
     [CardName.BLOCKHOUSE]: {Factory: Blockhouse},
-    [CardName.MULLIGANGS]: {Factory: Mulligangs},
+    [CardName.MULLIGANS]: {Factory: Mulligans},
     [CardName.MULLIGENS]: {Factory: Mulligens},
     [CardName.SAND_CLAIM]: {Factory: SandClaim},
   },
