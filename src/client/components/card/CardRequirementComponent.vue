@@ -24,7 +24,10 @@
         </template>
         <CardParty v-else-if="type === RequirementType.PARTY" :party="party" size="req" />
         <template v-else>
-            <div v-for="num in repeats" :key="num" :class="componentClasses"></div>
+            <template v-for="(num, index) in repeats" :key="num">
+              <div v-if="index > 0 && requirement.adjacent" class="card-special card-slash">/</div>
+              <div :class="componentClasses"></div>
+            </template>
         </template>
       </div>
   </div>

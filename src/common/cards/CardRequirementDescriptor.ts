@@ -33,6 +33,9 @@ export type CardRequirementDescriptor = {
   oxygen?: number,
   temperature?: number,
   greeneries?: number,
+  /** Whether the required tiles must be adjacent to each other (rendering hint only - the
+   * actual adjacency check is bespoke per card). */
+  adjacent?: boolean,
   /** Whether the player's last action this game was placing a greenery tile. */
   greeneryLastAction?: boolean,
   /** Count of cards (including events) the player has ever played costing 25 M€ or more. */

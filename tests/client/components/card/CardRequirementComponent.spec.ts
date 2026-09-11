@@ -62,4 +62,26 @@ describe('CardRequirementComponent', () => {
     expect(wrapper.find('.greenery-tile').exists()).to.be.true;
     expect(wrapper.find('.card-asterix').exists()).to.be.true;
   });
+
+  it('renders a slash between two adjacent-greeneries requirement icons', () => {
+    const wrapper = shallowMount(CardRequirementComponent, {
+      ...globalConfig,
+      props: {
+        requirement: {greeneries: 2, adjacent: true, count: 2},
+      },
+    });
+    expect(wrapper.findAll('.greenery-tile')).to.have.length(2);
+    expect(wrapper.find('.card-slash').exists()).to.be.true;
+  });
+
+  it('does not render a slash for a plain (non-adjacent) 2-greeneries requirement', () => {
+    const wrapper = shallowMount(CardRequirementComponent, {
+      ...globalConfig,
+      props: {
+        requirement: {greeneries: 2, count: 2},
+      },
+    });
+    expect(wrapper.findAll('.greenery-tile')).to.have.length(2);
+    expect(wrapper.find('.card-slash').exists()).to.be.false;
+  });
 });
