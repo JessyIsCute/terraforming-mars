@@ -15,7 +15,7 @@ describe('OreForOxygenRacket', () => {
 
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.PLANT]);
-    expect(card.cost).to.eq(0);
+    expect(card.cost).to.eq(1);
     expect(card.reserveUnits).deep.include({steel: 3});
     expect(card.victoryPoints).to.eq(-1);
   });

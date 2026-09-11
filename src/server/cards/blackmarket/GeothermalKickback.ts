@@ -8,7 +8,7 @@ import {digit} from '../Options';
 
 /** Mid-game tier (unlocks generation 4+): heat surplus buys into M€ production, helping a terraforming-focused economy catch up financially. */
 export class GeothermalKickback extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.GEOTHERMAL_KICKBACK, heat: number = 5) {
+  constructor(name: CardName = CardName.GEOTHERMAL_KICKBACK, heat: number = 2) {
     super({
       name,
       type: CardType.AUTOMATED,
@@ -35,12 +35,12 @@ export class GeothermalKickback extends Card implements IProjectCard {
 
 export class GeothermalKickbackII extends GeothermalKickback {
   constructor() {
-    super(CardName.GEOTHERMAL_KICKBACK_II, 6);
+    super(CardName.GEOTHERMAL_KICKBACK_II, 3);
   }
 }
 
 export class GeothermalKickbackIII extends GeothermalKickback {
   constructor() {
-    super(CardName.GEOTHERMAL_KICKBACK_III, 7);
+    super(CardName.GEOTHERMAL_KICKBACK_III, 4);
   }
 }

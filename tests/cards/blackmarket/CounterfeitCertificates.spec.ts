@@ -19,7 +19,7 @@ describe('CounterfeitCertificates', () => {
     expect(card.tags).deep.eq([Tag.EARTH]);
     expect(card.cost).to.eq(2);
     expect(card.reserveUnits).deep.include({heat: 1});
-    expect(card.victoryPoints).to.eq(-1);
+    expect(card.victoryPoints).to.eq(-2);
   });
 
   it('play spends 1 heat and gains 3 TR', () => {

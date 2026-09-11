@@ -8,13 +8,13 @@ import {digit} from '../Options';
 
 /** Mid-game tier (unlocks generation 4+): mineral surplus buys into plant production, helping a mineral-heavy economy catch up on greenery. */
 export class OreForOxygenRacket extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.ORE_FOR_OXYGEN_RACKET, steel: number = 3) {
+  constructor(name: CardName = CardName.ORE_FOR_OXYGEN_RACKET, cost: number = 1) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.PLANT],
-      cost: 0,
-      reserveUnits: {steel},
+      cost,
+      reserveUnits: {steel: 3},
       victoryPoints: -1,
 
       behavior: {
@@ -24,10 +24,10 @@ export class OreForOxygenRacket extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM13',
         renderData: CardRenderer.builder((b) => {
-          b.minus().steel(steel, {digit}).plainText(`Spend ${steel} steel.`, /** parens */ true).br;
+          b.minus().steel(3, {digit}).plainText('Spend 3 steel.', /** parens */ true).br;
           b.production((pb) => pb.plants(2));
         }),
-        description: `Spend ${steel} steel. Raise your plant production 2 steps (trade mining tailings for fertile soil, off the books).`,
+        description: 'Spend 3 steel. Raise your plant production 2 steps (trade mining tailings for fertile soil, off the books).',
       },
     });
   }
@@ -35,12 +35,12 @@ export class OreForOxygenRacket extends Card implements IProjectCard {
 
 export class OreForOxygenRacketII extends OreForOxygenRacket {
   constructor() {
-    super(CardName.ORE_FOR_OXYGEN_RACKET_II, 4);
+    super(CardName.ORE_FOR_OXYGEN_RACKET_II, 2);
   }
 }
 
 export class OreForOxygenRacketIII extends OreForOxygenRacket {
   constructor() {
-    super(CardName.ORE_FOR_OXYGEN_RACKET_III, 5);
+    super(CardName.ORE_FOR_OXYGEN_RACKET_III, 3);
   }
 }

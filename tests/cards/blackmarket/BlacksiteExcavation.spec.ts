@@ -15,7 +15,7 @@ describe('BlacksiteExcavation', () => {
 
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.BUILDING, Tag.PLANT]);
-    expect(card.cost).to.eq(0);
+    expect(card.cost).to.eq(1);
     expect(card.reserveUnits).deep.include({titanium: 5});
     expect(card.victoryPoints).to.eq(-2);
   });

@@ -8,13 +8,13 @@ import {digit} from '../Options';
 
 /** Late-game tier (unlocks generation 7+): a big mineral-to-plant-and-heat-production double conversion. */
 export class BlacksiteExcavation extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.BLACKSITE_EXCAVATION, titanium: number = 5) {
+  constructor(name: CardName = CardName.BLACKSITE_EXCAVATION, cost: number = 1) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.BUILDING, Tag.PLANT],
-      cost: 0,
-      reserveUnits: {titanium},
+      cost,
+      reserveUnits: {titanium: 5},
       victoryPoints: -2,
 
       behavior: {
@@ -24,10 +24,10 @@ export class BlacksiteExcavation extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM20',
         renderData: CardRenderer.builder((b) => {
-          b.minus().titanium(titanium, {digit}).plainText(`Spend ${titanium} titanium.`, /** parens */ true).br;
+          b.minus().titanium(5, {digit}).plainText('Spend 5 titanium.', /** parens */ true).br;
           b.production((pb) => pb.plants(2).nbsp.heat(2));
         }),
-        description: `Spend ${titanium} titanium. Raise your plant production 2 steps and heat production 2 steps.`,
+        description: 'Spend 5 titanium. Raise your plant production 2 steps and heat production 2 steps.',
       },
     });
   }
@@ -35,12 +35,12 @@ export class BlacksiteExcavation extends Card implements IProjectCard {
 
 export class BlacksiteExcavationII extends BlacksiteExcavation {
   constructor() {
-    super(CardName.BLACKSITE_EXCAVATION_II, 6);
+    super(CardName.BLACKSITE_EXCAVATION_II, 2);
   }
 }
 
 export class BlacksiteExcavationIII extends BlacksiteExcavation {
   constructor() {
-    super(CardName.BLACKSITE_EXCAVATION_III, 7);
+    super(CardName.BLACKSITE_EXCAVATION_III, 3);
   }
 }

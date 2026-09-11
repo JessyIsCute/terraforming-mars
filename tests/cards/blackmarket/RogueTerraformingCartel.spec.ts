@@ -17,7 +17,7 @@ describe('RogueTerraformingCartel', () => {
     expect(card.tags).deep.eq([Tag.EARTH]);
     expect(card.cost).to.eq(0);
     expect(card.reserveUnits).deep.include({titanium: 4, steel: 4});
-    expect(card.victoryPoints).to.eq(-2);
+    expect(card.victoryPoints).to.eq(-4);
   });
 
   it('play spends 4 titanium and 4 steel and gains 6 TR', () => {

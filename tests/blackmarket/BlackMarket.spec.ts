@@ -109,10 +109,13 @@ describe('BlackMarket', () => {
     expect(next.card.name).to.eq(CardName.SMUGGLED_REACTOR_CORE_II);
   });
 
-  it('a fixed-price design\'s price escalates by variant (2 / 3 / 4 titanium)', () => {
-    expect(new SmuggledReactorCore().reserveUnits).to.deep.include({titanium: 2});
-    expect(new SmuggledReactorCoreII().reserveUnits).to.deep.include({titanium: 3});
-    expect(new SmuggledReactorCoreIII().reserveUnits).to.deep.include({titanium: 4});
+  it('a fixed-price design\'s M€ cost escalates by variant (1 / 2 / 3), with a flat resource cost', () => {
+    expect(new SmuggledReactorCore().cost).to.eq(1);
+    expect(new SmuggledReactorCoreII().cost).to.eq(2);
+    expect(new SmuggledReactorCoreIII().cost).to.eq(3);
+    for (const printing of [new SmuggledReactorCore(), new SmuggledReactorCoreII(), new SmuggledReactorCoreIII()]) {
+      expect(printing.reserveUnits).to.deep.include({titanium: 2});
+    }
   });
 
   it('doing the whole stack (3 printings) never collides, then rotates to a new design within the same tier', () => {
@@ -136,7 +139,7 @@ describe('BlackMarket', () => {
 
   it('rotates to a fresh design once a stack empties, if one remains in the queue', () => {
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new SmuggledReactorCore(CardName.SMUGGLED_REACTOR_CORE_III, 4), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 2};
+    data.early.slots[0] = {card: new SmuggledReactorCore(CardName.SMUGGLED_REACTOR_CORE_III, 3), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 2};
     data.early.designQueue = [COUNTERFEIT_CERTIFICATES_DESIGN];
     player.titanium = 4;
 

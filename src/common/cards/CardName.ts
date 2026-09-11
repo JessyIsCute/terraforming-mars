@@ -1322,4 +1322,18 @@ export enum CardName {
   ROGUE_TERRAFORMING_CARTEL = 'Rogue Terraforming Cartel',
   ROGUE_TERRAFORMING_CARTEL_II = 'Rogue Terraforming Cartel:2',
   ROGUE_TERRAFORMING_CARTEL_III = 'Rogue Terraforming Cartel:3',
+
+  // Black Market: active ("blue") illegal-action cards, mid/late tiers.
+  INSIDER_EXIT_STRATEGY = 'Insider Exit Strategy',
+  INSIDER_EXIT_STRATEGY_II = 'Insider Exit Strategy:2',
+  INSIDER_EXIT_STRATEGY_III = 'Insider Exit Strategy:3',
+  OUTER_SYSTEM_RACKETEERING = 'Outer System Racketeering',
+  OUTER_SYSTEM_RACKETEERING_II = 'Outer System Racketeering:2',
+  OUTER_SYSTEM_RACKETEERING_III = 'Outer System Racketeering:3',
+  BIOPIRACY_RING = 'Biopiracy Ring',
+  BIOPIRACY_RING_II = 'Biopiracy Ring:2',
+  BIOPIRACY_RING_III = 'Biopiracy Ring:3',
+  ORBITAL_SMUGGLING_RING = 'Orbital Smuggling Ring',
+  ORBITAL_SMUGGLING_RING_II = 'Orbital Smuggling Ring:2',
+  ORBITAL_SMUGGLING_RING_III = 'Orbital Smuggling Ring:3',
 }

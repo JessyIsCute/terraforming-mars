@@ -14,7 +14,7 @@ export class CounterfeitCertificates extends Card implements IProjectCard {
       tags: [Tag.EARTH],
       cost: 2,
       reserveUnits: {heat},
-      victoryPoints: -1,
+      victoryPoints: -2,
 
       behavior: {
         tr: 3,

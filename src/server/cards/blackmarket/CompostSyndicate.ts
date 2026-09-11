@@ -8,13 +8,13 @@ import {digit} from '../Options';
 
 /** Mid-game tier (unlocks generation 4+): plant surplus buys into minerals, helping a terraforming-focused economy catch up on mining. */
 export class CompostSyndicate extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.COMPOST_SYNDICATE, plants: number = 3, steel: number = 5) {
+  constructor(name: CardName = CardName.COMPOST_SYNDICATE, cost: number = 1, steel: number = 5) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.BUILDING],
-      cost: 0,
-      reserveUnits: {plants},
+      cost,
+      reserveUnits: {plants: 3},
       victoryPoints: -1,
 
       behavior: {
@@ -24,10 +24,10 @@ export class CompostSyndicate extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM15',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(plants, {digit}).plainText(`Spend ${plants} plants.`, /** parens */ true).br;
+          b.minus().plants(3, {digit}).plainText('Spend 3 plants.', /** parens */ true).br;
           b.steel(steel);
         }),
-        description: `Spend ${plants} plants. Gain ${steel} steel (turn a greenhouse surplus into scrap-metal profit).`,
+        description: `Spend 3 plants. Gain ${steel} steel (turn a greenhouse surplus into scrap-metal profit).`,
       },
     });
   }
@@ -35,12 +35,12 @@ export class CompostSyndicate extends Card implements IProjectCard {
 
 export class CompostSyndicateII extends CompostSyndicate {
   constructor() {
-    super(CardName.COMPOST_SYNDICATE_II, 4, 6);
+    super(CardName.COMPOST_SYNDICATE_II, 2, 6);
   }
 }
 
 export class CompostSyndicateIII extends CompostSyndicate {
   constructor() {
-    super(CardName.COMPOST_SYNDICATE_III, 5, 7);
+    super(CardName.COMPOST_SYNDICATE_III, 3, 7);
   }
 }

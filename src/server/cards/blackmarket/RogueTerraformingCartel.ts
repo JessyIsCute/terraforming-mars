@@ -15,7 +15,7 @@ export class RogueTerraformingCartel extends Card implements IProjectCard {
       tags: [Tag.EARTH],
       cost: 0,
       reserveUnits: {titanium, steel: 4},
-      victoryPoints: -2,
+      victoryPoints: -4,
 
       behavior: {
         tr: 6,

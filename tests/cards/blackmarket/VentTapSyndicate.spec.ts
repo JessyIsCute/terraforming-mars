@@ -16,17 +16,17 @@ describe('VentTapSyndicate', () => {
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.POWER]);
     expect(card.cost).to.eq(0);
-    expect(card.reserveUnits).deep.include({heat: 7});
+    expect(card.reserveUnits).deep.include({heat: 4});
     expect(card.victoryPoints).to.eq(-2);
   });
 
-  it('play spends 7 heat and raises M€ production 3 steps', () => {
-    player.heat = 7;
-    expect(player.production.megacredits).to.eq(0);
+  it('play spends 4 heat and gains 14 M€', () => {
+    player.heat = 4;
+    const before = player.megaCredits;
 
     card.play(player);
 
     expect(player.heat).to.eq(0);
-    expect(player.production.megacredits).to.eq(3);
+    expect(player.megaCredits).to.eq(before + 14);
   });
 });

@@ -16,17 +16,17 @@ describe('MeltdownContract', () => {
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.POWER]);
     expect(card.cost).to.eq(0);
-    expect(card.reserveUnits).deep.include({titanium: 3});
+    expect(card.reserveUnits).deep.include({titanium: 2});
     expect(card.victoryPoints).to.eq(-1);
   });
 
-  it('play spends 3 titanium and raises heat production 2 steps', () => {
-    player.titanium = 3;
+  it('play spends 2 titanium and raises heat production 3 steps', () => {
+    player.titanium = 2;
     expect(player.production.heat).to.eq(0);
 
     card.play(player);
 
     expect(player.titanium).to.eq(0);
-    expect(player.production.heat).to.eq(2);
+    expect(player.production.heat).to.eq(3);
   });
 });

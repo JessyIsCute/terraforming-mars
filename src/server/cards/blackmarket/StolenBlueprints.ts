@@ -7,13 +7,13 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class StolenBlueprints extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.STOLEN_BLUEPRINTS, steel: number = 2) {
+  constructor(name: CardName = CardName.STOLEN_BLUEPRINTS, cost: number = 1) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.BUILDING, Tag.BUILDING],
-      cost: 0,
-      reserveUnits: {steel},
+      cost,
+      reserveUnits: {steel: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +23,10 @@ export class StolenBlueprints extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM10',
         renderData: CardRenderer.builder((b) => {
-          b.minus().steel(steel, {digit}).plainText(`Spend ${steel} steel.`, /** parens */ true).br;
+          b.minus().steel(2, {digit}).plainText('Spend 2 steel.', /** parens */ true).br;
           b.cards(1);
         }),
-        description: `Spend ${steel} steel. Draw a card.`,
+        description: 'Spend 2 steel. Draw a card.',
       },
     });
   }
@@ -34,12 +34,12 @@ export class StolenBlueprints extends Card implements IProjectCard {
 
 export class StolenBlueprintsII extends StolenBlueprints {
   constructor() {
-    super(CardName.STOLEN_BLUEPRINTS_II, 3);
+    super(CardName.STOLEN_BLUEPRINTS_II, 2);
   }
 }
 
 export class StolenBlueprintsIII extends StolenBlueprints {
   constructor() {
-    super(CardName.STOLEN_BLUEPRINTS_III, 4);
+    super(CardName.STOLEN_BLUEPRINTS_III, 3);
   }
 }

@@ -15,7 +15,7 @@ describe('PirateTradeRoute', () => {
 
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.SPACE]);
-    expect(card.cost).to.eq(0);
+    expect(card.cost).to.eq(1);
     expect(card.reserveUnits).deep.include({steel: 1, titanium: 1});
     expect(card.victoryPoints).to.eq(-1);
   });

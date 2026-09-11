@@ -25,6 +25,10 @@ import {GreenhouseLaundering, GreenhouseLaunderingII, GreenhouseLaunderingIII} f
 import {VentTapSyndicate, VentTapSyndicateII, VentTapSyndicateIII} from './VentTapSyndicate';
 import {BlackMarketTerraformer, BlackMarketTerraformerII, BlackMarketTerraformerIII} from './BlackMarketTerraformer';
 import {RogueTerraformingCartel, RogueTerraformingCartelII, RogueTerraformingCartelIII} from './RogueTerraformingCartel';
+import {InsiderExitStrategy, InsiderExitStrategyII, InsiderExitStrategyIII} from './InsiderExitStrategy';
+import {OuterSystemRacketeering, OuterSystemRacketeeringII, OuterSystemRacketeeringIII} from './OuterSystemRacketeering';
+import {BiopiracyRing, BiopiracyRingII, BiopiracyRingIII} from './BiopiracyRing';
+import {OrbitalSmugglingRing, OrbitalSmugglingRingII, OrbitalSmugglingRingIII} from './OrbitalSmugglingRing';
 
 /**
  * Every Black Market design's 3 printings, registered `instantiate: false` so they're never
@@ -131,6 +135,23 @@ export const BLACKMARKET_CARD_MANIFEST = new ModuleManifest({
     [CardName.ROGUE_TERRAFORMING_CARTEL]: {Factory: RogueTerraformingCartel, instantiate: false},
     [CardName.ROGUE_TERRAFORMING_CARTEL_II]: {Factory: RogueTerraformingCartelII, instantiate: false},
     [CardName.ROGUE_TERRAFORMING_CARTEL_III]: {Factory: RogueTerraformingCartelIII, instantiate: false},
+
+    [CardName.INSIDER_EXIT_STRATEGY]: {Factory: InsiderExitStrategy, instantiate: false},
+    [CardName.INSIDER_EXIT_STRATEGY_II]: {Factory: InsiderExitStrategyII, instantiate: false},
+    [CardName.INSIDER_EXIT_STRATEGY_III]: {Factory: InsiderExitStrategyIII, instantiate: false},
+
+    [CardName.OUTER_SYSTEM_RACKETEERING]: {Factory: OuterSystemRacketeering, instantiate: false},
+    [CardName.OUTER_SYSTEM_RACKETEERING_II]: {Factory: OuterSystemRacketeeringII, instantiate: false},
+    [CardName.OUTER_SYSTEM_RACKETEERING_III]: {Factory: OuterSystemRacketeeringIII, instantiate: false},
+
+    [CardName.BIOPIRACY_RING]: {Factory: BiopiracyRing, instantiate: false},
+    [CardName.BIOPIRACY_RING_II]: {Factory: BiopiracyRingII, instantiate: false},
+    [CardName.BIOPIRACY_RING_III]: {Factory: BiopiracyRingIII, instantiate: false},
+
+    // Venus tag -- requires Venus, mirroring Underground Casino's per-card compatibility gate.
+    [CardName.ORBITAL_SMUGGLING_RING]: {Factory: OrbitalSmugglingRing, instantiate: false, compatibility: 'venus'},
+    [CardName.ORBITAL_SMUGGLING_RING_II]: {Factory: OrbitalSmugglingRingII, instantiate: false, compatibility: 'venus'},
+    [CardName.ORBITAL_SMUGGLING_RING_III]: {Factory: OrbitalSmugglingRingIII, instantiate: false, compatibility: 'venus'},
   },
 });
 
@@ -147,9 +168,9 @@ export type BlackMarketDesign = {
   /** The 3 CardName printings, in reveal order -- see CardName.ts's Black Market comment. */
   printings: readonly [CardName, CardName, CardName];
   /**
-   * The numeric knob that escalates cheapest-to-priciest across the 3 printings -- almost
-   * always the cost of the design's main resource, but for a couple of designs (e.g. Poached
-   * Specimens) it's the size of the *reward* instead, since their cost is flat across all 3.
+   * The numeric knob that escalates cheapest-to-priciest across the 3 printings -- usually
+   * the design's M€ cost, sometimes a resource-cost count, and for a couple of designs (e.g.
+   * Poached Specimens) the size of the *reward* instead, since their cost is flat across all 3.
    */
   variants: readonly [number, number, number];
   /** Constructs `name` with the given printing's numeric knob. */
@@ -173,8 +194,8 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
   {
     tier: 'early',
     printings: [CardName.SMUGGLED_REACTOR_CORE, CardName.SMUGGLED_REACTOR_CORE_II, CardName.SMUGGLED_REACTOR_CORE_III],
-    variants: [2, 3, 4],
-    build: (name, titanium) => new SmuggledReactorCore(name, titanium),
+    variants: [1, 2, 3],
+    build: (name, cost) => new SmuggledReactorCore(name, cost),
   },
   {
     tier: 'early',
@@ -198,7 +219,7 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
     tier: 'early',
     printings: [CardName.PIRATE_TRADE_ROUTE, CardName.PIRATE_TRADE_ROUTE_II, CardName.PIRATE_TRADE_ROUTE_III],
     variants: [1, 2, 3],
-    build: (name, titanium) => new PirateTradeRoute(name, titanium),
+    build: (name, cost) => new PirateTradeRoute(name, cost),
   },
   {
     tier: 'early',
@@ -215,14 +236,14 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
   {
     tier: 'early',
     printings: [CardName.STOLEN_BLUEPRINTS, CardName.STOLEN_BLUEPRINTS_II, CardName.STOLEN_BLUEPRINTS_III],
-    variants: [2, 3, 4],
-    build: (name, steel) => new StolenBlueprints(name, steel),
+    variants: [1, 2, 3],
+    build: (name, cost) => new StolenBlueprints(name, cost),
   },
   {
     tier: 'early',
     printings: [CardName.ILLICIT_MINING_OP, CardName.ILLICIT_MINING_OP_II, CardName.ILLICIT_MINING_OP_III],
-    variants: [2, 3, 4],
-    build: (name, energy) => new IllicitMiningOp(name, energy, energy + 2),
+    variants: [1, 2, 3],
+    build: (name, cost) => new IllicitMiningOp(name, cost, cost + 3),
   },
   {
     tier: 'early',
@@ -235,52 +256,70 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
   {
     tier: 'mid',
     printings: [CardName.ORE_FOR_OXYGEN_RACKET, CardName.ORE_FOR_OXYGEN_RACKET_II, CardName.ORE_FOR_OXYGEN_RACKET_III],
-    variants: [3, 4, 5],
-    build: (name, steel) => new OreForOxygenRacket(name, steel),
+    variants: [1, 2, 3],
+    build: (name, cost) => new OreForOxygenRacket(name, cost),
   },
   {
     tier: 'mid',
     printings: [CardName.MELTDOWN_CONTRACT, CardName.MELTDOWN_CONTRACT_II, CardName.MELTDOWN_CONTRACT_III],
-    variants: [3, 4, 5],
-    build: (name, titanium) => new MeltdownContract(name, titanium),
+    variants: [0, 1, 2],
+    build: (name, cost) => new MeltdownContract(name, cost),
   },
   {
     tier: 'mid',
     printings: [CardName.COMPOST_SYNDICATE, CardName.COMPOST_SYNDICATE_II, CardName.COMPOST_SYNDICATE_III],
-    variants: [3, 4, 5],
-    build: (name, plants) => new CompostSyndicate(name, plants, plants + 2),
+    variants: [1, 2, 3],
+    build: (name, cost) => new CompostSyndicate(name, cost, cost + 4),
   },
   {
     tier: 'mid',
     printings: [CardName.GEOTHERMAL_KICKBACK, CardName.GEOTHERMAL_KICKBACK_II, CardName.GEOTHERMAL_KICKBACK_III],
-    variants: [5, 6, 7],
+    variants: [2, 3, 4],
     build: (name, heat) => new GeothermalKickback(name, heat),
   },
   {
     tier: 'mid',
     printings: [CardName.SMUGGLED_SEED_VAULT, CardName.SMUGGLED_SEED_VAULT_II, CardName.SMUGGLED_SEED_VAULT_III],
-    variants: [4, 5, 6],
-    build: (name, plants) => new SmuggledSeedVault(name, plants),
+    variants: [1, 2, 3],
+    build: (name, cost) => new SmuggledSeedVault(name, cost),
   },
   {
     tier: 'mid',
     printings: [CardName.HEAVY_METAL_HUSTLE, CardName.HEAVY_METAL_HUSTLE_II, CardName.HEAVY_METAL_HUSTLE_III],
     variants: [3, 4, 5],
-    build: (name, titanium) => new HeavyMetalHustle(name, titanium),
+    build: (name, titanium) => new HeavyMetalHustle(name, titanium, titanium + 2),
+  },
+  {
+    tier: 'mid',
+    printings: [CardName.INSIDER_EXIT_STRATEGY, CardName.INSIDER_EXIT_STRATEGY_II, CardName.INSIDER_EXIT_STRATEGY_III],
+    variants: [6, 7, 8],
+    build: (name, cost) => new InsiderExitStrategy(name, cost),
+  },
+  {
+    tier: 'mid',
+    printings: [CardName.OUTER_SYSTEM_RACKETEERING, CardName.OUTER_SYSTEM_RACKETEERING_II, CardName.OUTER_SYSTEM_RACKETEERING_III],
+    variants: [7, 8, 9],
+    build: (name, cost) => new OuterSystemRacketeering(name, cost),
+  },
+  {
+    tier: 'mid',
+    printings: [CardName.BIOPIRACY_RING, CardName.BIOPIRACY_RING_II, CardName.BIOPIRACY_RING_III],
+    variants: [5, 6, 7],
+    build: (name, cost) => new BiopiracyRing(name, cost),
   },
 
   // Late game (generation 7+)
   {
     tier: 'late',
     printings: [CardName.CARTEL_REFINERY, CardName.CARTEL_REFINERY_II, CardName.CARTEL_REFINERY_III],
-    variants: [5, 6, 7],
-    build: (name, steel) => new CartelRefinery(name, steel),
+    variants: [1, 2, 3],
+    build: (name, cost) => new CartelRefinery(name, cost, cost + 2),
   },
   {
     tier: 'late',
     printings: [CardName.BLACKSITE_EXCAVATION, CardName.BLACKSITE_EXCAVATION_II, CardName.BLACKSITE_EXCAVATION_III],
-    variants: [5, 6, 7],
-    build: (name, titanium) => new BlacksiteExcavation(name, titanium),
+    variants: [1, 2, 3],
+    build: (name, cost) => new BlacksiteExcavation(name, cost),
   },
   {
     tier: 'late',
@@ -291,7 +330,7 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
   {
     tier: 'late',
     printings: [CardName.VENT_TAP_SYNDICATE, CardName.VENT_TAP_SYNDICATE_II, CardName.VENT_TAP_SYNDICATE_III],
-    variants: [7, 8, 9],
+    variants: [4, 5, 6],
     build: (name, heat) => new VentTapSyndicate(name, heat),
   },
   {
@@ -305,5 +344,11 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
     printings: [CardName.ROGUE_TERRAFORMING_CARTEL, CardName.ROGUE_TERRAFORMING_CARTEL_II, CardName.ROGUE_TERRAFORMING_CARTEL_III],
     variants: [4, 5, 6],
     build: (name, titanium) => new RogueTerraformingCartel(name, titanium),
+  },
+  {
+    tier: 'late',
+    printings: [CardName.ORBITAL_SMUGGLING_RING, CardName.ORBITAL_SMUGGLING_RING_II, CardName.ORBITAL_SMUGGLING_RING_III],
+    variants: [9, 10, 11],
+    build: (name, cost) => new OrbitalSmugglingRing(name, cost),
   },
 ];

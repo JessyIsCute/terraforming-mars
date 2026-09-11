@@ -7,13 +7,13 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class PirateTradeRoute extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.PIRATE_TRADE_ROUTE, titanium: number = 1) {
+  constructor(name: CardName = CardName.PIRATE_TRADE_ROUTE, cost: number = 1) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.SPACE],
-      cost: 0,
-      reserveUnits: {steel: 1, titanium},
+      cost,
+      reserveUnits: {steel: 1, titanium: 1},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +23,10 @@ export class PirateTradeRoute extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM07',
         renderData: CardRenderer.builder((b) => {
-          b.minus().steel(1, {digit}).nbsp.minus().titanium(titanium, {digit}).plainText(`Spend 1 steel and ${titanium} titanium.`, /** parens */ true).br;
+          b.minus().steel(1, {digit}).nbsp.minus().titanium(1, {digit}).plainText('Spend 1 steel and 1 titanium.', /** parens */ true).br;
           b.megacredits(5);
         }),
-        description: `Spend 1 steel and ${titanium} titanium. Gain 5 M€ (raid a cargo hauler).`,
+        description: 'Spend 1 steel and 1 titanium. Gain 5 M€ (raid a cargo hauler).',
       },
     });
   }

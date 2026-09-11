@@ -6,14 +6,14 @@ import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
-/** Late-game tier (unlocks generation 7+): a bigger, dual-reward mineral-to-heat-and-plants conversion. */
+/** Late-game tier (unlocks generation 7+): a dual-reward mineral-to-heat-and-plants conversion. */
 export class CartelRefinery extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.CARTEL_REFINERY, steel: number = 5) {
+  constructor(name: CardName = CardName.CARTEL_REFINERY, cost: number = 1, steel: number = 3) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.POWER, Tag.PLANT],
-      cost: 0,
+      cost,
       reserveUnits: {steel},
       victoryPoints: -2,
 
@@ -36,12 +36,12 @@ export class CartelRefinery extends Card implements IProjectCard {
 
 export class CartelRefineryII extends CartelRefinery {
   constructor() {
-    super(CardName.CARTEL_REFINERY_II, 6);
+    super(CardName.CARTEL_REFINERY_II, 2, 4);
   }
 }
 
 export class CartelRefineryIII extends CartelRefinery {
   constructor() {
-    super(CardName.CARTEL_REFINERY_III, 7);
+    super(CardName.CARTEL_REFINERY_III, 3, 5);
   }
 }

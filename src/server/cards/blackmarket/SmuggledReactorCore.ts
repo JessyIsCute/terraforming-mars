@@ -7,13 +7,13 @@ import {CardRenderer} from '../render/CardRenderer';
 import {digit} from '../Options';
 
 export class SmuggledReactorCore extends Card implements IProjectCard {
-  constructor(name: CardName = CardName.SMUGGLED_REACTOR_CORE, titanium: number = 2) {
+  constructor(name: CardName = CardName.SMUGGLED_REACTOR_CORE, cost: number = 1) {
     super({
       name,
       type: CardType.AUTOMATED,
       tags: [Tag.POWER, Tag.BUILDING],
-      cost: 0,
-      reserveUnits: {titanium},
+      cost,
+      reserveUnits: {titanium: 2},
       victoryPoints: -1,
 
       behavior: {
@@ -23,10 +23,10 @@ export class SmuggledReactorCore extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM03',
         renderData: CardRenderer.builder((b) => {
-          b.minus().titanium(titanium, {digit}).plainText(`Spend ${titanium} titanium.`, /** parens */ true).br;
+          b.minus().titanium(2, {digit}).plainText('Spend 2 titanium.', /** parens */ true).br;
           b.production((pb) => pb.energy(2));
         }),
-        description: `Spend ${titanium} titanium. Raise your energy production 2 steps.`,
+        description: 'Spend 2 titanium. Raise your energy production 2 steps.',
       },
     });
   }
@@ -34,12 +34,12 @@ export class SmuggledReactorCore extends Card implements IProjectCard {
 
 export class SmuggledReactorCoreII extends SmuggledReactorCore {
   constructor() {
-    super(CardName.SMUGGLED_REACTOR_CORE_II, 3);
+    super(CardName.SMUGGLED_REACTOR_CORE_II, 2);
   }
 }
 
 export class SmuggledReactorCoreIII extends SmuggledReactorCore {
   constructor() {
-    super(CardName.SMUGGLED_REACTOR_CORE_III, 4);
+    super(CardName.SMUGGLED_REACTOR_CORE_III, 3);
   }
 }
