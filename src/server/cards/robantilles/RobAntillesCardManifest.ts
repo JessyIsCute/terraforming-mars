@@ -143,4 +143,16 @@ export const ROB_ANTILLES_CARD_MANIFEST = new ModuleManifest({
     [CardName.ELECTORAL_CAMPAIGN]: {Factory: ElectoralCampaign},
     [CardName.TAX_THE_RICH]: {Factory: TaxTheRich},
   },
+  // Both are near-exact mechanical duplicates of an existing sillyfication card (same
+  // resource type, same trigger, same VP scaling). If both fan modules are active,
+  // sillyfication's version wins and the Rob Antilles one is removed from the deck.
+  //  - Dogs in Space vs. Uranus Sea Creatures: Animal resource, gained when any player
+  //    plays a tag from the same family (Space vs. Jovian) including this card, VP per animal.
+  //  - Mobile Biological Dome vs. Evergreen Forest: Seed resource (used nowhere else in the
+  //    codebase), party-gated, seeds accumulate during production and periodically convert
+  //    to a board benefit.
+  conditionalCardsToRemove: new Map([
+    [CardName.DOGS_IN_SPACE, CardName.URANUS_SEA_CREATURES],
+    [CardName.MOBILE_BIOLOGICAL_DOME, CardName.EVERGREEN_FOREST],
+  ]),
 });

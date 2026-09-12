@@ -133,4 +133,11 @@ export const IDES_OF_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.GALILEO_INSTITUTE]: {Factory: GalileoInstitute},
     [CardName.UNIVERSAL_FIGHTERS]: {Factory: UniversalFighters},
   },
+  // Amphibians (Ides of Mars) is a near-exact mechanical duplicate of sillyfication's
+  // Amphibians (same Animal resource, same -12C requirement, same ocean-tile trigger, same
+  // VP-per-animal). If both fan modules are active, sillyfication's version wins and this
+  // one is removed from the deck.
+  conditionalCardsToRemove: new Map([
+    [CardName.AMPHIBIANS_IOM, CardName.AMPHIBIANS],
+  ]),
 });
