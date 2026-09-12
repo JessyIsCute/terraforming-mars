@@ -146,6 +146,9 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
         if (source !== 'self') {
           const hasProtetedHabitats = p.tableau.has(CardName.PROTECTED_HABITATS) ||
             p.tableau.has(CardName.PROTECTED_HABITATS_BETTER_MARS);
+          // Martian Rangers (Rob Antilles): "Opponents cannot remove your Animals" -- narrower
+          // than Protected Habitats above (Animal only, not Microbe).
+          const hasMartianRangers = p.tableau.has(CardName.MARTIAN_RANGERS);
           for (const card of p.getCardsWithResources(resourceType)) {
             if (card.resourceCount < min) {
               continue;
@@ -157,6 +160,9 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
               if (card.resourceType === CardResource.ANIMAL || card.resourceType === CardResource.MICROBE) {
                 continue;
               }
+            }
+            if (hasMartianRangers && card.resourceType === CardResource.ANIMAL) {
+              continue;
             }
             resourceCards.push(card);
           }

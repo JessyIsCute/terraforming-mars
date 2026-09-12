@@ -60,6 +60,15 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.NEW_HOLLAND]: 'new-holland',
   [TileType.NEURAL_INSTANCE]: 'neural-instance',
   [TileType.GARBAGE_DUMP]: 'garbage_dump',
+  [TileType.PUMPING_HUB]: 'pumping_hub',
+  [TileType.INVAK_CITY]: 'city', // No dedicated art; renders as a plain city tile.
+  [TileType.SUBURBS]: 'greenery', // No dedicated art; sits over the player's own greenery tile.
+  [TileType.HARBOR_BOREALIS]: 'ocean-city', // No dedicated art; reuses the ocean/city hybrid icon.
+  [TileType.INDUSTRIAL_METROPOLIS]: 'city', // No dedicated art; renders as a plain city tile.
+  [TileType.PARADISE_CITY]: 'city', // No dedicated art; renders as a plain city tile.
+  [TileType.ANIMAL_DOME]: 'animal_dome',
+  [TileType.SEDIMENT]: 'city', // No dedicated art; renders as a plain city tile until covered.
+  [TileType.BIOLOGICAL_DOME]: 'ecological_zone', // No dedicated art; reuses the ecological-zone icon (also a plant/dome tile).
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([
@@ -103,6 +112,8 @@ const descriptions: Record<TileType, string> = {
 
   [TileType.NEW_HOLLAND]: 'New Holland: counts as an ocean and a city',
   [TileType.NEURAL_INSTANCE]: 'Neural Instance: MarsBot gains VP for adjacent non-human spaces',
+  [TileType.INVAK_CITY]: 'Invak City: counts as a city and a greenery',
+  [TileType.ANIMAL_DOME]: 'Animal Dome: placed next to no other tile. Adjacency bonus: 1 animal',
 };
 
 export default defineComponent({

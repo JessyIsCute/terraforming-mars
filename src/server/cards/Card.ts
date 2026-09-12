@@ -1,7 +1,7 @@
 import {CardMetadata} from '../../common/cards/CardMetadata';
 import {CardName} from '../../common/cards/CardName';
 import {CardType} from '../../common/cards/CardType';
-import {CardDiscount, GlobalParameterRequirementBonus} from '../../common/cards/Types';
+import {CardDiscount, GlobalParameterRequirementBonus, TagCardRequirementBonus} from '../../common/cards/Types';
 import {AdjacencyBonus} from '../ares/AdjacencyBonus';
 import {CardResource} from '../../common/CardResource';
 import {Tag} from '../../common/cards/Tag';
@@ -58,6 +58,7 @@ type SharedProperties = {
   initialActionText?: string;
   firstAction?: Behavior & {text: string};
   globalParameterRequirementBonus?: GlobalParameterRequirementBonus;
+  tagCardRequirementBonus?: TagCardRequirementBonus;
   metadata: CardMetadata;
   requirements?: CardRequirementsDescriptor;
   name: CardName;
@@ -472,6 +473,22 @@ export abstract class Card implements ICard {
         }
       }
       return globalParameterRequirementBonus.steps;
+    }
+    return 0;
+  }
+
+  public getTagCardRequirementBonus(player: IPlayer, tag: Tag): number {
+    if (this.properties.tagCardRequirementBonus !== undefined) {
+      const tagCardRequirementBonus = this.properties.tagCardRequirementBonus;
+      if (tagCardRequirementBonus.nextCardOnly === true) {
+        if (player.lastCardPlayed !== this.name) {
+          return 0;
+        }
+      }
+      if (tagCardRequirementBonus.tag !== tag) {
+        return 0;
+      }
+      return tagCardRequirementBonus.steps;
     }
     return 0;
   }

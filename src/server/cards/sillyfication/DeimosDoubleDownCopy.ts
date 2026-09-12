@@ -140,6 +140,9 @@ export class DeimosDoubleDownCopy implements IProjectCard {
   public getGlobalParameterRequirementBonus(player: IPlayer, parameter: GlobalParameter): number {
     return this.source.getGlobalParameterRequirementBonus(player, parameter);
   }
+  public getTagCardRequirementBonus(player: IPlayer, tag: Tag): number {
+    return this.source.getTagCardRequirementBonus(player, tag);
+  }
 
   public serialize(serialized: SerializedCard): void {
     serialized.data = {sourceCardName: this.sourceCardName};

@@ -96,6 +96,13 @@ export interface ICard {
    * see `globalParameterRequirementBonus` for more information.
    */
   getGlobalParameterRequirementBonus(player: IPlayer, parameter: GlobalParameter): number;
+  /**
+   * The +/- bonus applied to a tag-count requirement, e.g. Excavation Syria Planum.
+   *
+   * NB: Instances of `Card` allow using a JSON object to describe the tag requirement bonus,
+   * see `tagCardRequirementBonus` for more information.
+   */
+  getTagCardRequirementBonus(player: IPlayer, tag: Tag): number;
   victoryPoints?: number | 'special' | CountableVictoryPoints,
   getVictoryPoints(player: IPlayer, context?: GetVictoryPointsContext): number;
   /** Returns any dynamic influence value */
@@ -114,6 +121,17 @@ export interface ICard {
   onCardsDrawn?(cardOwner: IPlayer, drawingPlayer: IPlayer, count: number): void;
   onStandardProject?(player: IPlayer, project: IStandardProjectCard): void;
   onTilePlaced?(cardOwner: IPlayer, activePlayer: IPlayer, space: Space, boardType: BoardType): void;
+  /**
+   * Called once, on every card in every player's tableau, after the final greenery phase
+   * concludes for every player but before end-of-game scoring runs. For cards with a forced
+   * one-shot effect that has to happen at that exact moment (e.g. idesOfMars' Hidden City:
+   * "place a City on Mars" as the very last tile placement of the game).
+   *
+   * Implementations should `player.defer(...)` their own work rather than acting synchronously,
+   * and must track their own idempotency (e.g. a `this.data` flag, or checking board state)
+   * since Game.ts's resolution loop may call this more than once while deferred actions drain.
+   */
+  onFinalGreeneryPlacementComplete?(player: IPlayer): void;
   /**
    * Called on every card in every player's tableau whenever anybody moves a marker (either
    * direction) on the Delta Project track.

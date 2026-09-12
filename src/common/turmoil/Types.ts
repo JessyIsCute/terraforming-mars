@@ -8,7 +8,7 @@ export type AgendaStyle =
   /** The incoming chairman sets the incoming policy and bonus each generation. */
   'Chairman';
 
-const PARTIES = ['m', 's', 'u', 'k', 'r', 'g'] as const;
+const PARTIES = ['m', 's', 'u', 'k', 'r', 'g', 'pop', 'spo', 'emp', 'bur', 'cen', 'tra'] as const;
 const BONUS_SUFFIXES = ['b01', 'b02'] as const;
 const POLICY_SUFFIXES = ['p01', 'p02', 'p03', 'p04'] as const;
 
@@ -41,6 +41,12 @@ const names: Record<Party, PartyName> = {
   k: PartyName.KELVINISTS,
   r: PartyName.REDS,
   g: PartyName.GREENS,
+  pop: PartyName.POPULISTS,
+  spo: PartyName.SPOME,
+  emp: PartyName.EMPOWER,
+  bur: PartyName.BUREAUCRATS,
+  cen: PartyName.CENTRISTS,
+  tra: PartyName.TRANSHUMANISTS,
 } as const;
 
 export type AgendaInfo = {

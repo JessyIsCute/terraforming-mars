@@ -196,6 +196,8 @@ export class Game implements IGame, Logger {
   public tradeEmbargo: boolean = false;
   // Behold The Emperor
   public beholdTheEmperor: boolean = false;
+  // Backstabbing (idesOfMars, fan)
+  public backstabbingPlayer: PlayerId | undefined = undefined;
   // Double Down
   public inDoubleDown: boolean = false;
   public doubleDownPrelude: CardName | undefined = undefined;
@@ -519,6 +521,7 @@ export class Game implements IGame, Logger {
       activePlayer: this.activePlayer.id,
       awards: this.awards.map(toName),
       beholdTheEmperor: this.beholdTheEmperor,
+      backstabbingPlayer: this.backstabbingPlayer,
       board: this.board.serialize(),
       claimedMilestones: serializeClaimedMilestones(this.claimedMilestones),
       ceoDeck: this.ceoDeck.serialize(),
@@ -1245,6 +1248,33 @@ export class Game implements IGame, Logger {
         this.donePlayers.add(player.id);
       }
     }
+    this.resolveEndOfGameCardEffects();
+  }
+
+  /**
+   * Hook for cards with a forced one-shot effect that must resolve after the final greenery
+   * phase concludes for every player, but before end-of-game scoring runs -- e.g. idesOfMars'
+   * Hidden City ("place a City on Mars" as the very last tile placement of the game). See
+   * ICard.onFinalGreeneryPlacementComplete for the contract cards implement against this.
+   *
+   * This mirrors the drain-then-check idiom used just above in takeNextFinalGreeneryAction and
+   * in postProductionPhase: cards are expected to queue their work via `player.defer(...)`
+   * rather than act synchronously, so this may need to run more than once as those deferred
+   * actions (which can require real player input, e.g. choosing a space) drain one at a time.
+   */
+  private resolveEndOfGameCardEffects(): void {
+    if (this.deferredActions.length > 0) {
+      this.deferredActions.runAll(() => this.resolveEndOfGameCardEffects());
+      return;
+    }
+
+    this.triggerForAllCards((p, c) => c.onFinalGreeneryPlacementComplete?.(p));
+
+    if (this.deferredActions.length > 0) {
+      this.deferredActions.runAll(() => this.resolveEndOfGameCardEffects());
+      return;
+    }
+
     this.updatePlayerVPForTheGeneration();
     this.updateGlobalsForTheGeneration();
     this.gotoEndGame();
@@ -1492,6 +1522,15 @@ export class Game implements IGame, Logger {
 
     // Clear out underworld components.
     UnderworldExpansion.onTilePlaced(this, space);
+
+    // Rob Antilles (Sedimentary Rocks): get 3 M€ when a City tile is placed over a Sediment
+    // tile. This is generic (not gated to Sedimentary Rocks' own action) because the covering
+    // City tile can come from any card or the City standard project -- see
+    // MarsBoard.getAvailableSpacesForCity and MarsBoard.canCover for the placement side of this.
+    if (initialTileType === TileType.SEDIMENT && space.tile?.tileType === TileType.CITY) {
+      player.stock.add(Resource.MEGACREDITS, 3, {log: true});
+      this.log('${0} gained 3 M€ for placing a City tile over a Sediment tile', (b) => b.player(player));
+    }
 
     // Energy Harvest tracks whether a player's most recent action placed a greenery.
     if (space.tile !== undefined && space.player === player && GREENERY_TILES.has(space.tile.tileType)) {
@@ -1875,7 +1914,7 @@ export class Game implements IGame, Logger {
 
     // Reload turmoil elements if needed
     if (d.turmoil && gameOptions.turmoilExtension) {
-      game.turmoil = Turmoil.deserialize(d.turmoil, players);
+      game.turmoil = Turmoil.deserialize(d.turmoil, players, gameOptions);
     }
 
     // Reload moon elements if needed
@@ -1923,6 +1962,7 @@ export class Game implements IGame, Logger {
     game.nomadSpace = d.nomadSpace;
     game.tradeEmbargo = d.tradeEmbargo ?? false;
     game.beholdTheEmperor = d.beholdTheEmperor ?? false;
+    game.backstabbingPlayer = d.backstabbingPlayer;
     game.globalsPerGeneration = d.globalsPerGeneration;
 
     // TODO(kberg): Remove this migration code by 2026-08-01

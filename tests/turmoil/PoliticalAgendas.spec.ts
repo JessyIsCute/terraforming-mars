@@ -49,7 +49,8 @@ describe('PoliticalAgendas', () => {
 
     it('Chairman mode, human chairperson' + suffix, () => {
       // For the neutral chairman to always pick the second item in the list.
-      PoliticalAgendas.randomElement = (list: Array<any>) => list[1];
+      // Some placeholder parties only have one bonus/policy; fall back to index 0 for those.
+      PoliticalAgendas.randomElement = (list: Array<any>) => list[Math.min(1, list.length - 1)];
 
       let game = Game.newInstance('gameid', [player1, player2], player1, 'spectatorid', {turmoilExtension: true, politicalAgendasExtension: 'Chairman'});
       let newPlayer2: IPlayer = player2;
@@ -87,7 +88,8 @@ describe('PoliticalAgendas', () => {
 
     it('Chairman mode, neutral chairperson' + suffix, () => {
       // For the neutral chairperson to always pick the second item.
-      PoliticalAgendas.randomElement = (list: Array<any>) => list[1];
+      // Some placeholder parties only have one bonus/policy; fall back to index 0 for those.
+      PoliticalAgendas.randomElement = (list: Array<any>) => list[Math.min(1, list.length - 1)];
 
       let game = Game.newInstance('gameid', [player1, player2], player1, 'spectatorid', {turmoilExtension: true, politicalAgendasExtension: 'Chairman'});
       if (deserialize) {

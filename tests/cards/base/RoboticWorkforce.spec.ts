@@ -321,6 +321,13 @@ describe('RoboticWorkforce', () => {
           if (card.name === CardName.SOLAR_FARM || card.name === CardName.SMALL_OPEN_PIT_MINE) {
             return;
           }
+          // These place a tile with a placement prerequisite (an off-world city, an existing
+          // greenery, an ocean adjacent to a city) that this generic test's fixed board setup
+          // doesn't provide, so they have no legal space to place on here. Real playability is
+          // covered by their own dedicated tests.
+          if (card.name === CardName.FLYING_GARDEN || card.name === CardName.SUBURBS || card.name === CardName.HARBOR_BOREALIS) {
+            return;
+          }
 
           testCard(card);
         });

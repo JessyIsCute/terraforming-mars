@@ -216,6 +216,10 @@ class StandardDraft extends Draft {
     if (player.tableau.has(CardName.MARS_MATHS)) {
       return 5;
     }
+    // Great Face of Cydonia (Rob Antilles): draw 1 extra card during the research phase.
+    if (player.tableau.has(CardName.GREAT_FACE_OF_CYDONIA)) {
+      return 5;
+    }
 
     return 4;
   }
@@ -226,6 +230,10 @@ class StandardDraft extends Draft {
         return 2;
       }
       if (player.tableau.has(CardName.MARS_MATHS)) {
+        return 2;
+      }
+      // Great Face of Cydonia (Rob Antilles): may keep 2 cards in the first draft round.
+      if (player.tableau.has(CardName.GREAT_FACE_OF_CYDONIA)) {
         return 2;
       }
     }

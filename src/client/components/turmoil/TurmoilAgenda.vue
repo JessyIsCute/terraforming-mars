@@ -180,6 +180,9 @@
       <span class="red-arrow-3x"></span>3<span class="plant resource"></span> / 2<span class="microbe resource"></span>
       </div>
     </template>
+    <template v-else-if="isPlaceholderId">
+      <div>No effect yet</div>
+    </template>
     <template v-else>
       <div>Unknown agenda ID {{id}}</div>
     </template>
@@ -214,6 +217,12 @@ export default defineComponent({
         g: 'greens',
       };
       return 'party-badge party-badge--' + partyBadgeSlugs[this.id[0]];
+    },
+    // These six placeholder parties (no published bonus/policy defined yet) share this
+    // generic "no effect" display instead of a bespoke template block.
+    isPlaceholderId(): boolean {
+      const placeholderPrefixes = ['pop', 'spo', 'emp', 'bur', 'cen', 'tra'];
+      return placeholderPrefixes.some((prefix) => this.id.startsWith(prefix));
     },
   },
 });

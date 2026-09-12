@@ -26,6 +26,18 @@ export type GlobalParameterRequirementBonus = {
 };
 
 /**
+ * A type of tag-count requirement bonus (e.g. Excavation Syria Planum).
+ */
+export type TagCardRequirementBonus = {
+  /** The size of the bonus. */
+  steps: number,
+  /** The tag whose requirement count this reduces (or increases). */
+  tag: Tag,
+  /** This bonus only applies to the next card played when this is true. */
+  nextCardOnly?: boolean,
+};
+
+/**
  * Describes which non-megacredit resources a standard project accepts as payment.
  */
 export type StandardProjectCanPayWith = {

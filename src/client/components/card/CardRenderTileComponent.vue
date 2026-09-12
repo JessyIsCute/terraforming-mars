@@ -151,6 +151,15 @@ const TILE_CLASSES: Record<TileType, Classes> = {
     tile: 'card-tile-neural-instance',
   },
   [TileType.GARBAGE_DUMP]: {},
+  [TileType.PUMPING_HUB]: {},
+  [TileType.INVAK_CITY]: {}, // This isn't shown on a card
+  [TileType.ANIMAL_DOME]: {},
+  [TileType.BIOLOGICAL_DOME]: {},
+  [TileType.SEDIMENT]: {},
+  [TileType.SUBURBS]: {},
+  [TileType.HARBOR_BOREALIS]: {},
+  [TileType.INDUSTRIAL_METROPOLIS]: {},
+  [TileType.PARADISE_CITY]: {},
 };
 
 export default defineComponent({

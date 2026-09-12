@@ -40,4 +40,10 @@ export type PoliticalAgendasModel = {
   greens: Agenda;
   reds: Agenda;
   kelvinists: Agenda;
+  populists: Agenda;
+  spome: Agenda;
+  empower: Agenda;
+  bureaucrats: Agenda;
+  centrists: Agenda;
+  transhumanists: Agenda;
 }

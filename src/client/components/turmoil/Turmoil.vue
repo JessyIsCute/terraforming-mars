@@ -124,6 +124,18 @@ export default defineComponent({
         return politicalAgendas.reds.bonusId;
       case PartyName.GREENS:
         return politicalAgendas.greens.bonusId;
+      case PartyName.POPULISTS:
+        return politicalAgendas.populists.bonusId;
+      case PartyName.SPOME:
+        return politicalAgendas.spome.bonusId;
+      case PartyName.EMPOWER:
+        return politicalAgendas.empower.bonusId;
+      case PartyName.BUREAUCRATS:
+        return politicalAgendas.bureaucrats.bonusId;
+      case PartyName.CENTRISTS:
+        return politicalAgendas.centrists.bonusId;
+      case PartyName.TRANSHUMANISTS:
+        return politicalAgendas.transhumanists.bonusId;
       }
     },
     getPolicy(partyName: PartyName): PolicyId {
@@ -144,6 +156,18 @@ export default defineComponent({
         return politicalAgendas.reds.policyId;
       case PartyName.GREENS:
         return politicalAgendas.greens.policyId;
+      case PartyName.POPULISTS:
+        return politicalAgendas.populists.policyId;
+      case PartyName.SPOME:
+        return politicalAgendas.spome.policyId;
+      case PartyName.EMPOWER:
+        return politicalAgendas.empower.policyId;
+      case PartyName.BUREAUCRATS:
+        return politicalAgendas.bureaucrats.policyId;
+      case PartyName.CENTRISTS:
+        return politicalAgendas.centrists.policyId;
+      case PartyName.TRANSHUMANISTS:
+        return politicalAgendas.transhumanists.policyId;
       default:
         throw new Error(`Unknown party name ${partyName}`);
       }

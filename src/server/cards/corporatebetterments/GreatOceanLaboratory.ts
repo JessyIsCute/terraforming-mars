@@ -8,6 +8,7 @@ import {Resource} from '../../../common/Resource';
 import {ICard} from '../ICard';
 import {GainProduction} from '../../deferredActions/GainProduction';
 import {CardRenderer} from '../render/CardRenderer';
+import {Units} from '../../../common/Units';
 
 export class GreatOceanLaboratory extends Card implements IProjectCard {
   constructor() {
@@ -41,5 +42,10 @@ export class GreatOceanLaboratory extends Card implements IProjectCard {
     if (amount > 0) {
       player.game.defer(new GainProduction(player, Resource.MEGACREDITS, {count: amount}));
     }
+  }
+
+  // Exposes this card's own contribution (its Microbe tag) so Robotic Workforce can replay it.
+  public productionBox(player: IPlayer): Units {
+    return Units.of({megacredits: player.tags.cardTagCount(this, Tag.MICROBE)});
   }
 }

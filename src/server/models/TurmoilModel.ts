@@ -40,6 +40,12 @@ export function getTurmoilModel(game: IGame): TurmoilModel | undefined {
       greens: PoliticalAgendas.getAgenda(turmoil, PartyName.GREENS),
       reds: PoliticalAgendas.getAgenda(turmoil, PartyName.REDS),
       kelvinists: PoliticalAgendas.getAgenda(turmoil, PartyName.KELVINISTS),
+      populists: PoliticalAgendas.getAgenda(turmoil, PartyName.POPULISTS),
+      spome: PoliticalAgendas.getAgenda(turmoil, PartyName.SPOME),
+      empower: PoliticalAgendas.getAgenda(turmoil, PartyName.EMPOWER),
+      bureaucrats: PoliticalAgendas.getAgenda(turmoil, PartyName.BUREAUCRATS),
+      centrists: PoliticalAgendas.getAgenda(turmoil, PartyName.CENTRISTS),
+      transhumanists: PoliticalAgendas.getAgenda(turmoil, PartyName.TRANSHUMANISTS),
     };
 
     const policyActionUsers = Array.from(

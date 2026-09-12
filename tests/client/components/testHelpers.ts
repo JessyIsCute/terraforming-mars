@@ -244,5 +244,29 @@ export function fakePoliticalAgendasModel(): PoliticalAgendasModel {
       bonusId: 'kb01',
       policyId: 'kp01',
     },
+    populists: {
+      bonusId: 'popb01',
+      policyId: 'popp01',
+    },
+    spome: {
+      bonusId: 'spob01',
+      policyId: 'spop01',
+    },
+    empower: {
+      bonusId: 'empb01',
+      policyId: 'empp01',
+    },
+    bureaucrats: {
+      bonusId: 'burb01',
+      policyId: 'burp01',
+    },
+    centrists: {
+      bonusId: 'cenb01',
+      policyId: 'cenp01',
+    },
+    transhumanists: {
+      bonusId: 'trab01',
+      policyId: 'trap01',
+    },
   };
 }

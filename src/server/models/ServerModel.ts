@@ -331,6 +331,10 @@ export class Server {
       protection.titanium = 'on';
     }
 
+    if (player.megacreditsAreProtected()) {
+      protection.megacredits = 'on';
+    }
+
     if (player.plantsAreProtected()) {
       protection.plants = 'on';
     } else if (player.tableau.has(CardName.BOTANICAL_EXPERIENCE)) {

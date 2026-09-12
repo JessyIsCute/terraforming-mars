@@ -1,4 +1,4 @@
-import {OCEAN_UPGRADE_TILES, TileType} from '../../common/TileType';
+import {CITY_TILES, CITY_UPGRADE_TILES, GREENERY_TILES, GREENERY_UPGRADE_TILES, OCEAN_UPGRADE_TILES, TileType} from '../../common/TileType';
 import {SpaceType} from '../../common/boards/SpaceType';
 import {CanAffordOptions, IPlayer} from '../IPlayer';
 import {Board} from './Board';
@@ -110,9 +110,15 @@ export class MarsBoard extends Board {
       return (spacesNextToMySpaces.length > 0) ? spacesNextToMySpaces : spacesOnLand;
     }
     // A city cannot be adjacent to another city
-    return spacesOnLand.filter(
+    const normal = spacesOnLand.filter(
       (space) => this.getAdjacentSpaces(space).some((adjacentSpace) => Board.isCitySpace(adjacentSpace)) === false,
     );
+    // Rob Antilles: Sedimentary Rocks reserves a space for its owner with a Sediment tile, which
+    // that player may later cover with a City tile "ignoring the normal placement rules" -- so it
+    // shows up here even though it's already occupied and even if it's adjacent to another city.
+    const sedimentSpaces = this.spaces.filter((space) =>
+      space.tile?.tileType === TileType.SEDIMENT && space.player?.id === player.id && !normal.includes(space));
+    return sedimentSpaces.length > 0 ? [...normal, ...sedimentSpaces] : normal;
   }
 
   public hasAvailableCitySpaceWithBonus(player: IPlayer, bonus: SpaceBonus): boolean {
@@ -274,6 +280,23 @@ export class MarsBoard extends Board {
       return true;
     }
     if (space.tile.tileType === TileType.OCEAN && OCEAN_UPGRADE_TILES.has(newTile.tileType)) {
+      return true;
+    }
+    // Rob Antilles: Suburbs is placed on top of the player's own greenery, and Industrial
+    // Metropolis/Paradise City are placed on top of the player's own city, mirroring the
+    // ocean-upgrade pattern above for the other two base tile types.
+    if (GREENERY_TILES.has(space.tile.tileType) && GREENERY_UPGRADE_TILES.has(newTile.tileType)) {
+      return true;
+    }
+    if (CITY_TILES.has(space.tile.tileType) && CITY_UPGRADE_TILES.has(newTile.tileType)) {
+      return true;
+    }
+    // Rob Antilles: Sedimentary Rocks' Sediment special tile can later be covered by a normal
+    // City tile (from any source: another card, or the City standard project), ignoring the
+    // usual "space must be empty" rule. See MarsBoard.getAvailableSpacesForCity for the other
+    // half of this (surfacing the space as a legal city target and exempting it from the
+    // "no city adjacent to city" rule), and Game.addTile for the M€ reward on the cover.
+    if (space.tile.tileType === TileType.SEDIMENT && newTile.tileType === TileType.CITY) {
       return true;
     }
     return false;

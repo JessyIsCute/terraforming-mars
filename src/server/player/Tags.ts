@@ -37,6 +37,7 @@ export type MultipleCountMode =
  * 3. Habitat Marte (PF) Mars tags count as science tags.
  * 4. Chimera (PF) has two wild tags, but only count as one tag for milestones and (funding) awards.
  * 5. Nereid Biosystems (fan) Jovian tags count as microbe tags.
+ * 6. Galileo Institute (fan, idesOfMars) Jovian tags count as science tags, but not vice versa.
  *
  */
 export class Tags {
@@ -113,6 +114,10 @@ export class Tags {
       if (tag === Tag.MICROBE && this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
         tagCount += this.rawCount(Tag.JOVIAN, includeEvents);
       }
+      // Galileo Institute hook
+      if (tag === Tag.SCIENCE && this.player.tableau.has(CardName.GALILEO_INSTITUTE)) {
+        tagCount += this.rawCount(Tag.JOVIAN, includeEvents);
+      }
     }
 
     // Chimera hook
@@ -148,6 +153,11 @@ export class Tags {
         this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
         return true;
       }
+      if (tag === Tag.JOVIAN &&
+        target === Tag.SCIENCE &&
+        this.player.tableau.has(CardName.GALILEO_INSTITUTE)) {
+        return true;
+      }
     }
     if (target === Tag.EVENT && card.type === CardType.EVENT) {
       return true;
@@ -172,6 +182,9 @@ export class Tags {
         count++;
       } else if (tag === Tag.JOVIAN && targets.includes(Tag.MICROBE) &&
         this.player.tableau.has(CardName.NEREID_BIOSYSTEMS)) {
+        count++;
+      } else if (tag === Tag.JOVIAN && targets.includes(Tag.SCIENCE) &&
+        this.player.tableau.has(CardName.GALILEO_INSTITUTE)) {
         count++;
       }
     }

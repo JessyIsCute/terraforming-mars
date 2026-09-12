@@ -189,6 +189,9 @@ class FakeCard implements IProjectCard {
   public getGlobalParameterRequirementBonus(): number {
     return 0;
   }
+  public getTagCardRequirementBonus(): number {
+    return 0;
+  }
   public type = CardType.ACTIVE;
   public metadata = {};
   public resourceCount = 0;

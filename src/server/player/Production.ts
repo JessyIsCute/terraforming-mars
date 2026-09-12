@@ -5,6 +5,7 @@ import {BaseStock} from './StockBase';
 import {IPlayer} from '../IPlayer';
 import {CardName} from '../../common/cards/CardName';
 import {RebalanceSeebeckProductionLoss} from '../deferredActions/RebalanceSeebeckProductionLoss';
+import {OrcTurbinesProductionSwap} from '../deferredActions/OrcTurbinesProductionSwap';
 
 export class Production extends BaseStock {
   constructor(player: IPlayer) {
@@ -13,7 +14,7 @@ export class Production extends BaseStock {
   public add(
     resource: Resource,
     amount : number,
-    options? : { log: boolean, from? : From, stealing?: boolean, skipSeebeckRedistribution?: boolean},
+    options? : { log: boolean, from? : From, stealing?: boolean, skipSeebeckRedistribution?: boolean, skipOrcTurbinesSwap?: boolean},
   ) {
     // Sistemas Seebeck: energy and heat production are one pool for its owner - redirect a
     // reduction to either into a deferred choice of how to split it between the two,
@@ -24,6 +25,18 @@ export class Production extends BaseStock {
       this.player.game !== undefined &&
       this.player.tableau.has(CardName.SISTEMAS_SEEBECK)) {
       this.player.game.defer(new RebalanceSeebeckProductionLoss(this.player, resource, -amount, options));
+      return;
+    }
+
+    // Orc Turbines (Rob Antilles): "every time you decrease your Energy production, you can
+    // decrease your Heat production by 2 instead" - offer the substitution instead of applying
+    // the Energy loss directly.
+    if (amount < 0 &&
+      resource === Resource.ENERGY &&
+      options?.skipOrcTurbinesSwap !== true &&
+      this.player.game !== undefined &&
+      this.player.tableau.has(CardName.ORC_TURBINES)) {
+      this.player.game.defer(new OrcTurbinesProductionSwap(this.player, -amount, options));
       return;
     }
 

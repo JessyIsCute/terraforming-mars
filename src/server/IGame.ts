@@ -119,6 +119,12 @@ export interface IGame extends Logger {
   tradeEmbargo: boolean;
   /** True when Behold The Emperor is in effect this coming Turmoil phase */
   beholdTheEmperor: boolean;
+  /**
+   * For Backstabbing (idesOfMars, fan): if this player has a delegate in the winning party
+   * at the next Turmoil phase, they become chairman instead of that party's leader. Consumed
+   * (cleared) by that Turmoil phase whether or not it actually applied.
+   */
+  backstabbingPlayer: PlayerId | undefined;
   /** Double Down: tracking when an action is due to double down. Does not need to be serialized. */
   inDoubleDown: boolean;
   /**

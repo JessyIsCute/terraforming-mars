@@ -27,6 +27,7 @@ export type SerializedGame = {
     aresData?: AresData;
     awards: Array<AwardName>;
     beholdTheEmperor?: boolean;
+    backstabbingPlayer?: PlayerId;
     board: SerializedBoard;
     ceoDeck: SerializedDeck;
     currentSeed: number;

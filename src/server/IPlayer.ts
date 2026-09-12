@@ -96,6 +96,9 @@ export interface IPlayer {
   // Sistemas Seebeck (fan): set right before an action resolves to mark it as free -
   // takeAction() checks and clears this instead of incrementing actionsTakenThisRound.
   skipNextActionIncrement: boolean;
+  // robAntilles (fan, Giga Interferometer): set while this player has an unanswered mid-generation
+  // ad hoc research/draft selection pending - takeAction() leaves their waitingFor alone until it clears.
+  awaitingAdHocResearch: boolean;
   // Luna Trade Federation
   canUseTitaniumAsMegacredits: boolean;
   // Martian Lumber Corp
@@ -167,6 +170,13 @@ export interface IPlayer {
    */
   trThisGeneration: number;
   /**
+   * When set to the current generation, this player may end their turn having taken 0
+   * actions this round without it counting as passing.
+   *
+   * For Administrative Delay (idesOfMars, fan).
+   */
+  administrativeDelayActiveGeneration: number | undefined;
+  /**
    * The list of standard projects (EXCEPT SELL PATENTS) this player has taken this generation.
    *
    * For Underworld: Standard Technology and Labor Trafficking
@@ -225,6 +235,7 @@ export interface IPlayer {
   getVictoryPoints(): VictoryPointsBreakdown;
   plantsAreProtected(): boolean;
   alloysAreProtected(): boolean;
+  megacreditsAreProtected(): boolean;
   /**
    * Return true when |resource| cannot be stolen from this player.
    */
@@ -288,6 +299,11 @@ export interface IPlayer {
    */
   temporaryGlobalParameterRequirementBonus: number;
   /**
+   * For the given tag, return a sum of all tag-count requirement bonuses this
+   * player has thanks to played cards (e.g. Excavation Syria Planum).
+   */
+  getTagCardRequirementBonus(tag: Tag): number;
+  /**
    * Called when this player is responsible for increasing a global parameter.
    */
   onGlobalParameterIncrease(parameter: GlobalParameter, steps: number): void;
@@ -327,7 +343,7 @@ export interface IPlayer {
   runProductionPhase(): void;
   finishProductionPhase(): void;
 
-  runResearchPhase(): void;
+  runResearchPhase(onFinished?: () => void): void;
   getCardCost(card: IProjectCard): number;
 
   /** The number of resources on this card for this player, or 0 if the player does not have this card. */

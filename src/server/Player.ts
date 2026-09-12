@@ -67,6 +67,7 @@ import {message} from './logs/MessageBuilder';
 import {calculateVictoryPoints} from './game/calculateVictoryPoints';
 import {VictoryPointsBreakdown} from '../common/game/VictoryPointsBreakdown';
 import {Supercapacitors} from './cards/promo/Supercapacitors';
+import {deferEnergyKeep, getEnergyKeepCap} from './cards/robantilles/RobAntillesEnergyKeep';
 import {CanAffordOptions, CardAction, IPlayer} from './IPlayer';
 import {IPreludeCard} from './cards/prelude/IPreludeCard';
 import {copyAndClear, inplaceRemove, sum, toName} from '../common/utils/utils';
@@ -126,6 +127,8 @@ export class Player implements IPlayer {
   public canUseHeatAsMegaCredits: boolean = false;
   // Sistemas Seebeck (fan): see IPlayer.skipNextActionIncrement.
   public skipNextActionIncrement: boolean = false;
+  // robAntilles (fan, Giga Interferometer): see IPlayer.awaitingAdHocResearch.
+  public awaitingAdHocResearch: boolean = false;
   // Martian Lumber Corp
   public canUsePlantsAsMegacredits: boolean = false;
   // Luna Trade Federation
@@ -182,6 +185,9 @@ export class Player implements IPlayer {
   public removedFromPlayCards: Array<IProjectCard> = [];
   public preservationProgram = false;
   public trThisGeneration = 0;
+  // Administrative Delay (idesOfMars, fan): when set to the current generation, this player
+  // may end their turn having taken 0 actions this round without it counting as passing.
+  public administrativeDelayActiveGeneration: number | undefined = undefined;
   public underworldData: UnderworldPlayerData = UnderworldExpansion.initializePlayer();
   public conglomeratesData: ConglomeratesPlayerData = ConglomeratesExpansion.initializePlayer();
   public deltaProjectData?: DeltaProjectPlayerModel;
@@ -411,7 +417,12 @@ export class Player implements IPlayer {
   }
 
   public alloysAreProtected(): boolean {
-    return this.playedCards.has(CardName.LUNAR_SECURITY_STATIONS);
+    return this.playedCards.has(CardName.LUNAR_SECURITY_STATIONS) ||
+      this.playedCards.has(CardName.MARTIAN_ARMED_FORCES);
+  }
+
+  public megacreditsAreProtected(): boolean {
+    return this.playedCards.has(CardName.MARTIAN_ARMED_FORCES);
   }
 
   public isProtected(resource: Resource) {
@@ -421,6 +432,8 @@ export class Player implements IPlayer {
     case Resource.STEEL:
     case Resource.TITANIUM:
       return this.alloysAreProtected();
+    case Resource.MEGACREDITS:
+      return this.megacreditsAreProtected();
     }
     return false;
   }
@@ -523,6 +536,14 @@ export class Player implements IPlayer {
 
     requirementsBonus += UnderworldExpansion.getGlobalParameterRequirementBonus(this, parameter);
 
+    return requirementsBonus;
+  }
+
+  public getTagCardRequirementBonus(tag: Tag): number {
+    let requirementsBonus = 0;
+    for (const card of this.tableau) {
+      requirementsBonus += card.getTagCardRequirementBonus(this, tag);
+    }
     return requirementsBonus;
   }
 
@@ -644,8 +665,11 @@ export class Player implements IPlayer {
 
     this.turmoilPolicyActionUsed = false;
     this.politicalAgendasActionUsedCount = 0;
+    const energyKeepCap = getEnergyKeepCap(this);
     if (this.playedCards.has(CardName.SUPERCAPACITORS)) {
       Supercapacitors.onProduction(this);
+    } else if (energyKeepCap > 0) {
+      deferEnergyKeep(this, energyKeepCap);
     } else {
       this.heat += this.energy;
       this.energy = 0;
@@ -693,7 +717,7 @@ export class Player implements IPlayer {
     return total;
   }
 
-  public runResearchPhase(): void {
+  public runResearchPhase(onFinished: () => void = () => this.game.playerIsFinishedWithResearchPhase(this)): void {
     if (!this.game.gameOptions.draftVariant || this.game.isSoloMode()) {
       this.draftedCards = newStandardDraft(this.game).draw(this);
     }
@@ -703,6 +727,9 @@ export class Player implements IPlayer {
     let selectable = this.draftedCards.length;
     if (this.playedCards.has(CardName.MARS_MATHS) && !this.playedCards.has(CardName.LUNA_PROJECT_OFFICE)) {
       selectable = Math.min(selectable, 4);
+    }
+    if (this.playedCards.has(CardName.BUDGET_RESTRICTIONS)) {
+      selectable = Math.min(selectable, 3);
     }
     if (this.nextResearchKeepMax !== undefined) {
       selectable = Math.min(selectable, this.nextResearchKeepMax);
@@ -724,7 +751,7 @@ export class Player implements IPlayer {
       const saved = action.cb;
       action.cb = ((response) => {
         saved(response);
-        this.game.playerIsFinishedWithResearchPhase(this);
+        onFinished();
         return undefined;
       });
       return action;
@@ -1590,6 +1617,14 @@ export class Player implements IPlayer {
       return;
     }
 
+    // robAntilles (fan, Giga Interferometer): a mid-generation ad hoc research phase set this
+    // player's waitingFor to their drafted-card selection. Leave it alone here instead of
+    // clobbering it with the normal next-action prompt below; runResearchPhase's onFinished
+    // callback clears the flag and resumes this method once they've answered it.
+    if (this.awaitingAdHocResearch) {
+      return;
+    }
+
     if (this.actionsTakenThisRound === 0 || game.gameOptions.undoOption) {
       game.save();
     }
@@ -1844,8 +1879,11 @@ export class Player implements IPlayer {
     });
 
     // End turn
+    // Administrative Delay (idesOfMars, fan): lets this player end a turn with 0 actions
+    // taken, without it counting as passing, for the rest of the generation it was played.
+    const administrativeDelayInEffect = this.administrativeDelayActiveGeneration === this.game.generation;
     if (this.game.players.length > 1 &&
-      this.actionsTakenThisRound > 0 &&
+      (this.actionsTakenThisRound > 0 || administrativeDelayInEffect) &&
       !this.game.gameOptions.fastModeOption &&
       this.allOtherPlayersHavePassed() === false) {
       action.options.push(this.endTurnOption());
@@ -2000,6 +2038,7 @@ export class Player implements IPlayer {
       canUseTitaniumAsMegacredits: this.canUseTitaniumAsMegacredits,
       preservationProgram: this.preservationProgram,
       trThisGeneration: this.trThisGeneration,
+      administrativeDelayActiveGeneration: this.administrativeDelayActiveGeneration,
       // This generation / this round
       actionsTakenThisRound: this.actionsTakenThisRound,
       availableActionsThisRound: this.availableActionsThisRound,
@@ -2160,6 +2199,7 @@ export class Player implements IPlayer {
     player.preservationProgram = d.preservationProgram ?? false;
     // TODO(kberg): remove ?? 0 by 2026-11-01
     player.trThisGeneration = d.trThisGeneration ?? 0;
+    player.administrativeDelayActiveGeneration = d.administrativeDelayActiveGeneration;
 
     player.timer = Timer.deserialize(d.timer);
     player.underworldData = d.underworldData;

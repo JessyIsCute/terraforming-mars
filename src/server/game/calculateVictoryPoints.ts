@@ -16,11 +16,14 @@ export function calculateVictoryPoints(player: IPlayer) {
   const builder = new VictoryPointsBreakdownBuilder();
 
   // Victory points from cards
+  // idesOfMars' Public Relations: this player's own negative-VP cards no longer count against
+  // them (doesn't affect the Vermin penalty below, which isn't "a card you own").
+  const ignoreOwnNegativeVP = player.tableau.some((c) => c.name === CardName.PUBLIC_RELATIONS);
   let playerOwnsVermin = false; // For Vermin
   for (const playedCard of player.tableau) {
     if (playedCard.victoryPoints !== undefined) {
       const vp = playedCard.getVictoryPoints(player);
-      builder.setVictoryPoints('victoryPoints', vp, playedCard.name);
+      builder.setVictoryPoints('victoryPoints', ignoreOwnNegativeVP && vp < 0 ? 0 : vp, playedCard.name);
     }
     // MutationMarkets: a mutation's ongoing VP bonus applies even to a card with no
     // printed victoryPoints formula of its own.
@@ -132,10 +135,14 @@ export function calculateVictoryPoints(player: IPlayer) {
  * copy of this instead of importing it.
  */
 function calculateNegativeVP(player: IPlayer): number {
+  // idesOfMars' Public Relations: mirrors the same card-level exclusion applied above, so a
+  // player who no longer suffers their own negative-VP cards also doesn't get an Underworld
+  // corruption bribe for VP they were never docked in the first place.
+  const ignoreOwnNegativeVP = player.tableau.some((c) => c.name === CardName.PUBLIC_RELATIONS);
   let negativeVP = 0;
   let playerOwnsVermin = false;
   for (const playedCard of player.tableau) {
-    if (playedCard.victoryPoints !== undefined) {
+    if (playedCard.victoryPoints !== undefined && !ignoreOwnNegativeVP) {
       const vp = playedCard.getVictoryPoints(player);
       if (vp < 0) {
         negativeVP += vp;

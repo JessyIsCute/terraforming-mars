@@ -6,7 +6,14 @@ import {Unity} from './parties/Unity';
 import {Kelvinists} from './parties/Kelvinists';
 import {Reds} from './parties/Reds';
 import {Greens} from './parties/Greens';
+import {Populists} from './parties/Populists';
+import {Spome} from './parties/Spome';
+import {Empower} from './parties/Empower';
+import {Bureaucrats} from './parties/Bureaucrats';
+import {Centrists} from './parties/Centrists';
+import {Transhumanists} from './parties/Transhumanists';
 import {IGame} from '../IGame';
+import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
 import {IGlobalEvent} from './globalEvents/IGlobalEvent';
 import {SerializedDelegate, SerializedTurmoil} from './SerializedTurmoil';
@@ -36,10 +43,24 @@ export const ALL_PARTIES = {
   [PartyName.GREENS]: Greens,
   [PartyName.REDS]: Reds,
   [PartyName.KELVINISTS]: Kelvinists,
+  [PartyName.POPULISTS]: Populists,
+  [PartyName.SPOME]: Spome,
+  [PartyName.EMPOWER]: Empower,
+  [PartyName.BUREAUCRATS]: Bureaucrats,
+  [PartyName.CENTRISTS]: Centrists,
+  [PartyName.TRANSHUMANISTS]: Transhumanists,
 } satisfies Record<PartyName, PartyFactory>;
 
-function createParties(): ReadonlyArray<IParty> {
-  return [new MarsFirst(), new Scientists(), new Unity(), new Greens(), new Reds(), new Kelvinists()];
+function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
+  const parties: Array<IParty> = [
+    new MarsFirst(), new Scientists(), new Unity(), new Greens(), new Reds(), new Kelvinists(),
+  ];
+  // Populists, Spome, Empower, Bureaucrats, Centrists and Transhumanists are placeholder parties
+  // (no real bonus/policy defined yet) added only for the fan expansions whose cards reference them.
+  if (gameOptions.idesOfMarsExpansion || gameOptions.robAntillesExpansion) {
+    parties.push(new Populists(), new Spome(), new Empower(), new Bureaucrats(), new Centrists(), new Transhumanists());
+  }
+  return parties;
 }
 
 const UNINITIALIZED_POLITICAL_AGENDAS_DATA: PoliticalAgendasData = {
@@ -53,7 +74,7 @@ export class Turmoil {
   public dominantParty: IParty;
   public usedFreeDelegateAction = new Set<IPlayer>();
   public delegateReserve = new MultiSet<Delegate>();
-  public parties = createParties();
+  public parties: ReadonlyArray<IParty>;
   public playersInfluenceBonus = new Map<PlayerId, number>();
   public readonly globalEventDealer: GlobalEventDealer;
   public distantGlobalEvent: IGlobalEvent | undefined;
@@ -62,10 +83,12 @@ export class Turmoil {
   public politicalAgendasData: PoliticalAgendasData = UNINITIALIZED_POLITICAL_AGENDAS_DATA;
 
   private constructor(
+    gameOptions: GameOptions,
     rulingPartyName: PartyName,
     chairman: Delegate,
     dominantPartyName: PartyName,
     globalEventDealer: GlobalEventDealer) {
+    this.parties = createParties(gameOptions);
     this.rulingParty = this.getPartyByName(rulingPartyName);
     this.chairman = chairman;
     this.dominantParty = this.getPartyByName(dominantPartyName);
@@ -76,13 +99,10 @@ export class Turmoil {
     const dealer = GlobalEventDealer.newInstance(game);
 
     // The game begins with Greens in power and a Neutral chairman
-    const turmoil = new Turmoil(PartyName.GREENS, 'NEUTRAL', PartyName.GREENS, dealer);
+    const turmoil = new Turmoil(game.gameOptions, PartyName.GREENS, 'NEUTRAL', PartyName.GREENS, dealer);
 
     game.log('A neutral delegate is the new chairman.');
     game.log('Greens are in power in the first generation.');
-
-    // Init parties
-    turmoil.parties = createParties();
 
     game.playersInGenerationOrder.forEach((player) => {
       turmoil.delegateReserve.add(player, DELEGATES_PER_PLAYER);
@@ -344,6 +364,18 @@ export class Turmoil {
       newChairman = this.chairman;
     }
 
+    // Backstabbing (idesOfMars, fan): "this generation, if you have a delegate in a winning
+    // party, you become the chairman instead of the party leader." Consumed here whether or
+    // not it actually applies, since its effect only ever lasts for the generation it was
+    // played.
+    if (game.backstabbingPlayer !== undefined) {
+      const backstabber = game.getPlayerById(game.backstabbingPlayer);
+      game.backstabbingPlayer = undefined;
+      if (this.rulingParty.delegates.count(backstabber) > 0) {
+        newChairman = backstabber;
+      }
+    }
+
     if (game.beholdTheEmperor !== true) {
       // Fill the delegate reserve with everyone except the party leader
       if (this.rulingParty.partyLeader !== undefined) {
@@ -592,10 +624,10 @@ export class Turmoil {
     return result;
   }
 
-  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>): Turmoil {
+  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>, gameOptions: GameOptions): Turmoil {
     const dealer = GlobalEventDealer.deserialize(d.globalEventDealer);
     const chairman = deserializeDelegateOrUndefined(d.chairman, players);
-    const turmoil = new Turmoil(d.rulingParty, chairman || 'NEUTRAL', d.dominantParty, dealer);
+    const turmoil = new Turmoil(gameOptions, d.rulingParty, chairman || 'NEUTRAL', d.dominantParty, dealer);
 
     turmoil.usedFreeDelegateAction = new Set(d.usedFreeDelegateAction.map((p) => deserializePlayerId(p, players)));
 

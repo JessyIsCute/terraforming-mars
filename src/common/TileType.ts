@@ -66,6 +66,21 @@ export enum TileType {
 
     // Sillyfication
     GARBAGE_DUMP, // 45
+
+    // Rob Antilles
+    PUMPING_HUB, // 46
+
+    // idesOfMars
+    INVAK_CITY, // 47
+
+    // Rob Antilles
+    SUBURBS, // 48
+    HARBOR_BOREALIS, // 49
+    INDUSTRIAL_METROPOLIS, // 50
+    PARADISE_CITY, // 51
+    ANIMAL_DOME, // 52
+    SEDIMENT, // 53
+    BIOLOGICAL_DOME, // 54
   }
 
 export const tileTypeToString: Record<TileType, string> = {
@@ -116,11 +131,31 @@ export const tileTypeToString: Record<TileType, string> = {
   [TileType.NEW_HOLLAND]: CardName.NEW_HOLLAND,
   [TileType.NEURAL_INSTANCE]: 'Neural Instance',
   [TileType.GARBAGE_DUMP]: CardName.GARBAGE_DUMPS,
+  [TileType.PUMPING_HUB]: CardName.THARSIS_PUMPING_HUB,
+  [TileType.INVAK_CITY]: CardName.INVAK_CITY,
+  [TileType.SUBURBS]: CardName.SUBURBS,
+  [TileType.HARBOR_BOREALIS]: CardName.HARBOR_BOREALIS,
+  [TileType.INDUSTRIAL_METROPOLIS]: CardName.INDUSTRIAL_METROPOLIS,
+  [TileType.PARADISE_CITY]: CardName.PARADISE_CITY,
+  [TileType.ANIMAL_DOME]: CardName.LIVESTOCK_GIANT_DOME,
+  [TileType.SEDIMENT]: CardName.SEDIMENTARY_ROCKS,
+  [TileType.BIOLOGICAL_DOME]: CardName.MOBILE_BIOLOGICAL_DOME,
 } as const;
 
 export const HAZARD_TILES = new Set([TileType.DUST_STORM_MILD, TileType.DUST_STORM_SEVERE, TileType.EROSION_MILD, TileType.EROSION_SEVERE]);
-export const OCEAN_UPGRADE_TILES = new Set([TileType.OCEAN_CITY, TileType.OCEAN_FARM, TileType.OCEAN_SANCTUARY, TileType.NEW_HOLLAND]);
-export const CITY_TILES = new Set([TileType.CITY, TileType.CAPITAL, TileType.OCEAN_CITY, TileType.RED_CITY, TileType.NEW_HOLLAND]);
+// Harbor Borealis (Rob Antilles) is placed over a plain ocean tile, same "upgradeable ocean"
+// placement rule as Ocean City/Ocean Farm/Ocean Sanctuary/New Holland. Unlike those, its printed
+// text never says it "counts as an ocean", so it's deliberately left out of OCEAN_TILES below.
+export const OCEAN_UPGRADE_TILES = new Set([TileType.OCEAN_CITY, TileType.OCEAN_FARM, TileType.OCEAN_SANCTUARY, TileType.NEW_HOLLAND, TileType.HARBOR_BOREALIS]);
+// Invak City (idesOfMars) substitutes one of the player's own greeneries and counts as both a
+// city and a greenery -- same "counts as two things" pattern as Ocean City/New Holland (ocean +
+// city) and Wetlands (ocean + greenery) above. Suburbs and Paradise City (Rob Antilles) are the
+// same pattern for "counts as a City" specifically.
+export const CITY_TILES = new Set([TileType.CITY, TileType.CAPITAL, TileType.OCEAN_CITY, TileType.RED_CITY, TileType.NEW_HOLLAND, TileType.INVAK_CITY, TileType.SUBURBS, TileType.PARADISE_CITY]);
 export const OCEAN_TILES = new Set([TileType.OCEAN, TileType.OCEAN_CITY, TileType.OCEAN_FARM, TileType.OCEAN_SANCTUARY, TileType.WETLANDS, TileType.NEW_HOLLAND]);
 export const BASE_OCEAN_TILES = new Set([TileType.OCEAN, TileType.WETLANDS]);
-export const GREENERY_TILES = new Set([TileType.GREENERY, TileType.WETLANDS]);
+export const GREENERY_TILES = new Set([TileType.GREENERY, TileType.WETLANDS, TileType.INVAK_CITY]);
+// Rob Antilles: tiles placed on top of the player's OWN existing greenery/city tile, mirroring
+// the ocean-upgrade pattern above but for the other two base tile types. See MarsBoard.canCover.
+export const GREENERY_UPGRADE_TILES = new Set([TileType.SUBURBS]);
+export const CITY_UPGRADE_TILES = new Set([TileType.INDUSTRIAL_METROPOLIS, TileType.PARADISE_CITY]);
