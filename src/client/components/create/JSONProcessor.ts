@@ -94,6 +94,9 @@ export class JSONProcessor {
       mutationMarkets: json_constants.MUTATION_MARKETS_EXPANSION,
       conglomerates: json_constants.CONGLOMERATES_EXPANSION,
       blackMarket: json_constants.BLACK_MARKET_EXPANSION,
+      corporateBetterments: json_constants.CORPORATE_BETTERMENTS_EXPANSION,
+      idesOfMars: json_constants.IDES_OF_MARS_EXPANSION,
+      robAntilles: json_constants.ROB_ANTILLES_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

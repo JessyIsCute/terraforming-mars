@@ -211,6 +211,24 @@
                                 <div class="create-game-expansion-icon expansion-icon-blackMarket"></div>
                                 <span v-i18n>Black Market</span>&nbsp;<span title="A fan expansion: buy bespoke illegal project cards from a persistent 5-slot market for a fixed price">(&#945;)</span>&nbsp;<a :href="wikiUrls.blackMarket" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
+
+                            <input type="checkbox" name="corporateBetterments" id="corporateBetterments-checkbox" v-model="expansions.corporateBetterments">
+                            <label for="corporateBetterments-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-corporateBetterments"></div>
+                                <span v-i18n>Corporate Betterments</span>&nbsp;<span title="A fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.corporateBetterments" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
+
+                            <input type="checkbox" name="idesOfMars" id="idesOfMars-checkbox" v-model="expansions.idesOfMars">
+                            <label for="idesOfMars-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-idesOfMars"></div>
+                                <span v-i18n>Ides of Mars</span>&nbsp;<span title="A fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.idesOfMars" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
+
+                            <input type="checkbox" name="robAntilles" id="robAntilles-checkbox" v-model="expansions.robAntilles">
+                            <label for="robAntilles-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-robAntilles"></div>
+                                <span v-i18n>Rob Antilles</span>&nbsp;<span title="A fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.robAntilles" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">

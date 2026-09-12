@@ -307,6 +307,9 @@ export class Game implements IGame, Logger {
         mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
         conglomerates: partialOptions.conglomeratesExpansion ?? false,
         blackMarket: partialOptions.blackMarketExpansion ?? false,
+        corporateBetterments: partialOptions.corporateBettermentsExpansion ?? false,
+        idesOfMars: partialOptions.idesOfMarsExpansion ?? false,
+        robAntilles: partialOptions.robAntillesExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};

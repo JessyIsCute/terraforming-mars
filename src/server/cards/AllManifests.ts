@@ -22,6 +22,9 @@ import {BETTER_MARS_CARD_MANIFEST} from './betterMars/BetterMarsCardManifest';
 import {CONGLOMERATES_CARD_MANIFEST} from './conglomerates/ConglomeratesCardManifest';
 import {MUTATIONMARKETS_CARD_MANIFEST} from './mutationmarkets/MutationMarketsCardManifest';
 import {BLACKMARKET_CARD_MANIFEST} from './blackmarket/BlackMarketCardManifest';
+import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './corporatebetterments/CorporateBettermentsCardManifest';
+import {IDES_OF_MARS_CARD_MANIFEST} from './idesofmars/IdesOfMarsCardManifest';
+import {ROB_ANTILLES_CARD_MANIFEST} from './robantilles/RobAntillesCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -45,4 +48,7 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   CONGLOMERATES_CARD_MANIFEST,
   MUTATIONMARKETS_CARD_MANIFEST,
   BLACKMARKET_CARD_MANIFEST,
+  CORPORATE_BETTERMENTS_CARD_MANIFEST,
+  IDES_OF_MARS_CARD_MANIFEST,
+  ROB_ANTILLES_CARD_MANIFEST,
 ];

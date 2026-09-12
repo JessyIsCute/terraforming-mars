@@ -46,4 +46,9 @@ export enum CardResource {
   JOURNALISM = 'Journalism',
   ACTIVIST = 'Activist',
   SUPPLY_CHAIN = 'Supply Chain',
+
+  // Ides of Mars / Rob Antilles (fan expansions)
+  LOOT = 'Loot',
+  BUDGET = 'Budget',
+  RELIC = 'Relic',
 }
