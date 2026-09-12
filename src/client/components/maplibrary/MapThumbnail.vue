@@ -37,18 +37,6 @@ import {spaceBonusCss} from '@/client/utils/spaceBonusIcon';
 // mars-without-venus.png (620x600) that lines up with the standard hex bounding box.
 const MARS_IMAGE = {left: 99, top: 119, width: 438, height: 379, naturalWidth: 620, naturalHeight: 600};
 
-// Extra pixels of Mars board (in hex-bounding-box units) shown beyond the tight hex diamond on
-// each side, so the heat/oxygen/temperature tracks painted just outside the diamond peek into
-// the preview instead of being cropped off flush with the hexes. This box is centered as a whole
-// (see .map-thumbnail below), so a bigger left/right disparity here doesn't just reveal more --
-// it visibly skews the planet itself off-center within the thumbnail. Keep left/right close to
-// each other; the temperature track (right side) sits very slightly further out than the oxygen
-// track, so it keeps a touch more margin, but not enough to look lopsided.
-const TRACK_MARGIN_LEFT = 90;
-const TRACK_MARGIN_TOP = 63;
-const TRACK_MARGIN_BOTTOM = 55;
-const TRACK_MARGIN_RIGHT = 100;
-
 export default defineComponent({
   name: 'MapThumbnail',
   props: {
@@ -82,10 +70,41 @@ export default defineComponent({
       }
       return {minLeft, minTop, maxLeft, maxTop};
     },
+    // Scale/position of the full (unpadded) Mars image against the *tight* hex diamond -- the
+    // same alignment MapEditor.vue's gridStyle uses with no margin at all. Shared by margins()
+    // and backdropStyle() so "how big is the full image at this board's scale" only lives once.
+    imagePlacement(): {sx: number, sy: number, bgXTight: number, bgYTight: number, fullWidth: number, fullHeight: number} {
+      const {minLeft, minTop, maxLeft, maxTop} = this.bounds;
+      const sx = ((maxLeft - minLeft) + 46) / MARS_IMAGE.width;
+      const sy = ((maxTop - minTop) + 51) / MARS_IMAGE.height;
+      return {
+        sx,
+        sy,
+        bgXTight: minLeft - MARS_IMAGE.left * sx,
+        bgYTight: minTop - MARS_IMAGE.top * sy,
+        fullWidth: MARS_IMAGE.naturalWidth * sx,
+        fullHeight: MARS_IMAGE.naturalHeight * sy,
+      };
+    },
+    // How far the full Mars image (heat/oxygen/temperature tracks and all) extends beyond the
+    // tight hex diamond on each side -- computed exactly from the image's own geometry rather
+    // than a guessed pixel constant, so the thumbnail always shows the whole board: nothing
+    // cropped, and no margin wasted on blank space past the image's real edge. The scale-to-fit
+    // transform below (see `scale`) then shrinks that whole box uniformly to fit the thumbnail.
+    margins(): {left: number, top: number, right: number, bottom: number} {
+      const {bgXTight, bgYTight, fullWidth, fullHeight} = this.imagePlacement;
+      const {maxLeft, maxTop} = this.bounds;
+      return {
+        left: Math.max(0, -bgXTight),
+        top: Math.max(0, -bgYTight),
+        right: Math.max(0, (bgXTight + fullWidth) - (maxLeft + 90)),
+        bottom: Math.max(0, (bgYTight + fullHeight) - (maxTop + 90)),
+      };
+    },
     naturalSize(): {width: number, height: number} {
       return {
-        width: this.bounds.maxLeft + 90 + TRACK_MARGIN_LEFT + TRACK_MARGIN_RIGHT,
-        height: this.bounds.maxTop + 90 + TRACK_MARGIN_TOP + TRACK_MARGIN_BOTTOM,
+        width: this.bounds.maxLeft + 90 + this.margins.left + this.margins.right,
+        height: this.bounds.maxTop + 90 + this.margins.top + this.margins.bottom,
       };
     },
     scale(): number {
@@ -95,14 +114,9 @@ export default defineComponent({
       return Math.min(this.width / this.naturalSize.width, this.height / this.naturalSize.height);
     },
     backdropStyle(): Record<string, string> {
-      const {minLeft, minTop, maxLeft, maxTop} = this.bounds;
-      // sx/sy keep mapping the painted diamond onto the *unpadded* hex bounding box -- only the
-      // container and background position grow by TRACK_MARGIN, so the diamond itself stays at
-      // the same scale/alignment, with a uniform strip of extra board revealed on every side.
-      const sx = ((maxLeft - minLeft) + 46) / MARS_IMAGE.width;
-      const sy = ((maxTop - minTop) + 51) / MARS_IMAGE.height;
-      const bgX = (minLeft - MARS_IMAGE.left * sx + TRACK_MARGIN_LEFT).toFixed(1);
-      const bgY = (minTop - MARS_IMAGE.top * sy + TRACK_MARGIN_TOP).toFixed(1);
+      const {sx, sy, bgXTight, bgYTight} = this.imagePlacement;
+      const bgX = (bgXTight + this.margins.left).toFixed(1);
+      const bgY = (bgYTight + this.margins.top).toFixed(1);
       return {
         background:
           'linear-gradient(rgba(21, 19, 31, 0.45), rgba(21, 19, 31, 0.45)) local, ' +
@@ -125,7 +139,7 @@ export default defineComponent({
     },
     hexStyle(space: CustomSpaceDef): Record<string, string> {
       const p = customSpacePixel(space.x, space.y, this.maxY);
-      return {left: `${p.left + TRACK_MARGIN_LEFT}px`, top: `${p.top + TRACK_MARGIN_TOP}px`};
+      return {left: `${p.left + this.margins.left}px`, top: `${p.top + this.margins.top}px`};
     },
     hexClass(space: CustomSpaceDef): Record<string, boolean> {
       const isCove = space.spaceType === SpaceType.COVE;

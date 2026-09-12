@@ -56,6 +56,18 @@ describe('MapThumbnail', () => {
     expect(style.background).to.contain('mars-without-venus.png');
   });
 
+  it('sizes the backdrop to show the entire Mars image, nothing cropped and no margin wasted', () => {
+    const definition = blankCustomBoard(9, 'Standard');
+    const wrapper = mount(MapThumbnail, {...globalConfig, props: {definition}});
+    const style = (wrapper.find('.map-thumbnail-inner').element as HTMLElement).style;
+    // A full 9-row board maps 1:1 onto mars-without-venus.png's own scale (sx=sy=1), so the
+    // margins computed to fit the whole image exactly fill the container out to the image's real
+    // 620x600 size -- no more (wasted blank space) and no less (cropped track/backdrop).
+    expect(style.width).eq('620px');
+    expect(style.height).eq('600px');
+    expect(style.background).to.contain('620px 600px');
+  });
+
   it('defaults to a 160x130 box, and honors explicit width/height props', () => {
     const definition = blankCustomBoard(9, 'Standard');
     const defaultSize = mount(MapThumbnail, {...globalConfig, props: {definition}});
