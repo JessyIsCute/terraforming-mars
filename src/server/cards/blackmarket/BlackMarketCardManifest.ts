@@ -12,7 +12,7 @@ import {UndergroundCasino, UndergroundCasinoII, UndergroundCasinoIII, Undergroun
 import {BootlegTerraformingFormula, BootlegTerraformingFormulaII, BootlegTerraformingFormulaIII, BootlegTerraformingFormulaIV} from './BootlegTerraformingFormula';
 import {StolenBlueprints, StolenBlueprintsII, StolenBlueprintsIII, StolenBlueprintsIV} from './StolenBlueprints';
 import {IllicitMiningOp, IllicitMiningOpII, IllicitMiningOpIII, IllicitMiningOpIV} from './IllicitMiningOp';
-import {RogueAiContract, RogueAiContractII, RogueAiContractIII, RogueAiContractIV} from './RogueAiContract';
+import {RogueAiContract, RogueAiContractII, RogueAiContractIII} from './RogueAiContract';
 import {OreForOxygenRacket, OreForOxygenRacketII, OreForOxygenRacketIII} from './OreForOxygenRacket';
 import {MeltdownContract, MeltdownContractII, MeltdownContractIII} from './MeltdownContract';
 import {CompostSyndicate, CompostSyndicateII, CompostSyndicateIII} from './CompostSyndicate';
@@ -101,10 +101,10 @@ export const BLACKMARKET_CARD_MANIFEST = new ModuleManifest({
     [CardName.ILLICIT_MINING_OP_III]: {Factory: IllicitMiningOpIII, instantiate: false},
     [CardName.ILLICIT_MINING_OP_IV]: {Factory: IllicitMiningOpIV, instantiate: false},
 
+    // Moved to the mid tier -- see BLACK_MARKET_DESIGNS below.
     [CardName.ROGUE_AI_CONTRACT]: {Factory: RogueAiContract, instantiate: false},
     [CardName.ROGUE_AI_CONTRACT_II]: {Factory: RogueAiContractII, instantiate: false},
     [CardName.ROGUE_AI_CONTRACT_III]: {Factory: RogueAiContractIII, instantiate: false},
-    [CardName.ROGUE_AI_CONTRACT_IV]: {Factory: RogueAiContractIV, instantiate: false},
 
     [CardName.ORE_FOR_OXYGEN_RACKET]: {Factory: OreForOxygenRacket, instantiate: false},
     [CardName.ORE_FOR_OXYGEN_RACKET_II]: {Factory: OreForOxygenRacketII, instantiate: false},
@@ -283,14 +283,16 @@ export const BLACK_MARKET_DESIGNS: ReadonlyArray<BlackMarketDesign> = [
     variants: [1, 2, 3, 4],
     build: (name, cost) => new IllicitMiningOp(name, cost, cost + 3),
   },
-  {
-    tier: 'early',
-    printings: [CardName.ROGUE_AI_CONTRACT, CardName.ROGUE_AI_CONTRACT_II, CardName.ROGUE_AI_CONTRACT_III, CardName.ROGUE_AI_CONTRACT_IV],
-    variants: [8, 9, 10, 11],
-    build: (name, cost) => new RogueAiContract(name, cost),
-  },
 
   // Mid game (generation 4+)
+  {
+    // Moved here from the early tier -- draw-3-cards is a stronger effect than the rest of
+    // the early roster, and 8-10 M€ reads more naturally as a mid-tier price.
+    tier: 'mid',
+    printings: [CardName.ROGUE_AI_CONTRACT, CardName.ROGUE_AI_CONTRACT_II, CardName.ROGUE_AI_CONTRACT_III],
+    variants: [8, 9, 10],
+    build: (name, cost) => new RogueAiContract(name, cost),
+  },
   {
     tier: 'mid',
     printings: [CardName.ORE_FOR_OXYGEN_RACKET, CardName.ORE_FOR_OXYGEN_RACKET_II, CardName.ORE_FOR_OXYGEN_RACKET_III],

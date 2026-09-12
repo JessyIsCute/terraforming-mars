@@ -37,13 +37,14 @@ const UNIT_LABELS: Record<keyof Units, string> = {
  * 4-slot supply, revealed as the game reaches that generation. There's no bidding and no
  * mutation/infection layering (see MutationMarkets for that) -- you just do the project right
  * there, publicly, for its own printed price (M€ via `cost`, everything else via
- * `reserveUnits`, exactly like any other card's play cost). A bought slot just goes empty for
- * the rest of the generation; the whole row -- bought slots and unsold ones alike -- advances
- * to the next item in its list only at generation end (`onGenerationEnd`, mirroring
- * MutationMarkets' own end-of-generation refresh). See CardName.ts's Black Market comment and
- * BlackMarketCardManifest.ts's doc comments for how "replayable" (doing the same design more
- * than once) and per-printing pricing are made safe/possible without touching the shared
- * project deck or Card.ts's shared properties cache.
+ * `reserveUnits`, exactly like any other card's play cost). Buying a slot empties it
+ * immediately. At the end of every generation each row shifts one slot to the left -- the
+ * leftmost card (bought or not) is discarded, everything else slides down, and a fresh
+ * printing is dealt into the newly-open rightmost slot -- a plain conveyor, closer to
+ * MutationMarkets' own end-of-generation shift than a per-slot refill. See CardName.ts's Black
+ * Market comment and BlackMarketCardManifest.ts's doc comments for how "replayable" (doing the
+ * same design more than once) and per-printing pricing are made safe/possible without
+ * touching the shared project deck or Card.ts's shared properties cache.
  */
 export class BlackMarket {
   private constructor() {}
@@ -75,31 +76,29 @@ export class BlackMarket {
 
   /**
    * Called as the current generation ends, before `onGenerationStart` runs for the next one --
-   * mirrors MutationMarkets' own generation-end refresh. Every slot in every unlocked row
-   * advances to the next item in its list (the same design's next printing, or a fresh design
-   * once its printings run out), whether that slot was bought this generation or just sat
-   * there unsold -- and a bought (`sold`) slot reappears for the new generation.
+   * mirrors MutationMarkets' own generation-end shift. Every unlocked row's leftmost slot
+   * (bought or still sitting there unsold, doesn't matter) is discarded, every other slot
+   * shifts one position left, and a fresh printing is dealt into the newly-open rightmost slot.
    */
   public static onGenerationEnd(game: IGame): void {
     const data = game.blackMarketData;
     if (data === undefined) {
       return;
     }
-    BlackMarket.advanceRow(data.early);
+    BlackMarket.shiftRow(data.early);
     if (data.mid !== undefined) {
-      BlackMarket.advanceRow(data.mid);
+      BlackMarket.shiftRow(data.mid);
     }
     if (data.late !== undefined) {
-      BlackMarket.advanceRow(data.late);
+      BlackMarket.shiftRow(data.late);
     }
   }
 
-  private static advanceRow(row: BlackMarketRowData): void {
-    for (let i = 0; i < row.slots.length; i++) {
-      const current = row.slots[i];
-      row.slots[i] = current === undefined ? undefined : BlackMarket.nextSlot(row, current);
-      row.sold[i] = false;
+  private static shiftRow(row: BlackMarketRowData): void {
+    for (let i = 0; i < row.slots.length - 1; i++) {
+      row.slots[i] = row.slots[i + 1];
     }
+    row.slots[row.slots.length - 1] = BlackMarket.dealNext(row);
   }
 
   /**
@@ -125,14 +124,13 @@ export class BlackMarket {
    * Does the project at `tier`/`slotIndex` for `player`: pays the card's own printed price --
    * `getCardCost` (M€, after any discounts like Corrupt Office's) via a plain `Payment`, plus
    * the non-M€ `reserveUnits` bundle (no substitution), deducted by the normal play pipeline --
-   * then resolves its behavior and adds it to the player's tableau. The slot just goes empty
-   * (`sold[slotIndex] = true`) for the rest of the generation; it only reappears (as the same
-   * design's next printing, or a fresh design) once the whole row advances at generation end.
+   * then resolves its behavior and adds it to the player's tableau. The slot just goes empty;
+   * it stays that way until the row's next generation-end shift.
    */
   public static buy(game: IGame, player: IPlayer, tier: BlackMarketTier, slotIndex: number): void {
     const row = BlackMarket.rowOrThrow(game, tier);
     const slot = row.slots[slotIndex];
-    if (slot === undefined || row.sold[slotIndex]) {
+    if (slot === undefined) {
       throw new Error(`No Black Market card at ${tier}[${slotIndex}]`);
     }
     if (!BlackMarket.canAfford(player, slot.card)) {
@@ -140,7 +138,7 @@ export class BlackMarket {
     }
     const cost = player.getCardCost(slot.card);
     player.playCard(slot.card, Payment.of({megacredits: cost}));
-    row.sold[slotIndex] = true;
+    row.slots[slotIndex] = undefined;
   }
 
   /** A short, human-readable price label for a card's own printed price, e.g. "2 titanium" or "2 M€, 1 heat". */
@@ -169,38 +167,33 @@ export class BlackMarket {
   }
 
   private static initializeRow(game: IGame, tier: BlackMarketTier): BlackMarketRowData {
-    const designQueue = BLACK_MARKET_DESIGNS
-      .map((_design, index) => index)
-      .filter((index) => BLACK_MARKET_DESIGNS[index].tier === tier && BlackMarket.isDesignCompatible(index, game));
-    inplaceShuffle(designQueue, game.rng);
+    const printingQueue: Array<{designIndex: number, variantIndex: number}> = [];
+    BLACK_MARKET_DESIGNS.forEach((design, designIndex) => {
+      if (design.tier === tier && BlackMarket.isDesignCompatible(designIndex, game)) {
+        design.printings.forEach((_name, variantIndex) => {
+          printingQueue.push({designIndex, variantIndex});
+        });
+      }
+    });
+    inplaceShuffle(printingQueue, game.rng);
 
     const row: BlackMarketRowData = {
       slots: new Array(BLACK_MARKET_ROW_SLOT_COUNT).fill(undefined),
-      sold: new Array(BLACK_MARKET_ROW_SLOT_COUNT).fill(false),
-      designQueue,
+      printingQueue,
     };
     for (let i = 0; i < BLACK_MARKET_ROW_SLOT_COUNT; i++) {
-      row.slots[i] = BlackMarket.startStack(row);
+      row.slots[i] = BlackMarket.dealNext(row);
     }
     return row;
   }
 
-  /** Pulls the next not-yet-shown design off the row's queue and reveals its first (cheapest) printing, or leaves the slot empty if none remain. */
-  private static startStack(row: BlackMarketRowData): BlackMarketSlot {
-    const designIndex = row.designQueue.pop();
-    if (designIndex === undefined) {
+  /** Pulls the next not-yet-dealt printing off the row's shuffled queue, or leaves the slot empty if none remain. */
+  private static dealNext(row: BlackMarketRowData): BlackMarketSlot {
+    const next = row.printingQueue.pop();
+    if (next === undefined) {
       return undefined;
     }
-    return BlackMarket.buildSlot(designIndex, 0);
-  }
-
-  /** After a purchase: the same design's next printing if the stack isn't exhausted yet, otherwise a fresh design from the same row (or empty, if none remain). Stack depth varies by tier (early=4, mid=3, late=2 printings), so this reads the design's own printings length rather than assuming 3. */
-  private static nextSlot(row: BlackMarketRowData, bought: NonNullable<BlackMarketSlot>): BlackMarketSlot {
-    const design = BLACK_MARKET_DESIGNS[bought.designIndex];
-    if (bought.variantIndex < design.printings.length - 1) {
-      return BlackMarket.buildSlot(bought.designIndex, bought.variantIndex + 1);
-    }
-    return BlackMarket.startStack(row);
+    return BlackMarket.buildSlot(next.designIndex, next.variantIndex);
   }
 
   private static buildSlot(designIndex: number, variantIndex: number): BlackMarketSlot {
@@ -236,8 +229,7 @@ export class BlackMarket {
   private static serializeRow(row: BlackMarketRowData): SerializedBlackMarketRowData {
     return {
       slots: row.slots.map((slot) => slot === undefined ? undefined : {designIndex: slot.designIndex, variantIndex: slot.variantIndex}),
-      sold: row.sold,
-      designQueue: row.designQueue,
+      printingQueue: row.printingQueue,
     };
   }
 
@@ -255,8 +247,7 @@ export class BlackMarket {
   private static deserializeRow(row: SerializedBlackMarketRowData): BlackMarketRowData {
     return {
       slots: row.slots.map((slot) => BlackMarket.deserializeSlot(slot)),
-      sold: row.sold,
-      designQueue: row.designQueue,
+      printingQueue: row.printingQueue,
     };
   }
 

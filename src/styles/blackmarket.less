@@ -3,7 +3,7 @@
 // only rendered once unlocked (BlackMarket.vue's v-if), so this file never needs to know
 // about that -- it just lays out however many rows happen to be present.
 
-@bm-card-width: 180px;
+@bm-card-width: 243px; // 180px + ~35%
 
 .black-market {
   margin: 20px 0;
@@ -22,7 +22,7 @@
 .black-market-row-slots {
   display: grid;
   grid-template-columns: repeat(4, @bm-card-width);
-  gap: 6px;
+  gap: 8px;
 }
 
 .black-market-slot {
@@ -33,8 +33,8 @@
 // box together so the grid cell doesn't need separately-computed dimensions, and disables
 // interaction since this is a read-only market preview, not a hand of playable cards.
 .black-market-card-scale-wrapper {
-  zoom: 0.75;
-  margin: 0 10px;
+  zoom: 0.975; // 0.75 + 30%
+  margin: 0 13px;
   pointer-events: none;
 }
 

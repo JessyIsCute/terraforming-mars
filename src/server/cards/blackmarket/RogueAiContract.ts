@@ -40,9 +40,3 @@ export class RogueAiContractIII extends RogueAiContract {
     super(CardName.ROGUE_AI_CONTRACT_III, 10);
   }
 }
-
-export class RogueAiContractIV extends RogueAiContract {
-  constructor() {
-    super(CardName.ROGUE_AI_CONTRACT_IV, 11);
-  }
-}

@@ -1294,7 +1294,6 @@ export enum CardName {
   ROGUE_AI_CONTRACT = 'Rogue AI Contract',
   ROGUE_AI_CONTRACT_II = 'Rogue AI Contract:2',
   ROGUE_AI_CONTRACT_III = 'Rogue AI Contract:3',
-  ROGUE_AI_CONTRACT_IV = 'Rogue AI Contract:4',
 
   // Black Market: mid-game tier (unlocks generation 4+) -- 3 printings each.
   ORE_FOR_OXYGEN_RACKET = 'Ore-for-Oxygen Racket',

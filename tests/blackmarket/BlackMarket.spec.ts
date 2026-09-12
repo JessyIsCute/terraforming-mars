@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {BlackMarket} from '@/server/blackmarket/BlackMarket';
 import {BLACK_MARKET_ROW_SLOT_COUNT} from '@/server/blackmarket/BlackMarketData';
 import {BLACK_MARKET_DESIGNS} from '@/server/cards/blackmarket/BlackMarketCardManifest';
-import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII, SmuggledReactorCoreIV} from '@/server/cards/blackmarket/SmuggledReactorCore';
+import {SmuggledReactorCore, SmuggledReactorCoreII, SmuggledReactorCoreIII} from '@/server/cards/blackmarket/SmuggledReactorCore';
 import {CounterfeitCertificates} from '@/server/cards/blackmarket/CounterfeitCertificates';
 import {RogueAiContract} from '@/server/cards/blackmarket/RogueAiContract';
 import {OreForOxygenRacket} from '@/server/cards/blackmarket/OreForOxygenRacket';
@@ -33,14 +33,11 @@ describe('BlackMarket', () => {
     [game, player] = testGame(2, {blackMarketExpansion: true});
   });
 
-  it('initialize deals the early row with 4 distinct designs, each showing its cheapest printing, none sold, and leaves mid/late locked', () => {
+  it('initialize deals the early row full, each slot a real early-tier printing, and leaves mid/late locked', () => {
     const data = game.blackMarketData!;
     expect(data).is.not.undefined;
     expect(data.early.slots).has.lengthOf(BLACK_MARKET_ROW_SLOT_COUNT);
     expect(data.early.slots.every((slot) => slot !== undefined)).is.true;
-    expect(data.early.sold.every((sold) => sold === false)).is.true;
-    expect(new Set(data.early.slots.map((slot) => slot!.designIndex)).size).to.eq(BLACK_MARKET_ROW_SLOT_COUNT);
-    expect(data.early.slots.every((slot) => slot!.variantIndex === 0)).is.true;
     expect(data.early.slots.every((slot) => BLACK_MARKET_DESIGNS[slot!.designIndex].tier === 'early')).is.true;
     expect(data.mid).is.undefined;
     expect(data.late).is.undefined;
@@ -85,18 +82,24 @@ describe('BlackMarket', () => {
 
   it('excludes the Underground Casino design (Crime tag) from the early row when Underworld is not enabled', () => {
     const data = game.blackMarketData!;
-    const activeDesigns = [...data.early.slots.map((s) => s?.designIndex), ...data.early.designQueue];
+    const activeDesigns = [
+      ...data.early.slots.map((s) => s?.designIndex),
+      ...data.early.printingQueue.map((p) => p.designIndex),
+    ];
     expect(activeDesigns).to.not.include(UNDERGROUND_CASINO_DESIGN);
   });
 
   it('includes the Underground Casino design when Underworld is enabled', () => {
     const [underworldGame] = testGame(2, {blackMarketExpansion: true, underworldExpansion: true});
     const data = underworldGame.blackMarketData!;
-    const activeDesigns = [...data.early.slots.map((s) => s?.designIndex), ...data.early.designQueue];
+    const activeDesigns = [
+      ...data.early.slots.map((s) => s?.designIndex),
+      ...data.early.printingQueue.map((p) => p.designIndex),
+    ];
     expect(activeDesigns).to.include(UNDERGROUND_CASINO_DESIGN);
   });
 
-  it('buy deducts both the card\'s M€ cost and its reserveUnits via the normal play pipeline, adds it to the tableau, and marks the slot sold (hidden) for the rest of the generation', () => {
+  it('buy deducts both the card\'s M€ cost and its reserveUnits via the normal play pipeline, adds it to the tableau, and empties the slot', () => {
     const data = game.blackMarketData!;
     data.early.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
     player.megaCredits = 1;
@@ -107,43 +110,45 @@ describe('BlackMarket', () => {
     expect(player.megaCredits).to.eq(0);
     expect(player.titanium).to.eq(0);
     expect(player.playedCards.has(CardName.SMUGGLED_REACTOR_CORE)).is.true;
-    expect(data.early.sold[0]).is.true;
-    // The slot's design/printing is still tracked internally (so onGenerationEnd can advance
-    // it) even though it now reads as sold/hidden.
-    expect(data.early.slots[0]!.designIndex).to.eq(SMUGGLED_REACTOR_CORE_DESIGN);
-    expect(data.early.slots[0]!.variantIndex).to.eq(0);
+    expect(data.early.slots[0]).is.undefined;
   });
 
   it('regression: buying a pure-M€-cost design (no reserveUnits) actually charges its M€ cost', () => {
+    game.generation = 4;
+    BlackMarket.onGenerationStart(game);
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
+    data.mid!.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
     player.megaCredits = 8;
 
-    BlackMarket.buy(game, player, 'early', 0);
+    BlackMarket.buy(game, player, 'mid', 0);
 
     expect(player.megaCredits).to.eq(0);
     expect(player.playedCards.has(CardName.ROGUE_AI_CONTRACT)).is.true;
   });
 
   it('canAfford is false, and buy throws, when the player lacks the M€ for a pure-M€-cost design', () => {
+    game.generation = 4;
+    BlackMarket.onGenerationStart(game);
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
+    data.mid!.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
     player.megaCredits = 7;
 
-    expect(BlackMarket.canAfford(player, data.early.slots[0]!.card)).is.false;
-    expect(() => BlackMarket.buy(game, player, 'early', 0)).to.throw();
+    expect(BlackMarket.canAfford(player, data.mid!.slots[0]!.card)).is.false;
+    expect(() => BlackMarket.buy(game, player, 'mid', 0)).to.throw();
     expect(player.megaCredits).to.eq(7);
   });
 
   it('canAfford is true once the player has enough M€', () => {
+    game.generation = 4;
+    BlackMarket.onGenerationStart(game);
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
+    data.mid!.slots[0] = {card: new RogueAiContract(), designIndex: ROGUE_AI_CONTRACT_DESIGN, variantIndex: 0};
     player.megaCredits = 8;
 
-    expect(BlackMarket.canAfford(player, data.early.slots[0]!.card)).is.true;
+    expect(BlackMarket.canAfford(player, data.mid!.slots[0]!.card)).is.true;
   });
 
-  it('cannot buy an already-sold slot again this generation', () => {
+  it('cannot buy an already-emptied slot', () => {
     const data = game.blackMarketData!;
     data.early.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
     player.megaCredits = 100;
@@ -163,50 +168,43 @@ describe('BlackMarket', () => {
     }
   });
 
-  it('onGenerationEnd advances every slot -- sold or still unsold -- to the design\'s next printing, and resets sold', () => {
+  it('onGenerationEnd shifts every slot one to the left, discards the leftmost (bought or not), and deals a fresh printing into the rightmost', () => {
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
-    data.early.sold[0] = true; // simulate: bought earlier this generation
-    data.early.slots[1] = {card: new CounterfeitCertificates(), designIndex: COUNTERFEIT_CERTIFICATES_DESIGN, variantIndex: 0};
-    data.early.sold[1] = false; // still sitting there, unsold
+    const slot1 = {card: new SmuggledReactorCoreII(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 1};
+    const slot2 = {card: new CounterfeitCertificates(), designIndex: COUNTERFEIT_CERTIFICATES_DESIGN, variantIndex: 0};
+    data.early.slots = [undefined, slot1, slot2, undefined];
+    data.early.printingQueue = [{designIndex: COUNTERFEIT_CERTIFICATES_DESIGN, variantIndex: 1}];
 
     BlackMarket.onGenerationEnd(game);
 
-    expect(data.early.sold[0]).is.false;
-    expect(data.early.slots[0]!.designIndex).to.eq(SMUGGLED_REACTOR_CORE_DESIGN);
-    expect(data.early.slots[0]!.variantIndex).to.eq(1);
-    expect(data.early.slots[0]!.card.name).to.eq(CardName.SMUGGLED_REACTOR_CORE_II);
-
-    // Unsold slots advance too -- this isn't a "keep it until bought" pile anymore.
-    expect(data.early.sold[1]).is.false;
-    expect(data.early.slots[1]!.designIndex).to.eq(COUNTERFEIT_CERTIFICATES_DESIGN);
-    expect(data.early.slots[1]!.variantIndex).to.eq(1);
-    expect(data.early.slots[1]!.card.name).to.eq(CardName.COUNTERFEIT_CERTIFICATES_II);
+    // Leftmost (was undefined -- e.g. bought earlier) is discarded either way; everything shifts down.
+    expect(data.early.slots[0]).to.equal(slot1);
+    expect(data.early.slots[1]).to.equal(slot2);
+    expect(data.early.slots[2]).is.undefined;
+    // The rightmost slot is freshly dealt from the queue.
+    expect(data.early.slots[3]!.designIndex).to.eq(COUNTERFEIT_CERTIFICATES_DESIGN);
+    expect(data.early.slots[3]!.variantIndex).to.eq(1);
+    expect(data.early.printingQueue).has.lengthOf(0);
   });
 
-  it('onGenerationEnd rotates to a fresh design once a design\'s printings run out, if one remains in the queue', () => {
+  it('onGenerationEnd discards a still-unsold leftmost card just as readily as a bought (empty) one', () => {
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new SmuggledReactorCoreIV(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 3};
-    data.early.designQueue = [COUNTERFEIT_CERTIFICATES_DESIGN];
+    const leftmost = {card: new SmuggledReactorCore(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 0};
+    data.early.slots = [leftmost, undefined, undefined, undefined];
+    data.early.printingQueue = [];
 
     BlackMarket.onGenerationEnd(game);
 
-    const next = data.early.slots[0]!;
-    expect(next.designIndex).to.eq(COUNTERFEIT_CERTIFICATES_DESIGN);
-    expect(next.variantIndex).to.eq(0);
-    expect(data.early.sold[0]).is.false;
-    expect(data.early.designQueue).has.lengthOf(0);
+    expect(data.early.slots).deep.eq([undefined, undefined, undefined, undefined]);
   });
 
-  it('onGenerationEnd leaves a permanently-exhausted slot empty (no design left in the queue)', () => {
+  it('onGenerationEnd leaves the rightmost slot empty once the tier\'s printing queue runs dry', () => {
     const data = game.blackMarketData!;
-    data.early.slots[0] = {card: new SmuggledReactorCoreIV(), designIndex: SMUGGLED_REACTOR_CORE_DESIGN, variantIndex: 3};
-    data.early.designQueue = [];
+    data.early.slots = [undefined, undefined, undefined, undefined];
+    data.early.printingQueue = [];
 
-    BlackMarket.onGenerationEnd(game);
-
-    expect(data.early.slots[0]).is.undefined;
-    expect(data.early.sold[0]).is.false;
+    expect(() => BlackMarket.onGenerationEnd(game)).to.not.throw();
+    expect(data.early.slots.every((slot) => slot === undefined)).is.true;
   });
 
   it('onGenerationEnd only touches unlocked rows', () => {
@@ -215,7 +213,7 @@ describe('BlackMarket', () => {
     expect(game.blackMarketData!.late).is.undefined;
   });
 
-  it('buying from the mid row deducts price and marks the slot sold', () => {
+  it('buying from the mid row deducts price and empties the slot', () => {
     const data = game.blackMarketData!;
     game.generation = 4;
     BlackMarket.onGenerationStart(game);
@@ -228,7 +226,7 @@ describe('BlackMarket', () => {
     expect(player.megaCredits).to.eq(0);
     expect(player.steel).to.eq(0);
     expect(player.playedCards.has(CardName.ORE_FOR_OXYGEN_RACKET)).is.true;
-    expect(data.mid!.sold[0]).is.true;
+    expect(data.mid!.slots[0]).is.undefined;
   });
 
   it('throws when buying from a row that has not unlocked yet', () => {
@@ -239,29 +237,27 @@ describe('BlackMarket', () => {
     const data = game.blackMarketData!;
     const serialized = BlackMarket.serialize(data)!;
     expect(serialized.early.slots).has.lengthOf(BLACK_MARKET_ROW_SLOT_COUNT);
-    expect(serialized.early.sold).has.lengthOf(BLACK_MARKET_ROW_SLOT_COUNT);
     expect(serialized.mid).is.undefined;
     expect(serialized.late).is.undefined;
 
     const deserialized = BlackMarket.deserialize(serialized)!;
-    expect(deserialized.early.sold).deep.eq(data.early.sold);
+    expect(deserialized.early.printingQueue).deep.eq(data.early.printingQueue);
     expect(deserialized.early.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, name: s.card.name}))
       .deep.eq(data.early.slots.map((s) => s === undefined ? undefined : {designIndex: s.designIndex, variantIndex: s.variantIndex, name: s.card.name}));
     expect(deserialized.mid).is.undefined;
     expect(deserialized.late).is.undefined;
   });
 
-  it('serialize/deserialize round-trips an unlocked mid row too, including sold flags', () => {
+  it('serialize/deserialize round-trips an unlocked mid row too', () => {
     game.generation = 4;
     BlackMarket.onGenerationStart(game);
     const data = game.blackMarketData!;
-    data.mid!.sold[0] = true;
 
     const serialized = BlackMarket.serialize(data)!;
     expect(serialized.mid).is.not.undefined;
 
     const deserialized = BlackMarket.deserialize(serialized)!;
-    expect(deserialized.mid!.sold).deep.eq(data.mid!.sold);
+    expect(deserialized.mid!.printingQueue).deep.eq(data.mid!.printingQueue);
     expect(deserialized.mid!.slots.map((s) => s?.card.name)).deep.eq(data.mid!.slots.map((s) => s?.card.name));
   });
 
