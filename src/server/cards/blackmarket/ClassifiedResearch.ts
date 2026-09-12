@@ -4,6 +4,7 @@ import {Tag} from '../../../common/cards/Tag';
 import {IProjectCard} from '../IProjectCard';
 import {Card} from '../Card';
 import {CardRenderer} from '../render/CardRenderer';
+import {digit} from '../Options';
 
 export class ClassifiedResearch extends Card implements IProjectCard {
   constructor(name: CardName = CardName.CLASSIFIED_RESEARCH, cost: number = 7) {
@@ -12,7 +13,8 @@ export class ClassifiedResearch extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       tags: [Tag.SCIENCE, Tag.SCIENCE],
       cost,
-      victoryPoints: -1,
+      reserveUnits: {energy: 1},
+      victoryPoints: -2,
 
       behavior: {
         drawCard: 1,
@@ -21,9 +23,10 @@ export class ClassifiedResearch extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'BM01',
         renderData: CardRenderer.builder((b) => {
+          b.minus().energy(1, {digit}).plainText('Spend 1 energy.', /** parens */ true).br;
           b.cards(1);
         }),
-        description: 'Draw a card.',
+        description: 'Spend 1 energy. Draw a card.',
       },
     });
   }

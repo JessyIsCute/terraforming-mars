@@ -16,12 +16,17 @@ describe('ClassifiedResearch', () => {
   it('has the printed stats', () => {
     expect(card.tags).deep.eq([Tag.SCIENCE, Tag.SCIENCE]);
     expect(card.cost).to.eq(7);
-    expect(card.victoryPoints).to.eq(-1);
+    expect(card.reserveUnits).to.deep.include({energy: 1});
+    expect(card.victoryPoints).to.eq(-2);
   });
 
-  it('play draws a card', () => {
+  it('play spends 1 energy and draws a card', () => {
+    player.energy = 1;
     expect(player.cardsInHand).has.lengthOf(0);
+
     card.play(player);
+
+    expect(player.energy).to.eq(0);
     expect(player.cardsInHand).has.lengthOf(1);
   });
 
