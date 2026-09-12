@@ -13,19 +13,23 @@ import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
 import {SelectAmount} from '../../inputs/SelectAmount';
 
-/** Whether a single declarative behavior block spends energy. */
-function spendsEnergy(behavior: Behavior | undefined): boolean {
-  return behavior?.spend?.energy !== undefined;
+/** Whether a single declarative behavior block spends energy, or cuts energy production
+ * (e.g. Hackers' "-1 energy production", or most City-tile cards). Growing energy
+ * production doesn't count - only losing it, one way or another, does. */
+function usesEnergy(behavior: Behavior | undefined): boolean {
+  if (behavior === undefined) {
+    return false;
+  }
+  const energyProduction = behavior.production?.energy;
+  return behavior.spend?.energy !== undefined || (typeof energyProduction === 'number' && energyProduction < 0);
 }
 
-/** Whether a card spends energy as a cost, either on play (`behavior`) or as its
+/** Whether a card spends or reduces energy, either on play (`behavior`) or as its
  * repeatable action (`actionBehavior`) - used by Sistemas Seebeck's initial draw filter.
- * Most energy spenders (e.g. Ironworks' "spend 4 energy") are the latter. Cards that
- * merely grant energy (production or stock) don't count - only ones that use it as a
- * cost. Heat spenders don't count either - starting cards should actually use the energy
- * this corp gives you, and heat production takes a few generations to show up anyway. */
-function usesEnergy(card: {behavior?: Behavior, actionBehavior?: Behavior}): boolean {
-  return spendsEnergy(card.behavior) || spendsEnergy(card.actionBehavior);
+ * Heat doesn't count either way - starting cards should actually use the energy this corp
+ * gives you, and heat production takes a few generations to show up anyway. */
+function cardUsesEnergy(card: {behavior?: Behavior, actionBehavior?: Behavior}): boolean {
+  return usesEnergy(card.behavior) || usesEnergy(card.actionBehavior);
 }
 
 export class SistemasSeebeck extends CorporationCard implements ICorporationCard {
@@ -34,11 +38,11 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
       name: CardName.SISTEMAS_SEEBECK,
       tags: [Tag.SCIENCE, Tag.POWER],
       startingMegaCredits: 45,
-      initialActionText: 'Draw cards until you draw 2 cards that spend energy, then shuffle the rest back',
+      initialActionText: 'Draw cards until you draw 2 cards that spend or reduce energy, discarding the rest',
 
       metadata: {
         cardNumber: 'PfC97', // Renumber
-        description: 'You start with 45 M€. Draw cards until you draw 2 cards that spend energy - shuffle the rest back.',
+        description: 'You start with 45 M€. Draw cards until you draw 2 cards that spend or reduce energy - discard the rest.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(45).br;
           b.text('2X', {size: Size.SMALL}).cards(1).colon().minus().energy(1, {size: Size.SMALL});
@@ -54,7 +58,7 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
 
   public override initialAction(player: IPlayer): PlayerInput | undefined {
     player.game.defer(DrawCards.keepAll(player, 2, {
-      include: (card) => usesEnergy(card),
+      include: (card) => cardUsesEnergy(card),
     }));
     return undefined;
   }

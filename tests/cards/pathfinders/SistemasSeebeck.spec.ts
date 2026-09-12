@@ -38,7 +38,7 @@ describe('SistemasSeebeck', () => {
 
   it('initial action draws until 2 cards that spend energy are found, discarding the rest', () => {
     const match1 = fakeCard({behavior: {spend: {energy: 1}}});
-    // Merely granting energy doesn't count - only spending it does. Spending heat doesn't
+    // Merely granting energy doesn't count - only losing it does. Spending heat doesn't
     // count either - only energy, for starters.
     const nonMatch1 = fakeCard({behavior: {production: {energy: 1}}});
     const nonMatch2 = fakeCard({behavior: {spend: {heat: 2}}});
@@ -52,6 +52,23 @@ describe('SistemasSeebeck', () => {
 
     expect(player.cardsInHand).includes(match1);
     expect(player.cardsInHand).includes(match2);
+    expect(player.cardsInHand).not.includes(nonMatch1);
+    expect(player.cardsInHand).not.includes(nonMatch2);
+  });
+
+  it('also matches a card that reduces energy production, like Hackers, not just ones that spend it', () => {
+    const productionMatch1 = fakeCard({behavior: {production: {energy: -1, megacredits: 2}}}); // Hackers' shape
+    const productionMatch2 = fakeCard({behavior: {production: {energy: -1}}});
+    // Growing energy production doesn't count - only losing it does.
+    const nonMatch1 = fakeCard({behavior: {production: {energy: 2}}});
+    const nonMatch2 = fakeCard({behavior: {production: {heat: -3}}});
+    game.projectDeck.drawPile.push(productionMatch2, nonMatch2, nonMatch1, productionMatch1);
+
+    card.initialAction(player);
+    runAllActions(game);
+
+    expect(player.cardsInHand).includes(productionMatch1);
+    expect(player.cardsInHand).includes(productionMatch2);
     expect(player.cardsInHand).not.includes(nonMatch1);
     expect(player.cardsInHand).not.includes(nonMatch2);
   });
