@@ -4,16 +4,16 @@ import {IPlayer} from '../../IPlayer';
 import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {SelectCard} from '../../inputs/SelectCard';
-import {newProjectCard} from '../../createCard';
 import {CardRenderer} from '../render/CardRenderer';
 import {digit, all} from '../Options';
 import {DeimosDoubleDownCopy} from './DeimosDoubleDownCopy';
 
 /** Space prelude: gain 2 titanium, draw 2 Space events, then hand every player (including
- * you) a copy of one. A player can never hold two playable instances of the same-named
- * card (playedCards forbids duplicate names in the tableau), so the acting player - who
- * already has the original - gets a DeimosDoubleDownCopy instead: a genuinely distinct
- * card that delegates everything else (cost/tags/behavior/etc) to the real thing. */
+ * you) a DeimosDoubleDownCopy of one - a genuinely distinct card (shown as "<real card>
+ * Copy") that delegates everything else (cost/tags/behavior/etc) to the real thing. Every
+ * recipient gets the same kind of copy, not just the acting player, so nobody ever risks
+ * holding two playable instances of the same name (playedCards forbids duplicates in the
+ * tableau) regardless of what else they're holding. */
 export class DeimosDoubleDown extends PreludeCard {
   constructor() {
     super({
@@ -45,18 +45,7 @@ export class DeimosDoubleDown extends PreludeCard {
     return new SelectCard('Select a Space event to copy to every player', 'Copy', spaceEvents)
       .andThen(([card]) => {
         for (const p of player.game.players) {
-          if (p === player) {
-            // You already have the original - a second copy of the same name would be
-            // unplayable (a player can never hold two playable instances of the same-named
-            // card), so give a distinct-but-identical copy instead.
-            const copy = new DeimosDoubleDownCopy(card.name);
-            p.cardsInHand.push(copy);
-            continue;
-          }
-          const copy = newProjectCard(card.name);
-          if (copy !== undefined) {
-            p.cardsInHand.push(copy);
-          }
+          p.cardsInHand.push(new DeimosDoubleDownCopy(card.name));
         }
         player.game.log('${0} gave every player a copy of ${1}', (b) => b.player(player).card(card));
         return undefined;

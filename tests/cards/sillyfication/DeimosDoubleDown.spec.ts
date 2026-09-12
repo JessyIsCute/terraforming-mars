@@ -42,15 +42,18 @@ describe('DeimosDoubleDown', () => {
     }
   });
 
-  it('give-away hands every other player a fresh copy of the chosen space event', () => {
+  it('give-away hands every other player a DeimosDoubleDownCopy of the chosen space event too', () => {
     player.cardsInHand = [new Comet()];
     player2.cardsInHand = [];
 
     const selectCard = cast(card.bespokePlay(player), SelectCard);
     selectCard.cb([selectCard.cards[0]]);
 
-    expect(player2.cardsInHand.map((c) => c.name)).to.deep.eq(['Comet']);
-    expect(player2.cardsInHand[0]).to.not.eq(player.cardsInHand[0]);
+    expect(player2.cardsInHand).to.have.length(1);
+    const otherCopy = player2.cardsInHand[0];
+    expect(otherCopy).to.be.instanceOf(DeimosDoubleDownCopy);
+    expect(otherCopy.tags).to.deep.eq([Tag.SPACE]);
+    expect(otherCopy).to.not.eq(player.cardsInHand[0]);
   });
 
   it('gives the owner a genuinely distinct copy instead of a second same-named Comet', () => {
@@ -73,5 +76,22 @@ describe('DeimosDoubleDown', () => {
     expect(() => player.playedCards.push(originalComet)).to.not.throw();
     expect(() => player.playedCards.push(copy)).to.not.throw();
     expect(player.playedCards.length).to.eq(2);
+  });
+
+  it('gives every player the same kind of copy, all independently playable', () => {
+    const originalComet = new Comet();
+    player.cardsInHand = [originalComet];
+    player2.cardsInHand = [];
+
+    const selectCard = cast(card.bespokePlay(player), SelectCard);
+    selectCard.cb([selectCard.cards[0]]);
+
+    const ownCopy = player.cardsInHand.find((c) => c !== originalComet)!;
+    const otherCopy = player2.cardsInHand[0];
+    expect(ownCopy).to.be.instanceOf(DeimosDoubleDownCopy);
+    expect(otherCopy).to.be.instanceOf(DeimosDoubleDownCopy);
+    expect(ownCopy).to.not.eq(otherCopy);
+
+    expect(() => player2.playedCards.push(otherCopy)).to.not.throw();
   });
 });
