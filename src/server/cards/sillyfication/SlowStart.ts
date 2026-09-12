@@ -12,19 +12,24 @@ export class SlowStart extends PreludeCard {
       name: CardName.SLOW_START,
       tags: [Tag.WILD],
 
+      behavior: {
+        production: {megacredits: 2},
+      },
+
       metadata: {
         cardNumber: 'T14',
         renderData: CardRenderer.builder((b) => {
-          b.text('everyone skips generation 1', {size: Size.SMALL, uppercase});
+          b.production((pb) => pb.megacredits(2)).br;
+          b.text('everyone skips generation 2', {size: Size.SMALL, uppercase});
         }),
-        description: 'This generation, every player skips their actions and the game goes straight to the production phase.',
+        description: 'Increase your M€ production 2 steps. Next generation, every player skips their actions and the game goes straight to the production phase.',
       },
     });
   }
 
   public override bespokePlay(player: IPlayer) {
     player.game.skipGeneration1Actions = true;
-    player.game.log('${0} sends every player straight to the production phase this generation.', (b) => b.card(this));
+    player.game.log('${0} sends every player straight to the production phase next generation.', (b) => b.card(this));
     return undefined;
   }
 }

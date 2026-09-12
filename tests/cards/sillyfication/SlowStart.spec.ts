@@ -14,6 +14,12 @@ describe('SlowStart', () => {
     [/* game */, player, player2] = testGame(2, {preludeExtension: true});
   });
 
+  it('increases M€ production 2 steps', () => {
+    player.production.override({megacredits: 0});
+    card.play(player);
+    expect(player.production.megacredits).to.eq(2);
+  });
+
   it('sets the game flag to skip generation 1 actions', () => {
     expect(player.game.skipGeneration1Actions).is.false;
     card.play(player);

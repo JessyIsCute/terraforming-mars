@@ -8,7 +8,10 @@ import {newProjectCard} from '../../createCard';
 import {CardRenderer} from '../render/CardRenderer';
 import {digit, all} from '../Options';
 
-/** Space prelude: gain 2 titanium, draw 2 Space events, then hand every player a copy of one. */
+/** Space prelude: gain 2 titanium, draw 2 Space events, then hand every OTHER player a copy
+ * of one (giving yourself a second copy would be dead - a player can never hold two
+ * playable instances of the same-named card, since playedCards forbids duplicate names in
+ * the tableau - so you keep the original instead). */
 export class DeimosDoubleDown extends PreludeCard {
   constructor() {
     super({
@@ -24,9 +27,9 @@ export class DeimosDoubleDown extends PreludeCard {
         cardNumber: 'X76',
         renderData: CardRenderer.builder((b) => {
           b.titanium(2, {digit}).cards(2, {secondaryTag: Tag.EVENT}).super((sb) => sb.tag(Tag.SPACE)).br;
-          b.text('copy to all').colon().cards(1, {secondaryTag: Tag.EVENT, all}).super((sb) => sb.tag(Tag.SPACE));
+          b.text('copy to others').colon().cards(1, {secondaryTag: Tag.EVENT, all}).super((sb) => sb.tag(Tag.SPACE));
         }),
-        description: 'Gain 2 titanium. Draw 2 Space event cards. Then choose a Space event in your hand; every player, including you, gets a copy of it.',
+        description: 'Gain 2 titanium. Draw 2 Space event cards. Then choose a Space event in your hand; every other player gets a copy of it.',
       },
     });
   }
@@ -37,15 +40,20 @@ export class DeimosDoubleDown extends PreludeCard {
     if (spaceEvents.length === 0) {
       return undefined;
     }
-    return new SelectCard('Select a Space event to copy to every player', 'Copy', spaceEvents)
+    return new SelectCard('Select a Space event to copy to every other player', 'Copy', spaceEvents)
       .andThen(([card]) => {
         for (const p of player.game.players) {
+          // You already have the original - a second copy would be unplayable, since a
+          // player can never hold two playable instances of the same-named card.
+          if (p === player) {
+            continue;
+          }
           const copy = newProjectCard(card.name);
           if (copy !== undefined) {
             p.cardsInHand.push(copy);
           }
         }
-        player.game.log('${0} gave every player a copy of ${1}', (b) => b.player(player).card(card));
+        player.game.log('${0} gave every other player a copy of ${1}', (b) => b.player(player).card(card));
         return undefined;
       });
   }

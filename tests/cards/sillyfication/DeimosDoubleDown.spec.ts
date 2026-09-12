@@ -41,7 +41,7 @@ describe('DeimosDoubleDown', () => {
     }
   });
 
-  it('give-away hands every player a fresh copy of the chosen space event', () => {
+  it('give-away hands every OTHER player a fresh copy of the chosen space event, not the owner', () => {
     player.cardsInHand = [new Comet()];
     player2.cardsInHand = [];
 
@@ -50,7 +50,8 @@ describe('DeimosDoubleDown', () => {
 
     expect(player2.cardsInHand.map((c) => c.name)).to.deep.eq(['Comet']);
     expect(player2.cardsInHand[0]).to.not.eq(player.cardsInHand[0]);
-    // Owner also gets a copy ("including you").
-    expect(player.cardsInHand.filter((c) => c.name === 'Comet')).has.lengthOf(2);
+    // The owner keeps just their original - a second copy would be unplayable, since a
+    // player can never hold two playable instances of the same-named card.
+    expect(player.cardsInHand.filter((c) => c.name === 'Comet')).has.lengthOf(1);
   });
 });
