@@ -21,6 +21,7 @@ import {ClientAward, ClientMilestone} from '../../common/ma/ClientMilestoneAward
 import {CardType} from '../../common/cards/CardType';
 import {OneOrArray} from '../../common/utils/types';
 import {globalInitialize} from '../globalInitialize';
+import {CardName} from '../../common/cards/CardName';
 
 type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -64,6 +65,12 @@ class CardProcessor {
 
   private static processCard(module: GameModule, card: ICard, compatibility: undefined | OneOrArray<Expansion>) {
     if (card.type === CardType.PROXY) {
+      return;
+    }
+    // Its face varies per instance (whichever card it copies) and is sent over the wire
+    // instead - see ModelUtils.ts's customCard handling. Unlike other `instantiate: false`
+    // cards (e.g. Black Market's tiers), it has no single fixed face to export at all.
+    if (card.name === CardName.DEIMOS_DOUBLE_DOWN_COPY) {
       return;
     }
 

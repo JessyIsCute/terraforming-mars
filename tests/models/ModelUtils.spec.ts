@@ -3,8 +3,11 @@ import {cardsToModel} from '../../src/server/models/ModelUtils';
 import {MutationName} from '../../src/common/mutationmarkets/MutationName';
 import {InfectionName} from '../../src/common/mutationmarkets/InfectionName';
 import {Tag} from '../../src/common/cards/Tag';
+import {CardName} from '../../src/common/cards/CardName';
 import {Venuphile} from '../../src/server/cards/sillyfication/Venuphile';
 import {InSpire} from '../../src/server/cards/pathfinders/InSpire';
+import {DeimosDoubleDownCopy} from '../../src/server/cards/sillyfication/DeimosDoubleDownCopy';
+import {NitrogenRichAsteroid} from '../../src/server/cards/base/NitrogenRichAsteroid';
 import {fakeCard} from '../TestingUtils';
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
@@ -126,5 +129,17 @@ describe('cardsToModel', () => {
   it('leaves inSpireResources undefined for every other card', () => {
     const card = fakeCard({});
     expect(cardsToModel(player, [card])[0].inSpireResources).is.undefined;
+  });
+
+  it('sends DeimosDoubleDownCopy\'s real wrapped-card face over the wire as customCard', () => {
+    const card = new DeimosDoubleDownCopy(CardName.NITROGEN_RICH_ASTEROID);
+    const source = new NitrogenRichAsteroid();
+
+    const [model] = cardsToModel(player, [card]);
+
+    expect(model.customCard).is.not.undefined;
+    expect(model.customCard!.tags).to.deep.eq(source.tags);
+    expect(model.customCard!.cost).to.eq(source.cost);
+    expect(model.customCard!.metadata).to.eq(source.metadata);
   });
 });

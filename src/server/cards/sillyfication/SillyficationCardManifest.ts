@@ -62,6 +62,7 @@ import {MusicalChairs} from './MusicalChairs';
 import {PreludeCloning} from './PreludeCloning';
 import {ProjectImitators} from './ProjectImitators';
 import {DeimosDoubleDown} from './DeimosDoubleDown';
+import {DeimosDoubleDownCopy} from './DeimosDoubleDownCopy';
 import {WellnessDeluxe} from './WellnessDeluxe';
 import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
@@ -235,5 +236,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.MULLIGANS]: {Factory: Mulligans},
     [CardName.MULLIGENS]: {Factory: Mulligens},
     [CardName.SAND_CLAIM]: {Factory: SandClaim},
+    // Never dealt from the deck - only ever constructed directly by Deimos Double Down.
+    [CardName.DEIMOS_DOUBLE_DOWN_COPY]: {Factory: DeimosDoubleDownCopy, instantiate: false},
   },
 });

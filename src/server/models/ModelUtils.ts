@@ -101,6 +101,21 @@ export function cardsToModel(
         compatibility: getCustomCardDefinition(card.name)?.compatibility ?? [],
       };
     }
+    // Same reasoning as Custom Card Maker cards above: DeimosDoubleDownCopy's face varies
+    // per instance (whichever Space event it copies), so it's not in the static manifest
+    // either - see DeimosDoubleDownCopy.ts's doc comment.
+    if (card.name === CardName.DEIMOS_DOUBLE_DOWN_COPY) {
+      model.customCard = {
+        type: card.type,
+        cost: card.cost,
+        tags: card.tags,
+        requirements: card.requirements,
+        metadata: card.metadata,
+        resourceType: card.resourceType,
+        module: 'sillyfication',
+        compatibility: ['sillyfication'],
+      };
+    }
     const namePrefixes: Array<string> = [];
     if (card.mutations !== undefined && card.mutations.length > 0) {
       const mutationNames = card.mutations.map((m) => m.mutation);

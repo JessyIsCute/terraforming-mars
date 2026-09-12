@@ -657,6 +657,7 @@ export enum CardName {
   PRELUDE_CLONING = 'Prelude Cloning',
   PROJECT_IMITATORS = 'Project Imitators',
   DEIMOS_DOUBLE_DOWN = 'Deimos Double Down?',
+  DEIMOS_DOUBLE_DOWN_COPY = 'Double Down Copy',
   WELLNESS_DELUXE = 'Wellness Deluxe',
   VENUS_VENTURES = 'Venus Ventures',
   NEREID_BIOSYSTEMS = 'Nereid Biosystems',

@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {DeimosDoubleDown} from '../../../src/server/cards/sillyfication/DeimosDoubleDown';
+import {DeimosDoubleDownCopy} from '../../../src/server/cards/sillyfication/DeimosDoubleDownCopy';
 import {Comet} from '../../../src/server/cards/base/Comet';
 import {IGame} from '../../../src/server/IGame';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
@@ -41,7 +42,7 @@ describe('DeimosDoubleDown', () => {
     }
   });
 
-  it('give-away hands every OTHER player a fresh copy of the chosen space event, not the owner', () => {
+  it('give-away hands every other player a fresh copy of the chosen space event', () => {
     player.cardsInHand = [new Comet()];
     player2.cardsInHand = [];
 
@@ -50,8 +51,27 @@ describe('DeimosDoubleDown', () => {
 
     expect(player2.cardsInHand.map((c) => c.name)).to.deep.eq(['Comet']);
     expect(player2.cardsInHand[0]).to.not.eq(player.cardsInHand[0]);
-    // The owner keeps just their original - a second copy would be unplayable, since a
-    // player can never hold two playable instances of the same-named card.
-    expect(player.cardsInHand.filter((c) => c.name === 'Comet')).has.lengthOf(1);
+  });
+
+  it('gives the owner a genuinely distinct copy instead of a second same-named Comet', () => {
+    const originalComet = new Comet();
+    player.cardsInHand = [originalComet];
+
+    const selectCard = cast(card.bespokePlay(player), SelectCard);
+    selectCard.cb([selectCard.cards[0]]);
+
+    expect(player.cardsInHand).to.have.length(2);
+    expect(player.cardsInHand).to.include(originalComet);
+    const copy = player.cardsInHand.find((c) => c !== originalComet)!;
+    expect(copy).to.be.instanceOf(DeimosDoubleDownCopy);
+    expect(copy.name).to.not.eq(originalComet.name);
+    // But it functions identically - same tags/cost/behavior as the real Comet.
+    expect(copy.tags).to.deep.eq(originalComet.tags);
+    expect(copy.cost).to.eq(originalComet.cost);
+
+    // Both are independently playable in the same tableau - the whole point.
+    expect(() => player.playedCards.push(originalComet)).to.not.throw();
+    expect(() => player.playedCards.push(copy)).to.not.throw();
+    expect(player.playedCards.length).to.eq(2);
   });
 });

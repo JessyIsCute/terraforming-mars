@@ -110,6 +110,12 @@ describe('Warmonger', () => {
   for (const manifest of ALL_MODULE_MANIFESTS) {
     for (const projectCard of CardManifest.values(manifest.projectCards)) {
       const card = new projectCard.Factory();
+      // DeimosDoubleDownCopy has no fixed identity of its own - it delegates everything
+      // (including `type`) to whatever real card it's wrapping, which defaults to Comet
+      // outside of an actual game. Not a real event to test here.
+      if (card.name === CardName.DEIMOS_DOUBLE_DOWN_COPY) {
+        continue;
+      }
       if (card.type !== CardType.EVENT) {
         continue;
       }
