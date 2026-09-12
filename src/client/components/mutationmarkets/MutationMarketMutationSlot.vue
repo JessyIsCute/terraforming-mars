@@ -4,7 +4,7 @@
     :class="[entranceClass, {'infection-card-standalone': marketSlot?.kind === 'infection'}]"
     :style="{gridColumn}">
     <div v-if="isVoid" class="mutation-market-void"></div>
-    <template v-else-if="marketSlot !== undefined">
+    <template v-else-if="marketSlot">
       <div :class="marketSlot.kind === 'infection' ? 'infection-market-mutation-label' : 'mutation-market-mutation-label'">{{ marketSlot.kind }}</div>
       <div class="mutation-market-mutation-name">{{ slotName }}</div>
       <div class="mutation-market-mutation-detail">
@@ -43,8 +43,10 @@ const ENTRANCE_ANIMATION_MS = 700;
 export default defineComponent({
   name: 'MutationMarketMutationSlot',
   props: {
+    // `undefined` server-side, but an empty array slot travels over JSON as `null`
+    // (JSON.stringify turns an `undefined` array element into `null`) -- accept both.
     marketSlot: {
-      type: Object as PropType<MutationMarketMutationSlotModel>,
+      type: Object as PropType<MutationMarketMutationSlotModel | null>,
       default: undefined,
     },
     // CSS grid-column shorthand (e.g. "1 / span 2"), computed by the parent from this
@@ -72,20 +74,20 @@ export default defineComponent({
     },
     // Mutation or infection's display name -- whichever this slot holds.
     slotName(): string {
-      if (this.marketSlot === undefined) {
+      if (!this.marketSlot) {
         return '';
       }
       return this.marketSlot.kind === 'mutation' ? this.marketSlot.mutation : this.marketSlot.infection;
     },
     // Infections have no bidding requirement at all, so there's nothing to show here.
     requirementText(): string {
-      if (this.marketSlot === undefined || this.marketSlot.kind !== 'mutation') {
+      if (!this.marketSlot || this.marketSlot.kind !== 'mutation') {
         return '';
       }
       return describeMutationRequirement(MUTATION_DEFINITIONS[this.marketSlot.mutation].requirement);
     },
     effectText(): string {
-      if (this.marketSlot === undefined) {
+      if (!this.marketSlot) {
         return '';
       }
       return this.marketSlot.kind === 'mutation' ?

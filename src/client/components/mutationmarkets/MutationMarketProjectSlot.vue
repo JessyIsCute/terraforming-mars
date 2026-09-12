@@ -1,6 +1,6 @@
 <template>
   <div class="mutation-market-project-slot" :class="entranceClass">
-    <template v-if="marketSlot !== undefined">
+    <template v-if="marketSlot">
       <div class="mutation-market-card-scale-wrapper">
         <Card :card="marketSlot.card" :autoTall="true" />
       </div>
@@ -37,8 +37,10 @@ export default defineComponent({
     Card,
   },
   props: {
+    // `undefined` server-side, but an empty array slot travels over JSON as `null`
+    // (JSON.stringify turns an `undefined` array element into `null`) -- accept both.
     marketSlot: {
-      type: Object as PropType<MutationMarketProjectSlotModel>,
+      type: Object as PropType<MutationMarketProjectSlotModel | null>,
       default: undefined,
     },
   },

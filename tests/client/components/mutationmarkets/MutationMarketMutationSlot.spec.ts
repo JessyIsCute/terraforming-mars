@@ -24,6 +24,15 @@ describe('MutationMarketMutationSlot', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
+  it('regression: does not crash when the slot is null (JSON turns an empty array slot into null, not undefined)', () => {
+    const wrapper = shallowMount(MutationMarketMutationSlot, {
+      ...globalConfig,
+      props: {marketSlot: null, gridColumn: '1 / span 2'},
+    });
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.text()).to.eq('');
+  });
+
   it('renders the mutation name', () => {
     const wrapper = shallowMount(MutationMarketMutationSlot, {
       ...globalConfig,

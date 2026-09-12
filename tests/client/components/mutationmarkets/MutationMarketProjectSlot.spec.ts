@@ -26,6 +26,15 @@ describe('MutationMarketProjectSlot', () => {
     expect(wrapper.findComponent({name: 'Card'}).exists()).to.be.false;
   });
 
+  it('regression: does not crash when the slot is null (JSON turns an empty array slot into null, not undefined)', () => {
+    const wrapper = shallowMount(MutationMarketProjectSlot, {
+      ...globalConfig,
+      props: {marketSlot: null},
+    });
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.findComponent({name: 'Card'}).exists()).to.be.false;
+  });
+
   it('renders the card when a slot is present', () => {
     const wrapper = shallowMount(MutationMarketProjectSlot, {
       ...globalConfig,
