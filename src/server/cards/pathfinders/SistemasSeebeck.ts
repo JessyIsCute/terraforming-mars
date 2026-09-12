@@ -5,13 +5,16 @@ import {IPlayer} from '../../IPlayer';
 import {PlayerInput} from '../../PlayerInput';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
-import {DrawCards} from '../../deferredActions/DrawCards';
 import {Behavior} from '../../behavior/Behavior';
 import {Size} from '../../../common/cards/render/Size';
 import {Resource} from '../../../common/Resource';
 import {OrOptions} from '../../inputs/OrOptions';
 import {SelectOption} from '../../inputs/SelectOption';
 import {SelectAmount} from '../../inputs/SelectAmount';
+import {Priority} from '../../deferredActions/Priority';
+import {keep, LogType} from '../../deferredActions/ChooseCards';
+import {Deck} from '../Deck';
+import {IProjectCard} from '../IProjectCard';
 
 /** Whether a single declarative behavior block spends energy, or cuts energy production
  * (e.g. Hackers' "-1 energy production", or most City-tile cards). Growing energy
@@ -38,11 +41,11 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
       name: CardName.SISTEMAS_SEEBECK,
       tags: [Tag.SCIENCE, Tag.POWER],
       startingMegaCredits: 45,
-      initialActionText: 'Draw cards until you draw 2 cards that spend or reduce energy, discarding the rest',
+      initialActionText: 'Draw cards until you draw 2 cards that spend or reduce energy, then shuffle the rest back into the deck',
 
       metadata: {
         cardNumber: 'PfC97', // Renumber
-        description: 'You start with 45 M€. Draw cards until you draw 2 cards that spend or reduce energy - discard the rest.',
+        description: 'You start with 45 M€. Draw cards until you draw 2 cards that spend or reduce energy, then shuffle the rest back into the deck.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(45).br;
           b.text('2X', {size: Size.SMALL}).cards(1).colon().minus().energy(1, {size: Size.SMALL});
@@ -56,10 +59,39 @@ export class SistemasSeebeck extends CorporationCard implements ICorporationCard
     });
   }
 
+  /** Unlike the generic "draw until you find N matches" mechanism most cards use (which
+   * discards non-matches - the standard, correct behavior for that class of effect), this
+   * one specifically shuffles its rejects back into the deck instead - by request, not a
+   * shared mechanic change. */
   public override initialAction(player: IPlayer): PlayerInput | undefined {
-    player.game.defer(DrawCards.keepAll(player, 2, {
-      include: (card) => cardUsesEnergy(card),
-    }));
+    player.defer(() => {
+      const game = player.game;
+      const deck = game.projectDeck;
+      const matched: Array<IProjectCard> = [];
+      const rejected: Array<IProjectCard> = [];
+
+      while (matched.length < 2) {
+        if (matched.length + rejected.length >= deck.drawPile.length + deck.discardPile.length) {
+          game.log('${0} went through the entire deck without finding 2 matches', (b) => b.player(player));
+          break;
+        }
+        const card = deck.drawOrThrow(game);
+        if (cardUsesEnergy(card)) {
+          matched.push(card);
+        } else {
+          rejected.push(card);
+        }
+      }
+
+      if (rejected.length > 0) {
+        deck.drawPile.push(...rejected);
+        Deck.shuffle(deck.drawPile, game.rng);
+        game.log('${0} shuffled ${1} card(s) back into the deck', (b) => b.player(player).number(rejected.length));
+      }
+
+      keep(player, matched, [], LogType.DREW_VERBOSE);
+      return undefined;
+    }, Priority.DRAW_CARDS);
     return undefined;
   }
 

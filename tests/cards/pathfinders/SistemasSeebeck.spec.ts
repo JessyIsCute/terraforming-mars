@@ -36,7 +36,7 @@ describe('SistemasSeebeck', () => {
     expect(player.megaCredits).eq(45);
   });
 
-  it('initial action draws until 2 cards that spend energy are found, discarding the rest', () => {
+  it('initial action draws until 2 cards that spend energy are found, shuffling the rest back into the deck', () => {
     const match1 = fakeCard({behavior: {spend: {energy: 1}}});
     // Merely granting energy doesn't count - only losing it does. Spending heat doesn't
     // count either - only energy, for starters.
@@ -54,6 +54,35 @@ describe('SistemasSeebeck', () => {
     expect(player.cardsInHand).includes(match2);
     expect(player.cardsInHand).not.includes(nonMatch1);
     expect(player.cardsInHand).not.includes(nonMatch2);
+
+    // Rejected cards go back into the drawPile, not the discard pile - unlike the generic
+    // "draw until match" mechanism most cards use.
+    expect(game.projectDeck.discardPile).not.includes(nonMatch1);
+    expect(game.projectDeck.discardPile).not.includes(nonMatch2);
+    expect(game.projectDeck.drawPile).includes(nonMatch1);
+    expect(game.projectDeck.drawPile).includes(nonMatch2);
+  });
+
+  it('reshuffles the deck once the rejects are back in it', () => {
+    const match1 = fakeCard({behavior: {spend: {energy: 1}}});
+    const match2 = fakeCard({behavior: {spend: {energy: 1}}});
+    const rejects = Array.from({length: 10}, () => fakeCard({behavior: {production: {plants: 1}}}));
+    // drawPile.pop() draws from the end - put the 2 matches at the very bottom so every
+    // reject gets drawn (and shuffled back) first.
+    game.projectDeck.drawPile.push(match1, match2, ...rejects);
+    const orderBefore = [...game.projectDeck.drawPile];
+
+    card.initialAction(player);
+    runAllActions(game);
+
+    expect(player.cardsInHand).includes(match1);
+    expect(player.cardsInHand).includes(match2);
+    for (const reject of rejects) {
+      expect(game.projectDeck.drawPile).includes(reject);
+    }
+    // The 10 rejects landing back in exactly the same order they were drawn out in would be
+    // an ~1-in-3.6-million coincidence if they were truly reshuffled.
+    expect(game.projectDeck.drawPile).to.not.deep.eq(orderBefore.filter((c) => rejects.includes(c)));
   });
 
   it('also matches a card that reduces energy production, like Hackers, not just ones that spend it', () => {
