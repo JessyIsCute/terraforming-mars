@@ -17,6 +17,15 @@
               <a v-if="gameOptions.expansions.underworld" :href="rulebookUrls.underworld" class="tooltip" data-tooltip="Underworld rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-underworld"></div></a>
               <a v-if="gameOptions.expansions.starwars" :href="rulebookUrls.starwars" class="tooltip" data-tooltip="Star Wars rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-starwars"></div></a>
               <a v-if="gameOptions.expansions.deltaProject" :href="rulebookUrls.deltaProject" class="tooltip" data-tooltip="Delta Project rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-deltaProject"></div></a>
+              <a v-if="gameOptions.expansions.sillyfication" :href="rulebookUrls.sillyfication" class="tooltip" data-tooltip="Sillyfication rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-sillyfication"></div></a>
+              <a v-if="gameOptions.expansions.betterMars" :href="rulebookUrls.betterMars" class="tooltip" data-tooltip="BetterMars rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-betterMars"></div></a>
+              <a v-if="gameOptions.expansions.customCards" :href="rulebookUrls.customCards" class="tooltip" data-tooltip="Custom Cards rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-customCards"></div></a>
+              <a v-if="gameOptions.expansions.mutationMarkets" :href="rulebookUrls.mutationMarkets" class="tooltip" data-tooltip="MutationMarkets rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-mutationMarkets"></div></a>
+              <a v-if="gameOptions.expansions.conglomerates" :href="rulebookUrls.conglomerates" class="tooltip" data-tooltip="Conglomerates rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-conglomerates"></div></a>
+              <a v-if="gameOptions.expansions.blackMarket" :href="rulebookUrls.blackMarket" class="tooltip" data-tooltip="Black Market rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-blackMarket"></div></a>
+              <a v-if="gameOptions.expansions.corporateBetterments" :href="rulebookUrls.corporateBetterments" class="tooltip" data-tooltip="Corporate Betterments rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-corporateBetterments"></div></a>
+              <a v-if="gameOptions.expansions.idesOfMars" :href="rulebookUrls.idesOfMars" class="tooltip" data-tooltip="Ides of Mars rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-idesOfMars"></div></a>
+              <a v-if="gameOptions.expansions.robAntilles" :href="rulebookUrls.robAntilles" class="tooltip" data-tooltip="Rob Antilles rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-robAntilles"></div></a>
             </li>
 
             <li><div class="setup-item" v-i18n>Board:</div>
