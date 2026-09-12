@@ -142,4 +142,12 @@ describe('cardsToModel', () => {
     expect(model.customCard!.cost).to.eq(source.cost);
     expect(model.customCard!.metadata).to.eq(source.metadata);
   });
+
+  it('shows DeimosDoubleDownCopy\'s displayed title as "<real card> Copy"', () => {
+    const card = new DeimosDoubleDownCopy(CardName.NITROGEN_RICH_ASTEROID);
+
+    const [model] = cardsToModel(player, [card]);
+
+    expect(model.combinedDisplayName).to.eq('Nitrogen-Rich Asteroid Copy');
+  });
 });

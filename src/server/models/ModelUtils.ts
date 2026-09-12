@@ -115,6 +115,12 @@ export function cardsToModel(
         module: 'sillyfication',
         compatibility: ['sillyfication'],
       };
+      // Cast rather than importing the concrete class, which would create a circular
+      // import through createCard.ts/AllManifests.ts (ModelUtils.ts is imported from very
+      // early in that chain) - safe here since the name check above already confirms the
+      // real runtime type.
+      const sourceCardName = (card as unknown as {sourceCardName: CardName}).sourceCardName;
+      model.combinedDisplayName = `${sourceCardName} Copy`;
     }
     const namePrefixes: Array<string> = [];
     if (card.mutations !== undefined && card.mutations.length > 0) {
