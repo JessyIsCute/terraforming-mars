@@ -16,8 +16,8 @@ describe('SpireTech', () => {
     player.playedCards.push(card);
   });
 
-  it('costs 27 and scores 1 VP', () => {
-    expect(card.cost).to.eq(27);
+  it('costs 25 and scores 1 VP', () => {
+    expect(card.cost).to.eq(25);
     expect(card.getVictoryPoints(player)).to.eq(1);
   });
 
@@ -58,14 +58,14 @@ describe('SpireTech', () => {
     expect(player.megaCredits).to.eq(0);
   });
 
-  it('gains 2 science per card not bought during the research phase', () => {
+  it('gains 1 science per card not bought during the research phase', () => {
     player.game.phase = Phase.RESEARCH;
     const kept = [new MicroCredits()];
     const discarded = [new MicroCredits(), new GanymedeColony()];
 
     SpireTech.onDrawCards(player, kept, discarded);
 
-    expect(card.resourceCount).to.eq(4);
+    expect(card.resourceCount).to.eq(2);
   });
 
   it('does not gain science outside the research phase', () => {

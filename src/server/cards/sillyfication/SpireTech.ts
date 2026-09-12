@@ -16,15 +16,15 @@ export class SpireTech extends Card implements IProjectCard {
       type: CardType.ACTIVE,
       name: CardName.SPIRE_TECH,
       tags: [Tag.SPACE, Tag.SCIENCE],
-      cost: 27,
+      cost: 25,
       victoryPoints: 1,
       resourceType: CardResource.SCIENCE,
 
       metadata: {
         cardNumber: 'T21',
         renderData: CardRenderer.builder((b) => {
-          b.effect('During each round\'s research phase, gain 2 science resources here for each card you do not buy.', (eb) => {
-            eb.cards(1).startEffect.resource(CardResource.SCIENCE, {amount: 2}).asterix();
+          b.effect('During each round\'s research phase, gain 1 science resource here for each card you do not buy.', (eb) => {
+            eb.cards(1).startEffect.resource(CardResource.SCIENCE, {amount: 1}).asterix();
           }).br;
           b.effect('When you play a card with at least 2 tags, including this, remove 1 science resource here to gain 1 titanium and 1 M€.', (eb) => {
             eb.emptyTag(2).startEffect.minus().resource(CardResource.SCIENCE).nbsp.plus().titanium(1).nbsp.megacredits(1);
@@ -48,7 +48,7 @@ export class SpireTech extends Card implements IProjectCard {
     if (player.game.phase === Phase.RESEARCH && discards.length > 0) {
       const card = player.playedCards.get(CardName.SPIRE_TECH);
       if (card !== undefined) {
-        player.addResourceTo(card, {qty: discards.length * 2, log: true});
+        player.addResourceTo(card, {qty: discards.length, log: true});
       }
     }
     return undefined;

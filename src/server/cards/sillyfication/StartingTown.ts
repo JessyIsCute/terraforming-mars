@@ -17,7 +17,7 @@ export class StartingTown extends Card implements IProjectCard {
       type: CardType.AUTOMATED,
       name: CardName.STARTING_TOWN,
       tags: [Tag.CITY, Tag.BUILDING],
-      cost: 14,
+      cost: 15,
       victoryPoints: 1,
 
       metadata: {
