@@ -1,6 +1,6 @@
 <template>
   <div class="black-market-slot" :class="entranceClass">
-    <div v-if="card !== undefined" class="black-market-card-scale-wrapper">
+    <div v-if="card" class="black-market-card-scale-wrapper">
       <Card :card="card" :autoTall="true" />
     </div>
   </div>
@@ -20,8 +20,10 @@ export default defineComponent({
     Card,
   },
   props: {
+    // `undefined` server-side, but an empty array slot travels over JSON as `null`
+    // (JSON.stringify turns an `undefined` array element into `null`) -- accept both.
     card: {
-      type: Object as PropType<CardModel | undefined>,
+      type: Object as PropType<CardModel | undefined | null>,
       default: undefined,
     },
   },
