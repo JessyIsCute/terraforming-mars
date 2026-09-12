@@ -38,12 +38,24 @@ const NO_WARNINGS: ReadonlySet<Warning> = new Set();
  * compiled static client manifest (see export_card_rendering.ts) so the client renders the
  * real wrapped card's face instead of a generic placeholder (see ModelUtils.ts's
  * `customCard` handling).
+ *
+ * Known gap: `canPlay`/`canPlayPostRequirements` delegate straight to the wrapped source,
+ * so the Think Tank/Aeron Genomics "pay a global-parameter shortfall with resources" path
+ * (GlobalParameterRequirement.satisfies) would set additionalProjectCosts on the source
+ * instance, not this one, if a copied event ever had an unmet global-parameter requirement
+ * - none of the 42 real Space events do today, but a future one that does wouldn't show the
+ * discount breakdown correctly through a copy.
  */
 export class DeimosDoubleDownCopy implements IProjectCard {
   public readonly name = CardName.DEIMOS_DOUBLE_DOWN_COPY;
   public sourceCardName: CardName;
   public resourceCount = 0;
   public warnings: ReadonlySet<Warning> = NO_WARNINGS;
+  // Ephemeral, per-instance, and reset/set unconditionally by Player.getPlayableCards/
+  // canPlay for every card in hand on every check - must be a real mutable field, not a
+  // delegating getter (that threw "which only has a getter" the moment this card was ever
+  // actually checked for playability).
+  public additionalProjectCosts: AdditionalProjectCosts | undefined = undefined;
 
   private cachedSource: IProjectCard | undefined;
 
@@ -97,9 +109,6 @@ export class DeimosDoubleDownCopy implements IProjectCard {
   }
   public get bonusResource(): Array<Resource> | undefined {
     return this.source.bonusResource;
-  }
-  public get additionalProjectCosts(): AdditionalProjectCosts | undefined {
-    return this.source.additionalProjectCosts;
   }
 
   public addWarning(warning: Warning): void {

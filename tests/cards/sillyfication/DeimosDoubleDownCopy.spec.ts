@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {DeimosDoubleDownCopy} from '../../../src/server/cards/sillyfication/DeimosDoubleDownCopy';
 import {Comet} from '../../../src/server/cards/base/Comet';
 import {NitrogenRichAsteroid} from '../../../src/server/cards/base/NitrogenRichAsteroid';
+import {GiantIceAsteroid} from '../../../src/server/cards/base/GiantIceAsteroid';
 import {CardName} from '../../../src/common/cards/CardName';
 import {Tag} from '../../../src/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
@@ -83,6 +84,20 @@ describe('DeimosDoubleDownCopy', () => {
     expect((restored as DeimosDoubleDownCopy).sourceCardName).to.eq(CardName.NITROGEN_RICH_ASTEROID);
     expect(restored.resourceCount).to.eq(2);
     expect(restored.tags).to.deep.eq(new NitrogenRichAsteroid().tags);
+  });
+
+  it('does not throw when checked for playability - additionalProjectCosts must be a real settable field', () => {
+    // Regression: getPlayableCards/canPlay unconditionally do
+    // `card.additionalProjectCosts = undefined` for every card in hand, every time. A
+    // getter-only delegate threw "Cannot set property... which only has a getter" the
+    // moment a copy (e.g. of Giant Ice Asteroid) was sitting in hand.
+    const copy = new DeimosDoubleDownCopy(CardName.GIANT_ICE_ASTEROID);
+    player.megaCredits = 100;
+    player.cardsInHand = [copy];
+
+    expect(() => player.getPlayableCards()).to.not.throw();
+    expect(player.getPlayableCards()).to.include(copy);
+    expect(copy.tags).to.deep.eq(new GiantIceAsteroid().tags);
   });
 
   it('resourceCount and warnings are independent, own state, not delegated', () => {
