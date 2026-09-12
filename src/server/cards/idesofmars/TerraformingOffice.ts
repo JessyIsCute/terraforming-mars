@@ -22,8 +22,7 @@ export class TerraformingOffice extends Card implements IProjectCard, IActionCar
         renderData: CardRenderer.builder((b) => {
           b.action('Once per generation, take another action.', (eb) => eb.empty().startAction.text('ACTION'));
         }),
-        description: 'Requires that the Bureaucrats are ruling or that you have 2 delegates there. ' +
-          'Once per generation, take another action.',
+        description: 'Requires that the Bureaucrats are ruling or that you have 2 delegates there.',
       },
     });
   }

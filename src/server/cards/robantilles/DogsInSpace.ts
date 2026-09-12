@@ -35,7 +35,6 @@ export class DogsInSpace extends Card implements IProjectCard {
           }).br;
           b.vpText('1 VP for every 2 animals on this card.');
         }),
-        description: 'Add an animal to this card whenever you play a Space tag.',
       },
     });
   }

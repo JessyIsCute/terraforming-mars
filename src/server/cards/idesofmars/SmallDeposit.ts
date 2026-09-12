@@ -44,7 +44,8 @@ export class SmallDeposit extends ActionCard implements IProjectCard, IActionCar
       metadata: {
         cardNumber: 'Im119',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.RESOURCE_CUBE, 2).arrow().steel(2).nbsp.or().nbsp.titanium(2).br;
+          b.resource(CardResource.RESOURCE_CUBE, 2).arrow().steel(2).nbsp.or().br;
+          b.resource(CardResource.RESOURCE_CUBE, 2).arrow().titanium(2).br;
           b.plainText('Add 6 ore to this card.', /** parens */ true);
         }),
         description: 'Add 6 ore to this card. Action: spend 2 ore from this card to get 2 steel or 2 titanium.',

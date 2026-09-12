@@ -23,7 +23,6 @@ export class FuturisticCentre extends Card implements IProjectCard {
             eb.cards(1).startEffect.megacredits(-1);
           });
         }),
-        description: 'During research phase, you pay 1 M€ less for cards you buy.',
       },
     });
   }

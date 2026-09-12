@@ -38,7 +38,7 @@ export class SlowGrowthPlantation extends ActionCard implements IActionCard, IPr
           b.action('Add 1 microbe to this card, OR remove 5 microbes here to place a greenery tile.', (eb) => {
             eb.empty().startAction.resource(CardResource.MICROBE);
           }).br;
-          b.resource(CardResource.MICROBE, 5).arrow().greenery();
+          b.resource(CardResource.MICROBE, {amount: 5, digit: true}).arrow().greenery();
         }),
         description: 'Requires 4% oxygen. Add 3 microbes to this card.',
       },

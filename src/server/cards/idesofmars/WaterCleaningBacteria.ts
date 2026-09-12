@@ -39,7 +39,7 @@ export class WaterCleaningBacteria extends ActionCard implements IActionCard, IP
           });
           b.br;
           b.action('Remove 8 microbes here to place an ocean tile.', (eb) => {
-            eb.resource(CardResource.MICROBE, 8).startAction.oceans(1);
+            eb.resource(CardResource.MICROBE, {amount: 8, digit: true}).startAction.oceans(1);
           });
           b.br;
           b.production((pb) => pb.energy(1));

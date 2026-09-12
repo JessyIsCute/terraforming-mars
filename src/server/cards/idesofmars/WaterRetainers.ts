@@ -32,8 +32,7 @@ export class WaterRetainers extends Card implements IProjectCard {
           b.br;
           b.production((pb) => pb.plants(1));
         }),
-        description: 'Increase your plant production 1 step. Cards and actions that place a greenery tile cost 2 M€ less; ' +
-          'cards and actions that place an ocean tile cost 3 M€ less.',
+        description: 'Increase your plant production 1 step.',
       },
     });
   }

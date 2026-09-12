@@ -58,9 +58,7 @@ export class InvakCity extends Card implements IProjectCard {
           });
         }),
         description: 'Requires that you own a greenery. Decrease your energy production 1 step ' +
-          'and increase your M€ production 3 steps. Substitute one of your greeneries with the ' +
-          'special Invak City tile: it counts as both a city and a greenery, with an adjacency ' +
-          'bonus of 2 M€.',
+          'and increase your M€ production 3 steps.',
       },
     });
   }

@@ -21,7 +21,7 @@ export class MeteorShower extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'H68',
         renderData: CardRenderer.builder((b) => {
-          b.steel(5).titanium(4);
+          b.steel(5, {digit: true}).titanium(4, {digit: true});
         }),
         description: 'Gain 5 steel and 4 titanium.',
       },

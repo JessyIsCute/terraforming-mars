@@ -31,7 +31,7 @@ export class ArchitecturalContracts extends Card implements IProjectCard {
             eb.city().startEffect.megacredits(-3);
           });
         }),
-        description: 'Requires that you own a city tile. Cards with a city tag, and the City standard project, cost 3 M€ less.',
+        description: 'Requires that you own a city tile.',
       },
     });
   }

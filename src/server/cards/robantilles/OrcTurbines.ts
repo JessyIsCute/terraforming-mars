@@ -32,9 +32,6 @@ export class OrcTurbines extends Card implements IActionCard, IProjectCard {
             eb.minus().energy(1).startEffect.minus().heat(2);
           });
         }),
-        description: 'Action: spend 2 heat to gain 1 energy. You may do this up to 5 times. ' +
-          'Effect: every time you decrease your Energy production, you may decrease your Heat ' +
-          'production by 2 instead.',
       },
     });
   }

@@ -27,7 +27,7 @@ export class BlueMars extends Card implements IProjectCard {
             eb.oceans(1).startEffect.tr(1);
           });
         }),
-        description: 'Requires that all oceans have been placed. Whenever you would place an ocean tile, raise your TR 1 step instead.',
+        description: 'Requires that all oceans have been placed.',
       },
     });
   }

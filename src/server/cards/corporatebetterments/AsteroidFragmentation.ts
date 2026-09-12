@@ -26,7 +26,8 @@ export class AsteroidFragmentation extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'CB06',
         renderData: CardRenderer.builder((b) => {
-          b.heat(6).nbsp.steel(3).nbsp.titanium(3).arrow().tr(3);
+          b.heat(6).nbsp.steel(3, {digit: true}).nbsp.titanium(3, {digit: true}).br;
+          b.arrow().tr(3, {digit: true});
         }),
         description: 'Spend 6 heat, 3 steel and 3 titanium to raise your TR 3 steps.',
       },

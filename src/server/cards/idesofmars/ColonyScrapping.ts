@@ -23,7 +23,7 @@ export class ColonyScrapping extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'Im122',
         renderData: CardRenderer.builder((b) => {
-          b.minus().colonies(1).arrow().megacredits(PAYOUT);
+          b.minus().colonies(1).megacredits(PAYOUT);
         }),
         description: `Requires that you own at least 1 colony. Remove 1 of your colonies and get ${PAYOUT} M€.`,
       },

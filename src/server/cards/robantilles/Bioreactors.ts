@@ -27,7 +27,7 @@ export class Bioreactors extends Card implements IProjectCard {
             eb.resource(CardResource.MICROBE).startEffect.resource(CardResource.MICROBE);
           });
         }),
-        description: 'Requires that you have at least 2 Science tags. Every time you add a microbe to any card, add an additional one.',
+        description: 'Requires that you have at least 2 Science tags.',
       },
     });
   }

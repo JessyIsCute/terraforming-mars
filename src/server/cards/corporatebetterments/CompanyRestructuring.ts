@@ -25,7 +25,7 @@ export class CompanyRestructuring extends Card implements IProjectCard {
           }).br;
           b.plainText('Opponents may discard cards the same way for 2 M€ each.');
         }),
-        description: 'Discard any number of cards and gain 3 M€ each. Opponents may do the same for 2 M€ each.',
+        description: 'Opponents may do the same for 2 M€ each.',
       },
     });
   }

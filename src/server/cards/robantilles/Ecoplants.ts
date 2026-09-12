@@ -34,8 +34,7 @@ export class Ecoplants extends Card implements IProjectCard {
             eb.greenery().startEffect.minus().megacredits(2);
           });
         }),
-        description: 'Requires that you have Plant production. Your Greenery tiles cost 1 plant less. ' +
-          'Cards and standard projects that make you place a Greenery tile cost 2 M€ less.',
+        description: 'Requires that you have Plant production.',
       },
     });
   }

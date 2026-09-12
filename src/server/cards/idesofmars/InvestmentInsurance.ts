@@ -30,8 +30,7 @@ export class InvestmentInsurance extends Card implements IProjectCard {
             eb.empty().startEffect.production((pb) => pb.megacredits(1));
           });
         }),
-        description: 'Decrease your M€ production 1 step. During production phase, increase your M€ production 1 step if ' +
-          'you did not increase it during the previous generation.',
+        description: 'Decrease your M€ production 1 step.',
       },
     });
   }

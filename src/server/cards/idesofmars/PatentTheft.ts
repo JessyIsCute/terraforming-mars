@@ -37,8 +37,7 @@ export class PatentTheft extends Card implements IProjectCard, IActionCard {
           }).br;
           b.vpText('-1 VP for every 2 Loot resources on this card.');
         }),
-        description: 'Action: use an action from an active card an opponent owns, and add a Loot resource ' +
-          'to this card. -1 VP for every 2 Loot resources on this card.',
+        description: 'Adds a Loot resource to this card. -1 VP for every 2 Loot resources on this card.',
       },
     });
   }

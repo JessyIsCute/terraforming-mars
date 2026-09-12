@@ -28,7 +28,6 @@ export class MartianArmedForces extends Card implements IProjectCard {
             eb.megacredits(1).steel(1).titanium(1).startEffect.text('protected');
           });
         }),
-        description: 'Opponents cannot remove your M€, steel or titanium.',
       },
     });
   }

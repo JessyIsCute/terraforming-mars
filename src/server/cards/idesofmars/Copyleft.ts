@@ -31,7 +31,7 @@ export class Copyleft extends Card implements IProjectCard {
             eb.tag(Tag.SCIENCE).startEffect.cards(1);
           });
         }),
-        description: `When any Science tag is played, reveal 1 card. The player who played it may buy the revealed card for ${BUY_COST} M€; ` +
+        description: `The player who played it may buy the revealed card for ${BUY_COST} M€; ` +
           `if they don't, you may buy it for ${BUY_COST} M€.`,
       },
     });

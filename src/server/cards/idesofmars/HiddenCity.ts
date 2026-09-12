@@ -47,8 +47,7 @@ export class HiddenCity extends Card implements IProjectCard {
           });
         }),
         description: 'Requires 2 Mars tags. Decrease your energy production 1 step and increase ' +
-          'your M€ production 2 steps. At game end, after final greenery placement, place a City ' +
-          'on Mars. If no areas are available, place it on the outside of the map.',
+          'your M€ production 2 steps. If no areas are available, place it on the outside of the map.',
       },
     });
   }

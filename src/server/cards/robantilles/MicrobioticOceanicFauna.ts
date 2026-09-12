@@ -28,7 +28,7 @@ export class MicrobioticOceanicFauna extends Card implements IProjectCard {
             eb.tag(Tag.MICROBE).startEffect.megacredits(-3);
           });
         }),
-        description: 'Requires 3 ocean tiles. Cards with a microbe tag cost 3 M€ less.',
+        description: 'Requires 3 ocean tiles.',
       },
     });
   }

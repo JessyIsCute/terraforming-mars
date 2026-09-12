@@ -20,7 +20,7 @@ export class BioBatteries extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'IM135',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(4).arrow().production((pb) => pb.energy(2));
+          b.minus().plants(4).production((pb) => pb.energy(2));
         }),
         description: 'Spend 4 plants and increase your energy production 2 steps.',
       },

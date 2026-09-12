@@ -36,7 +36,8 @@ export class InVivoTesting extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'I55',
         renderData: CardRenderer.builder((b) => {
-          b.minus().resource(CardResource.MICROBE, {amount: 3, all}).nbsp.or().minus().plants(5, {all}).asterix();
+          b.minus().resource(CardResource.MICROBE, {amount: 3, all}).nbsp.or().br;
+          b.minus().plants(5, {all}).asterix();
         }),
         description: 'Requires that you own at least 1 Science tag. Remove 3 microbes or 5 plants from a player.',
       },

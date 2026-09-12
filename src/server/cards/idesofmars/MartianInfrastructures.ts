@@ -50,8 +50,7 @@ export class MartianInfrastructures extends Card implements IProjectCard {
           b.br;
           b.production((pb) => pb.minus().energy(1));
         }),
-        description: 'Decrease your energy production 1 step. Cards and standard projects that ' +
-          'place a tile on Mars cost you 2 M€ less.',
+        description: 'Decrease your energy production 1 step.',
       },
     });
   }

@@ -30,7 +30,6 @@ export class MausoleumAtHellas extends ActionCard implements IProjectCard {
           }).br;
           b.vpText('1 VP for each relic resource on this card.');
         }),
-        description: 'Action: Discard a card from your hand to add 1 relic resource to this card.',
       },
     });
   }

@@ -27,7 +27,6 @@ export class DragonStorm extends ActionCard implements IProjectCard, IActionCard
             eb.energy(1).startAction.production((pb) => pb.energy(1));
           });
         }),
-        description: 'Spend 1 energy to increase your energy production 1 step.',
       },
     });
   }

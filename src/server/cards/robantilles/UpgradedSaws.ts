@@ -25,7 +25,6 @@ export class UpgradedSaws extends Card implements IProjectCard {
             eb.greenery({size: Size.SMALL}).startEffect.production((pb) => pb.megacredits(1));
           });
         }),
-        description: 'Increase your M€ production 1 step when you place a greenery tile.',
       },
     });
   }
