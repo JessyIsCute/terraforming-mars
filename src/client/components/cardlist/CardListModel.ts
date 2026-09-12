@@ -49,6 +49,9 @@ const MODULE_ABBREVIATIONS = {
   mutationMarkets: 'M',
   conglomerates: 'g',
   blackMarket: 'k',
+  corporateBetterments: 'o',
+  idesOfMars: 'i',
+  robAntilles: 'R',
 } satisfies Record<GameModule, string>;
 
 const TYPE_ABBREVIATIONS = {
@@ -116,6 +119,9 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       mutationMarkets: true,
       conglomerates: true,
       blackMarket: true,
+      corporateBetterments: true,
+      idesOfMars: true,
+      robAntilles: true,
     },
     types: {
       event: true,

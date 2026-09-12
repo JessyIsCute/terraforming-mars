@@ -81,6 +81,10 @@ export class GlobalEventDealer {
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       conglomerates: gameOptions.conglomeratesExpansion,
       blackMarket: gameOptions.blackMarketExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      corporateBetterments: gameOptions.corporateBettermentsExpansion,
+      idesOfMars: gameOptions.idesOfMarsExpansion,
+      robAntilles: gameOptions.robAntillesExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

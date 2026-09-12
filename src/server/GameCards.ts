@@ -29,6 +29,9 @@ import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManife
 import {CONGLOMERATES_CARD_MANIFEST} from './cards/conglomerates/ConglomeratesCardManifest';
 import {BLACKMARKET_CARD_MANIFEST} from './cards/blackmarket/BlackMarketCardManifest';
 import {DELTA_PROJECT_CARD_MANIFEST} from './cards/delta/DeltaProjectCardManifest';
+import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './cards/corporatebetterments/CorporateBettermentsCardManifest';
+import {IDES_OF_MARS_CARD_MANIFEST} from './cards/idesofmars/IdesOfMarsCardManifest';
+import {ROB_ANTILLES_CARD_MANIFEST} from './cards/robantilles/RobAntillesCardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
@@ -77,6 +80,9 @@ export class GameCards {
       // every other module and in case future manifest-wide processing (cardsToRemove, etc.)
       // ever depends on a module's manifest being present here.
       [gameOptions.blackMarketExpansion, BLACKMARKET_CARD_MANIFEST],
+      [gameOptions.corporateBettermentsExpansion, CORPORATE_BETTERMENTS_CARD_MANIFEST],
+      [gameOptions.idesOfMarsExpansion, IDES_OF_MARS_CARD_MANIFEST],
+      [gameOptions.robAntillesExpansion, ROB_ANTILLES_CARD_MANIFEST],
       // DeltaProject's own card (the prelude) is force-dealt directly in Game.ts, not drawn
       // from this pool - but other cards depending on the expansion (e.g. Epsilon Dample,
       // via its `compatibility: 'deltaProject'`) still need this manifest present here.

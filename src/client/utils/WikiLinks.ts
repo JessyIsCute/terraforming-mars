@@ -29,6 +29,9 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   mutationMarkets: `${FORK_WIKI}/MutationMarkets`,
   conglomerates: `${FORK_WIKI}/Conglomerates`,
   blackMarket: `${FORK_WIKI}/Black-Market`,
+  corporateBetterments: `${FORK_WIKI}/Corporate-Betterments`,
+  idesOfMars: `${FORK_WIKI}/Ides-of-Mars`,
+  robAntilles: `${FORK_WIKI}/Rob-Antilles`,
 };
 
 export const WIKI_URLS = {

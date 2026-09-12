@@ -20,6 +20,9 @@ export const EXPANSIONS = [
   'mutationMarkets',
   'conglomerates',
   'blackMarket',
+  'corporateBetterments',
+  'idesOfMars',
+  'robAntilles',
 ] as const;
 
 export const GAME_MODULES = [
@@ -53,6 +56,9 @@ export const MODULE_NAMES = {
   mutationMarkets: 'MutationMarkets',
   conglomerates: 'Conglomerates',
   blackMarket: 'Black Market',
+  corporateBetterments: 'Corporate Betterments',
+  idesOfMars: 'Ides of Mars',
+  robAntilles: 'Rob Antilles',
 } satisfies Record<GameModule, string>;
 
 export const DEFAULT_EXPANSIONS = {
@@ -77,4 +83,7 @@ export const DEFAULT_EXPANSIONS = {
   mutationMarkets: false,
   conglomerates: false,
   blackMarket: false,
+  corporateBetterments: false,
+  idesOfMars: false,
+  robAntilles: false,
 } satisfies Record<Expansion, boolean>;
