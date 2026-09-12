@@ -5,15 +5,10 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 
-/**
- * Printed as a blue (Active-style) card but its rules text is a passive, continuous discount
- * with no player-triggered repeatable action -- the same situation as the official card Splice's
- * discount effect, which is Automated. Classified AUTOMATED per the batch spec's guidance.
- */
 export class MicrobioticOceanicFauna extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MICROBIOTIC_OCEANIC_FAUNA,
       tags: [Tag.MICROBE],
       cost: 7,

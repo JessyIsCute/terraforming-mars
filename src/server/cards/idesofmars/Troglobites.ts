@@ -13,10 +13,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class Troglobites extends Card implements IProjectCard {
   constructor() {
     super({
-      // Card is printed with the "(Effect: ...)" passive-trigger wording used by AUTOMATED
-      // (green) cards in this expansion, despite a blue frame -- classified AUTOMATED per
-      // spec guidance rather than the frame color.
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.TROGLOBITES,
       tags: [Tag.ANIMAL],
       cost: 10,

@@ -10,7 +10,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class WaterRetainers extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.WATER_RETAINERS,
       tags: [Tag.SCIENCE],
       cost: 19,

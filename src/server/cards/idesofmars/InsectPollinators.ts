@@ -8,13 +8,10 @@ import {Space} from '../../boards/Space';
 import {TileType} from '../../../common/TileType';
 import {CardRenderer} from '../render/CardRenderer';
 
-// Insect Pollinators is an AUTOMATED card despite its blue frame: the printed text uses
-// "Effect:" for a passive discount with no player-activated action. See batch spec notes
-// for card 17 ("guessed" cardType).
 export class InsectPollinators extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.INSECT_POLLINATORS,
       tags: [Tag.MICROBE],
       cost: 8,

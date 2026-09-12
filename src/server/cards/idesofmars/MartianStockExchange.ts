@@ -17,10 +17,7 @@ import {all} from '../Options';
 export class MartianStockExchange extends Card implements IProjectCard {
   constructor() {
     super({
-      // Printed with the "(Effect: ...)" passive-trigger wording used by AUTOMATED (green)
-      // cards in this expansion, despite a blue frame -- classified AUTOMATED per spec
-      // guidance rather than the frame color (same call as Troglobites/Amphibians).
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MARTIAN_STOCK_EXCHANGE,
       tags: [Tag.MARS, Tag.BUILDING],
       cost: 26,

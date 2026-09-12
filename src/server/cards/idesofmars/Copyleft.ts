@@ -13,13 +13,10 @@ import {CardRenderer} from '../render/CardRenderer';
 
 const BUY_COST = 3;
 
-// Copyleft is an AUTOMATED card despite its blue frame: the printed text uses "Effect:"
-// and reacts passively to any Science tag being played, with no player-activated action
-// or resource storage of its own. See batch spec notes for card 15 ("guessed" cardType).
 export class Copyleft extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.COPYLEFT,
       tags: [Tag.SCIENCE],
       cost: 5,

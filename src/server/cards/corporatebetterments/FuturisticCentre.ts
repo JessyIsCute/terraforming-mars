@@ -10,7 +10,7 @@ import {CardRenderer} from '@/server/cards/render/CardRenderer';
 export class FuturisticCentre extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.FUTURISTIC_CENTRE,
       tags: [Tag.SCIENCE, Tag.BUILDING],
       cost: 18,

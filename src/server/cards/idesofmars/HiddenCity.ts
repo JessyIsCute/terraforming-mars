@@ -25,7 +25,7 @@ export class HiddenCity extends Card implements IProjectCard {
 
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.HIDDEN_CITY,
       tags: [Tag.MARS, Tag.MARS],
       cost: 14,

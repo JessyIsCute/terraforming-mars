@@ -15,7 +15,7 @@ import {Size} from '../../../common/cards/render/Size';
 export class StemCellResearchCenter extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.STEM_CELL_RESEARCH_CENTER,
       tags: [Tag.MICROBE, Tag.BUILDING],
       cost: 12,

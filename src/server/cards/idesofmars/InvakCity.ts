@@ -30,7 +30,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class InvakCity extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.INVAK_CITY,
       tags: [Tag.PLANT],
       cost: 21,

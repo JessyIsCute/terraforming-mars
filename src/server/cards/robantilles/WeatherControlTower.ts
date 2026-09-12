@@ -13,7 +13,7 @@ import {Size} from '../../../common/cards/render/Size';
 export class WeatherControlTower extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.WEATHER_CONTROL_TOWER,
       tags: [Tag.BUILDING],
       cost: 8,

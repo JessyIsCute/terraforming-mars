@@ -13,7 +13,7 @@ import {all} from '@/server/cards/Options';
 export class MartianSafari extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MARTIAN_SAFARI,
       tags: [Tag.ANIMAL],
       cost: 22,

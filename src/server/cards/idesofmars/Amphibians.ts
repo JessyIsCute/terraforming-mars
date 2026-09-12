@@ -13,10 +13,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class Amphibians extends Card implements IProjectCard {
   constructor() {
     super({
-      // Printed with the "(Effect: ...)" passive-trigger wording used by AUTOMATED (green)
-      // cards in this expansion, despite a blue frame -- classified AUTOMATED per spec
-      // guidance rather than the frame color (same call as Troglobites/Martian Stock Exchange).
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.AMPHIBIANS_IOM,
       tags: [Tag.ANIMAL],
       cost: 7,

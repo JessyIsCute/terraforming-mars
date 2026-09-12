@@ -13,7 +13,7 @@ import * as constants from '../../../common/constants';
 export class BlueMars extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.BLUE_MARS,
       tags: [Tag.MARS],
       cost: 2,

@@ -7,13 +7,10 @@ import {IPlayer} from '../../IPlayer';
 import {Resource} from '../../../common/Resource';
 import {CardRenderer} from '../render/CardRenderer';
 
-// Investment Insurance is an AUTOMATED card despite its blue frame: the printed text uses
-// "Effect:" and describes an automatic production-phase trigger, with no player-activated
-// action. See batch spec notes for card 21 ("guessed" cardType).
 export class InvestmentInsurance extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.INVESTMENT_INSURANCE,
       tags: [Tag.EARTH],
       cost: 5,

@@ -19,7 +19,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class DogsInSpace extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.DOGS_IN_SPACE,
       tags: [Tag.ANIMAL, Tag.POWER],
       cost: 16,

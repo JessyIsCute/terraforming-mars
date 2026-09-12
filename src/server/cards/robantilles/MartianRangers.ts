@@ -10,13 +10,12 @@ import {CardRenderer} from '../render/CardRenderer';
  * The "opponents cannot remove your animals" clause is implemented in
  * RemoveResourcesFromCard.getAvailableTargetCards (see the opponentHasMartianRangers
  * check there), mirroring the existing Protected Habitats guard for Animal/Microbe
- * resources. This card is classified AUTOMATED per the batch instructions (passive
- * "Effect:" wording despite the blue Active-style frame in the source scan).
+ * resources.
  */
 export class MartianRangers extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MARTIAN_RANGERS,
       tags: [Tag.ANIMAL, Tag.EARTH],
       cost: 12,

@@ -32,7 +32,7 @@ const MARS_TILE_TYPES: ReadonlySet<TileType> = new Set([
 export class MartianInfrastructures extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MARTIAN_INFRASTRUCTURES,
       tags: [],
       cost: 6,

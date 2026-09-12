@@ -11,7 +11,7 @@ import {IStandardProjectCard} from '../IStandardProjectCard';
 export class Ecoplants extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.ECOPLANTS,
       tags: [Tag.PLANT],
       cost: 10,

@@ -15,7 +15,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class MartianArmedForces extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.MARTIAN_ARMED_FORCES,
       tags: [Tag.EARTH],
       cost: 13,

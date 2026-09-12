@@ -13,7 +13,7 @@ import {Size} from '../../../common/cards/render/Size';
 export class UpgradedSaws extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.UPGRADED_SAWS,
       tags: [Tag.SCIENCE],
       cost: 9,

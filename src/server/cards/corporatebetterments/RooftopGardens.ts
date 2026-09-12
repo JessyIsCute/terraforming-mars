@@ -13,7 +13,7 @@ import {all} from '../Options';
 export class RooftopGardens extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.ROOFTOP_GARDENS,
       tags: [Tag.PLANT],
       cost: 15,

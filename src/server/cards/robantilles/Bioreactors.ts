@@ -12,7 +12,7 @@ import {LogHelper} from '../../LogHelper';
 export class Bioreactors extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.BIOREACTORS_RA,
       tags: [Tag.MICROBE],
       cost: 19,

@@ -11,7 +11,7 @@ import {IStandardProjectCard} from '@/server/cards/IStandardProjectCard';
 export class ArchitecturalContracts extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.ARCHITECTURAL_CONTRACTS,
       tags: [Tag.BUILDING],
       cost: 22,

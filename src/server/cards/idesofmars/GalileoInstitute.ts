@@ -11,7 +11,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class GalileoInstitute extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.GALILEO_INSTITUTE,
       tags: [Tag.JOVIAN],
       cost: 21,

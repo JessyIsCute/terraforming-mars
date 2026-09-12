@@ -14,7 +14,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class PublicRelations extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.PUBLIC_RELATIONS,
       tags: [Tag.EARTH, Tag.EARTH],
       cost: 14,

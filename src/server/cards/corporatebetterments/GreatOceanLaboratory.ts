@@ -13,7 +13,7 @@ import {Units} from '../../../common/Units';
 export class GreatOceanLaboratory extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.GREAT_OCEAN_LABORATORY,
       tags: [Tag.MICROBE, Tag.BUILDING],
       cost: 20,
