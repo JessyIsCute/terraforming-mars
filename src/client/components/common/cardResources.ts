@@ -27,4 +27,7 @@ export const cardResourceCSS = {
   [CardResource.JOURNALISM]: 'card-resource-journalism',
   [CardResource.SUPPLY_CHAIN]: 'card-resource-supply-chain',
   [CardResource.DIRECTOR]: 'card-resource-director',
+  [CardResource.LOOT]: 'card-resource-loot',
+  [CardResource.BUDGET]: 'card-resource-budget',
+  [CardResource.RELIC]: 'card-resource-relic',
 } satisfies Record<CardResource, string>;
