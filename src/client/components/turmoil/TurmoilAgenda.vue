@@ -1,5 +1,5 @@
 <template>
-  <div class="tooltip tooltip-bottom" :data-tooltip="resolvedDescription">
+  <div class="tooltip tooltip-bottom agenda-tooltip" :data-tooltip="resolvedDescription">
     <template v-if="morePartiesExpansion && id === 'mb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-building party-resource-tag"></div>
@@ -331,6 +331,7 @@
     <template v-else-if="id === 'empb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-power party-resource-tag"></div>
+      <div class="resource card card-small"></div>
     </template>
     <template v-else-if="id === 'empb02'">
       <div class="resource money party-resource">1</div> /

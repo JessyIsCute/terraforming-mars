@@ -764,6 +764,18 @@ input[type="radio"]:checked + .party-container::after {
   cursor: default;
 }
 
+// Turmoil agenda (bonus/policy) hover tooltips carry a full sentence, sometimes quite long --
+// Spectre's default tooltip is a single-line, ellipsis-truncated bubble meant for short labels,
+// which cuts these off. Let it wrap onto multiple lines and grow to fit instead.
+.agenda-tooltip.tooltip::after {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 260px;
+  text-align: center;
+  line-height: 1.3;
+}
+
 .greenery-tile-turmoil {
   background-image: url(./assets/tiles/greenery.png);
   background-size: 50px 46px;

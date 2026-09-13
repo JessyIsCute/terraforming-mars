@@ -63,9 +63,13 @@ export type AgendaInfo = {
 };
 
 export function agendaInfoById(id: BonusId | PolicyId): AgendaInfo {
-  const p = id[0] as Party;
-  const type = id[1] === 'b' ? 'Bonus' : 'Policy';
-  const num = id.substring(2);
+  // The suffix (bonus/policy marker + 2-digit number) is always exactly 3 characters -- 'b01',
+  // 'b02', 'p01'..'p04' -- regardless of how long the party prefix itself is (1 character for
+  // the 6 official parties, up to 3 for the 6 More Parties ones, e.g. 'bur').
+  const suffix = id.slice(-3);
+  const p = id.slice(0, -3) as Party;
+  const type = suffix[0] === 'b' ? 'Bonus' : 'Policy';
+  const num = suffix.slice(1);
   const name = names[p];
   return {name, type, num};
 }
