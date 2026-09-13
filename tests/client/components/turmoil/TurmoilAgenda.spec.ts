@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount, shallowMount} from '@vue/test-utils';
 import {expect} from 'chai';
 import {globalConfig} from '../getLocalVue';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
@@ -22,7 +22,7 @@ const NEW_PARTY_IMPLEMENTED_IDS: ReadonlyArray<BonusId | PolicyId> = [
   'spob01', 'spob02', 'spop01', 'spop02', 'spop03',
   'empb01', 'empb02', 'empp02', 'empp03', 'empp04',
   'burb01', 'burb02', 'burp03', 'burp04',
-  'cenb01', 'cenb02', 'cenp01', 'cenp02', 'cenp03',
+  'cenb01', 'cenb02', 'cenp01', 'cenp02', 'cenp03', 'cenp04',
   'trab01', 'trab02', 'trap01', 'trap02',
 ];
 
@@ -31,6 +31,12 @@ const NEW_PARTY_IMPLEMENTED_IDS: ReadonlyArray<BonusId | PolicyId> = [
 const NEW_PARTY_NOT_IMPLEMENTED_IDS: ReadonlyArray<BonusId | PolicyId> = [
   'popb02', 'popp02', 'spop04', 'empp01', 'burp01', 'burp02', 'trap03', 'trap04',
 ];
+
+// Options API computed properties aren't reflected in TurmoilAgenda's props-only public type,
+// so tests reach into the raw vm to read them -- same pattern used elsewhere in this suite.
+function resolvedDescriptionOf(wrapper: ReturnType<typeof shallowMount>): string {
+  return (wrapper.vm as unknown as {resolvedDescription: string}).resolvedDescription;
+}
 
 describe('TurmoilAgenda', () => {
   it('mounts without errors', () => {
@@ -61,7 +67,7 @@ describe('TurmoilAgenda', () => {
         id: 'rp02',
       },
     });
-    expect(wrapper.attributes('data-tooltip')).to.eq(AGENDA_DESCRIPTIONS.rp02);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS.rp02);
   });
 
   it('shows the More Parties hover description when the expansion is active', () => {
@@ -72,8 +78,8 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(wrapper.attributes('data-tooltip')).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS.rp02);
-    expect(wrapper.attributes('data-tooltip')).to.not.eq(AGENDA_DESCRIPTIONS.rp02);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS.rp02);
+    expect(resolvedDescriptionOf(wrapper)).to.not.eq(AGENDA_DESCRIPTIONS.rp02);
   });
 
   it('falls back to the vanilla description under More Parties for ids whose content is unchanged', () => {
@@ -84,17 +90,47 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(wrapper.attributes('data-tooltip')).to.eq(AGENDA_DESCRIPTIONS.gb01);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS.gb01);
   });
 
+  it('teleports a tooltip to <body> on hover, positioned from the trigger, and removes it on mouseleave', async () => {
+    const wrapper = mount(TurmoilAgenda, {
+      ...globalConfig,
+      props: {
+        id: 'rp02',
+      },
+      attachTo: document.body,
+    });
+    expect(document.body.querySelector('.agenda-tooltip-portal')).to.be.null;
+
+    await wrapper.find('div').trigger('mouseenter');
+    const portal = document.body.querySelector('.agenda-tooltip-portal');
+    expect(portal).to.not.be.null;
+    expect(portal!.textContent!.trim()).to.eq(AGENDA_DESCRIPTIONS.rp02);
+
+    await wrapper.find('div').trigger('mouseleave');
+    expect(document.body.querySelector('.agenda-tooltip-portal')).to.be.null;
+
+    wrapper.unmount();
+  });
+
+  // rp04's rework restricts scope (Mars-only parameters) but its vanilla icon already only ever
+  // depicted the 3 Mars parameters, so it's deliberately reused as-is -- markup is identical,
+  // only the hover description differs.
+  const ICON_UNCHANGED_IDS: ReadonlyArray<BonusId | PolicyId> = ['rp04'];
+
   for (const id of REWORKED_IDS) {
-    it(`mounts ${id} without errors, vanilla and More Parties, with different markup`, () => {
+    it(`mounts ${id} without errors, vanilla and More Parties, with the expected markup`, () => {
       const vanilla = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       const reworked = shallowMount(TurmoilAgenda, {...globalConfig, props: {id, morePartiesExpansion: true}});
       expect(vanilla.exists()).to.be.true;
       expect(reworked.exists()).to.be.true;
-      expect(vanilla.html()).to.not.eq(reworked.html());
-      expect(reworked.attributes('data-tooltip')).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS[id]);
+      if (ICON_UNCHANGED_IDS.includes(id)) {
+        expect(vanilla.html()).to.eq(reworked.html());
+      } else {
+        expect(vanilla.html()).to.not.eq(reworked.html());
+      }
+      expect(resolvedDescriptionOf(reworked)).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS[id]);
     });
   }
 
@@ -103,7 +139,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.not.include('Not implemented');
-      expect(wrapper.attributes('data-tooltip')).to.eq(AGENDA_DESCRIPTIONS[id]);
+      expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS[id]);
     });
   }
 
@@ -112,7 +148,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.include('Not implemented');
-      expect(wrapper.attributes('data-tooltip')).to.eq(AGENDA_DESCRIPTIONS[id]);
+      expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS[id]);
     });
   }
 });

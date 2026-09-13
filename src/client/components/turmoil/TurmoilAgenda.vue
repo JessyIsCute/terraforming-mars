@@ -1,5 +1,5 @@
 <template>
-  <div class="tooltip tooltip-bottom agenda-tooltip" :data-tooltip="resolvedDescription">
+  <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
     <template v-if="morePartiesExpansion && id === 'mb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-building party-resource-tag"></div>
@@ -7,7 +7,7 @@
     </template>
     <template v-else-if="morePartiesExpansion && id === 'mp02'">
       <span class="money resource">22</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="tile city-tile tile-size--S"></div>
     </template>
     <template v-else-if="morePartiesExpansion && id === 'mp03'">
@@ -18,7 +18,7 @@
     </template>
     <template v-else-if="morePartiesExpansion && id === 'mp04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-building"></div></div>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-mars"></div></div>
     </template>
@@ -38,7 +38,7 @@
     </template>
     <template v-else-if="morePartiesExpansion && id === 'sp04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-science"></div></div>
     </template>
     <template v-else-if="morePartiesExpansion && id === 'ub02'">
@@ -49,7 +49,7 @@
     <template v-else-if="morePartiesExpansion && id === 'up02'">
       <div class="policy-top-margin">
       <span class="money resource">10</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="tile fleet tile-size--S"></div>
       </div>
     </template>
@@ -60,7 +60,7 @@
     </template>
     <template v-else-if="morePartiesExpansion && id === 'up04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-venus"></div></div>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-space"></div></div>
     </template>
@@ -76,13 +76,13 @@
       <div class="production-box party-production-box">
         <div class="production-prefix minus"></div><div class="heat production"></div><div class="heat production"></div>
       </div>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="rating tile party-rating party-tile"></div>
       </div>
     </template>
     <template v-else-if="morePartiesExpansion && id === 'kp03'">
       <span class="money resource">9</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="production-box party-production-box">
         <div class="heat production"></div><div class="heat production"></div>
       </div>
@@ -107,7 +107,7 @@
     </template>
     <template v-else-if="morePartiesExpansion && id === 'gp04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-plant"></div></div>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-animal"></div></div>
     </template>
@@ -305,12 +305,12 @@
     </template>
     <template v-else-if="id === 'popp04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-event"></div></div>
     </template>
     <template v-else-if="id === 'spob01'">
       <div class="resource money party-resource">1</div> /
-      <div class="card-tile card-tile-lunar-habitat tile-size--S"></div>
+      <div class="tile card-tile-lunar-habitat"></div>
     </template>
     <template v-else-if="id === 'spob02'">
       <div class="resource money party-resource">1</div> /
@@ -321,17 +321,17 @@
       <div class="policy-top-margin"><div class="tile city-tile tile-size--S"></div> : <div class="resource card card-with-border"></div></div>
     </template>
     <template v-else-if="id === 'spop02'">
-      <div class="policy-top-margin"><div class="card-tile card-tile-lunar-habitat tile-size--S"></div> : <span class="money resource">4</span></div>
+      <div class="policy-top-margin"><div class="tile card-tile-lunar-habitat"></div> : <span class="money resource">4</span></div>
     </template>
     <template v-else-if="id === 'spop03'">
       <span class="money resource">15</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="colony-cube"></div>
     </template>
     <template v-else-if="id === 'empb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-power party-resource-tag"></div>
-      <div class="resource card card-small"></div>
+      <div class="resource-tag tag-none party-resource-tag"></div>
     </template>
     <template v-else-if="id === 'empb02'">
       <div class="resource money party-resource">1</div> /
@@ -350,7 +350,7 @@
     </template>
     <template v-else-if="id === 'empp04'">
       <span class="money resource">4</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-power"></div></div>
     </template>
     <template v-else-if="id === 'burb01'">
@@ -374,17 +374,22 @@
       <div class="tile empty-tile tile-size--S"></div>
     </template>
     <template v-else-if="id === 'cenp01'">
-      <div class="policy-top-margin">1 of each <span class="red-arrow-3x"></span> <span class="money resource">15</span></div>
+      <div class="policy-top-margin">1 of each <span class="red-arrow"></span> <span class="money resource">15</span></div>
     </template>
     <template v-else-if="id === 'cenp02'">
       <span class="money resource">7</span>
-      <span class="red-arrow-3x"></span>
+      <span class="red-arrow"></span>
       <div class="production-box party-production-box"><div class="production-prefix plus"></div></div>
     </template>
     <template v-else-if="id === 'cenp03'">
       <div class="policy-top-margin">
-      <div class="resource-tag tag-diverse party-resource-tag"></div> : <div class="resource money">4</div>
+      <div class="resource-tag tag-wild party-resource-tag"></div> : <div class="resource money">4</div>
       </div>
+    </template>
+    <template v-else-if="id === 'cenp04'">
+      <span class="money resource">4</span>
+      <span class="red-arrow"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-diverse"></div></div>
     </template>
     <template v-else-if="id === 'trab01'">
       <div class="resource money party-resource">1</div> /
@@ -408,6 +413,14 @@
       <div>Unknown agenda ID {{id}}</div>
     </template>
   </div>
+  <Teleport to="body">
+    <div
+      v-if="showTooltip"
+      class="agenda-tooltip-portal"
+      :style="{top: tooltipTop + 'px', left: tooltipLeft + 'px'}">
+      {{ resolvedDescription }}
+    </div>
+  </Teleport>
 </template>
 
 <script lang="ts">
@@ -434,6 +447,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+  },
+  data() {
+    return {
+      showTooltip: false,
+      tooltipTop: 0,
+      tooltipLeft: 0,
+    };
   },
   computed: {
     partyBadgeClass(): string {
@@ -462,6 +482,22 @@ export default defineComponent({
         }
       }
       return AGENDA_DESCRIPTIONS[this.id] ?? `Unknown agenda ${this.id}`;
+    },
+  },
+  methods: {
+    // The turmoil board is wrapped in an accordion (`overflow: hidden`, needed for its
+    // collapse animation) and scaled down with a CSS transform, both of which clip/reposition
+    // a plain CSS-positioned tooltip anywhere it would extend past that box. Teleporting the
+    // tooltip to <body> and positioning it in the viewport with the trigger's own bounding
+    // rect sidesteps both.
+    onMouseEnter(event: MouseEvent) {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      this.tooltipTop = rect.bottom + 6;
+      this.tooltipLeft = rect.left + rect.width / 2;
+      this.showTooltip = true;
+    },
+    onMouseLeave() {
+      this.showTooltip = false;
     },
   },
 });
