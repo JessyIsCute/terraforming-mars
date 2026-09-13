@@ -86,10 +86,15 @@ describe('InSpire', () => {
     runAllActions(game); // auto-add microbe: 0 -> 1
 
     // The second microbe tag comes from playing RegolithEaters itself - the take, if
-    // chosen, must land on THIS instance, not the earlier one.
+    // chosen, must land on THIS instance, not the earlier one. RegolithEaters also carries
+    // a Science tag (a fresh, forced auto-add), so the two different rules triggered by one
+    // card play offer an order pick first.
     const triggeringMicrobeCard = new RegolithEaters();
     player.playedCards.push(triggeringMicrobeCard);
     card.onCardPlayed(player, triggeringMicrobeCard);
+    runAllActions(game);
+    const order = cast(player.popWaitingFor(), OrOptions);
+    order.options[order.options.findIndex((o) => o.title === 'a microbe')].cb();
     runAllActions(game);
     const options = cast(player.popWaitingFor(), OrOptions);
     options.options[1].cb(); // Take
@@ -181,6 +186,56 @@ describe('InSpire', () => {
     expect(items).has.lengthOf(2);
     expect(items[0]).to.include({type: CardRenderItemType.STEEL, amount: 1});
     expect(items[1]).to.include({type: CardRenderItemType.RESOURCE, amount: 1, resource: CardResource.MICROBE});
+  });
+
+  it('lets you choose the order when a card triggers 2 different rules and at least one is a real choice', () => {
+    // Steel is already at 1 (a real add-or-take choice); titanium is still fresh (a forced
+    // auto-add) - the combination should still offer an order pick, not just resolve
+    // titanium first because Space comes after Building in the rule list.
+    card.onCardPlayed(player, fakeCard({tags: [Tag.BUILDING]}));
+    runAllActions(game); // auto-add steel: 0 -> 1
+
+    card.onCardPlayed(player, fakeCard({tags: [Tag.BUILDING, Tag.SPACE]}));
+    runAllActions(game);
+    const order = cast(player.popWaitingFor(), OrOptions);
+    expect(order.title).eq('Select which InSpire effect to resolve first');
+    expect(order.options.map((o) => o.title)).deep.eq(['steel', 'titanium']);
+
+    // Pick titanium first, even though steel is the one with an actual choice.
+    order.options[1].cb();
+    runAllActions(game);
+    expect(card.data.titanium).eq(1);
+
+    // Steel's own add-or-take choice is still pending, and comes next.
+    const steelChoice = cast(player.popWaitingFor(), OrOptions);
+    expect(steelChoice.options.map((o) => o.title)).deep.eq(['Add steel to InSpire', 'Take steel from InSpire']);
+  });
+
+  it('labels a trigger that can no longer do anything instead of silently skipping it', () => {
+    // Microbe is capped at 2, and the triggering card below can't take one off InSpire's
+    // hands (it has no resourceType) - a dead end. Paired with a fresh (auto-add) Space tag,
+    // it should still show up in the order menu, labeled as having no effect.
+    // A bare fakeCard is never a legal microbe target, so both of these just keep
+    // auto-adding up to the cap, same as the "cannot hold the resource" case above.
+    card.onCardPlayed(player, fakeCard({tags: [Tag.MICROBE]}));
+    runAllActions(game); // auto-add: 0 -> 1
+    card.onCardPlayed(player, fakeCard({tags: [Tag.MICROBE]}));
+    runAllActions(game); // auto-add: 1 -> 2
+
+    card.onCardPlayed(player, fakeCard({tags: [Tag.MICROBE, Tag.SPACE]}));
+    runAllActions(game);
+    const order = cast(player.popWaitingFor(), OrOptions);
+    expect(order.options.map((o) => o.title)).deep.eq([
+      'titanium',
+      'a microbe (InSpire already holds 2 - no effect)',
+    ]);
+
+    // Picking the dead-end option does nothing and doesn't crash; titanium is still pending.
+    order.options[1].cb();
+    runAllActions(game);
+    expect(card.data.microbe).eq(2);
+    expect(player.popWaitingFor()).is.undefined;
+    expect(card.data.titanium).eq(1);
   });
 
   it('the Science tag redistributes into M€ stock, not production', () => {

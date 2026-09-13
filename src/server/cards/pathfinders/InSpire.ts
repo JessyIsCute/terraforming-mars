@@ -3,6 +3,7 @@ import {CorporationCard} from '../corporation/CorporationCard';
 import {ICorporationCard} from '../corporation/ICorporationCard';
 import {IPlayer} from '../../IPlayer';
 import {ICard} from '../ICard';
+import {PlayerInput} from '../../PlayerInput';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {CardResource} from '../../../common/CardResource';
@@ -183,42 +184,99 @@ export class InSpire extends CorporationCard implements ICorporationCard {
     }
   }
 
-  private triggerRule(player: IPlayer, rule: Rule, card: ICard): void {
-    player.defer(() => {
-      const stored = this.getStored(rule.key);
-      const canAdd = stored < MAX_PER_TYPE;
-      const canTake = stored > 0 && this.canRedistribute(rule.key, card);
+  /** Whether resolving `rule` against `card` right now is a forced single outcome ('auto' -
+   * only add or only take is legal), a real add-or-take choice ('choice'), or a dead end
+   * ('noop' - already holds the cap and this specific card can't take one off its hands). */
+  private classify(rule: Rule, card: ICard): 'auto' | 'choice' | 'noop' {
+    const stored = this.getStored(rule.key);
+    const canAdd = stored < MAX_PER_TYPE;
+    const canTake = stored > 0 && this.canRedistribute(rule.key, card);
+    if (canAdd && canTake) {
+      return 'choice';
+    }
+    if (!canAdd && !canTake) {
+      return 'noop';
+    }
+    return 'auto';
+  }
 
-      if (canAdd && !canTake) {
+  private resolveTrigger(player: IPlayer, rule: Rule, card: ICard): PlayerInput | undefined {
+    const outcome = this.classify(rule, card);
+    if (outcome === 'noop') {
+      return undefined;
+    }
+    if (outcome === 'auto') {
+      if (this.getStored(rule.key) < MAX_PER_TYPE) {
+        this.addStored(player, rule);
+      } else {
+        this.redistribute(player, rule, card);
+      }
+      return undefined;
+    }
+    return new OrOptions(
+      new SelectOption(`Add ${rule.label} to InSpire`, 'Add').andThen(() => {
         this.addStored(player, rule);
         return undefined;
-      }
-      if (!canAdd && canTake) {
+      }),
+      new SelectOption(`Take ${rule.label} from InSpire`, 'Take').andThen(() => {
         this.redistribute(player, rule, card);
         return undefined;
+      }),
+    ).setTitle('Select an option for InSpire');
+  }
+
+  /** Resolves each pending trigger from the played card one at a time (deferred, so the
+   * player sees InSpire's updated state before the next one). When 2+ *different* rules are
+   * pending and at least one of them isn't a forced single outcome - a real add-or-take
+   * choice, or a dead-end that's worth explaining rather than silently skipping - the player
+   * picks which one goes next. Plain forced triggers (and repeated tags of the same rule,
+   * where there's nothing to choose between two Steel triggers) just resolve in order
+   * without asking. */
+  private resolveQueue(player: IPlayer, pending: ReadonlyArray<Rule>, card: ICard): void {
+    if (pending.length === 0) {
+      return;
+    }
+    const distinctRules: Array<Rule> = [];
+    const seenKeys = new Set<ResourceKey>();
+    for (const rule of pending) {
+      if (!seenKeys.has(rule.key)) {
+        seenKeys.add(rule.key);
+        distinctRules.push(rule);
       }
-      if (!canAdd && !canTake) {
-        return undefined;
+    }
+    const needsMenu = distinctRules.length >= 2 && distinctRules.some((rule) => this.classify(rule, card) !== 'auto');
+    if (!needsMenu) {
+      for (const rule of pending) {
+        player.defer(() => this.resolveTrigger(player, rule, card), Priority.DEFAULT);
       }
-      return new OrOptions(
-        new SelectOption(`Add ${rule.label} to InSpire`, 'Add').andThen(() => {
-          this.addStored(player, rule);
+      return;
+    }
+
+    player.defer(() => {
+      const options = distinctRules.map((rule) => {
+        const label = this.classify(rule, card) === 'noop' ?
+          `${rule.label} (InSpire already holds ${MAX_PER_TYPE} - no effect)` :
+          rule.label;
+        return new SelectOption(label).andThen(() => {
+          const index = pending.findIndex((r) => r.key === rule.key);
+          const remaining = pending.slice(0, index).concat(pending.slice(index + 1));
+          player.defer(() => this.resolveTrigger(player, rule, card), Priority.DEFAULT);
+          this.resolveQueue(player, remaining, card);
           return undefined;
-        }),
-        new SelectOption(`Take ${rule.label} from InSpire`, 'Take').andThen(() => {
-          this.redistribute(player, rule, card);
-          return undefined;
-        }),
-      ).setTitle('Select an option for InSpire');
+        });
+      });
+      return new OrOptions(...options).setTitle('Select which InSpire effect to resolve first');
     }, Priority.DEFAULT);
   }
 
   public onCardPlayed(player: IPlayer, card: ICard): void {
+    const pending: Array<Rule> = [];
     for (const rule of RULES) {
       const count = player.tags.cardTagCount(card, [...rule.tags]);
       for (let i = 0; i < count; i++) {
-        this.triggerRule(player, rule, card);
+        pending.push(rule);
       }
     }
+    this.resolveQueue(player, pending, card);
   }
 }
