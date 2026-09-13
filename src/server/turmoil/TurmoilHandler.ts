@@ -14,6 +14,7 @@ import {MARS_FIRST_MORE_PARTIES_POLICY_3} from './parties/MarsFirstMoreParties';
 import {PartyHooks} from './parties/PartyHooks';
 import {PartyName} from '../../common/turmoil/PartyName';
 import {REDS_POLICY_2} from './parties/Reds';
+import {REDS_MORE_PARTIES_POLICY_3} from './parties/RedsMoreParties';
 import {MoonExpansion} from '../moon/MoonExpansion';
 import {TRSource} from '../../common/cards/TRSource';
 import {IPolicy, policyDescription} from './Policy';
@@ -62,16 +63,31 @@ export class TurmoilHandler {
       MARS_FIRST_POLICY_2.onCardPlayed(player, selectedCard);
     }
 
-    // More Parties MarsFirst P3 hook
-    if (PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp03')) {
+    // More Parties MarsFirst P3 hook (vanilla mp03 is an unrelated steel-value bonus, no
+    // onCardPlayed of its own, but gate explicitly anyway for clarity/safety)
+    if (player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp03')) {
       MARS_FIRST_MORE_PARTIES_POLICY_3.onCardPlayed(player, selectedCard);
     }
   }
 
+  // More Parties Reds P2 hook (vanilla rp02 is an unrelated tile-placement cost)
+  public static applyOnStandardProjectEffect(player: IPlayer): void {
+    if (player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp02')) {
+      player.game.defer(new DiscardCards(player, 1, 1, 'Select a card to discard (Turmoil Reds)'));
+    }
+  }
+
   public static resolveTilePlacementCosts(player: IPlayer): void {
-    // PoliticalAgendas Reds P2 hook
-    if (PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp02')) {
+    // PoliticalAgendas Reds P2 hook (vanilla only -- More Parties reuses 'rp02' for an
+    // unrelated standard-project effect, see RedsMoreParties/applyOnStandardProjectEffect)
+    if (!player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp02')) {
       REDS_POLICY_2.onTilePlaced(player);
+    }
+
+    // More Parties Reds P3 hook (vanilla rp03 is an unrelated action, no onTilePlaced of its own,
+    // but gate explicitly anyway for clarity/safety)
+    if (player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp03')) {
+      REDS_MORE_PARTIES_POLICY_3.onTilePlaced(player);
     }
   }
 
@@ -100,8 +116,15 @@ export class TurmoilHandler {
       }
     }
 
-    // PoliticalAgendas Reds P4 hook
-    if (PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp04')) {
+    // PoliticalAgendas Reds P4 hook (vanilla: any parameter)
+    if (!player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp04')) {
+      player.production.add(Resource.MEGACREDITS, -1 * steps, {log: true});
+    }
+
+    // More Parties Reds P4 hook: Mars parameters only
+    if (player.game.gameOptions.morePartiesExpansion &&
+        MARS_GLOBAL_PARAMETERS.includes(parameter) &&
+        PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp04')) {
       player.production.add(Resource.MEGACREDITS, -1 * steps, {log: true});
     }
 

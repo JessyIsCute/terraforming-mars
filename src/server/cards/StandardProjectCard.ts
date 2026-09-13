@@ -10,6 +10,7 @@ import {IStandardProjectCard} from './IStandardProjectCard';
 import {sum} from '../../common/utils/utils';
 import {Payment} from '../../common/inputs/Payment';
 import {StandardProjectCanPayWith} from '../../common/cards/Types';
+import {TurmoilHandler} from '../turmoil/TurmoilHandler';
 
 type StaticStandardProjectCardProperties = {
   name: CardName,
@@ -61,6 +62,7 @@ export abstract class StandardProjectCard extends Card implements IStandardProje
     for (const playedCard of player.tableau) {
       playedCard.onStandardProject?.(player, this);
     }
+    TurmoilHandler.applyOnStandardProjectEffect(player);
   }
 
   protected canPlayOptions(player: IPlayer) {
