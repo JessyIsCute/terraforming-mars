@@ -46,7 +46,7 @@ export class LivestockGiantDome extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'H33',
         renderData: CardRenderer.builder((b) => {
-          b.tile(TileType.ANIMAL_DOME, true).asterix().br;
+          b.tile(TileType.ANIMAL_DOME).asterix().br;
           b.plainText('Immediately play an Active card that collects Animals, ignoring its cost and requirements.', true);
         }),
         description: 'Requires a maximum of 7% oxygen. Place the special Animal Dome tile NEXT TO NO OTHER TILE. ' +

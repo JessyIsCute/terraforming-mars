@@ -28,7 +28,7 @@ export class ParadiseCity extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'H07',
         renderData: CardRenderer.builder((b) => {
-          b.tile(TileType.PARADISE_CITY, true).asterix().br;
+          b.tile(TileType.PARADISE_CITY).asterix().br;
           b.plainText('Requires that you own a city adjacent to an ocean. Replace it with the Paradise City tile. ' +
             'It counts as a city. Adjacency bonus: 1 M€.');
         }),

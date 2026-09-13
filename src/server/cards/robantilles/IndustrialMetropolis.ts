@@ -36,7 +36,7 @@ export class IndustrialMetropolis extends Card implements IProjectCard {
           b.production((pb) => {
             pb.minus().energy(1).br;
             pb.plus().steel(1);
-          }).nbsp.tile(TileType.INDUSTRIAL_METROPOLIS, true).asterix();
+          }).nbsp.tile(TileType.INDUSTRIAL_METROPOLIS).asterix();
           b.br;
           b.plainText('Place on top of one of your cities. Adjacency bonus: 1 steel.');
         }),

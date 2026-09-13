@@ -153,13 +153,25 @@ const TILE_CLASSES: Record<TileType, Classes> = {
   [TileType.GARBAGE_DUMP]: {},
   [TileType.PUMPING_HUB]: {},
   [TileType.INVAK_CITY]: {}, // This isn't shown on a card
-  [TileType.ANIMAL_DOME]: {},
-  [TileType.BIOLOGICAL_DOME]: {},
-  [TileType.SEDIMENT]: {},
+  [TileType.ANIMAL_DOME]: {
+    tile: 'card-tile-animal-dome',
+  },
+  [TileType.BIOLOGICAL_DOME]: {
+    tile: 'card-tile-biological-dome',
+  },
+  [TileType.SEDIMENT]: {
+    tile: 'card-tile-sediment',
+  },
   [TileType.SUBURBS]: {},
+  // Harbor Borealis's source art has a visible Getty Images watermark, so it isn't wired up
+  // yet -- still rendering as a generic empty tile pending a clean asset.
   [TileType.HARBOR_BOREALIS]: {},
-  [TileType.INDUSTRIAL_METROPOLIS]: {},
-  [TileType.PARADISE_CITY]: {},
+  [TileType.INDUSTRIAL_METROPOLIS]: {
+    tile: 'card-tile-industrial-metropolis',
+  },
+  [TileType.PARADISE_CITY]: {
+    tile: 'card-tile-paradise-city',
+  },
 };
 
 export default defineComponent({

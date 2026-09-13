@@ -63,12 +63,14 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.PUMPING_HUB]: 'pumping_hub',
   [TileType.INVAK_CITY]: 'city', // No dedicated art; renders as a plain city tile.
   [TileType.SUBURBS]: 'greenery', // No dedicated art; sits over the player's own greenery tile.
-  [TileType.HARBOR_BOREALIS]: 'ocean-city', // No dedicated art; reuses the ocean/city hybrid icon.
-  [TileType.INDUSTRIAL_METROPOLIS]: 'city', // No dedicated art; renders as a plain city tile.
-  [TileType.PARADISE_CITY]: 'city', // No dedicated art; renders as a plain city tile.
+  // Harbor Borealis's source art has a visible Getty Images watermark, so it isn't wired up
+  // yet -- still using the ocean/city hybrid icon as a placeholder pending a clean asset.
+  [TileType.HARBOR_BOREALIS]: 'ocean-city',
+  [TileType.INDUSTRIAL_METROPOLIS]: 'industrial_metropolis',
+  [TileType.PARADISE_CITY]: 'paradise_city',
   [TileType.ANIMAL_DOME]: 'animal_dome',
-  [TileType.SEDIMENT]: 'city', // No dedicated art; renders as a plain city tile until covered.
-  [TileType.BIOLOGICAL_DOME]: 'ecological_zone', // No dedicated art; reuses the ecological-zone icon (also a plant/dome tile).
+  [TileType.SEDIMENT]: 'sediment',
+  [TileType.BIOLOGICAL_DOME]: 'biological_dome',
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([

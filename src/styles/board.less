@@ -345,11 +345,6 @@
   .special-tile-board('./assets/tiles/special_tile_icons/great_dam.png');
 }
 
-// Rob Antilles: placeholder art, reuses the natural-preserve icon (also an isolated-placement tile).
-.board-space-tile--animal_dome {
-  .special-tile-board('./assets/tiles/special_tile_icons/natural_preserve.png');
-}
-
 .board-space-tile--great_dam {
   .special-tile-board('./assets/tiles/special_tile_icons/great_dam.png');
 }
@@ -367,6 +362,27 @@
   width: 44px;
   height: 50px;
   background-size: 44px, 50px;
+}
+
+// Rob Antilles: dedicated board art (replaces the earlier placeholder icons).
+.board-space-tile--animal_dome {
+  background: url("./assets/tiles/animal_dome_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--biological_dome {
+  background: url("./assets/tiles/biological_dome_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--sediment {
+  background: url("./assets/tiles/sediment_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--industrial_metropolis {
+  background: url("./assets/tiles/industrial_metropolis_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--paradise_city {
+  background: url("./assets/tiles/paradise_city_board_tile.png") no-repeat center / 46px;
 }
 
 .board-cube {

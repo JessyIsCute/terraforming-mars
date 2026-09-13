@@ -33,7 +33,7 @@ export class SedimentaryRocks extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'H57',
         renderData: CardRenderer.builder((b) => {
-          b.tile(TileType.SEDIMENT, true, false).asterix();
+          b.tile(TileType.SEDIMENT).asterix();
           b.br;
           b.text(
             'Place the Special Sediment tile. You can place a City tile over this tile, ignoring the normal ' +

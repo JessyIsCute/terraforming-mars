@@ -34,7 +34,7 @@ export class MobileBiologicalDome extends Card implements IProjectCard {
             'adjacent empty area. If no such area exists, remove the Biological Dome tile.',
             (eb) => eb.empty().startEffect.resource(CardResource.SEED));
           b.br;
-          b.tile(TileType.BIOLOGICAL_DOME, true, false).asterix();
+          b.tile(TileType.BIOLOGICAL_DOME).asterix();
         }),
         description: 'Requires that Spome are ruling or that you have 2 delegates there. ' +
           'Place the Biological Dome special tile. Adjacency bonus 1 plant.',
