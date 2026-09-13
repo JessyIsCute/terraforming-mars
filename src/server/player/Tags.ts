@@ -49,12 +49,18 @@ export class Tags {
   public extraPlantTags: number;
   // Delta Project
   public extraJovianTags: number;
+  // More Parties: Scientists rework policy 1, Unity rework policy 3
+  public extraSpaceTags: number;
+  // More Parties: Transhumanists rework policy 1
+  public extraWildTags: number;
 
   constructor(player: IPlayer) {
     this.player = player;
     this.extraScienceTags = 0;
     this.extraPlantTags = 0;
     this.extraJovianTags = 0;
+    this.extraSpaceTags = 0;
+    this.extraWildTags = 0;
   }
 
   /**
@@ -94,6 +100,14 @@ export class Tags {
       tagCount += this.extraJovianTags;
     }
 
+    if (tag === Tag.SPACE) {
+      tagCount += this.extraSpaceTags;
+    }
+
+    if (tag === Tag.WILD) {
+      tagCount += this.extraWildTags;
+    }
+
     if (includeTagSubstitutions) {
       // Earth Embassy hook
       if (tag === Tag.EARTH && this.player.tableau.has(CardName.EARTH_EMBASSY)) {
@@ -101,7 +115,7 @@ export class Tags {
       }
 
       if (tag !== Tag.WILD) {
-        tagCount += this.rawCount(Tag.WILD, includeEvents);
+        tagCount += this.rawCount(Tag.WILD, includeEvents) + this.extraWildTags;
       }
     }
 
@@ -220,7 +234,7 @@ export class Tags {
     }
 
     if (mode !== 'award') {
-      tagCount += this.rawCount(Tag.WILD, includeEvents);
+      tagCount += this.rawCount(Tag.WILD, includeEvents) + this.extraWildTags;
       // Chimera has 2 wild tags but should only count as one for milestones.
       if (this.player.tableau.has(CardName.CHIMERA) && mode === 'milestone') {
         tagCount--;
@@ -240,6 +254,9 @@ export class Tags {
     }
     if (tags.includes(Tag.JOVIAN)) {
       tagCount += this.extraJovianTags;
+    }
+    if (tags.includes(Tag.SPACE)) {
+      tagCount += this.extraSpaceTags;
     }
 
     return tagCount;
@@ -304,6 +321,10 @@ export class Tags {
     if (this.extraJovianTags > 0) {
       uniqueTags.add(Tag.JOVIAN);
     }
+    if (this.extraSpaceTags > 0) {
+      uniqueTags.add(Tag.SPACE);
+    }
+    wildTagCount += this.extraWildTags;
 
     // Global events occur outside the action phase. Stop counting here, before wild tags apply.
     if (mode === 'globalEvent') {

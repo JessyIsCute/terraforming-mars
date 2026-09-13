@@ -18,6 +18,8 @@ import {MoonExpansion} from '../moon/MoonExpansion';
 import {TRSource} from '../../common/cards/TRSource';
 import {IPolicy, policyDescription} from './Policy';
 import {ParameterBonus, ParameterTrack} from '../../common/GlobalParameterConfig';
+import {MARS_GLOBAL_PARAMETERS} from './parties/ScientistsMoreParties';
+import {DiscardCards} from '../deferredActions/DiscardCards';
 
 /** The value at which a track first grants a bonus of the given kind, or Infinity if never. */
 function bonusThreshold(track: ParameterTrack, kind: ParameterBonus['kind']): number {
@@ -103,9 +105,17 @@ export class TurmoilHandler {
       player.production.add(Resource.MEGACREDITS, -1 * steps, {log: true});
     }
 
-    // PoliticalAgendas Scientists P3 hook
-    if (PartyHooks.shouldApplyPolicy(player, PartyName.SCIENTISTS, 'sp03')) {
+    // PoliticalAgendas Scientists P3 hook (vanilla: any parameter, draw only)
+    if (!player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.SCIENTISTS, 'sp03')) {
       player.drawCard(steps);
+    }
+
+    // More Parties Scientists P3 hook: Mars parameters only, draw then discard per step
+    if (player.game.gameOptions.morePartiesExpansion &&
+        MARS_GLOBAL_PARAMETERS.includes(parameter) &&
+        PartyHooks.shouldApplyPolicy(player, PartyName.SCIENTISTS, 'sp03')) {
+      player.drawCard(steps);
+      player.game.defer(new DiscardCards(player, steps, steps, 'Select cards to discard (Turmoil Scientists)'));
     }
   }
 

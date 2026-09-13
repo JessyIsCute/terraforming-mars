@@ -15,6 +15,7 @@ import {Transhumanists} from './parties/Transhumanists';
 import {GreensMoreParties} from './parties/GreensMoreParties';
 import {KelvinistsMoreParties} from './parties/KelvinistsMoreParties';
 import {MarsFirstMoreParties} from './parties/MarsFirstMoreParties';
+import {ScientistsMoreParties} from './parties/ScientistsMoreParties';
 import {IGame} from '../IGame';
 import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
@@ -63,7 +64,7 @@ export const ALL_PARTIES = {
 // for any not yet reworked), and the 6 new parties use their real content directly.
 export const MORE_PARTIES_ALL = {
   [PartyName.MARS]: MarsFirstMoreParties,
-  [PartyName.SCIENTISTS]: Scientists,
+  [PartyName.SCIENTISTS]: ScientistsMoreParties,
   [PartyName.UNITY]: Unity,
   [PartyName.GREENS]: GreensMoreParties,
   [PartyName.REDS]: Reds,
