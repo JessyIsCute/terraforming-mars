@@ -21,6 +21,9 @@ import {IPolicy, policyDescription} from './Policy';
 import {ParameterBonus, ParameterTrack} from '../../common/GlobalParameterConfig';
 import {MARS_GLOBAL_PARAMETERS} from './parties/ScientistsMoreParties';
 import {DiscardCards} from '../deferredActions/DiscardCards';
+import {POPULISTS_POLICY_1, POPULISTS_POLICY_3} from './parties/Populists';
+import {CENTRISTS_POLICY_3} from './parties/Centrists';
+import {BUREAUCRATS_POLICY_4} from './parties/Bureaucrats';
 
 /** The value at which a track first grants a bonus of the given kind, or Infinity if never. */
 function bonusThreshold(track: ParameterTrack, kind: ParameterBonus['kind']): number {
@@ -68,12 +71,68 @@ export class TurmoilHandler {
     if (player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp03')) {
       MARS_FIRST_MORE_PARTIES_POLICY_3.onCardPlayed(player, selectedCard);
     }
+
+    // More Parties Populists P1 hook (double VP as M€ gain/loss)
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.POPULISTS, 'popp01')) {
+      POPULISTS_POLICY_1.onCardPlayed(player, selectedCard);
+    }
+
+    // More Parties Populists P3 hook (draw on Event play)
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.POPULISTS, 'popp03')) {
+      POPULISTS_POLICY_3.onCardPlayed(player, selectedCard);
+    }
+
+    // More Parties Centrists P3 hook (M€ on playing a card with a new tag)
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.CENTRISTS, 'cenp03')) {
+      CENTRISTS_POLICY_3.onCardPlayed(player, selectedCard);
+    }
+
+    // More Parties Bureaucrats P4 hook (discard on card play, except the chairman)
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.BUREAUCRATS, 'burp04')) {
+      BUREAUCRATS_POLICY_4.onCardPlayed(player, selectedCard);
+    }
   }
 
   // More Parties Reds P2 hook (vanilla rp02 is an unrelated tile-placement cost)
   public static applyOnStandardProjectEffect(player: IPlayer): void {
     if (player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.REDS, 'rp02')) {
       player.game.defer(new DiscardCards(player, 1, 1, 'Select a card to discard (Turmoil Reds)'));
+    }
+
+    // More Parties Transhumanists P2 hook
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.TRANSHUMANISTS, 'trap02')) {
+      player.stock.add(Resource.MEGACREDITS, 2, {log: true, from: {partyName: PartyName.TRANSHUMANISTS}});
+    }
+  }
+
+  // More Parties Bureaucrats P3 hook -- called from Party.sendDelegate whenever a real player
+  // (not a neutral delegate) places a delegate in any party.
+  public static applyOnDelegatePlacedEffect(player: IPlayer): void {
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.BUREAUCRATS, 'burp03')) {
+      player.stock.add(Resource.MEGACREDITS, 3, {log: true, from: {partyName: PartyName.BUREAUCRATS}});
+    }
+  }
+
+  // More Parties Empower P2 hook -- called from Production.add whenever a player's energy
+  // production changes, positive or negative.
+  public static applyOnProductionChangedEffect(player: IPlayer, resource: Resource, amount: number): void {
+    if (resource === Resource.ENERGY && amount !== 0 &&
+        PartyHooks.shouldApplyPolicy(player, PartyName.EMPOWER, 'empp02')) {
+      player.stock.add(Resource.ENERGY, 2, {log: true, from: {partyName: PartyName.EMPOWER}});
+    }
+  }
+
+  // More Parties Spome P1 hook -- called from Game.addCity.
+  public static applyOnCityTilePlacedEffect(player: IPlayer): void {
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.SPOME, 'spop01')) {
+      player.drawCard(1);
+    }
+  }
+
+  // More Parties Spome P2 hook -- called from MoonExpansion.addHabitatTile.
+  public static applyOnHabitatTilePlacedEffect(player: IPlayer): void {
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.SPOME, 'spop02')) {
+      player.stock.add(Resource.MEGACREDITS, 4, {log: true, from: {partyName: PartyName.SPOME}});
     }
   }
 

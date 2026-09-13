@@ -6,6 +6,7 @@ import {IPlayer} from '../IPlayer';
 import {CardName} from '../../common/cards/CardName';
 import {RebalanceSeebeckProductionLoss} from '../deferredActions/RebalanceSeebeckProductionLoss';
 import {OrcTurbinesProductionSwap} from '../deferredActions/OrcTurbinesProductionSwap';
+import {TurmoilHandler} from '../turmoil/TurmoilHandler';
 
 export class Production extends BaseStock {
   constructor(player: IPlayer) {
@@ -69,6 +70,8 @@ export class Production extends BaseStock {
           card.onProductionGainByAnyPlayer?.(cardOwner, this.player, resource, amount);
         }
       }
+
+      TurmoilHandler.applyOnProductionChangedEffect(this.player, resource, amount);
     }
   }
 }

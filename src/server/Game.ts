@@ -71,10 +71,6 @@ import {UnderworldData} from './underworld/UnderworldData';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
-import {MutationMarkets} from './mutationmarkets/MutationMarkets';
-import {MutationMarketData} from './mutationmarkets/MutationMarketData';
-import {BlackMarket} from './blackmarket/BlackMarket';
-import {BlackMarketData} from './blackmarket/BlackMarketData';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -174,8 +170,6 @@ export class Game implements IGame, Logger {
   public moonData: MoonData | undefined;
   public pathfindersData: PathfindersData | undefined;
   public underworldData: UnderworldData = UnderworldExpansion.initializeGameWithoutUnderworld();
-  public mutationMarketData: MutationMarketData | undefined;
-  public blackMarketData: BlackMarketData | undefined;
   public conglomerates: ConglomeratesData = ConglomeratesExpansion.initializeEmpty();
   public inTurmoil: boolean = false;
 
@@ -306,9 +300,7 @@ export class Game implements IGame, Logger {
         sillyfication: partialOptions.sillyficationExpansion ?? false,
         betterMars: partialOptions.betterMarsExpansion ?? false,
         customCards: partialOptions.customCardsExpansion ?? false,
-        mutationMarkets: partialOptions.mutationMarketsExpansion ?? false,
         conglomerates: partialOptions.conglomeratesExpansion ?? false,
-        blackMarket: partialOptions.blackMarketExpansion ?? false,
         corporateBetterments: partialOptions.corporateBettermentsExpansion ?? false,
         idesOfMars: partialOptions.idesOfMarsExpansion ?? false,
         robAntilles: partialOptions.robAntillesExpansion ?? false,
@@ -393,14 +385,6 @@ export class Game implements IGame, Logger {
     // Must configure this before solo placement.
     if (gameOptions.underworldExpansion) {
       game.underworldData = UnderworldExpansion.initialize(rng);
-    }
-
-    if (gameOptions.mutationMarketsExpansion) {
-      game.mutationMarketData = MutationMarkets.initialize(game);
-    }
-
-    if (gameOptions.blackMarketExpansion) {
-      game.blackMarketData = BlackMarket.initialize(game);
     }
 
     if (gameOptions.conglomeratesExpansion) {
@@ -573,12 +557,6 @@ export class Game implements IGame, Logger {
     };
     if (this.aresData !== undefined) {
       result.aresData = this.aresData;
-    }
-    if (this.mutationMarketData !== undefined) {
-      result.mutationMarketData = MutationMarkets.serialize(this.mutationMarketData);
-    }
-    if (this.blackMarketData !== undefined) {
-      result.blackMarketData = BlackMarket.serialize(this.blackMarketData);
     }
     if (this.clonedGamedId !== undefined) {
       result.clonedGamedId = this.clonedGamedId;
@@ -902,8 +880,6 @@ export class Game implements IGame, Logger {
 
     this.endGenerationForColonies();
     UnderworldExpansion.endGeneration(this);
-    MutationMarkets.onGenerationEnd(this);
-    BlackMarket.onGenerationEnd(this);
 
     Turmoil.ifTurmoil(this, (turmoil) => {
       // this.phase = Phase.TURMOIL;
@@ -955,7 +931,6 @@ export class Game implements IGame, Logger {
     this.generation++;
     this.log('Generation ${0}', (b) => b.forNewGeneration().number(this.generation));
     this.setNextFirstPlayer();
-    BlackMarket.onGenerationStart(this);
 
     this.players.forEach((player) => {
       player.hasIncreasedTerraformRatingThisGeneration = false;
@@ -1286,7 +1261,6 @@ export class Game implements IGame, Logger {
     player.actionsTakenThisGame++;
     player.actionsTakenThisRound = 0;
 
-    MutationMarkets.resolveIfReturned(this, player);
     player.takeAction();
   }
 
@@ -1708,6 +1682,8 @@ export class Game implements IGame, Logger {
       tileType: TileType.CITY,
       card: cardName,
     });
+    // Turmoil Spome ruling policy
+    TurmoilHandler.applyOnCityTilePlacedEffect(player);
   }
 
   public canAddOcean(): boolean {
@@ -1932,12 +1908,6 @@ export class Game implements IGame, Logger {
     }
     if (d.conglomerates !== undefined) {
       game.conglomerates = d.conglomerates;
-    }
-    if (d.mutationMarketData !== undefined && gameOptions.mutationMarketsExpansion === true) {
-      game.mutationMarketData = MutationMarkets.deserialize(d.mutationMarketData);
-    }
-    if (d.blackMarketData !== undefined && gameOptions.blackMarketExpansion === true) {
-      game.blackMarketData = BlackMarket.deserialize(d.blackMarketData);
     }
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);

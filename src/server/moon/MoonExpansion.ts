@@ -21,6 +21,7 @@ import {Random} from '../../common/utils/Random';
 import {GameOptions} from '../game/GameOptions';
 import {Board} from '../boards/Board';
 import {GlobalParameter} from '../../common/GlobalParameter';
+import {TurmoilHandler} from '../turmoil/TurmoilHandler';
 
 export class MoonExpansion {
   public static readonly MOON_TILES: Set<TileType> = new Set([
@@ -74,6 +75,8 @@ export class MoonExpansion {
   public static addHabitatTile(
     player: IPlayer, spaceId: SpaceId, cardName: CardName | undefined = undefined): void {
     MoonExpansion.addTile(player, spaceId, {tileType: TileType.MOON_HABITAT, card: cardName});
+    // Turmoil Spome ruling policy
+    TurmoilHandler.applyOnHabitatTilePlacedEffect(player);
   }
 
   public static addRoadTile(
@@ -313,8 +316,7 @@ export class MoonExpansion {
     // must still survive this reconstruction (previously dropped here entirely, silently
     // zeroing e.g. Asteroid Resources' `reserveUnits: {energy: 3}` for this specific
     // computation -- harmless there since it separately enforces the cost via
-    // `behavior.spend`, but MutationMarkets' resourceCostOnPlay infections rely on this
-    // function alone).
+    // `behavior.spend`, but any future feature relying on `reserveUnits` alone would break).
     return Units.of({steel, titanium, heat, plants, energy: reserveUnits.energy, megacredits: reserveUnits.megacredits});
   }
 

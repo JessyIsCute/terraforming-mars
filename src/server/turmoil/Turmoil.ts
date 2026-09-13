@@ -18,6 +18,7 @@ import {MarsFirstMoreParties} from './parties/MarsFirstMoreParties';
 import {ScientistsMoreParties} from './parties/ScientistsMoreParties';
 import {UnityMoreParties} from './parties/UnityMoreParties';
 import {RedsMoreParties} from './parties/RedsMoreParties';
+import {TurmoilHandler} from './TurmoilHandler';
 import {IGame} from '../IGame';
 import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
@@ -239,6 +240,8 @@ export class Turmoil {
           card.onDelegateSent?.(somePlayer, delegate);
         }
       }
+      // Turmoil Bureaucrats ruling policy
+      TurmoilHandler.applyOnDelegatePlacedEffect(delegate);
     }
   }
 

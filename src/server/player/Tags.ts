@@ -53,6 +53,8 @@ export class Tags {
   public extraSpaceTags: number;
   // More Parties: Transhumanists rework policy 1
   public extraWildTags: number;
+  // More Parties: Empower policy 3
+  public extraEnergyTags: number;
 
   constructor(player: IPlayer) {
     this.player = player;
@@ -61,6 +63,7 @@ export class Tags {
     this.extraJovianTags = 0;
     this.extraSpaceTags = 0;
     this.extraWildTags = 0;
+    this.extraEnergyTags = 0;
   }
 
   /**
@@ -106,6 +109,10 @@ export class Tags {
 
     if (tag === Tag.WILD) {
       tagCount += this.extraWildTags;
+    }
+
+    if (tag === Tag.POWER) {
+      tagCount += this.extraEnergyTags;
     }
 
     if (includeTagSubstitutions) {
@@ -258,6 +265,9 @@ export class Tags {
     if (tags.includes(Tag.SPACE)) {
       tagCount += this.extraSpaceTags;
     }
+    if (tags.includes(Tag.POWER)) {
+      tagCount += this.extraEnergyTags;
+    }
 
     return tagCount;
   }
@@ -323,6 +333,9 @@ export class Tags {
     }
     if (this.extraSpaceTags > 0) {
       uniqueTags.add(Tag.SPACE);
+    }
+    if (this.extraEnergyTags > 0) {
+      uniqueTags.add(Tag.POWER);
     }
     wildTagCount += this.extraWildTags;
 
