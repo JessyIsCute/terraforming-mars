@@ -206,6 +206,29 @@
   &.party-background--kelvinists {
     background-position: -873px 316px;
   }
+
+  // The 6 fan-expansion parties (idesOfMars/robAntilles) have no bespoke artwork of their
+  // own yet, so each duplicates one of the 6 official party card backgrounds above rather
+  // than falling through to the default (0,0) crop, which showed unrelated icons from the
+  // top of the sprite sheet instead of a party card.
+  &.party-background--populists {
+    background-position: -23px 316px;
+  }
+  &.party-background--spome {
+    background-position: -193px 316px;
+  }
+  &.party-background--empower {
+    background-position: -363px 316px;
+  }
+  &.party-background--bureaucrats {
+    background-position: -533px 316px;
+  }
+  &.party-background--centrists {
+    background-position: -703px 316px;
+  }
+  &.party-background--transhumanists {
+    background-position: -873px 316px;
+  }
 }
 
 .party-badge {
@@ -244,6 +267,32 @@
   }
 
   &.party-badge--kelvinists {
+    background: #5d4d4d;
+  }
+
+  // Same duplicate-color pairing as party-background above.
+  &.party-badge--populists {
+    background: #c97e23;
+  }
+
+  &.party-badge--spome {
+    background: #fff;
+    color: @grey_900;
+  }
+
+  &.party-badge--empower {
+    background: #108ff0;
+  }
+
+  &.party-badge--bureaucrats {
+    background: #16b215;
+  }
+
+  &.party-badge--centrists {
+    background: #e65b5a;
+  }
+
+  &.party-badge--transhumanists {
     background: #5d4d4d;
   }
 }
@@ -290,6 +339,35 @@
 
   &.party-name--kelvinists {
     background: #5d4d4d;
+  }
+
+  // Same duplicate-color pairing as party-background/party-badge above.
+  &.party-name--populists {
+    background: #c97e23;
+  }
+
+  &.party-name--spome {
+    background: #fff;
+    color: @grey_900;
+  }
+
+  &.party-name--empower {
+    background: #108ff0;
+  }
+
+  &.party-name--bureaucrats {
+    background: #16b215;
+  }
+
+  &.party-name--centrists {
+    background: #e65b5a;
+  }
+
+  &.party-name--transhumanists {
+    background: #5d4d4d;
+    // "Transhumanists" is longer than any official party name and overflows the
+    // fixed-width pill at the default font size.
+    font-size: 10px;
   }
 }
 
