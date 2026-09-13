@@ -12,6 +12,7 @@ import {Empower} from './parties/Empower';
 import {Bureaucrats} from './parties/Bureaucrats';
 import {Centrists} from './parties/Centrists';
 import {Transhumanists} from './parties/Transhumanists';
+import {GreensMoreParties} from './parties/GreensMoreParties';
 import {IGame} from '../IGame';
 import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
@@ -38,11 +39,31 @@ export type Delegate = IPlayer | NeutralPlayer;
 
 export type PartyFactory = new() => IParty;
 
+// The 6 official parties as they work in every non-moreParties game -- unchanged by this
+// expansion. Also used by deserialize() to reconstruct a non-moreParties game's parties.
 export const ALL_PARTIES = {
   [PartyName.MARS]: MarsFirst,
   [PartyName.SCIENTISTS]: Scientists,
   [PartyName.UNITY]: Unity,
   [PartyName.GREENS]: Greens,
+  [PartyName.REDS]: Reds,
+  [PartyName.KELVINISTS]: Kelvinists,
+  [PartyName.POPULISTS]: Populists,
+  [PartyName.SPOME]: Spome,
+  [PartyName.EMPOWER]: Empower,
+  [PartyName.BUREAUCRATS]: Bureaucrats,
+  [PartyName.CENTRISTS]: Centrists,
+  [PartyName.TRANSHUMANISTS]: Transhumanists,
+} satisfies Record<PartyName, PartyFactory>;
+
+// The full pool of 12 parties available in a moreParties game: the 6 official ones get their
+// "Political Agendas" rework (different bonus/policy content; falls back to the vanilla class
+// for any not yet reworked), and the 6 new parties use their real content directly.
+export const MORE_PARTIES_ALL = {
+  [PartyName.MARS]: MarsFirst,
+  [PartyName.SCIENTISTS]: Scientists,
+  [PartyName.UNITY]: Unity,
+  [PartyName.GREENS]: GreensMoreParties,
   [PartyName.REDS]: Reds,
   [PartyName.KELVINISTS]: Kelvinists,
   [PartyName.POPULISTS]: Populists,
@@ -64,8 +85,8 @@ function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
   // More Parties: the board only has room for 6 party slots, so 6 of the 12 available parties
   // (the 6 official ones plus Populists, Spome, Empower, Bureaucrats, Centrists and
   // Transhumanists) are chosen at random each game, rather than always using all 12.
-  const names = Turmoil.shufflePartyNames(Object.keys(ALL_PARTIES) as Array<PartyName>);
-  return names.slice(0, PARTIES_IN_PLAY).map((name) => new ALL_PARTIES[name]());
+  const names = Turmoil.shufflePartyNames(Object.keys(MORE_PARTIES_ALL) as Array<PartyName>);
+  return names.slice(0, PARTIES_IN_PLAY).map((name) => new MORE_PARTIES_ALL[name]());
 }
 
 const UNINITIALIZED_POLITICAL_AGENDAS_DATA: PoliticalAgendasData = {
@@ -650,12 +671,13 @@ export class Turmoil {
     return result;
   }
 
-  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>, _gameOptions: GameOptions): Turmoil {
+  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>, gameOptions: GameOptions): Turmoil {
     const dealer = GlobalEventDealer.deserialize(d.globalEventDealer);
     const chairman = deserializeDelegateOrUndefined(d.chairman, players);
     // Reconstruct the exact persisted set of parties -- never recompute it via createParties(),
     // which would re-randomize a More Parties game's 6-of-12 selection on every load.
-    const parties = d.parties.map((sp) => new ALL_PARTIES[sp.name]());
+    const partyTable = gameOptions.morePartiesExpansion ? MORE_PARTIES_ALL : ALL_PARTIES;
+    const parties = d.parties.map((sp) => new partyTable[sp.name]());
     const turmoil = new Turmoil(parties, d.rulingParty, chairman || 'NEUTRAL', d.dominantParty, dealer);
 
     turmoil.usedFreeDelegateAction = new Set(d.usedFreeDelegateAction.map((p) => deserializePlayerId(p, players)));

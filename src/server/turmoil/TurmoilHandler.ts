@@ -7,6 +7,7 @@ import {PlayerInput} from '../PlayerInput';
 import {Resource} from '../../common/Resource';
 import {SpaceType} from '../../common/boards/SpaceType';
 import {GREENS_POLICY_2, GREENS_POLICY_3} from './parties/Greens';
+import {GREENS_MORE_PARTIES_POLICY_2, GREENS_MORE_PARTIES_POLICY_3} from './parties/GreensMoreParties';
 import {KELVINISTS_POLICY_3, KELVINISTS_POLICY_4} from './parties/Kelvinists';
 import {MARS_FIRST_POLICY_2} from './parties/MarsFirst';
 import {PartyHooks} from './parties/PartyHooks';
@@ -46,7 +47,8 @@ export class TurmoilHandler {
   public static applyOnCardPlayedEffect(player: IPlayer, selectedCard: ICard): void {
     // PoliticalAgendas Greens P3 hook
     if (PartyHooks.shouldApplyPolicy(player, PartyName.GREENS, 'gp03')) {
-      GREENS_POLICY_3.onCardPlayed(player, selectedCard);
+      const policy = player.game.gameOptions.morePartiesExpansion ? GREENS_MORE_PARTIES_POLICY_3 : GREENS_POLICY_3;
+      policy.onCardPlayed(player, selectedCard);
     }
 
     // PoliticalAgendas MarsFirst P2 hook
@@ -67,7 +69,8 @@ export class TurmoilHandler {
 
     // PoliticalAgendas Greens P2 hook
     if (PartyHooks.shouldApplyPolicy(player, PartyName.GREENS, 'gp02')) {
-      GREENS_POLICY_2.onTilePlaced(player);
+      const policy = player.game.gameOptions.morePartiesExpansion ? GREENS_MORE_PARTIES_POLICY_2 : GREENS_POLICY_2;
+      policy.onTilePlaced(player);
     }
 
     // PoliticalAgendas Kelvinists P4 hook
