@@ -3,7 +3,7 @@ import {GreatMartianArchives} from '../../../src/server/cards/robantilles/GreatM
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty} from '../../TestingUtils';
+import {setRulingParty, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {Tag} from '../../../src/common/cards/Tag';
 
@@ -11,10 +11,16 @@ describe('GreatMartianArchives', () => {
   let card: GreatMartianArchives;
   let game: IGame;
   let player: TestPlayer;
+  let restoreShuffle: () => void;
 
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.TRANSHUMANISTS);
     card = new GreatMartianArchives();
     [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without the Transhumanists ruling or 2 delegates there', () => {

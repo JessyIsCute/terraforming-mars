@@ -3,17 +3,23 @@ import {CorruptedDelegate} from '../../../src/server/cards/robantilles/Corrupted
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty} from '../../TestingUtils';
+import {setRulingParty, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 
 describe('CorruptedDelegate', () => {
   let card: CorruptedDelegate;
   let game: IGame;
   let player: TestPlayer;
+  let restoreShuffle: () => void;
 
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.BUREAUCRATS);
     card = new CorruptedDelegate();
     [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without the Bureaucrats ruling or 2 delegates there', () => {

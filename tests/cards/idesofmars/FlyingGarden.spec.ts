@@ -3,7 +3,7 @@ import {FlyingGarden} from '../../../src/server/cards/idesofmars/FlyingGarden';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty} from '../../TestingUtils';
+import {setRulingParty, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {TileType} from '../../../src/common/TileType';
 import {SpaceName} from '../../../src/common/boards/SpaceName';
@@ -16,9 +16,16 @@ describe('FlyingGarden', () => {
   let game: IGame;
   let player: TestPlayer;
 
+  let restoreShuffle: () => void;
+
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
     card = new FlyingGarden();
     [game, player] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without Spome ruling or 2 delegates, or without an off-world city', () => {

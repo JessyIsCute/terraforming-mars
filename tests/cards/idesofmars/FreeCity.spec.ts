@@ -3,7 +3,7 @@ import {FreeCity} from '../../../src/server/cards/idesofmars/FreeCity';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {runAllActions} from '../../TestingUtils';
+import {runAllActions, forcePartiesInPlay} from '../../TestingUtils';
 import {Turmoil} from '../../../src/server/turmoil/Turmoil';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {SelectSpace} from '../../../src/server/inputs/SelectSpace';
@@ -15,10 +15,17 @@ describe('FreeCity', () => {
   let game: IGame;
   let turmoil: Turmoil;
 
+  let restoreShuffle: () => void;
+
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.SCIENTISTS, PartyName.POPULISTS);
     card = new FreeCity();
     [game, player] = testGame(2, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
     turmoil = game.turmoil!;
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play unless Populists rule or you have 2 delegates there', () => {

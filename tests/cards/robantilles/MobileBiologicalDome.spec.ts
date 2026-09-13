@@ -3,7 +3,7 @@ import {MobileBiologicalDome} from '../../../src/server/cards/robantilles/Mobile
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty, runAllActions} from '../../TestingUtils';
+import {setRulingParty, runAllActions, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {TileType} from '../../../src/common/TileType';
 import {SelectSpace} from '../../../src/server/inputs/SelectSpace';
@@ -13,10 +13,16 @@ describe('MobileBiologicalDome', () => {
   let card: MobileBiologicalDome;
   let game: IGame;
   let player: TestPlayer;
+  let restoreShuffle: () => void;
 
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
     card = new MobileBiologicalDome();
     [game, player] = testGame(1, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without Spome ruling or 2 delegates there', () => {

@@ -3,7 +3,7 @@ import {GreenhouseLights} from '../../../src/server/cards/robantilles/Greenhouse
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty} from '../../TestingUtils';
+import {setRulingParty, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {Resource} from '../../../src/common/Resource';
 
@@ -11,10 +11,16 @@ describe('GreenhouseLights', () => {
   let card: GreenhouseLights;
   let game: IGame;
   let player: TestPlayer;
+  let restoreShuffle: () => void;
 
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.EMPOWER);
     card = new GreenhouseLights();
     [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without Empower ruling or 2 delegates there', () => {

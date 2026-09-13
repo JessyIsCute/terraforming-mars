@@ -30,6 +30,8 @@ import {PlayerId} from '../../common/Types';
 import {ChoosePolicyBonus} from '../deferredActions/ChoosePolicyBonus';
 import {toID} from '../../common/utils/utils';
 import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
+import {inplaceShuffle} from '../utils/shuffle';
+import {UnseededRandom} from '../../common/utils/Random';
 
 export type NeutralPlayer = 'NEUTRAL';
 export type Delegate = IPlayer | NeutralPlayer;
@@ -51,18 +53,19 @@ export const ALL_PARTIES = {
   [PartyName.TRANSHUMANISTS]: Transhumanists,
 } satisfies Record<PartyName, PartyFactory>;
 
+const PARTIES_IN_PLAY = 6;
+
 function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
-  const parties: Array<IParty> = [
-    new MarsFirst(), new Scientists(), new Unity(), new Greens(), new Reds(), new Kelvinists(),
-  ];
-  // Populists, Spome, Empower, Bureaucrats, Centrists and Transhumanists are placeholder parties
-  // (no real bonus/policy defined yet), gated behind their own "More Parties" expansion rather
-  // than idesOfMars/robAntilles directly -- those modules' cards that reference these parties
-  // separately require moreParties via `compatibility`, so the two stay in sync.
-  if (gameOptions.morePartiesExpansion) {
-    parties.push(new Populists(), new Spome(), new Empower(), new Bureaucrats(), new Centrists(), new Transhumanists());
+  if (!gameOptions.morePartiesExpansion) {
+    return [
+      new MarsFirst(), new Scientists(), new Unity(), new Greens(), new Reds(), new Kelvinists(),
+    ];
   }
-  return parties;
+  // More Parties: the board only has room for 6 party slots, so 6 of the 12 available parties
+  // (the 6 official ones plus Populists, Spome, Empower, Bureaucrats, Centrists and
+  // Transhumanists) are chosen at random each game, rather than always using all 12.
+  const names = Turmoil.shufflePartyNames(Object.keys(ALL_PARTIES) as Array<PartyName>);
+  return names.slice(0, PARTIES_IN_PLAY).map((name) => new ALL_PARTIES[name]());
 }
 
 const UNINITIALIZED_POLITICAL_AGENDAS_DATA: PoliticalAgendasData = {
@@ -71,6 +74,17 @@ const UNINITIALIZED_POLITICAL_AGENDAS_DATA: PoliticalAgendasData = {
 };
 
 export class Turmoil {
+  // Overridable for tests (see PoliticalAgendas.randomElement for the same pattern). Returns
+  // the full set of party names shuffled into the order they should be considered -- the first
+  // PARTIES_IN_PLAY become the game's parties.
+  public static shufflePartyNames: (names: ReadonlyArray<PartyName>) => ReadonlyArray<PartyName> = Turmoil.defaultShufflePartyNames;
+
+  private static defaultShufflePartyNames(names: ReadonlyArray<PartyName>): ReadonlyArray<PartyName> {
+    const copy = [...names];
+    inplaceShuffle(copy, UnseededRandom.INSTANCE);
+    return copy;
+  }
+
   public chairman: undefined | Delegate = undefined;
   public rulingParty: IParty;
   public dominantParty: IParty;
@@ -85,12 +99,12 @@ export class Turmoil {
   public politicalAgendasData: PoliticalAgendasData = UNINITIALIZED_POLITICAL_AGENDAS_DATA;
 
   private constructor(
-    gameOptions: GameOptions,
+    parties: ReadonlyArray<IParty>,
     rulingPartyName: PartyName,
     chairman: Delegate,
     dominantPartyName: PartyName,
     globalEventDealer: GlobalEventDealer) {
-    this.parties = createParties(gameOptions);
+    this.parties = parties;
     this.rulingParty = this.getPartyByName(rulingPartyName);
     this.chairman = chairman;
     this.dominantParty = this.getPartyByName(dominantPartyName);
@@ -100,11 +114,17 @@ export class Turmoil {
   public static newInstance(game: IGame, agendaStyle: AgendaStyle = 'Standard'): Turmoil {
     const dealer = GlobalEventDealer.newInstance(game);
 
-    // The game begins with Greens in power and a Neutral chairman
-    const turmoil = new Turmoil(game.gameOptions, PartyName.GREENS, 'NEUTRAL', PartyName.GREENS, dealer);
+    // The parties list is only randomized here, at true game creation (More Parties picks 6 of
+    // 12 parties at random) -- deserialize() must reuse the exact persisted set, never
+    // recompute it, or a reloaded game would end up with a different random selection.
+    const parties = createParties(game.gameOptions);
+    // The game begins with Greens in power and a Neutral chairman, or -- if Greens isn't one of
+    // the 6 parties chosen for a More Parties game -- whichever party was chosen first.
+    const startingParty = parties.find((party) => party.name === PartyName.GREENS)?.name ?? parties[0].name;
+    const turmoil = new Turmoil(parties, startingParty, 'NEUTRAL', startingParty, dealer);
 
     game.log('A neutral delegate is the new chairman.');
-    game.log('Greens are in power in the first generation.');
+    game.log('${0} are in power in the first generation.', (b) => b.partyName(startingParty));
 
     game.playersInGenerationOrder.forEach((player) => {
       turmoil.delegateReserve.add(player, DELEGATES_PER_PLAYER);
@@ -329,7 +349,11 @@ export class Turmoil {
   }
 
   private addNeutralDelegate(partyName: PartyName | undefined, game: IGame) {
-    if (partyName) {
+    // More Parties: global events are printed with one of the 6 official parties, but a
+    // moreParties game may not have that party in play (only 6 of the 12 available parties are
+    // chosen). Skip silently rather than erroring, same as any other reference to content not
+    // in this game.
+    if (partyName && this.parties.some((party) => party.name === partyName)) {
       this.sendDelegateToParty('NEUTRAL', partyName, game);
       game.log('A neutral delegate was added to the ${0} party', (b) => b.partyName(partyName));
     }
@@ -626,10 +650,13 @@ export class Turmoil {
     return result;
   }
 
-  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>, gameOptions: GameOptions): Turmoil {
+  public static deserialize(d: SerializedTurmoil, players: Array<IPlayer>, _gameOptions: GameOptions): Turmoil {
     const dealer = GlobalEventDealer.deserialize(d.globalEventDealer);
     const chairman = deserializeDelegateOrUndefined(d.chairman, players);
-    const turmoil = new Turmoil(gameOptions, d.rulingParty, chairman || 'NEUTRAL', d.dominantParty, dealer);
+    // Reconstruct the exact persisted set of parties -- never recompute it via createParties(),
+    // which would re-randomize a More Parties game's 6-of-12 selection on every load.
+    const parties = d.parties.map((sp) => new ALL_PARTIES[sp.name]());
+    const turmoil = new Turmoil(parties, d.rulingParty, chairman || 'NEUTRAL', d.dominantParty, dealer);
 
     turmoil.usedFreeDelegateAction = new Set(d.usedFreeDelegateAction.map((p) => deserializePlayerId(p, players)));
 

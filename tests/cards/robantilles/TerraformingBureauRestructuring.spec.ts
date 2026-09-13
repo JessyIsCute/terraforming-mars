@@ -5,7 +5,7 @@ import {EquatorialMagnetizer} from '../../../src/server/cards/base/EquatorialMag
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
-import {setRulingParty, runAllActions} from '../../TestingUtils';
+import {setRulingParty, runAllActions, forcePartiesInPlay} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {Resource} from '../../../src/common/Resource';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
@@ -17,10 +17,16 @@ describe('TerraformingBureauRestructuring', () => {
   let game: IGame;
   let player: TestPlayer;
   let opponent: TestPlayer;
+  let restoreShuffle: () => void;
 
   beforeEach(() => {
+    restoreShuffle = forcePartiesInPlay(PartyName.BUREAUCRATS);
     card = new TerraformingBureauRestructuring();
     [game, player, opponent] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+  });
+
+  afterEach(() => {
+    restoreShuffle();
   });
 
   it('cannot play without the Bureaucrats ruling or 2 delegates there', () => {

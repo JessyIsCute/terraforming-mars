@@ -6,7 +6,14 @@ export type AgendaStyle =
   /** Randomly choose policies and bonuses, which remain for the entire game. */
   'Random' |
   /** The incoming chairman sets the incoming policy and bonus each generation. */
-  'Chairman';
+  'Chairman' |
+  /**
+   * More Parties: whoever becomes (or already is) a party's leader immediately chooses
+   * that party's bonus, and its policy too unless the party is currently ruling (its policy
+   * stays locked until the next Chairman election). A neutral delegate becoming leader
+   * re-randomizes both instead. Forced on whenever the More Parties expansion is enabled.
+   */
+  'PartyLeaders';
 
 const PARTIES = ['m', 's', 'u', 'k', 'r', 'g', 'pop', 'spo', 'emp', 'bur', 'cen', 'tra'] as const;
 const BONUS_SUFFIXES = ['b01', 'b02'] as const;
