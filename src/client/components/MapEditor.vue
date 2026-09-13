@@ -929,7 +929,7 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
     // The real <Board> renders at its normal (smallish) size; blow it up so it's actually
     // useful for checking hex/bonus placement while editing. `zoom` (not `transform: scale`)
     // reserves real layout space for the enlarged board, same technique as CardMaker.vue's
-    // preview and MutationMarket.vue's card scaling.
+    // preview.
     zoom: 1.6;
     width: fit-content;
     max-width: 100%;

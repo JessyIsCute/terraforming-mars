@@ -9,8 +9,6 @@ import {Warning} from '../cards/Warning';
 import {GameModule, Expansion} from '../cards/GameModule';
 import {CardMetadata} from '../cards/CardMetadata';
 import {CardRequirementDescriptor} from '../cards/CardRequirementDescriptor';
-import {MutationName} from '../mutationmarkets/MutationName';
-import {InfectionName} from '../mutationmarkets/InfectionName';
 import {ICardRenderItem} from '../cards/render/Types';
 
 /**
@@ -49,14 +47,6 @@ export interface CardModel {
     cloneTag?: Tag; // Used with Pathfinders
     standardProjectCanPayWith?: StandardProjectCanPayWith; // Set for standard projects; undefined for regular project cards
     customCard?: CustomCardModel; // Set only for a Custom Card Maker card -- see CustomCardModel's doc comment.
-    mutationAddedTag?: Tag; // MutationMarkets: an extra tag granted by a mutation (e.g. Tag Diversifier), not part of the card's static tag list
-    mutationHighlight?: {tag?: boolean, cost?: boolean, vp?: boolean}; // MutationMarkets: which parts of the card get the mutated-green glow
-    mutationVictoryPoints?: number; // MutationMarkets: extra VP granted by mutations, on top of the card's own printed VP formula
-    mutationNames?: ReadonlyArray<MutationName>; // MutationMarkets: which mutation(s) are applied (won cards) or would apply (market preview), so the client can describe their effect(s) in the card's own description area
-    combinedDisplayName?: string; // MutationMarkets: the card's name prefixed by every applied mutation's and/or infection's prefix, e.g. "Overpriced Gigantic Asteroid Mining"
-    infectionAddedTag?: Tag; // MutationMarkets: always Tag.INFECTED when the card has 1+ infections -- mirrors mutationAddedTag, but fixed rather than chosen
-    infectionHighlight?: {cost?: boolean, vp?: boolean}; // MutationMarkets: which parts of the card get the infected-red glow
-    infectionVictoryPoints?: number; // MutationMarkets: VP penalty from infections, on top of the card's own printed VP formula (and any mutationVictoryPoints)
-    infectionNames?: ReadonlyArray<InfectionName>; // MutationMarkets: which infection(s) are applied to this card, so the client can describe their effect(s)
+    combinedDisplayName?: string; // DeimosDoubleDownCopy (sillyfication): the copy's display name, e.g. "<real card name> Copy"
     inSpireResources?: ReadonlyArray<ICardRenderItem>; // InSpire (Pathfinders): the resources currently stored on this card
 }

@@ -27,9 +27,7 @@ describe('GameSetupDetail', () => {
             sillyfication: true,
             betterMars: true,
             customCards: true,
-            mutationMarkets: true,
             conglomerates: true,
-            blackMarket: true,
             corporateBetterments: true,
             idesOfMars: true,
             robAntilles: true,
@@ -39,8 +37,8 @@ describe('GameSetupDetail', () => {
       },
     });
 
-    for (const expansion of ['sillyfication', 'betterMars', 'customCards', 'mutationMarkets',
-      'conglomerates', 'blackMarket', 'corporateBetterments', 'idesOfMars', 'robAntilles']) {
+    for (const expansion of ['sillyfication', 'betterMars', 'customCards',
+      'conglomerates', 'corporateBetterments', 'idesOfMars', 'robAntilles']) {
       expect(wrapper.find(`.expansion-icon-${expansion}`).exists(), expansion).to.be.true;
     }
   });

@@ -40,15 +40,6 @@ export default defineComponent({
       type: [Number, Object as () => CardRenderDynamicVictoryPoints],
       default: undefined,
     },
-    // MutationMarkets: extra VP a mutation grants and/or an infection penalizes, on top
-    // of the card's own printed formula (the two are summed into one net value if both
-    // apply). Folded into the displayed number (not shown as a separate badge) so the
-    // VP shown is always the card's actual current value; glows green if positive, red
-    // if negative.
-    bonus: {
-      type: Number,
-      default: 0,
-    },
   },
   components: {
     CardRenderItemComponent,
@@ -69,11 +60,6 @@ export default defineComponent({
       } else {
         classes.push('card-points-normal');
       }
-      if (this.bonus > 0) {
-        classes.push('mutation-glow');
-      } else if (this.bonus < 0) {
-        classes.push('infection-glow');
-      }
       return classes.join(' ');
     },
     points(): string {
@@ -85,7 +71,7 @@ export default defineComponent({
         return '?';
       }
       if (vps.item === undefined) {
-        return `${vps.points + this.bonus}`;
+        return `${vps.points}`;
       }
       if (vps.target === vps.points || vps.target === 1) {
         return `${vps.points}/`;
@@ -97,20 +83,11 @@ export default defineComponent({
       }
       return `${vps.points}/${vps.target}`;
     },
-    // The plain-number branch (no dynamic formula): printed VP (if any) plus the
-    // mutation bonus (if any) -- the card's one true current VP value.
     totalNumber(): number {
-      const base = typeof this.victoryPoints === 'number' ? this.victoryPoints : 0;
-      return base + this.bonus;
+      return typeof this.victoryPoints === 'number' ? this.victoryPoints : 0;
     },
     numberClasses(): string {
-      const classes = ['card-points', 'card-points-big'];
-      if (this.bonus > 0) {
-        classes.push('mutation-glow');
-      } else if (this.bonus < 0) {
-        classes.push('infection-glow');
-      }
-      return classes.join(' ');
+      return 'card-points card-points-big';
     },
     animal(): ICardRenderItem {
       return {is: 'item', type: CardRenderItemType.RESOURCE, resource: CardResource.ANIMAL, size: Size.SMALL, amount: 1};

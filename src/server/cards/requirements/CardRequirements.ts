@@ -24,8 +24,6 @@ import {RoadTilesRequirement} from './RoadTilesRequirement';
 import {TRRequirement} from './TRRequirement';
 import {TagCardRequirement} from './TagCardRequirement';
 import {UniqueTagsRequirement} from './UniqueTagsRequirement';
-import {ExpensiveCardsPlayedRequirement} from './ExpensiveCardsPlayedRequirement';
-import {CheapCardsPlayedRequirement} from './CheapCardsPlayedRequirement';
 import {TemperatureRequirement} from './TemperatureRequirement';
 import {VenusRequirement} from './VenusRequirement';
 import {CardRequirementDescriptor} from '../../../common/cards/CardRequirementDescriptor';
@@ -73,10 +71,6 @@ export class CardRequirements {
       return new TagCardRequirement(descriptor.tag, descriptor);
     } else if (descriptor.uniqueTags !== undefined) {
       return new UniqueTagsRequirement({...descriptor, count: descriptor.uniqueTags});
-    } else if (descriptor.expensiveCardsPlayed !== undefined) {
-      return new ExpensiveCardsPlayedRequirement({...descriptor, count: descriptor.expensiveCardsPlayed});
-    } else if (descriptor.cheapCardsPlayed !== undefined) {
-      return new CheapCardsPlayedRequirement({...descriptor, count: descriptor.cheapCardsPlayed});
     } else if (descriptor.oceans !== undefined) {
       return new OceanRequirement({...descriptor, count: descriptor.oceans});
     } else if (descriptor.oxygen !== undefined) {

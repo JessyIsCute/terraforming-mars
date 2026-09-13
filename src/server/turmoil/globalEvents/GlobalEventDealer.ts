@@ -77,10 +77,8 @@ export class GlobalEventDealer {
       betterMars: gameOptions.betterMarsExpansion,
       // Neither has a ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       customCards: gameOptions.customCardsExpansion,
-      mutationMarkets: gameOptions.mutationMarketsExpansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       conglomerates: gameOptions.conglomeratesExpansion,
-      blackMarket: gameOptions.blackMarketExpansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       corporateBetterments: gameOptions.corporateBettermentsExpansion,
       idesOfMars: gameOptions.idesOfMarsExpansion,

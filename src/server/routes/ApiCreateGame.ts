@@ -125,8 +125,6 @@ export class ApiCreateGame extends Handler {
         modularMA: gameReq.modularMA,
         moonExpansion: gameReq.expansions.moon,
         moonStandardProjectVariant: gameReq.moonStandardProjectVariant,
-        mutationMarketsExpansion: gameReq.expansions.mutationMarkets,
-        blackMarketExpansion: gameReq.expansions.blackMarket,
         corporateBettermentsExpansion: gameReq.expansions.corporateBetterments,
         idesOfMarsExpansion: gameReq.expansions.idesOfMars,
         robAntillesExpansion: gameReq.expansions.robAntilles,

@@ -15,7 +15,7 @@ describe('CardTags', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders only the printed tags when there is no mutation-added tag', () => {
+  it('renders one tag icon per printed tag', () => {
     const wrapper = mount(CardTags, {
       ...globalConfig,
       props: {
@@ -23,44 +23,13 @@ describe('CardTags', () => {
       },
     });
     expect(wrapper.findAll('.card-tag')).to.have.lengthOf(2);
-    expect(wrapper.find('.mutation-tag-glow').exists()).to.be.false;
   });
 
-  it('renders the mutation-added tag as one more tag in the same row, glowing', () => {
+  it('falls back to the asterisk overflow tag once there are more than 4 tags', () => {
     const wrapper = mount(CardTags, {
       ...globalConfig,
       props: {
-        tags: [Tag.SPACE, Tag.SCIENCE],
-        mutationAddedTag: Tag.ANIMAL,
-      },
-    });
-    const tags = wrapper.findAll('.card-tag');
-    expect(tags).to.have.lengthOf(3);
-    expect(tags[2].classes()).to.include('mutation-tag-glow');
-    expect(tags[2].classes()).to.include('tag-animal');
-    // The printed tags themselves aren't marked -- only the added one glows.
-    expect(tags[0].classes()).to.not.include('mutation-tag-glow');
-    expect(tags[1].classes()).to.not.include('mutation-tag-glow');
-  });
-
-  it('never renders Tag.INFECTED as its own (icon-less, invisible) tag -- the red ribbon already says so', () => {
-    const wrapper = mount(CardTags, {
-      ...globalConfig,
-      props: {
-        tags: [Tag.SPACE, Tag.INFECTED],
-      },
-    });
-    const tags = wrapper.findAll('.card-tag');
-    expect(tags).to.have.lengthOf(1);
-    expect(tags[0].classes()).to.include('tag-space');
-  });
-
-  it('falls back to the asterisk overflow tag once 4 printed tags plus the added one exceeds the cap', () => {
-    const wrapper = mount(CardTags, {
-      ...globalConfig,
-      props: {
-        tags: [Tag.SPACE, Tag.SCIENCE, Tag.EARTH, Tag.BUILDING],
-        mutationAddedTag: Tag.ANIMAL,
+        tags: [Tag.SPACE, Tag.SCIENCE, Tag.EARTH, Tag.BUILDING, Tag.ANIMAL],
       },
     });
     expect(wrapper.findAll('.card-tag')).to.have.lengthOf(1);

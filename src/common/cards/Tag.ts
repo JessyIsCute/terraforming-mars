@@ -16,8 +16,6 @@ export enum Tag {
     WILD = 'wild',
     EVENT = 'event',
     CLONE = 'clone',
-    /** MutationMarkets: added by any Infection, never printed on a card and never chosen by Tag Diversifier. */
-    INFECTED = 'infected',
 }
 
 export const ALL_TAGS = [
@@ -38,5 +36,4 @@ export const ALL_TAGS = [
   Tag.WILD,
   Tag.EVENT,
   Tag.CLONE,
-  Tag.INFECTED,
 ] as const;

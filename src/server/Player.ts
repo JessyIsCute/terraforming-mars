@@ -28,11 +28,6 @@ import {Priority} from './deferredActions/Priority';
 import {SelectPaymentDeferred} from './deferredActions/SelectPaymentDeferred';
 import {SelectProjectCardToPlay} from './inputs/SelectProjectCardToPlay';
 import {SelectOption} from './inputs/SelectOption';
-import {SelectAmount} from './inputs/SelectAmount';
-import {MutationMarkets} from './mutationmarkets/MutationMarkets';
-import {BlackMarket} from './blackmarket/BlackMarket';
-import {BlackMarketSlot} from './blackmarket/BlackMarketData';
-import {BlackMarketTier} from './cards/blackmarket/BlackMarketCardManifest';
 import {SelectSpace} from './inputs/SelectSpace';
 import {SelfReplicatingRobots} from './cards/promo/SelfReplicatingRobots';
 import {SerializedPlayer} from './SerializedPlayer';
@@ -176,9 +171,6 @@ export class Player implements IPlayer {
   public removingPlayers: Array<PlayerId> = [];
   // Warmonger
   public warmongerCards: number = 0;
-  // MutationMarkets: Gigantic Undertakings / Mini Mutation requirements
-  public expensiveCardsPlayed: number = 0;
-  public cheapCardsPlayed: number = 0;
   // For Playwrights corp.
   // removedFromPlayCards is a bit of a misname: it's a temporary storage for
   // cards that provide 'next card' discounts. This will clear between turns.
@@ -947,12 +939,6 @@ export class Player implements IPlayer {
     if (selectedCard.type !== CardType.PROXY) {
       this.lastCardPlayed = selectedCard.name;
       this.game.log('${0} played ${1}', (b) => b.player(this).card(selectedCard));
-      if (selectedCard.cost >= 25) {
-        this.expensiveCardsPlayed++;
-      }
-      if (selectedCard.cost < 7) {
-        this.cheapCardsPlayed++;
-      }
     }
 
     // Play the card
@@ -982,17 +968,6 @@ export class Player implements IPlayer {
       } else if (preludeCardIndex !== -1) {
         this.preludeCardsInHand.splice(preludeCardIndex, 1);
       }
-    }
-
-    // MutationMarkets on-play effects: must run after the removal above -- a Nested
-    // Mutation copy granted here shares the same CardName as `selectedCard`, and the
-    // removal step matches by name, so granting it any earlier would have it immediately
-    // stripped back out of hand. Infections have no on-play hook of their own anymore --
-    // a resourceCostOnPlay infection's cost is folded into reserveUnits instead (see
-    // InfectionEffects.applyReserveUnits), so it's already been required and deducted by
-    // this point via the same path as a real Moon reserve cost, above.
-    if (selectedCard.type !== CardType.PROXY) {
-      MutationMarkets.applyOnPlayEffects(this, selectedCard);
     }
 
     switch (cardAction) {
@@ -1822,58 +1797,6 @@ export class Player implements IPlayer {
       action.options.push(coloniesTradeAction);
     }
 
-    // MutationMarkets: bid on a market project card
-    const biddableSlots = MutationMarkets.biddableSlots(this.game, this);
-    if (biddableSlots.length > 0 && this.game.mutationMarketData !== undefined) {
-      const marketData = this.game.mutationMarketData;
-      const bidOptions = new OrOptions().setTitle('Bid on a MutationMarkets card');
-      for (const slotIndex of biddableSlots) {
-        const card = marketData.projectSlots[slotIndex];
-        if (card === undefined) {
-          continue;
-        }
-        const nextBid = MutationMarkets.nextBidFor(marketData, slotIndex);
-        const existingEscrow = marketData.projectAuctions[slotIndex]?.escrow[this.id] ?? 0;
-        bidOptions.options.push(new SelectAmount(`Bid on ${card.name}`, 'Bid', nextBid, this.megaCredits + existingEscrow)
-          .andThen((amount) => {
-            MutationMarkets.placeBid(this.game, this, slotIndex, amount);
-            return undefined;
-          }));
-      }
-      action.options.push(bidOptions);
-    }
-
-    // Black Market: do a project publicly available on the market, resolving it immediately
-    // like playing it from hand, for its own printed price. Rows unlock progressively
-    // (early from the start, mid/late at their generation threshold) -- see BlackMarket.ts.
-    const blackMarketData = this.game.blackMarketData;
-    if (blackMarketData !== undefined) {
-      const affordableSlots: Array<{tier: BlackMarketTier, slot: NonNullable<BlackMarketSlot>, slotIndex: number}> = [];
-      for (const tier of ['early', 'mid', 'late'] as const) {
-        const row = blackMarketData[tier];
-        if (row === undefined) {
-          continue;
-        }
-        row.slots.forEach((slot, slotIndex) => {
-          if (slot !== undefined && BlackMarket.canAfford(this, slot.card)) {
-            affordableSlots.push({tier, slot, slotIndex});
-          }
-        });
-      }
-      if (affordableSlots.length > 0) {
-        const buyOptions = new OrOptions().setTitle('Do a project on the Black Market');
-        for (const {tier, slot, slotIndex} of affordableSlots) {
-          buyOptions.options.push(
-            new SelectOption(`Do ${slot.card.name} on the Black Market for ${BlackMarket.describePrice(slot.card)}`, 'Do it')
-              .andThen(() => {
-                BlackMarket.buy(this.game, this, tier, slotIndex);
-                return undefined;
-              }));
-        }
-        action.options.push(buyOptions);
-      }
-    }
-
     // Add delegates
     Turmoil.ifTurmoil(this.game, (turmoil) => {
       const input = turmoil.getSendDelegateInput(this);
@@ -2082,8 +2005,6 @@ export class Player implements IPlayer {
       // Lawsuit
       removingPlayers: this.removingPlayers,
       warmongerCards: this.warmongerCards,
-      expensiveCardsPlayed: this.expensiveCardsPlayed,
-      cheapCardsPlayed: this.cheapCardsPlayed,
       // Playwrights
       removedFromPlayCards: this.removedFromPlayCards.map(toName),
       // Standard Technology: Underworld
@@ -2163,8 +2084,6 @@ export class Player implements IPlayer {
     }));
     player.removingPlayers = d.removingPlayers;
     player.warmongerCards = d.warmongerCards ?? 0;
-    player.expensiveCardsPlayed = d.expensiveCardsPlayed ?? 0;
-    player.cheapCardsPlayed = d.cheapCardsPlayed ?? 0;
     player.tags.extraScienceTags = d.scienceTagCount;
     player.tags.extraPlantTags = d.plantTagCount;
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;

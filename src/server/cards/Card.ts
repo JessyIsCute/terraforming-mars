@@ -28,10 +28,6 @@ import {AdditionalProjectCosts} from '../../common/cards/Types';
 import {GlobalParameter} from '../../common/GlobalParameter';
 import {Warning} from '../../common/cards/Warning';
 import {Resource} from '@/common/Resource';
-import {MutationEffects} from '../mutationmarkets/MutationEffects';
-import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
-import {InfectionEffects} from '../mutationmarkets/InfectionEffects';
-import {AppliedInfection} from '../../common/mutationmarkets/AppliedInfection';
 
 const NO_WARNINGS: ReadonlySet<Warning> = new Set();
 
@@ -199,22 +195,12 @@ export abstract class Card implements ICard {
   public get cardCost() {
     return this.properties.cardCost;
   }
-  public get baseType() {
+  public get type(): CardType {
     return this.properties.type;
   }
-  public get type(): CardType {
-    return MutationEffects.applyType(this, this.baseType);
-  }
-  public get baseCost() {
+  public get cost(): number {
     return this.properties.cost === undefined ? 0 : this.properties.cost;
   }
-  public get cost(): number {
-    return InfectionEffects.applyCost(this, MutationEffects.applyCost(this, this.baseCost));
-  }
-  /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
-  public mutations: Array<AppliedMutation> | undefined;
-  /** MutationMarkets: infections permanently applied to this card instance by Blacklab Cartel's action. */
-  public infections: Array<AppliedInfection> | undefined;
   public get initialActionText() {
     return this.properties.initialActionText || this.properties.firstAction?.text;
   }
@@ -240,13 +226,13 @@ export abstract class Card implements ICard {
     return this.properties.startingMegaCredits === undefined ? 0 : this.properties.startingMegaCredits;
   }
   public get tags(): Array<Tag> {
-    return InfectionEffects.applyTags(this, MutationEffects.applyTags(this, this.properties.tags === undefined ? [] : this.properties.tags));
+    return this.properties.tags === undefined ? [] : this.properties.tags;
   }
   public get cardDiscount() {
     return this.properties.cardDiscount;
   }
   public get reserveUnits(): Units {
-    return InfectionEffects.applyReserveUnits(this, this.properties.reserveUnits || Units.EMPTY);
+    return this.properties.reserveUnits || Units.EMPTY;
   }
   public get tr(): TRSource | undefined {
     return this.properties.tr;

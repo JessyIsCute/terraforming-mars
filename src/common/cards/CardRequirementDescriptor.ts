@@ -38,10 +38,6 @@ export type CardRequirementDescriptor = {
   adjacent?: boolean,
   /** Whether the player's last action this game was placing a greenery tile. */
   greeneryLastAction?: boolean,
-  /** Count of cards (including events) the player has ever played costing 25 M€ or more. */
-  expensiveCardsPlayed?: number,
-  /** Count of cards (including events) the player has ever played costing less than 7 M€. */
-  cheapCardsPlayed?: number,
   cities?: number,
   oceans?: number,
   production?: Resource,
@@ -86,10 +82,6 @@ export function requirementType(descriptor: CardRequirementDescriptor): Requirem
     return RequirementType.TAG;
   } else if (descriptor.uniqueTags !== undefined) {
     return RequirementType.UNIQUE_TAGS;
-  } else if (descriptor.expensiveCardsPlayed !== undefined) {
-    return RequirementType.EXPENSIVE_CARDS_PLAYED;
-  } else if (descriptor.cheapCardsPlayed !== undefined) {
-    return RequirementType.CHEAP_CARDS_PLAYED;
   } else if (descriptor.oceans !== undefined) {
     return RequirementType.OCEANS;
   } else if (descriptor.oxygen !== undefined) {

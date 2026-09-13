@@ -48,9 +48,7 @@ export type GameOptions = {
   sillyficationExpansion: boolean;
   betterMarsExpansion: boolean;
   customCardsExpansion: boolean;
-  mutationMarketsExpansion: boolean;
   conglomeratesExpansion: boolean;
-  blackMarketExpansion: boolean;
   corporateBettermentsExpansion: boolean;
   idesOfMarsExpansion: boolean;
   robAntillesExpansion: boolean;
@@ -134,9 +132,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     sillyfication: false,
     betterMars: false,
     customCards: false,
-    mutationMarkets: false,
     conglomerates: false,
-    blackMarket: false,
     corporateBetterments: false,
     idesOfMars: false,
     robAntilles: false,
@@ -175,9 +171,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   sillyficationExpansion: false,
   betterMarsExpansion: false,
   customCardsExpansion: false,
-  mutationMarketsExpansion: false,
   conglomeratesExpansion: false,
-  blackMarketExpansion: false,
   corporateBettermentsExpansion: false,
   idesOfMarsExpansion: false,
   robAntillesExpansion: false,

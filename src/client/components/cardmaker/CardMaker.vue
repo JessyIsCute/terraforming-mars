@@ -1060,7 +1060,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   .card-maker-preview-zoom {
     // The real Card component renders at its normal (small) size; blow it up so the preview
     // dominates the screen while editing. `zoom` (not `transform: scale`) reserves real layout
-    // space for the enlarged card, matching the pattern MutationMarket.vue already uses.
+    // space for the enlarged card.
     zoom: 2.5;
     width: fit-content;
   }

@@ -4,11 +4,8 @@ import {GameModule, GAME_MODULES} from '@/common/cards/GameModule';
 import {SearchIndex} from '@/client/components/cardlist/SearchIndex';
 import {CardResource} from '@/common/CardResource';
 
-export type TypeOption = CardType | 'colonyTiles' | 'globalEvents' | 'milestones' | 'awards' | 'agendas' | 'mutationCards';
-// Tag.INFECTED is never printed on a card -- it's only ever added to a specific card
-// instance at runtime by Blacklab Cartel's Infection mechanic -- so it would never match
-// anything in this static card-reference list and is excluded as a filter option.
-export type TagOption = Exclude<Tag, Tag.INFECTED> | 'none';
+export type TypeOption = CardType | 'colonyTiles' | 'globalEvents' | 'milestones' | 'awards' | 'agendas';
+export type TagOption = Tag | 'none';
 export type ResourceOption = CardResource | 'none';
 
 export type CardListModel = {
@@ -46,9 +43,7 @@ const MODULE_ABBREVIATIONS = {
   sillyfication: 'y',
   betterMars: 'B',
   customCards: 'x',
-  mutationMarkets: 'M',
   conglomerates: 'g',
-  blackMarket: 'k',
   corporateBetterments: 'o',
   idesOfMars: 'i',
   robAntilles: 'R',
@@ -70,7 +65,6 @@ const TYPE_ABBREVIATIONS = {
   milestones: 'm',
   awards: 'a',
   agendas: 't',
-  mutationCards: 'M',
 } satisfies Record<TypeOption, string>;
 
 const TAG_ABBREVIATIONS = {
@@ -117,9 +111,7 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       sillyfication: true,
       betterMars: true,
       customCards: true,
-      mutationMarkets: true,
       conglomerates: true,
-      blackMarket: true,
       corporateBetterments: true,
       idesOfMars: true,
       robAntilles: true,
@@ -140,7 +132,6 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       awards: true,
       ceo: true,
       agendas: true,
-      mutationCards: true,
     },
     tags: {
       building: true,

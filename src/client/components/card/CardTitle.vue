@@ -32,9 +32,9 @@ export default defineComponent({
       type: String as () => CardType,
       required: true,
     },
-    // MutationMarkets: overrides the displayed title (e.g. "Gigantic Asteroid Mining")
-    // without touching `title` itself, which stays the real CardName -- CardCorporationLogo
-    // and other consumers below still need the exact name.
+    // DeimosDoubleDownCopy (sillyfication): overrides the displayed title (e.g. "<real
+    // card name> Copy") without touching `title` itself, which stays the real CardName --
+    // CardCorporationLogo and other consumers below still need the exact name.
     displayTitle: {
       type: String,
       default: undefined,

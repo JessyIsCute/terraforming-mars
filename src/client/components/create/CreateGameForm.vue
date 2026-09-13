@@ -194,22 +194,10 @@
                                 <span v-i18n>Custom Cards</span>&nbsp;<span title="Community-submitted cards, approved on /cards">(&#945;)</span>
                             </label>
 
-                            <input type="checkbox" name="mutationMarkets" id="mutationMarkets-checkbox" v-model="expansions.mutationMarkets">
-                            <label for="mutationMarkets-checkbox" class="expansion-button">
-                                <div class="create-game-expansion-icon expansion-icon-mutationMarkets"></div>
-                                <span v-i18n>MutationMarkets</span>&nbsp;<span title="A fan expansion: bid on project cards permanently enhanced by mutations">(&#945;)</span>&nbsp;<a :href="wikiUrls.mutationMarkets" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                            </label>
-
                             <input type="checkbox" name="conglomerates" id="conglomerates-checkbox" v-model="expansions.conglomerates">
                             <label for="conglomerates-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-conglomerates"></div>
                                 <span v-i18n>Conglomerates</span>&nbsp;<span title="A fan expansion: 2v2 team play">(&#945;)</span>&nbsp;<a :href="wikiUrls.conglomerates" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                            </label>
-
-                            <input type="checkbox" name="blackMarket" id="blackMarket-checkbox" v-model="expansions.blackMarket">
-                            <label for="blackMarket-checkbox" class="expansion-button">
-                                <div class="create-game-expansion-icon expansion-icon-blackMarket"></div>
-                                <span v-i18n>Black Market</span>&nbsp;<span title="A fan expansion: buy bespoke illegal project cards from a persistent 5-slot market for a fixed price">(&#945;)</span>&nbsp;<a :href="wikiUrls.blackMarket" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
                             <input type="checkbox" name="corporateBetterments" id="corporateBetterments-checkbox" v-model="expansions.corporateBetterments">

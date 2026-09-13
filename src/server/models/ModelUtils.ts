@@ -14,8 +14,6 @@ import {asArray} from '../../common/utils/utils';
 import {isIStandardProjectCard} from '../cards/IStandardProjectCard';
 import {isCustomCardName, getCustomCardDefinition} from '../cards/CustomCardRegistry';
 import {NEUTRAL_COLONY_OWNER} from '../../common/Types';
-import {MutationEffects} from '../mutationmarkets/MutationEffects';
-import {InfectionEffects} from '../mutationmarkets/InfectionEffects';
 
 export function cardsToModel(
   player: IPlayer,
@@ -121,32 +119,6 @@ export function cardsToModel(
       // real runtime type.
       const sourceCardName = (card as unknown as {sourceCardName: CardName}).sourceCardName;
       model.combinedDisplayName = `${sourceCardName} Copy`;
-    }
-    const namePrefixes: Array<string> = [];
-    if (card.mutations !== undefined && card.mutations.length > 0) {
-      const mutationNames = card.mutations.map((m) => m.mutation);
-      model.mutationNames = mutationNames;
-      model.mutationAddedTag = card.mutations.find((m) => m.chosenTag !== undefined)?.chosenTag;
-      model.mutationHighlight = MutationEffects.highlightsFor(card);
-      namePrefixes.push(...MutationEffects.namePrefixes(mutationNames));
-      const mutationVp = MutationEffects.victoryPointsBonus(card, player);
-      if (mutationVp !== 0) {
-        model.mutationVictoryPoints = mutationVp;
-      }
-    }
-    if (card.infections !== undefined && card.infections.length > 0) {
-      const infectionNames = card.infections.map((i) => i.infection);
-      model.infectionNames = infectionNames;
-      model.infectionAddedTag = Tag.INFECTED;
-      model.infectionHighlight = InfectionEffects.highlightsFor(card);
-      namePrefixes.push(...InfectionEffects.namePrefixes(infectionNames));
-      const infectionVp = InfectionEffects.victoryPointsBonus(card);
-      if (infectionVp !== 0) {
-        model.infectionVictoryPoints = infectionVp;
-      }
-    }
-    if (namePrefixes.length > 0) {
-      model.combinedDisplayName = [...namePrefixes, card.name].join(' ');
     }
     return model;
   });

@@ -13,8 +13,6 @@ import {SpectatorId} from '../Types';
 import {ColonyName} from '../colonies/ColonyName';
 import {GlobalParameter} from '../GlobalParameter';
 import {Tag} from '../cards/Tag';
-import {MutationMarketModel} from './MutationMarketModel';
-import {BlackMarketModel} from './BlackMarketModel';
 import {ConglomeratesModel} from './ConglomeratesModel';
 
 // Common data about a game not assocaited with a player (eg the temperature.)
@@ -35,8 +33,6 @@ export type GameModel = {
   lastSoloGeneration: number,
   milestones: ReadonlyArray<ClaimedMilestoneModel>;
   moon: MoonModel | undefined;
-  mutationMarket: MutationMarketModel | undefined;
-  blackMarket: BlackMarketModel | undefined;
   name: string;
   oceans: number;
   oxygenLevel: number;

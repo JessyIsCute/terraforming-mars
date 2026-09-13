@@ -63,7 +63,6 @@
             <label :for="`${type}-cardType-checkbox`" class="expansion-button">
                 <span v-if="type === 'colonyTiles'" v-i18n>Colony Tiles</span>
                 <span v-else-if="type === 'globalEvents'" v-i18n>Global Events</span>
-                <span v-else-if="type === 'mutationCards'" v-i18n>Mutation/Infections</span>
                 <span v-else v-i18n>{{type}}</span>
             </label>
           </span>
@@ -184,19 +183,6 @@
         </div>
       </section>
 
-      <section v-show="visibleMutationNames.length > 0 || visibleInfectionNames.length > 0">
-        <h2 v-i18n>Mutation/Infections</h2>
-        <p><a href="mutation-simulator" v-i18n>Try the Mutation/Infection Simulator — preview any of these applied to any card</a></p>
-        <div class="player_home_colony_cont">
-          <div class="player_home_colony" v-for="mutationName in visibleMutationNames" :key="mutationName" v-memo="[mutationName]">
-            <MutationCard :mutation="mutationName" />
-          </div>
-          <div class="player_home_colony" v-for="infectionName in visibleInfectionNames" :key="infectionName" v-memo="[infectionName]">
-            <InfectionCard :infection="infectionName" />
-          </div>
-        </div>
-      </section>
-
       <div class="free-floating-preferences-icon">
         <div v-show="scrolled" class="sidebar_item card-list-scroll-top" title="Scroll to top" @click="scrollToTop()">
           <div class="card-list-scroll-top-arrow">↑</div>
@@ -232,8 +218,6 @@ import {FundedAwardModel} from '@/common/models/FundedAwardModel';
 import {TypeOption, CardListModel, hashToModel, modelToHash, ResourceOption, TagOption} from '@/client/components/cardlist/CardListModel';
 import {getAward, getMilestone} from '@/client/MilestoneAwardManifest';
 import {BonusId, BONUS_IDS, PolicyId, POLICY_IDS, agendaIdDescription} from '@/common/turmoil/Types';
-import {MutationName} from '@/common/mutationmarkets/MutationName';
-import {InfectionName} from '@/common/mutationmarkets/InfectionName';
 import Card from '@/client/components/card/Card.vue';
 import Colony from '@/client/components/colonies/Colony.vue';
 import GlobalEvent from '@/client/components/turmoil/GlobalEvent.vue';
@@ -242,8 +226,6 @@ import LanguageIcon from '@/client/components/LanguageIcon.vue';
 import Milestone from '@/client/components/Milestone.vue';
 import Award from '@/client/components/Award.vue';
 import TurmoilAgendaContainer from '@/client/components/cardlist/TurmoilAgendaContainer.vue';
-import MutationCard from '@/client/components/mutationmarkets/MutationCard.vue';
-import InfectionCard from '@/client/components/mutationmarkets/InfectionCard.vue';
 import {CardResource} from '@/common/CardResource';
 import {cardResourceCSS} from '../common/cardResources';
 import {setDocumentTitle} from '@/client/utils/documentTitle';
@@ -263,8 +245,6 @@ export default defineComponent({
     Milestone,
     Award,
     TurmoilAgendaContainer,
-    MutationCard,
-    InfectionCard,
     PreferencesIcon,
     LanguageIcon,
   },
@@ -306,15 +286,10 @@ export default defineComponent({
         'milestones',
         'awards',
         'agendas',
-        'mutationCards',
       ];
     },
     allTags(): Array<TagOption> {
-      // Tag.INFECTED is never printed on a static card (see TagOption's doc comment in
-      // CardListModel.ts) -- excluded here too, or it'd show as a checkbox that can
-      // never match anything.
-      const tags = getEnumStringValues(Tag).filter((tag): tag is Exclude<Tag, Tag.INFECTED> => tag !== Tag.INFECTED);
-      return [...tags, 'none'];
+      return [...getEnumStringValues(Tag), 'none'];
     },
     allResources(): Array<ResourceOption> {
       return [...getEnumStringValues(CardResource), 'none'];
@@ -324,12 +299,6 @@ export default defineComponent({
     },
     allAwardNames(): ReadonlyArray<AwardName> {
       return awardNames.toSorted();
-    },
-    allMutationNames(): ReadonlyArray<MutationName> {
-      return Object.values(MutationName).toSorted();
-    },
-    allInfectionNames(): ReadonlyArray<InfectionName> {
-      return Object.values(InfectionName).toSorted();
     },
     allAgendaIds(): ReadonlyArray<PolicyId | BonusId> {
       const ids = (POLICY_IDS as ReadonlyArray<PolicyId | BonusId>).concat(BONUS_IDS);
@@ -385,18 +354,6 @@ export default defineComponent({
         return [];
       }
       return this.allAgendaIds.filter((id) => this.include(id, 'agenda'));
-    },
-    visibleMutationNames(): Array<MutationName> {
-      if (!this.types.mutationCards || !this.expansions.mutationMarkets) {
-        return [];
-      }
-      return this.allMutationNames.filter((m) => this.include(m, 'mutation'));
-    },
-    visibleInfectionNames(): Array<InfectionName> {
-      if (!this.types.mutationCards || !this.expansions.mutationMarkets) {
-        return [];
-      }
-      return this.allInfectionNames.filter((i) => this.include(i, 'infection'));
     },
     agendaIdDescription(): typeof agendaIdDescription {
       return agendaIdDescription;
@@ -471,7 +428,7 @@ export default defineComponent({
     getAllColonyNames() {
       return OFFICIAL_COLONY_NAMES.concat(COMMUNITY_COLONY_NAMES).concat(PATHFINDERS_COLONY_NAMES);
     },
-    include(name: string, type: 'card' | 'globalEvent' | 'colony' | 'ma' | 'agenda' | 'mutation' | 'infection') {
+    include(name: string, type: 'card' | 'globalEvent' | 'colony' | 'ma' | 'agenda') {
       const normalized = this.filterText.toLocaleUpperCase();
       if (normalized.length === 0) {
         return true;
@@ -501,10 +458,7 @@ export default defineComponent({
 
       let matches = false;
       for (const tag of card.tags) {
-        // A static card definition never carries Tag.INFECTED (only added to a live
-        // instance at runtime by Blacklab Cartel), so it's excluded from TagOption/this.tags --
-        // this cast is safe since that case never actually occurs here.
-        if (this.tags[tag as TagOption]) {
+        if (this.tags[tag]) {
           matches = true;
         }
       }

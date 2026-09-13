@@ -1178,43 +1178,13 @@ input[type="radio"]:checked+.filterDiv::after {
   }
 }
 
-// MutationMarkets: a dark green "M" on a light green circle. CSS-only, no image asset --
-// works in both the .expansion-icon (25px) and .create-game-expansion-icon (30px) boxes.
-.expansion-icon-mutationMarkets {
-  background-image: none;
-  background-color: #a5d6a7;
-  border-radius: 50%;
-  text-align: center;
-
-  &::before {
-    content: "M";
-    font-weight: bold;
-    font-family: Prototype, sans-serif;
-    color: #1b5e20;
-    font-size: 20px;
-    line-height: 1.35;
-  }
-}
-
-// Conglomerates: a handshake emoji, same CSS-only trick as Sillyfication/MutationMarkets above.
+// Conglomerates: a handshake emoji, same CSS-only trick as Sillyfication above.
 .expansion-icon-conglomerates {
   background-image: none;
   text-align: center;
 
   &::before {
     content: "🤝";
-    font-size: 18px;
-    line-height: 1.35;
-  }
-}
-
-// Black Market: a briefcase emoji, same CSS-only trick as Conglomerates above.
-.expansion-icon-blackMarket {
-  background-image: none;
-  text-align: center;
-
-  &::before {
-    content: "💼";
     font-size: 18px;
     line-height: 1.35;
   }

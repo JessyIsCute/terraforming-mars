@@ -340,18 +340,6 @@
           <span class="word-1">In</span><span class="word-2">Spire</span>
         </div>
       </template>
-      <template v-else-if="title === CardName.BLACKLAB_CARTEL">
-        <div class="card-blacklab-cartel-logo">
-          <div class="word-1">BLACKLAB</div>
-          <div class="word-2">CARTEL</div>
-        </div>
-      </template>
-      <template v-else-if="title === CardName.HELIX_CONFERENCE">
-        <div class="card-helix-conference-logo">
-          <div class="word-1">HELIX</div>
-          <div class="word-2">CONFERENCE</div>
-        </div>
-      </template>
     </template>
     <template v-else>
       <div :class="logoClass">{{capsTitle}}</div>
@@ -381,7 +369,6 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.ATHENA]: 'bespoke',
   [CardName.AURORAI]: 'image',
   [CardName.BIO_SOL]: 'image',
-  [CardName.BLACKLAB_CARTEL]: 'bespoke',
   [CardName.CELESTIC]: 'bespoke',
   [CardName.CHEUNG_SHING_MARS]: 'bespoke',
   [CardName.CHIMERA]: 'image',
@@ -401,7 +388,6 @@ const logos: Partial<Record<CardName, 'image' | 'css' | 'bespoke'>> = {
   [CardName.HADESPHERE]: 'bespoke',
   [CardName.HECATE_SPEDITIONS]: 'bespoke',
   [CardName.HELION]: 'css',
-  [CardName.HELIX_CONFERENCE]: 'bespoke',
   [CardName.HENKEI_GENETICS]: 'bespoke',
   [CardName.INCITE]: 'bespoke',
   [CardName.IN_SPIRE]: 'bespoke',

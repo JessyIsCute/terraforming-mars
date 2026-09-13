@@ -27,7 +27,6 @@ import {UNDERWORLD_CARD_MANIFEST} from './cards/underworld/UnderworldCardManifes
 import {SILLYFICATION_CARD_MANIFEST} from './cards/sillyfication/SillyficationCardManifest';
 import {BETTER_MARS_CARD_MANIFEST} from './cards/betterMars/BetterMarsCardManifest';
 import {CONGLOMERATES_CARD_MANIFEST} from './cards/conglomerates/ConglomeratesCardManifest';
-import {BLACKMARKET_CARD_MANIFEST} from './cards/blackmarket/BlackMarketCardManifest';
 import {DELTA_PROJECT_CARD_MANIFEST} from './cards/delta/DeltaProjectCardManifest';
 import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './cards/corporatebetterments/CorporateBettermentsCardManifest';
 import {IDES_OF_MARS_CARD_MANIFEST} from './cards/idesofmars/IdesOfMarsCardManifest';
@@ -74,12 +73,6 @@ export class GameCards {
       [gameOptions.sillyficationExpansion, SILLYFICATION_CARD_MANIFEST],
       [gameOptions.betterMarsExpansion, BETTER_MARS_CARD_MANIFEST],
       [gameOptions.conglomeratesExpansion, CONGLOMERATES_CARD_MANIFEST],
-      // Every Black Market card is `instantiate: false` (never dealt from the shared
-      // ProjectDeck -- BlackMarket.ts deals its own dedicated pool directly by name), so this
-      // entry contributes nothing to getProjectCards(); it's here only for consistency with
-      // every other module and in case future manifest-wide processing (cardsToRemove, etc.)
-      // ever depends on a module's manifest being present here.
-      [gameOptions.blackMarketExpansion, BLACKMARKET_CARD_MANIFEST],
       [gameOptions.corporateBettermentsExpansion, CORPORATE_BETTERMENTS_CARD_MANIFEST],
       [gameOptions.idesOfMarsExpansion, IDES_OF_MARS_CARD_MANIFEST],
       [gameOptions.robAntillesExpansion, ROB_ANTILLES_CARD_MANIFEST],

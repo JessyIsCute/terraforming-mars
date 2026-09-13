@@ -9,8 +9,6 @@ export enum RequirementType {
     CITIES = 'City',
     TAG = 'tag',
     UNIQUE_TAGS = 'Unique tags',
-    EXPENSIVE_CARDS_PLAYED = 'Expensive cards played',
-    CHEAP_CARDS_PLAYED = 'Cheap cards played',
     PRODUCTION = 'production',
     REMOVED_PLANTS = 'Removed plants',
 

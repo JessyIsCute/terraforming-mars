@@ -23,8 +23,6 @@ import {SpectatorModel} from '../../common/models/SpectatorModel';
 import {GameModel} from '../../common/models/GameModel';
 import {Turmoil} from '../turmoil/Turmoil';
 import {createPathfindersModel} from './PathfindersModel';
-import {createMutationMarketModel} from './MutationMarketModel';
-import {createBlackMarketModel} from './BlackMarketModel';
 import {MoonModel} from '../../common/models/MoonModel';
 import {CardName} from '../../common/cards/CardName';
 import {AwardScorer} from '../awards/AwardScorer';
@@ -75,8 +73,6 @@ export class Server {
       lastSoloGeneration: game.lastSoloGeneration(),
       milestones: this.getMilestones(game),
       moon: this.getMoonModel(game),
-      mutationMarket: createMutationMarketModel(game),
-      blackMarket: createBlackMarketModel(game),
       name: game.name,
       oceans: game.board.getOceanSpaces().length,
       oxygenLevel: game.getOxygenLevel(),
@@ -467,9 +463,7 @@ export class Server {
         sillyfication: options.sillyficationExpansion,
         betterMars: options.betterMarsExpansion,
         customCards: options.customCardsExpansion,
-        mutationMarkets: options.mutationMarketsExpansion,
         conglomerates: options.conglomeratesExpansion,
-        blackMarket: options.blackMarketExpansion,
         corporateBetterments: options.corporateBettermentsExpansion,
         idesOfMars: options.idesOfMarsExpansion,
         robAntilles: options.robAntillesExpansion,

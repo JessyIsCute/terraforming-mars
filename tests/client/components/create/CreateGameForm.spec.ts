@@ -57,7 +57,6 @@ describe('CreateGameForm', () => {
       'conglomerates-checkbox': 'Conglomerates',
       'sillyfication-checkbox': 'Sillyfication',
       'betterMars-checkbox': 'BetterMars',
-      'mutationMarkets-checkbox': 'MutationMarkets',
     };
     for (const [id, page] of Object.entries(expected)) {
       const link = wrapper.find(`#${id}`).element.nextElementSibling!.querySelector('a');

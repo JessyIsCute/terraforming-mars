@@ -9,7 +9,6 @@ import {VictoryPointsBreakdownBuilder} from './VictoryPointsBreakdownBuilder';
 import {FundedAward} from '../awards/FundedAward';
 import {AwardScorer} from '../awards/AwardScorer';
 import {CardName} from '../../common/cards/CardName';
-import {MutationEffects} from '../mutationmarkets/MutationEffects';
 import {ConglomeratesExpansion} from '../conglomerates/ConglomeratesExpansion';
 
 export function calculateVictoryPoints(player: IPlayer) {
@@ -24,12 +23,6 @@ export function calculateVictoryPoints(player: IPlayer) {
     if (playedCard.victoryPoints !== undefined) {
       const vp = playedCard.getVictoryPoints(player);
       builder.setVictoryPoints('victoryPoints', ignoreOwnNegativeVP && vp < 0 ? 0 : vp, playedCard.name);
-    }
-    // MutationMarkets: a mutation's ongoing VP bonus applies even to a card with no
-    // printed victoryPoints formula of its own.
-    const mutationVp = MutationEffects.victoryPointsBonus(playedCard, player);
-    if (mutationVp !== 0) {
-      builder.setVictoryPoints('victoryPoints', mutationVp, playedCard.name + ' (mutation)');
     }
     playerOwnsVermin ||= playedCard.name === CardName.VERMIN;
   }

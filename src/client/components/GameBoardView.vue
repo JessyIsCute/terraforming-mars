@@ -1,10 +1,5 @@
 <!-- Common widgets between player and spectator views -->
 <template>
-  <template v-if="game.blackMarket">
-    <a class="hotkey-target"></a>
-    <BlackMarket :market="game.blackMarket"/>
-  </template>
-
   <a name="board" class="player_home_anchor hotkey-target"></a>
   <Board
     :spaces="game.spaces"
@@ -40,11 +35,6 @@
 
   <DeltaProjectBoard v-if="game.gameOptions.expansions.deltaProject" :players="players"/>
 
-  <template v-if="game.mutationMarket">
-    <a class="hotkey-target"></a>
-    <MutationMarket :market="game.mutationMarket"/>
-  </template>
-
   <div v-if="players.length > 1" class="player_home_block--milestones-and-awards">
     <a class="hotkey-target"></a>
     <Milestones :milestones="game.milestones" :conglomeratesExpansion="game.gameOptions.expansions.conglomerates" />
@@ -70,8 +60,6 @@ import Awards from '@/client/components/Awards.vue';
 import Turmoil from '@/client/components/turmoil/Turmoil.vue';
 import MoonBoard from '@/client/components/moon/MoonBoard.vue';
 import PlanetaryTracks from '@/client/components/pathfinders/PlanetaryTracks.vue';
-import MutationMarket from '@/client/components/mutationmarkets/MutationMarket.vue';
-import BlackMarket from '@/client/components/blackmarket/BlackMarket.vue';
 import ConglomeratesTeams from '@/client/components/conglomerates/ConglomeratesTeams.vue';
 import {TileView} from './board/TileView';
 import {scrollToSpace} from '@/client/utils/boardScroll';
@@ -101,8 +89,6 @@ export default defineComponent({
     Turmoil,
     MoonBoard,
     PlanetaryTracks,
-    MutationMarket,
-    BlackMarket,
     ConglomeratesTeams,
   },
   methods: {

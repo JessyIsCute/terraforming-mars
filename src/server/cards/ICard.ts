@@ -19,8 +19,6 @@ import {OneOrArray} from '../../common/utils/types';
 import {JSONValue} from '../../common/Types';
 import {IStandardProjectCard} from './IStandardProjectCard';
 import {ICardRenderItem} from '../../common/cards/render/Types';
-import {AppliedMutation} from '../../common/mutationmarkets/AppliedMutation';
-import {AppliedInfection} from '../../common/mutationmarkets/AppliedInfection';
 import {Warning} from '../../common/cards/Warning';
 import {Resource} from '../../common/Resource';
 import {Units} from '../../common/Units';
@@ -230,14 +228,6 @@ export interface ICard {
   onDelegateSent?(cardOwner: IPlayer, delegateOwner: IPlayer): void;
 
   readonly cost?: number; /** Used with IProjectCard and PreludeCard. */
-  /** The printed cost, before any MutationMarkets cost effect is folded in. Same as `cost` for an unmutated card. */
-  readonly baseCost?: number;
-  /** MutationMarkets: mutations permanently applied to this card instance after being won at auction. */
-  mutations?: Array<AppliedMutation>;
-  /** MutationMarkets: infections permanently applied to this card instance by Blacklab Cartel's action. */
-  infections?: Array<AppliedInfection>;
-  /** The printed type, before any MutationMarkets `convertType` effect is folded in. Same as `type` for an unmutated card. */
-  readonly baseType?: CardType;
   readonly type: CardType;
   readonly requirements: ReadonlyArray<CardRequirementDescriptor>;
   readonly metadata: CardMetadata;
