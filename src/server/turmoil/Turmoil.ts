@@ -13,6 +13,7 @@ import {Bureaucrats} from './parties/Bureaucrats';
 import {Centrists} from './parties/Centrists';
 import {Transhumanists} from './parties/Transhumanists';
 import {GreensMoreParties} from './parties/GreensMoreParties';
+import {KelvinistsMoreParties} from './parties/KelvinistsMoreParties';
 import {IGame} from '../IGame';
 import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
@@ -65,7 +66,7 @@ export const MORE_PARTIES_ALL = {
   [PartyName.UNITY]: Unity,
   [PartyName.GREENS]: GreensMoreParties,
   [PartyName.REDS]: Reds,
-  [PartyName.KELVINISTS]: Kelvinists,
+  [PartyName.KELVINISTS]: KelvinistsMoreParties,
   [PartyName.POPULISTS]: Populists,
   [PartyName.SPOME]: Spome,
   [PartyName.EMPOWER]: Empower,

@@ -33,9 +33,11 @@ export class TurmoilHandler {
       return undefined;
     }
     const policy: IPolicy = turmoil.rulingPolicy();
-    // kp03 is rendered in the Convert Heat slot by Player.getActions(); skip
-    // here to avoid double-rendering.
-    if (policy.id === KELVINISTS_POLICY_3.id) {
+    // The vanilla Kelvinists kp03 is rendered in the Convert Heat slot by Player.getActions();
+    // skip here to avoid double-rendering. Compared by object identity, not just id string --
+    // a More Parties game's Kelvinists rework reuses the 'kp03' id for an unrelated policy that
+    // should render normally through this generic path.
+    if (policy === KELVINISTS_POLICY_3) {
       return undefined;
     }
     if (policy.canAct?.(player)) {
@@ -81,8 +83,10 @@ export class TurmoilHandler {
 
   public static onGlobalParameterIncrease(player: IPlayer, parameter: GlobalParameter, steps: number = 1): void {
     if (parameter === GlobalParameter.TEMPERATURE) {
-      // PoliticalAgendas Kelvinists P2 hook
-      if (PartyHooks.shouldApplyPolicy(player, PartyName.KELVINISTS, 'kp02')) {
+      // PoliticalAgendas Kelvinists P2 hook (vanilla) / More Parties Kelvinists P1 hook (rework,
+      // same effect but moved to a different policy slot)
+      const policyId = player.game.gameOptions.morePartiesExpansion ? 'kp01' : 'kp02';
+      if (PartyHooks.shouldApplyPolicy(player, PartyName.KELVINISTS, policyId)) {
         player.stock.add(Resource.MEGACREDITS, steps * 3);
       }
     }

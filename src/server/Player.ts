@@ -1762,8 +1762,10 @@ export class Player implements IPlayer {
       action.options.push(convertPlants.action(this));
     }
 
-    // Convert Heat. Kelvinists kp03 swaps in a 6-heat variant in this slot.
-    if (PartyHooks.shouldApplyPolicy(this, PartyName.KELVINISTS, 'kp03')) {
+    // Convert Heat. Vanilla Kelvinists kp03 swaps in a 6-heat variant in this slot -- a More
+    // Parties game reuses the 'kp03' id for an unrelated policy, so this only applies outside
+    // that expansion (see TurmoilHandler.partyAction for the reworked kp03's own action).
+    if (!this.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(this, PartyName.KELVINISTS, 'kp03')) {
       if (KELVINISTS_POLICY_3.canAct(this)) {
         action.options.push(KELVINISTS_POLICY_3.action(this));
       }
