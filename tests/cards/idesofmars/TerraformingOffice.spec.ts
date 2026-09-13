@@ -13,7 +13,7 @@ describe('TerraformingOffice', () => {
 
   beforeEach(() => {
     card = new TerraformingOffice();
-    [game, player] = testGame(2, {turmoilExtension: true, idesOfMarsExpansion: true});
+    [game, player] = testGame(2, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
   });
 
   it('cannot play without the Bureaucrats ruling or 2 delegates there', () => {

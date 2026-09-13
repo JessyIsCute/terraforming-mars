@@ -4,7 +4,10 @@
       <p v-i18n>The ruling party's bonus is granted to every player at the end of each generation (scaled by how well each player matches it); its policy applies for the whole generation it rules.</p>
 
       <div class="help-party-block" v-for="party in parties" :key="party.name">
-        <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
+        <div class="help-party-label">
+          <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
+          <div v-if="party.requiresMoreParties" class="help-party-note" v-i18n>Requires the "More Parties" fan expansion</div>
+        </div>
 
         <div class="help-party-section">
           <h4 v-i18n>Ruling Bonus</h4>
@@ -32,7 +35,17 @@ type PartyHelpEntry = {
   name: PartyName;
   bonusDescriptions: Array<string>;
   policyDescriptions: Array<string>;
+  requiresMoreParties: boolean;
 };
+
+const MORE_PARTIES: ReadonlyArray<PartyName> = [
+  PartyName.POPULISTS,
+  PartyName.SPOME,
+  PartyName.EMPOWER,
+  PartyName.BUREAUCRATS,
+  PartyName.CENTRISTS,
+  PartyName.TRANSHUMANISTS,
+];
 
 export default defineComponent({
   name: 'HelpTurmoilParties',
@@ -44,6 +57,7 @@ export default defineComponent({
           name,
           bonusDescriptions: ids.bonuses.map((id) => AGENDA_DESCRIPTIONS[id] ?? `Unknown agenda ${id}`),
           policyDescriptions: ids.policies.map((id) => AGENDA_DESCRIPTIONS[id] ?? `Unknown agenda ${id}`),
+          requiresMoreParties: MORE_PARTIES.includes(name),
         };
       });
     },

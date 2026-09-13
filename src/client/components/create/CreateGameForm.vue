@@ -229,6 +229,12 @@
                                 <div class="create-game-expansion-icon expansion-icon-robAntilles"></div>
                                 <span v-i18n>Rob Antilles</span>&nbsp;<span title="A fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.robAntilles" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
+
+                            <input type="checkbox" name="moreParties" id="moreParties-checkbox" v-model="expansions.moreParties">
+                            <label for="moreParties-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-moreParties"></div>
+                                <span v-i18n>More Parties</span>&nbsp;<span title="A fan expansion: adds 6 new Turmoil parties (Populists, Spome, Empower, Bureaucrats, Centrists, Transhumanists), required by cards from other fan expansions that reference them">(&#945;)</span>&nbsp;<a :href="wikiUrls.moreParties" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">

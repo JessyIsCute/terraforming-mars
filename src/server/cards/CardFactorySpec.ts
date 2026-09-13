@@ -49,6 +49,8 @@ export function isCompatibleWith(cf: CardFactorySpec<any>, gameOptions: GameOpti
       return gameOptions.underworldExpansion;
     case 'deltaProject':
       return gameOptions.deltaProjectExpansion;
+    case 'moreParties':
+      return gameOptions.morePartiesExpansion;
     }
     throw new Error(`Unhandled expansion type ${expansion}`);
   });

@@ -473,6 +473,7 @@ export class Server {
         corporateBetterments: options.corporateBettermentsExpansion,
         idesOfMars: options.idesOfMarsExpansion,
         robAntilles: options.robAntillesExpansion,
+        moreParties: options.morePartiesExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

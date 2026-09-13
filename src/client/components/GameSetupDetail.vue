@@ -26,6 +26,7 @@
               <a v-if="gameOptions.expansions.corporateBetterments" :href="rulebookUrls.corporateBetterments" class="tooltip" data-tooltip="Corporate Betterments rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-corporateBetterments"></div></a>
               <a v-if="gameOptions.expansions.idesOfMars" :href="rulebookUrls.idesOfMars" class="tooltip" data-tooltip="Ides of Mars rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-idesOfMars"></div></a>
               <a v-if="gameOptions.expansions.robAntilles" :href="rulebookUrls.robAntilles" class="tooltip" data-tooltip="Rob Antilles rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-robAntilles"></div></a>
+              <a v-if="gameOptions.expansions.moreParties" :href="rulebookUrls.moreParties" class="tooltip" data-tooltip="More Parties rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-moreParties"></div></a>
             </li>
 
             <li><div class="setup-item" v-i18n>Board:</div>

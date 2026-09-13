@@ -16,7 +16,7 @@ describe('MobileBiologicalDome', () => {
 
   beforeEach(() => {
     card = new MobileBiologicalDome();
-    [game, player] = testGame(1, {turmoilExtension: true, robAntillesExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
   });
 
   it('cannot play without Spome ruling or 2 delegates there', () => {

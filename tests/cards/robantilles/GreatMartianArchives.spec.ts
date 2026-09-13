@@ -14,7 +14,7 @@ describe('GreatMartianArchives', () => {
 
   beforeEach(() => {
     card = new GreatMartianArchives();
-    [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true});
+    [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
   });
 
   it('cannot play without the Transhumanists ruling or 2 delegates there', () => {

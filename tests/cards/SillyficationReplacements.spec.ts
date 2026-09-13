@@ -53,28 +53,30 @@ describe('sillyfication cross-module replacements', () => {
     expect(pool).to.contain(CardName.URANUS_SEA_CREATURES);
   });
 
-  it('Mobile Biological Dome (Rob Antilles) is removed only once Evergreen Forest clears its own Turmoil requirement', () => {
-    const withoutTurmoil: GameOptions = {
+  it('Mobile Biological Dome (Rob Antilles) is removed when sillyfication is also active', () => {
+    // Both Mobile Biological Dome and Evergreen Forest require Turmoil directly (the former
+    // via the Spome party it references, the latter via its own compatibility), so unlike the
+    // Amphibians/Dogs in Space cases above, Turmoil must be on for either card to appear at all.
+    const withoutSilly: GameOptions = {
       ...DEFAULT_GAME_OPTIONS,
       corporateEra: true,
       robAntillesExpansion: true,
-      sillyficationExpansion: true,
-      turmoilExtension: false,
-    };
-    // Evergreen Forest itself requires Turmoil, so without it neither replacement fires:
-    // the Rob Antilles card stays so a Turmoil-less game isn't left with neither version.
-    let pool = new GameCards(withoutTurmoil).getProjectCards().map(toName);
-    expect(pool).to.contain(CardName.MOBILE_BIOLOGICAL_DOME);
-    expect(pool).to.not.contain(CardName.EVERGREEN_FOREST);
-
-    const withTurmoil: GameOptions = {
-      ...DEFAULT_GAME_OPTIONS,
-      corporateEra: true,
-      robAntillesExpansion: true,
-      sillyficationExpansion: true,
+      morePartiesExpansion: true,
       turmoilExtension: true,
+      sillyficationExpansion: false,
     };
-    pool = new GameCards(withTurmoil).getProjectCards().map(toName);
+    let pool = new GameCards(withoutSilly).getProjectCards().map(toName);
+    expect(pool).to.contain(CardName.MOBILE_BIOLOGICAL_DOME);
+
+    const withSilly: GameOptions = {
+      ...DEFAULT_GAME_OPTIONS,
+      corporateEra: true,
+      robAntillesExpansion: true,
+      morePartiesExpansion: true,
+      turmoilExtension: true,
+      sillyficationExpansion: true,
+    };
+    pool = new GameCards(withSilly).getProjectCards().map(toName);
     expect(pool).to.not.contain(CardName.MOBILE_BIOLOGICAL_DOME);
     expect(pool).to.contain(CardName.EVERGREEN_FOREST);
   });
@@ -85,6 +87,7 @@ describe('sillyfication cross-module replacements', () => {
       corporateEra: true,
       idesOfMarsExpansion: true,
       robAntillesExpansion: true,
+      morePartiesExpansion: true,
       turmoilExtension: true,
       sillyficationExpansion: false,
     };

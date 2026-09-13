@@ -18,7 +18,7 @@ describe('FlyingGarden', () => {
 
   beforeEach(() => {
     card = new FlyingGarden();
-    [game, player] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
   });
 
   it('cannot play without Spome ruling or 2 delegates, or without an off-world city', () => {

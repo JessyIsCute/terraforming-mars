@@ -56,8 +56,10 @@ function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
     new MarsFirst(), new Scientists(), new Unity(), new Greens(), new Reds(), new Kelvinists(),
   ];
   // Populists, Spome, Empower, Bureaucrats, Centrists and Transhumanists are placeholder parties
-  // (no real bonus/policy defined yet) added only for the fan expansions whose cards reference them.
-  if (gameOptions.idesOfMarsExpansion || gameOptions.robAntillesExpansion) {
+  // (no real bonus/policy defined yet), gated behind their own "More Parties" expansion rather
+  // than idesOfMars/robAntilles directly -- those modules' cards that reference these parties
+  // separately require moreParties via `compatibility`, so the two stay in sync.
+  if (gameOptions.morePartiesExpansion) {
     parties.push(new Populists(), new Spome(), new Empower(), new Bureaucrats(), new Centrists(), new Transhumanists());
   }
   return parties;

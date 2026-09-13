@@ -54,6 +54,7 @@ export type GameOptions = {
   corporateBettermentsExpansion: boolean;
   idesOfMarsExpansion: boolean;
   robAntillesExpansion: boolean;
+  morePartiesExpansion: boolean;
   /** One team-index per player (same order as the player list), chosen at game creation. Undefined falls back to pairing by table order. */
   conglomeratesTeamAssignments: Array<number> | undefined;
 
@@ -139,6 +140,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     corporateBetterments: false,
     idesOfMars: false,
     robAntilles: false,
+    moreParties: false,
   },
   fastModeOption: false,
   includeFanMA: false,
@@ -179,6 +181,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   corporateBettermentsExpansion: false,
   idesOfMarsExpansion: false,
   robAntillesExpansion: false,
+  morePartiesExpansion: false,
   conglomeratesTeamAssignments: undefined,
   undoOption: false,
   venusNextExtension: false,

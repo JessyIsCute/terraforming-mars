@@ -14,7 +14,7 @@ describe('GreenhouseLights', () => {
 
   beforeEach(() => {
     card = new GreenhouseLights();
-    [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true});
+    [game, player] = testGame(2, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
   });
 
   it('cannot play without Empower ruling or 2 delegates there', () => {

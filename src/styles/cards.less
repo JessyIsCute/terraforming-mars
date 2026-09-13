@@ -454,6 +454,16 @@ input[type="radio"]:checked+.filterDiv::after {
   content: "📺";
 }
 
+// More Parties has no cards of its own, but cards from other fan expansions that require its
+// 6 Turmoil parties show this as a secondary compatibility badge (see CardExpansion.vue).
+.moreParties-icon:after {
+  .expansion-icon-base();
+  background: white;
+  font-size: 12px;
+  line-height: 16px;
+  content: "🗳️";
+}
+
 /*********** Style the tags ************/
 
 .tag-wild {
@@ -1241,6 +1251,18 @@ input[type="radio"]:checked+.filterDiv::after {
 
   &::before {
     content: "📺";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
+// More Parties: a ballot-box emoji, same CSS-only trick as above.
+.expansion-icon-moreParties {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🗳️";
     font-size: 18px;
     line-height: 1.35;
   }

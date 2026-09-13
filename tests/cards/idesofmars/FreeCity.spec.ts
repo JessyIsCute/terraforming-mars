@@ -17,7 +17,7 @@ describe('FreeCity', () => {
 
   beforeEach(() => {
     card = new FreeCity();
-    [game, player] = testGame(2, {turmoilExtension: true, idesOfMarsExpansion: true});
+    [game, player] = testGame(2, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
     turmoil = game.turmoil!;
   });
 
