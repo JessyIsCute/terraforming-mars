@@ -10,6 +10,7 @@ import {GREENS_POLICY_2, GREENS_POLICY_3} from './parties/Greens';
 import {GREENS_MORE_PARTIES_POLICY_2, GREENS_MORE_PARTIES_POLICY_3} from './parties/GreensMoreParties';
 import {KELVINISTS_POLICY_3, KELVINISTS_POLICY_4} from './parties/Kelvinists';
 import {MARS_FIRST_POLICY_2} from './parties/MarsFirst';
+import {MARS_FIRST_MORE_PARTIES_POLICY_3} from './parties/MarsFirstMoreParties';
 import {PartyHooks} from './parties/PartyHooks';
 import {PartyName} from '../../common/turmoil/PartyName';
 import {REDS_POLICY_2} from './parties/Reds';
@@ -53,9 +54,15 @@ export class TurmoilHandler {
       policy.onCardPlayed(player, selectedCard);
     }
 
-    // PoliticalAgendas MarsFirst P2 hook
-    if (PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp02')) {
+    // PoliticalAgendas MarsFirst P2 hook (vanilla only -- More Parties reuses 'mp02' for an
+    // unrelated action, see MarsFirstMoreParties)
+    if (!player.game.gameOptions.morePartiesExpansion && PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp02')) {
       MARS_FIRST_POLICY_2.onCardPlayed(player, selectedCard);
+    }
+
+    // More Parties MarsFirst P3 hook
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.MARS, 'mp03')) {
+      MARS_FIRST_MORE_PARTIES_POLICY_3.onCardPlayed(player, selectedCard);
     }
   }
 
