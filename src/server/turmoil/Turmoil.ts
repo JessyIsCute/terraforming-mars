@@ -16,6 +16,7 @@ import {GreensMoreParties} from './parties/GreensMoreParties';
 import {KelvinistsMoreParties} from './parties/KelvinistsMoreParties';
 import {MarsFirstMoreParties} from './parties/MarsFirstMoreParties';
 import {ScientistsMoreParties} from './parties/ScientistsMoreParties';
+import {UnityMoreParties} from './parties/UnityMoreParties';
 import {IGame} from '../IGame';
 import {GameOptions} from '../game/GameOptions';
 import {GlobalEventDealer, getGlobalEventByName} from './globalEvents/GlobalEventDealer';
@@ -65,7 +66,7 @@ export const ALL_PARTIES = {
 export const MORE_PARTIES_ALL = {
   [PartyName.MARS]: MarsFirstMoreParties,
   [PartyName.SCIENTISTS]: ScientistsMoreParties,
-  [PartyName.UNITY]: Unity,
+  [PartyName.UNITY]: UnityMoreParties,
   [PartyName.GREENS]: GreensMoreParties,
   [PartyName.REDS]: Reds,
   [PartyName.KELVINISTS]: KelvinistsMoreParties,

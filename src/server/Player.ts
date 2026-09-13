@@ -802,7 +802,9 @@ export class Player implements IPlayer {
     cost -= card.getOwnCostReduction?.(this) ?? 0;
 
     // TODO(kberg): put this in a callback.
-    if (card.tags.includes(Tag.SPACE) && PartyHooks.shouldApplyPolicy(this, PartyName.UNITY, 'up04')) {
+    // Vanilla only -- More Parties reuses 'up04' for an unrelated action.
+    if (!this.game.gameOptions.morePartiesExpansion &&
+        card.tags.includes(Tag.SPACE) && PartyHooks.shouldApplyPolicy(this, PartyName.UNITY, 'up04')) {
       cost -= 2;
     }
 
