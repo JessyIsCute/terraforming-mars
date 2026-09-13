@@ -1,5 +1,4 @@
 import {IProjectCard} from '../IProjectCard';
-import {Tag} from '../../../common/cards/Tag';
 import {Card} from '../Card';
 import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
@@ -14,7 +13,7 @@ export class CorruptedDelegate extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.CORRUPTED_DELEGATE,
-      tags: [Tag.EVENT],
+      tags: [],
       cost: 0,
 
       requirements: {party: PartyName.BUREAUCRATS},

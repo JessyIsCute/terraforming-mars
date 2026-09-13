@@ -14,7 +14,7 @@ export class Clonation extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.CLONATION,
-      tags: [Tag.SCIENCE, Tag.ANIMAL, Tag.EVENT],
+      tags: [Tag.SCIENCE, Tag.ANIMAL],
       cost: 10,
 
       requirements: {party: PartyName.SCIENTISTS},

@@ -24,7 +24,7 @@ export class BattleOverMars extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.BATTLE_OVER_MARS,
-      tags: [Tag.EARTH, Tag.SPACE, Tag.EVENT],
+      tags: [Tag.EARTH, Tag.SPACE],
       cost: 3,
 
       metadata: {

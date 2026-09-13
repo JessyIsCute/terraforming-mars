@@ -11,7 +11,7 @@ export class SupernovaExplosion extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.SUPERNOVA_EXPLOSION,
-      tags: [Tag.SPACE, Tag.EVENT],
+      tags: [Tag.SPACE],
       cost: 22,
 
       behavior: {

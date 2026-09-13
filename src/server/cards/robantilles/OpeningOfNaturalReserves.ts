@@ -13,7 +13,7 @@ export class OpeningOfNaturalReserves extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.OPENING_OF_NATURAL_RESERVES,
-      tags: [Tag.ANIMAL, Tag.EVENT],
+      tags: [Tag.ANIMAL],
       cost: 12,
 
       victoryPoints: 'special',
