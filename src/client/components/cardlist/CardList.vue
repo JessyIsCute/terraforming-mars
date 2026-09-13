@@ -183,6 +183,15 @@
         </div>
       </section>
 
+      <section v-show="visibleNewPartyAgendaIds.length > 0">
+        <h2 v-i18n>More Parties Agendas</h2>
+        <div class="player_home_colony_cont">
+          <div class="player_home_colony" v-for="id in visibleNewPartyAgendaIds" :key="id" v-memo="[id, expansions.moreParties]">
+            <TurmoilAgendaContainer :agendaId="id" :morePartiesExpansion="expansions.moreParties" />
+          </div>
+        </div>
+      </section>
+
       <div class="free-floating-preferences-icon">
         <div v-show="scrolled" class="sidebar_item card-list-scroll-top" title="Scroll to top" @click="scrollToTop()">
           <div class="card-list-scroll-top-arrow">↑</div>
@@ -366,7 +375,13 @@ export default defineComponent({
       if (!this.types.agendas) {
         return [];
       }
-      return this.allAgendaIds.filter((id) => this.showAgenda(id));
+      return this.allAgendaIds.filter((id) => this.showAgenda(id) && !this.isNewPartyAgenda(id));
+    },
+    visibleNewPartyAgendaIds(): Array<PolicyId | BonusId> {
+      if (!this.types.agendas) {
+        return [];
+      }
+      return this.allAgendaIds.filter((id) => this.showAgenda(id) && this.isNewPartyAgenda(id));
     },
     agendaIdDescription(): typeof agendaIdDescription {
       return agendaIdDescription;
@@ -536,18 +551,15 @@ export default defineComponent({
       }
       return this.expansions[getMilestone(name).requirements ?? 'base'] === true;
     },
+    isNewPartyAgenda(id: PolicyId | BonusId): boolean {
+      return NEW_PARTIES.has(agendaInfoById(id).name as PartyName);
+    },
     showAgenda(id: PolicyId | BonusId): boolean {
       if (!this.include(id, 'agenda')) {
         return false;
       }
-      if (this.expansions.turmoil !== true) {
-        return false;
-      }
-      const partyName = agendaInfoById(id).name as PartyName;
-      if (NEW_PARTIES.has(partyName) && this.expansions.moreParties !== true) {
-        return false;
-      }
-      return true;
+      const requiredExpansion = this.isNewPartyAgenda(id) ? 'moreParties' : 'turmoil';
+      return this.expansions[requiredExpansion] === true;
     },
     showAward(name: AwardName): boolean {
       if (!this.include(name, 'ma')) {
