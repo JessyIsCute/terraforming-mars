@@ -1,6 +1,117 @@
 <template>
-  <div>
-    <template v-if="id === 'mb01'">
+  <div class="tooltip tooltip-bottom" :data-tooltip="resolvedDescription">
+    <template v-if="morePartiesExpansion && id === 'mb01'">
+      <div class="resource money party-resource">1</div> /
+      <div class="resource-tag tag-building party-resource-tag"></div>
+      <div class="resource-tag tag-mars party-resource-tag"></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'mp02'">
+      <span class="money resource">22</span>
+      <span class="red-arrow-3x"></span>
+      <div class="tile city-tile tile-size--S"></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'mp03'">
+      <div class="policy-top-margin">
+      <div class="resource-tag tag-building party-resource-tag"></div>
+      <div class="resource-tag tag-mars party-resource-tag"></div> : <div class="resource money">2</div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'mp04'">
+      <span class="money resource">4</span>
+      <span class="red-arrow-3x"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-building"></div></div>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-mars"></div></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'sp01'">
+      <div class="policy-top-margin">
+      +2 <div class="resource-tag tag-science party-resource-tag"></div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'sp03'">
+      <span>
+        <div class="tile oxygen-tile req-tile-small" style="margin: 10px -5px;"></div>
+        <div class="tile ocean-tile req-tile-small"></div>
+        <div class="tile temperature-tile req-tile-small"></div>
+        : <div class="resource card card-with-border"></div> /
+        <div class="resource card card-with-border red-outline"></div>
+      </span>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'sp04'">
+      <span class="money resource">4</span>
+      <span class="red-arrow-3x"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-science"></div></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'ub02'">
+      <div class="resource money party-resource">1</div> /
+      <div class="resource-tag tag-space party-resource-tag"></div>
+      <div class="production-box party-production-box"><div class="titanium production"></div></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'up02'">
+      <div class="policy-top-margin">
+      <span class="money resource">10</span>
+      <span class="red-arrow-3x"></span>
+      <div class="tile fleet tile-size--S"></div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'up03'">
+      <div class="policy-top-margin">
+      +2 <div class="resource-tag tag-space party-resource-tag"></div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'up04'">
+      <span class="money resource">4</span>
+      <span class="red-arrow-3x"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-venus"></div></div>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-space"></div></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'kb02'">
+      <div class="resource money party-resource">2</div> /
+      <div class="tile temperature-tile req-tile-small"></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'kp01'">
+      <div class="tile temperature-tile req-tile-small" style="margin-right:5px;"></div> : <span class="money resource">3</span>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'kp02'">
+      <div class="policy-top-margin">
+      <div class="production-box party-production-box">
+        <div class="production-prefix minus"></div><div class="heat production"></div><div class="heat production"></div>
+      </div>
+      <span class="red-arrow-3x"></span>
+      <div class="rating tile party-rating party-tile"></div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'kp03'">
+      <span class="money resource">9</span>
+      <span class="red-arrow-3x"></span>
+      <div class="production-box party-production-box">
+        <div class="heat production"></div><div class="heat production"></div>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'rb02'">
+      <div class="party-inferior-rating tile party-rating party-tile">&lt;</div>
+      <div class="tile empty-tile tile-size--S"></div> :
+      <div class="rating tile party-rating party-tile"></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'rp02'">
+      <div class="policy-top-margin"><span v-i18n>Standard Project</span> : <div class="resource card card-with-border red-outline"></div></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'rp03'">
+      <div class="policy-top-margin"><div class="tile empty-tile tile-size--S"></div> : <span class="money resource">-3</span></div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'gp03'">
+      <div class="policy-top-margin">
+      <div class="resource-tag tag-plant party-resource-tag"></div>
+      <div class="resource-tag tag-microbe party-resource-tag"></div>
+      <div class="resource-tag tag-animal party-resource-tag"></div> : <span class="plant resource"></span>
+      </div>
+    </template>
+    <template v-else-if="morePartiesExpansion && id === 'gp04'">
+      <span class="money resource">4</span>
+      <span class="red-arrow-3x"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-plant"></div></div>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-animal"></div></div>
+    </template>
+    <template v-else-if="id === 'mb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-building party-resource-tag"></div>
     </template>
@@ -192,6 +303,7 @@
 <script lang="ts">
 
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
+import {AGENDA_DESCRIPTIONS, MORE_PARTIES_AGENDA_DESCRIPTIONS} from '@/common/turmoil/AgendaDescriptions';
 import {defineComponent} from 'vue';
 
 export default defineComponent({
@@ -202,6 +314,13 @@ export default defineComponent({
       required: true,
     },
     showPartyBadge: {
+      type: Boolean,
+      default: false,
+    },
+    // Several bonus/policy ids mean something different under the More Parties expansion's
+    // "Political Agendas" rework -- pass true whenever the enclosing game (or reference view)
+    // has that expansion active, so the right icon and hover text are shown.
+    morePartiesExpansion: {
       type: Boolean,
       default: false,
     },
@@ -224,8 +343,16 @@ export default defineComponent({
       const placeholderPrefixes = ['pop', 'spo', 'emp', 'bur', 'cen', 'tra'];
       return placeholderPrefixes.some((prefix) => this.id.startsWith(prefix));
     },
+    resolvedDescription(): string {
+      if (this.morePartiesExpansion) {
+        const override = MORE_PARTIES_AGENDA_DESCRIPTIONS[this.id];
+        if (override !== undefined) {
+          return override;
+        }
+      }
+      return AGENDA_DESCRIPTIONS[this.id] ?? `Unknown agenda ${this.id}`;
+    },
   },
 });
 
 </script>
-

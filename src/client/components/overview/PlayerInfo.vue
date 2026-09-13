@@ -36,7 +36,7 @@
           </div>
         </div>
         <PlayerTags :player="player" :playerView="playerView" :hideZeroTags="hideZeroTags" :isTopBar="isTopBar" />
-        <PlayerAlliedParty :player="player"/>
+        <PlayerAlliedParty :player="player" :morePartiesExpansion="playerView.game.gameOptions.expansions.moreParties"/>
       </div>
 </template>
 

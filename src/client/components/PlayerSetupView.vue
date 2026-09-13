@@ -86,7 +86,7 @@
           :tileView="tileView"
           @toggleTileView="$emit('toggleTileView')"/>
 
-        <Turmoil v-if="game.turmoil" :turmoil="game.turmoil"/>
+        <Turmoil v-if="game.turmoil" :turmoil="game.turmoil" :morePartiesExpansion="game.gameOptions.expansions.moreParties"/>
 
         <PlanetaryTracks v-if="game.gameOptions.expansions.pathfinders" :tracks="game.pathfinders" :gameOptions="game.gameOptions"/>
 

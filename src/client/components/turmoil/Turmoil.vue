@@ -17,7 +17,7 @@
             <div :class="'party-name party-name--'+partyNameToCss(turmoil.ruling)" v-i18n>{{ turmoil.ruling }}</div>
           </div>
           <div class="dominant-party-bonus">
-            <TurmoilAgenda v-if="turmoil.ruling" :id="getPolicy(turmoil.ruling)"/>
+            <TurmoilAgenda v-if="turmoil.ruling" :id="getPolicy(turmoil.ruling)" :morePartiesExpansion="morePartiesExpansion"/>
           </div>
           <div class="policy-user-cubes">
             <template v-for="n in turmoil.policyActionUsers" :key="n.color">
@@ -40,7 +40,7 @@
                 <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
 
                 <div class="party-bonus">
-                  <TurmoilAgenda :id="getPolicy(party.name)"/>
+                  <TurmoilAgenda :id="getPolicy(party.name)" :morePartiesExpansion="morePartiesExpansion"/>
                 </div>
               </div>
             </div>
@@ -64,7 +64,7 @@
             </div>
             <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
             <div class="party-bonus">
-              <TurmoilAgenda type="party-bonus" :id="getBonus(party.name)"/>
+              <TurmoilAgenda type="party-bonus" :id="getBonus(party.name)" :morePartiesExpansion="morePartiesExpansion"/>
             </div>
           </div>
         </div>
@@ -96,6 +96,10 @@ export default defineComponent({
     turmoil: {
       type: Object as () => TurmoilModel,
       required: true,
+    },
+    morePartiesExpansion: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {

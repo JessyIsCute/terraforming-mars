@@ -68,6 +68,44 @@ export const AGENDA_DESCRIPTIONS: Partial<Record<BonusId | PolicyId, string>> = 
   trap01: 'No effect yet (Transhumanists\' real policy is not yet defined for this fan expansion)',
 };
 
+/**
+ * The More Parties expansion's "Political Agendas" rework reuses several existing bonus/policy
+ * ids for entirely different content (each party still has exactly 2 bonus slots and 4 policy
+ * slots, per the BonusId/PolicyId shape -- the rework just changes what occupies some slots).
+ * Only ids whose content actually changed are listed here; everything else falls back to
+ * AGENDA_DESCRIPTIONS unchanged. Consumers should look here first whenever a game (or reference
+ * view) has the More Parties expansion active. Kept in sync by hand with the real Bonus/Policy
+ * `description` fields in `src/server/turmoil/parties/*MoreParties.ts`.
+ */
+export const MORE_PARTIES_AGENDA_DESCRIPTIONS: Partial<Record<BonusId | PolicyId, string>> = {
+  mb01: 'Gain 1 M€ for every building and Mars tag you have',
+  mp02: 'Action: pay 22 M€ (steel usable) to place a city tile on Mars',
+  mp03: 'When you play a card with a building tag or Mars tag, gain 2 M€',
+  mp04: 'Action: choose building tag or Mars tag, spend 4 M€ to buy the first card with that tag',
+
+  sp01: 'All players are considered having 2 more science tags',
+  sp03: 'When you raise a Mars global parameter, draw a card and discard a card, per step raised',
+  sp04: 'Action: choose science tag, spend 4 M€ to buy the first card with that tag',
+
+  ub02: 'Gain 1 M€ for every Space tag you have and every titanium production level',
+  up02: 'Action: pay 10 M€ to gain a trade fleet',
+  up03: 'You\'re considered having 2 more Space tags',
+  up04: 'Action: choose a planet tag (except Mars) or Space tag, spend 4 M€ to buy the first card with that tag',
+
+  kb02: 'Gain 2 M€ for every step on the temperature track',
+  kp01: 'When you raise temperature, gain 3 M€ per step raised',
+  kp02: 'Action: lower your heat production 2 steps, gain 1 TR',
+  kp03: 'Action: pay 9 M€ to raise your heat production 2 steps',
+
+  rb02: 'The player(s) with the least tiles on Mars gains 1 TR',
+  rp02: 'Discard 1 card every time you play a standard project',
+  rp03: 'Pay 3 M€ every time you place a tile on Mars',
+  rp04: 'When you raise a Mars global parameter, decrease your M€ production 1 step per step raised',
+
+  gp03: 'Every time you play a card with a plant, microbe or animal tag, gain 1 plant resource or place the corresponding resource on that card',
+  gp04: 'Action: choose plant tag or animal tag, spend 4 M€ to buy the first card with that tag',
+};
+
 export const PARTY_AGENDA_IDS: Record<PartyName, {bonuses: ReadonlyArray<BonusId>; policies: ReadonlyArray<PolicyId>}> = {
   [PartyName.MARS]: {bonuses: ['mb01', 'mb02'], policies: ['mp01', 'mp02', 'mp03', 'mp04']},
   [PartyName.SCIENTISTS]: {bonuses: ['sb01', 'sb02'], policies: ['sp01', 'sp02', 'sp03', 'sp04']},

@@ -178,8 +178,8 @@
       <section v-show="visibleAgendaIds.length > 0">
         <h2 v-i18n>Agendas</h2>
         <div class="player_home_colony_cont">
-          <div class="player_home_colony" v-for="id in visibleAgendaIds" :key="id" v-memo="[id]">
-            <TurmoilAgendaContainer :agendaId="id" />
+          <div class="player_home_colony" v-for="id in visibleAgendaIds" :key="id" v-memo="[id, expansions.moreParties]">
+            <TurmoilAgendaContainer :agendaId="id" :morePartiesExpansion="expansions.moreParties" />
           </div>
         </div>
       </section>
