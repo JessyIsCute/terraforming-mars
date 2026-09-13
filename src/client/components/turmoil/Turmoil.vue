@@ -88,7 +88,7 @@ import {PartyName} from '@/common/turmoil/PartyName';
 import {TurmoilModel} from '@/common/models/TurmoilModel';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
 import GlobalEvent from '@/client/components/turmoil/GlobalEvent.vue';
-import {BonusId, PolicyId} from '@/common/turmoil/Types';
+import {Agenda, BonusId, PolicyId} from '@/common/turmoil/Types';
 
 export default defineComponent({
   name: 'Turmoil',
@@ -110,71 +110,43 @@ export default defineComponent({
       }
       return party.toLowerCase().split(' ').join('_');
     },
-    getBonus(party: PartyName): BonusId {
+    // politicalAgendas only has an entry for parties actually in play this game (More Parties
+    // games randomly select 6 of the 12 available -- see Turmoil.createParties). getBonus and
+    // getPolicy are only ever called with a party.name from turmoil.parties, so the entry
+    // always exists in practice; agendaFor throws a clear error otherwise instead of silently
+    // reading `undefined`.
+    agendaFor(party: PartyName): Agenda {
       const politicalAgendas = this.turmoil.politicalAgendas;
       if (politicalAgendas === undefined) {
         throw new Error('Political agendas not defined');
       }
-      switch (party) {
-      case PartyName.MARS:
-        return politicalAgendas.marsFirst.bonusId;
-      case PartyName.SCIENTISTS:
-        return politicalAgendas.scientists.bonusId;
-      case PartyName.UNITY:
-        return politicalAgendas.unity.bonusId;
-      case PartyName.KELVINISTS:
-        return politicalAgendas.kelvinists.bonusId;
-      case PartyName.REDS:
-        return politicalAgendas.reds.bonusId;
-      case PartyName.GREENS:
-        return politicalAgendas.greens.bonusId;
-      case PartyName.POPULISTS:
-        return politicalAgendas.populists.bonusId;
-      case PartyName.SPOME:
-        return politicalAgendas.spome.bonusId;
-      case PartyName.EMPOWER:
-        return politicalAgendas.empower.bonusId;
-      case PartyName.BUREAUCRATS:
-        return politicalAgendas.bureaucrats.bonusId;
-      case PartyName.CENTRISTS:
-        return politicalAgendas.centrists.bonusId;
-      case PartyName.TRANSHUMANISTS:
-        return politicalAgendas.transhumanists.bonusId;
+      const agenda = (() => {
+        switch (party) {
+        case PartyName.MARS: return politicalAgendas.marsFirst;
+        case PartyName.SCIENTISTS: return politicalAgendas.scientists;
+        case PartyName.UNITY: return politicalAgendas.unity;
+        case PartyName.KELVINISTS: return politicalAgendas.kelvinists;
+        case PartyName.REDS: return politicalAgendas.reds;
+        case PartyName.GREENS: return politicalAgendas.greens;
+        case PartyName.POPULISTS: return politicalAgendas.populists;
+        case PartyName.SPOME: return politicalAgendas.spome;
+        case PartyName.EMPOWER: return politicalAgendas.empower;
+        case PartyName.BUREAUCRATS: return politicalAgendas.bureaucrats;
+        case PartyName.CENTRISTS: return politicalAgendas.centrists;
+        case PartyName.TRANSHUMANISTS: return politicalAgendas.transhumanists;
+        default: throw new Error(`Unknown party name ${party}`);
+        }
+      })();
+      if (agenda === undefined) {
+        throw new Error(`No agenda in play for party ${party}`);
       }
+      return agenda;
+    },
+    getBonus(party: PartyName): BonusId {
+      return this.agendaFor(party).bonusId;
     },
     getPolicy(partyName: PartyName): PolicyId {
-      const politicalAgendas = this.turmoil.politicalAgendas;
-      if (politicalAgendas === undefined) {
-        throw new Error('Political agendas not defined');
-      }
-      switch (partyName) {
-      case PartyName.MARS:
-        return politicalAgendas.marsFirst.policyId;
-      case PartyName.SCIENTISTS:
-        return politicalAgendas.scientists.policyId;
-      case PartyName.UNITY:
-        return politicalAgendas.unity.policyId;
-      case PartyName.KELVINISTS:
-        return politicalAgendas.kelvinists.policyId;
-      case PartyName.REDS:
-        return politicalAgendas.reds.policyId;
-      case PartyName.GREENS:
-        return politicalAgendas.greens.policyId;
-      case PartyName.POPULISTS:
-        return politicalAgendas.populists.policyId;
-      case PartyName.SPOME:
-        return politicalAgendas.spome.policyId;
-      case PartyName.EMPOWER:
-        return politicalAgendas.empower.policyId;
-      case PartyName.BUREAUCRATS:
-        return politicalAgendas.bureaucrats.policyId;
-      case PartyName.CENTRISTS:
-        return politicalAgendas.centrists.policyId;
-      case PartyName.TRANSHUMANISTS:
-        return politicalAgendas.transhumanists.policyId;
-      default:
-        throw new Error(`Unknown party name ${partyName}`);
-      }
+      return this.agendaFor(partyName).policyId;
     },
     toggleMe() {
       const currentState: boolean = this.isVisible();

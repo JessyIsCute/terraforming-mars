@@ -28,6 +28,13 @@ export class PartyRequirement extends CardRequirement {
       return true;
     }
 
+    // More Parties games randomly select 6 of the 12 available parties (see
+    // Turmoil.createParties) -- this.party may not be one of them, in which case the
+    // requirement simply can't be satisfied (it can never be ruling or hold delegates).
+    if (!turmoil.parties.some((p) => p.name === this.party)) {
+      return false;
+    }
+
     const party = turmoil.getPartyByName(this.party);
     if (player.game.gameOptions.conglomeratesExpansion) {
       const teammates = player.teammates();
