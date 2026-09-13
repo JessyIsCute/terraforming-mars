@@ -9,19 +9,12 @@ import {ICard} from '../ICard';
 import {AddResourcesToCard} from '../../deferredActions/AddResourcesToCard';
 import {CardRenderer} from '../render/CardRenderer';
 
-/**
- * The printed text ("when you play a Space tag, including this...") implies this card should
- * carry a Space tag itself, but the extracted tags are only Animal and Power (flagged as an
- * inconsistency in the source card, not a transcription guess). Tags are kept exactly as
- * extracted, so this card cannot currently self-trigger; it still triggers off any other
- * Space-tagged card played.
- */
 export class DogsInSpace extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.ACTIVE,
       name: CardName.DOGS_IN_SPACE,
-      tags: [Tag.ANIMAL, Tag.POWER],
+      tags: [Tag.ANIMAL, Tag.SPACE],
       cost: 16,
 
       resourceType: CardResource.ANIMAL,

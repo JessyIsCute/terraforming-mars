@@ -30,6 +30,12 @@ describe('DogsInSpace', () => {
     expect(card.resourceCount).to.eq(0);
   });
 
+  it('adds an animal to itself, since it carries the Space tag it triggers on', () => {
+    player.onCardPlayed(card);
+    runAllActions(game);
+    expect(card.resourceCount).to.eq(1);
+  });
+
   it('awards 1 VP for every 2 animals on this card', () => {
     player.addResourceTo(card, 5);
     expect(card.getVictoryPoints(player)).to.eq(2);
