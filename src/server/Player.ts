@@ -191,6 +191,11 @@ export class Player implements IPlayer {
   // Administrative Delay (idesOfMars, fan): when set to the current generation, this player
   // may end their turn having taken 0 actions this round without it counting as passing.
   public administrativeDelayActiveGeneration: number | undefined = undefined;
+  // Management Crisis (Solaris, fan): when set to the current generation, this player is
+  // capped at 1 action per turn (instead of the normal 2) for the rest of the generation.
+  // Same "compare to current generation" pattern as administrativeDelayActiveGeneration above,
+  // so it self-clears once the generation moves on, with no explicit reset needed.
+  public oneActionPerTurnActiveGeneration: number | undefined = undefined;
   public underworldData: UnderworldPlayerData = UnderworldExpansion.initializePlayer();
   public conglomeratesData: ConglomeratesPlayerData = ConglomeratesExpansion.initializePlayer();
   public deltaProjectData?: DeltaProjectPlayerModel;
@@ -674,7 +679,15 @@ export class Player implements IPlayer {
     } else if (energyKeepCap > 0) {
       deferEnergyKeep(this, energyKeepCap);
     } else {
-      this.heat += this.energy;
+      const energyToConvert = this.energy;
+      this.heat += energyToConvert;
+      // Condensation Plant (Solaris, fan): 1 extra Heat per Energy converted here, i.e.
+      // the standard end-of-generation Energy->Heat conversion becomes 2-for-1 instead of
+      // 1-for-1. Only hooked into this default conversion path (not the Supercapacitors or
+      // energy-keep-cap branches above, which are rare fan-card edge cases of their own).
+      if (this.playedCards.has(CardName.CONDENSATION_PLANT)) {
+        this.heat += energyToConvert;
+      }
       this.energy = 0;
       this.finishProductionPhase();
     }
@@ -1724,7 +1737,9 @@ export class Player implements IPlayer {
 
       if (game.hasPassedThisActionPhase(this) || (this.allOtherPlayersHavePassed() === false && this.actionsTakenThisRound >= this.availableActionsThisRound)) {
         this.actionsTakenThisRound = 0;
-        this.availableActionsThisRound = 2;
+        // Management Crisis (Solaris, fan): once active for this generation, every future
+        // turn this generation starts capped at 1 action instead of the usual 2.
+        this.availableActionsThisRound = this.oneActionPerTurnActiveGeneration === game.generation ? 1 : 2;
         game.resettable = true;
         game.playerIsFinishedTakingActions();
         return;
@@ -2042,6 +2057,7 @@ export class Player implements IPlayer {
       preservationProgram: this.preservationProgram,
       trThisGeneration: this.trThisGeneration,
       administrativeDelayActiveGeneration: this.administrativeDelayActiveGeneration,
+      oneActionPerTurnActiveGeneration: this.oneActionPerTurnActiveGeneration,
       // This generation / this round
       actionsTakenThisRound: this.actionsTakenThisRound,
       availableActionsThisRound: this.availableActionsThisRound,
@@ -2202,6 +2218,7 @@ export class Player implements IPlayer {
     // TODO(kberg): remove ?? 0 by 2026-11-01
     player.trThisGeneration = d.trThisGeneration ?? 0;
     player.administrativeDelayActiveGeneration = d.administrativeDelayActiveGeneration;
+    player.oneActionPerTurnActiveGeneration = d.oneActionPerTurnActiveGeneration;
 
     player.timer = Timer.deserialize(d.timer);
     player.underworldData = d.underworldData;

@@ -88,6 +88,7 @@ export interface SerializedPlayer extends DeprecatedFields{
   tradesThisGeneration: number;
   trThisGeneration: number;
   administrativeDelayActiveGeneration?: number;
+  oneActionPerTurnActiveGeneration?: number;
   turmoilPolicyActionUsed: boolean;
   underworldData: UnderworldPlayerData;
   conglomeratesData?: ConglomeratesPlayerData;

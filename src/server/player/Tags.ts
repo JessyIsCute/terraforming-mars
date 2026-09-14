@@ -156,6 +156,26 @@ export class Tags {
   }
 
   /**
+   * Cyborgs / Strong Artificial Intelligence (Solaris, fan): both cards print the same passive
+   * effect -- "your Wild tags count as any tag of your choice" for the purpose of triggering
+   * other cards' tag-based effects (e.g. "when you play a card with a Space tag, gain 1 M€").
+   *
+   * Implementation note: engine-wide "choose which tag a Wild tag counts as, per use" isn't
+   * something the tag system supports today, and building that out is out of scope here. The
+   * faithful-but-scoped reading implemented below: while either card is in the player's tableau,
+   * their Wild tags automatically satisfy cardHasTag/cardTagCount for ANY single target tag --
+   * i.e. the "choice" is trivially made in the player's favor for whichever trigger is being
+   * checked, which is equivalent in effect to "choose the tag that matches" since only one tag
+   * is ever being tested at a time. This deliberately does NOT touch count()/multipleCount()/
+   * distinctCount() (used for card requirements, milestones, and awards) -- only the two
+   * methods that back "did the played card have tag X" trigger checks, so this doesn't
+   * silently inflate the player's general tag count elsewhere.
+   */
+  private wildTagsMatchAnyTagForTriggers(): boolean {
+    return this.player.tableau.has(CardName.CYBORGS) || this.player.tableau.has(CardName.STRONG_ARTIFICIAL_INTELLIGENCE);
+  }
+
+  /**
    * Returns true if `card` has `tag`. This includes Habitat Marte and Nereid Biosystems,
    * but not wild tags and not Earth Embassy.
    */
@@ -177,6 +197,11 @@ export class Tags {
       if (tag === Tag.JOVIAN &&
         target === Tag.SCIENCE &&
         this.player.tableau.has(CardName.GALILEO_INSTITUTE)) {
+        return true;
+      }
+      if (tag === Tag.WILD &&
+        target !== Tag.WILD &&
+        this.wildTagsMatchAnyTagForTriggers()) {
         return true;
       }
     }
@@ -206,6 +231,10 @@ export class Tags {
         count++;
       } else if (tag === Tag.JOVIAN && targets.includes(Tag.SCIENCE) &&
         this.player.tableau.has(CardName.GALILEO_INSTITUTE)) {
+        count++;
+      } else if (tag === Tag.WILD && !targets.includes(Tag.WILD) &&
+        this.wildTagsMatchAnyTagForTriggers()) {
+        // Cyborgs / Strong Artificial Intelligence -- see wildTagsMatchAnyTagForTriggers().
         count++;
       }
     }

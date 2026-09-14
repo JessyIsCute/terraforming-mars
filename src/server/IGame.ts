@@ -67,6 +67,18 @@ export interface IGame extends Logger {
    * `startGeneration`.
    */
   cardsPlayedThisGeneration: Set<CardName>;
+  /**
+   * Solaris (fan): Anti Fraud Investigation. When true, no player may remove resources from
+   * any card for the rest of the generation. Set true by Anti Fraud Investigation's play
+   * effect, reset to false at the start of each generation (mirroring
+   * `cardsPlayedThisGeneration` above). Enforced at `RemoveResourcesFromCard.getAvailableTargetCards`,
+   * the shared choke point used both by the declarative `removeResourcesFromAnyCard` behavior
+   * and by most bespoke "remove a resource from any card" card effects (e.g. Predators).
+   * It does not intercept every direct `player.removeResourceFrom(...)` call in the codebase
+   * (a handful of cards, like Space Privateers' self-penalty when an attack is blocked, call
+   * that directly rather than going through the shared deferred action) -- see card comment.
+   */
+  resourceRemovalBlockedThisGeneration: boolean;
   readonly players: ReadonlyArray<IPlayer>;
   readonly playersInGenerationOrder: ReadonlyArray<IPlayer>;
 

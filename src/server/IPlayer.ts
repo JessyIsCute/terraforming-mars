@@ -178,6 +178,7 @@ export interface IPlayer {
    * For Administrative Delay (idesOfMars, fan).
    */
   administrativeDelayActiveGeneration: number | undefined;
+  oneActionPerTurnActiveGeneration: number | undefined;
   /**
    * The list of standard projects (EXCEPT SELL PATENTS) this player has taken this generation.
    *

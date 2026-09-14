@@ -126,6 +126,11 @@ export class RemoveResourcesFromCard extends DeferredAction<Response> {
   }
 
   public static getAvailableTargetCards(player: IPlayer, resourceType: CardResource | undefined, source: Source = 'all', min: number = 1): Array<ICard> {
+    // Solaris (fan): Anti Fraud Investigation blocks all resource removal from cards for the
+    // rest of the generation it's played. See IGame.resourceRemovalBlockedThisGeneration.
+    if (player.game.resourceRemovalBlockedThisGeneration) {
+      return [];
+    }
     const resourceCards: Array<ICard> = [];
     for (const p of player.game.players) {
       if (p === player) {
