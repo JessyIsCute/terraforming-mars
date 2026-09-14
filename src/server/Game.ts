@@ -1728,6 +1728,9 @@ export class Game implements IGame, Logger {
         {title: 'Select how to pay for building a colony'}))
         .andThen(() => this.defer(new BuildColony(player)));
       break;
+    case SpaceBonus.FLOATER:
+      this.defer(new AddResourcesToCard(player, CardResource.FLOATER, {count: count}));
+      break;
     default:
       throw new Error('Unhandled space bonus ' + spaceBonus + '. Report this exact error, please.');
     }

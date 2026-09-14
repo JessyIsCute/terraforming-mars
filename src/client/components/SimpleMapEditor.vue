@@ -214,7 +214,7 @@ function moonSpaceId(index: number): SpaceId {
 
 type BonusTool = {key: string, bonus: SpaceBonus, css: string, label: string, description: string};
 
-// Both boards share the same "gain resource on tile placement" flavor of bonus -- Moon's mine
+// Both boards share this same "gain resource on tile placement" flavor of bonus -- Moon's mine
 // tiles and Venus's Cloud City/Floater Array/Gas Mine tiles all trigger grantSpaceBonuses()
 // generically (Game.ts), so nothing here is actually Moon-specific despite the name.
 const SHARED_BONUS_TOOLS: Array<BonusTool> = [
@@ -223,9 +223,21 @@ const SHARED_BONUS_TOOLS: Array<BonusTool> = [
   {key: 'bonus:' + SpaceBonus.DRAW_CARD, bonus: SpaceBonus.DRAW_CARD, css: 'card', label: 'Card', description: 'Draw 1 card when you place a tile on this space.'},
 ];
 
+// Venus gets a few more, on top of the shared set -- energy/heat/M€ are plain stock gains
+// (Game.ts's grantSpaceBonus handles them for any board already), and floater goes to a
+// floater-collecting card the player picks among (AddResourcesToCard), same mechanism as card/
+// steel/titanium above just targeting a card resource instead of player stock.
+const VENUS_BONUS_TOOLS: Array<BonusTool> = [
+  ...SHARED_BONUS_TOOLS,
+  {key: 'bonus:' + SpaceBonus.ENERGY, bonus: SpaceBonus.ENERGY, css: 'energy', label: 'Energy', description: 'Gain 1 energy when you place a tile on this space.'},
+  {key: 'bonus:' + SpaceBonus.HEAT, bonus: SpaceBonus.HEAT, css: 'heat', label: 'Heat', description: 'Gain 1 heat when you place a tile on this space.'},
+  {key: 'bonus:' + SpaceBonus.MEGACREDITS, bonus: SpaceBonus.MEGACREDITS, css: 'megacredit', label: 'M€', description: 'Gain 1 M€ when you place a tile on this space.'},
+  {key: 'bonus:' + SpaceBonus.FLOATER, bonus: SpaceBonus.FLOATER, css: 'floater', label: 'Floater', description: 'Add 1 floater to a card that collects them when you place a tile on this space.'},
+];
+
 const BONUS_TOOLS_BY_BOARD: Record<SimpleBoardType, Array<BonusTool>> = {
   moon: SHARED_BONUS_TOOLS,
-  venusPhase2: SHARED_BONUS_TOOLS,
+  venusPhase2: VENUS_BONUS_TOOLS,
 };
 
 type ReservedTool = {key: string, spot: VenusReservedSpot, css: string, label: string, description: string};
@@ -272,11 +284,11 @@ export default defineComponent({
       loadError: '',
       MAX_SIMPLE_BOARD_NAME_LENGTH,
       // Venus-only backdrop calibration tool -- see backdropStyleVars/backdropCss below. Starts
-      // at plain percentages (not the real board's own 'center'/'cover' defaults) since a slider
-      // needs actual numbers to move; visually close enough to start tuning from.
-      backdropX: 50,
-      backdropY: 50,
-      backdropScale: 100,
+      // at the real board's own shipped default (venusphase2.less's var() fallback), so opening
+      // the tool shows the actual current alignment rather than an arbitrary starting point.
+      backdropX: 0,
+      backdropY: 0,
+      backdropScale: 92,
       draggingBackdrop: false,
     };
   },
@@ -534,9 +546,9 @@ export default defineComponent({
       this.backdropScale = Math.min(300, Math.max(50, this.backdropScale + delta));
     },
     resetBackdrop(): void {
-      this.backdropX = 50;
-      this.backdropY = 50;
-      this.backdropScale = 100;
+      this.backdropX = 0;
+      this.backdropY = 0;
+      this.backdropScale = 92;
     },
     copyBackdropCss(): void {
       navigator.clipboard?.writeText(this.backdropCss);

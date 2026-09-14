@@ -39,12 +39,37 @@ describe('SimpleMapEditor', () => {
     expect(decoded.spaces).to.have.length(35);
   });
 
-  it('offers the same bonus palette on both Venus and Moon', () => {
+  it('offers a bonus palette on both Venus and Moon, with Venus getting extra tools', () => {
     const venus = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
     expect(venus.text()).to.include('Bonuses');
+    // Steel/titanium/card (shared with Moon) plus energy/heat/M€/floater.
+    expect((venus.vm as any).bonusTools).to.have.length(7);
 
     const moon = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
     expect(moon.text()).to.include('Bonuses');
+    expect((moon.vm as any).bonusTools).to.have.length(3);
+  });
+
+  it('offers energy/heat/M€/floater bonus tools on Venus but not Moon', () => {
+    const venus = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    const venusKeys = (venus.vm as any).bonusTools.map((t: any) => t.key);
+    expect(venusKeys).to.include('bonus:' + SpaceBonus.ENERGY);
+    expect(venusKeys).to.include('bonus:' + SpaceBonus.HEAT);
+    expect(venusKeys).to.include('bonus:' + SpaceBonus.MEGACREDITS);
+    expect(venusKeys).to.include('bonus:' + SpaceBonus.FLOATER);
+
+    const moon = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+    const moonKeys = (moon.vm as any).bonusTools.map((t: any) => t.key);
+    expect(moonKeys).to.not.include('bonus:' + SpaceBonus.FLOATER);
+  });
+
+  it('painting the floater bonus on Venus round-trips through the code', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'bonus:' + SpaceBonus.FLOATER;
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+
+    expect(decodeSimpleBoard((wrapper.vm as any).code).spaces[0].bonus).to.deep.eq([SpaceBonus.FLOATER]);
   });
 
   it('painting a bonus on Venus stacks bonuses, right-click removes the last one', async () => {
@@ -288,17 +313,19 @@ describe('SimpleMapEditor', () => {
       expect(wrapper.find('.simple-map-editor-backdrop-drag').exists()).is.false;
     });
 
-    it('starts centered at 100% scale and drives the CSS custom properties accordingly', () => {
+    it('starts at the real board\'s own shipped default and drives the CSS custom properties accordingly', () => {
       const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
       const vm = wrapper.vm as any;
-      expect(vm.backdropX).to.eq(50);
-      expect(vm.backdropY).to.eq(50);
-      expect(vm.backdropScale).to.eq(100);
+      // Matches venusphase2.less's own var() fallback (0% 0% / 92%) -- see that file's comment
+      // for how this exact value was calibrated with this same tool.
+      expect(vm.backdropX).to.eq(0);
+      expect(vm.backdropY).to.eq(0);
+      expect(vm.backdropScale).to.eq(92);
       expect(vm.backdropStyleVars).to.deep.eq({
-        '--venus-backdrop-position': '50% 50%',
-        '--venus-backdrop-size': '100%',
+        '--venus-backdrop-position': '0% 0%',
+        '--venus-backdrop-size': '92%',
       });
-      expect(vm.backdropCss).to.eq('background-position: 50% 50%;\nbackground-size: 100%;');
+      expect(vm.backdropCss).to.eq('background-position: 0% 0%;\nbackground-size: 92%;');
     });
 
     it('scrolling over the backdrop scales it up/down, clamped to 50-300%', async () => {
@@ -306,11 +333,11 @@ describe('SimpleMapEditor', () => {
       const drag = wrapper.find('.simple-map-editor-backdrop-drag');
 
       await drag.trigger('wheel', {deltaY: -1});
-      expect((wrapper.vm as any).backdropScale).to.eq(105);
+      expect((wrapper.vm as any).backdropScale).to.eq(97); // 92 (default) + 5
 
       await drag.trigger('wheel', {deltaY: 1});
       await drag.trigger('wheel', {deltaY: 1});
-      expect((wrapper.vm as any).backdropScale).to.eq(95);
+      expect((wrapper.vm as any).backdropScale).to.eq(87); // 97 - 5 - 5
 
       (wrapper.vm as any).backdropScale = 300;
       await drag.trigger('wheel', {deltaY: -1});
@@ -332,19 +359,22 @@ describe('SimpleMapEditor', () => {
       el.dispatchEvent(new MouseEvent('mousedown', {clientX: 100, clientY: 100, bubbles: true}));
       expect(vm.draggingBackdrop).is.true;
 
-      window.dispatchEvent(new MouseEvent('mousemove', {clientX: 120, clientY: 80}));
-      expect(vm.backdropX).to.eq(60); // +20px / 200px width = +10%, from a 50% start
-      expect(vm.backdropY).to.eq(40); // -20px / 200px height = -10%, from a 50% start
+      window.dispatchEvent(new MouseEvent('mousemove', {clientX: 120, clientY: 100}));
+      expect(vm.backdropX).to.eq(10); // +20px / 200px width = +10%, from a 0% start
+      expect(vm.backdropY).to.eq(0); // unchanged
+
+      window.dispatchEvent(new MouseEvent('mousemove', {clientX: 400, clientY: 100}));
+      expect(vm.backdropX).to.eq(100); // would be +150% from a 0% start -- clamped at the max
 
       window.dispatchEvent(new MouseEvent('mouseup'));
       expect(vm.draggingBackdrop).is.false;
 
       // Further movement after mouseup shouldn't do anything -- the window listeners were removed.
       window.dispatchEvent(new MouseEvent('mousemove', {clientX: 0, clientY: 0}));
-      expect(vm.backdropX).to.eq(60);
+      expect(vm.backdropX).to.eq(100);
     });
 
-    it('Reset restores the default centered/100% state', async () => {
+    it('Reset restores the default alignment state', async () => {
       const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
       const vm = wrapper.vm as any;
       vm.backdropX = 10;
@@ -356,9 +386,9 @@ describe('SimpleMapEditor', () => {
       const resetButton = buttons.find((b) => b.text() === 'Reset');
       await resetButton?.trigger('click');
 
-      expect(vm.backdropX).to.eq(50);
-      expect(vm.backdropY).to.eq(50);
-      expect(vm.backdropScale).to.eq(100);
+      expect(vm.backdropX).to.eq(0);
+      expect(vm.backdropY).to.eq(0);
+      expect(vm.backdropScale).to.eq(92);
     });
 
     it('Copy backdrop CSS writes the current CSS to the clipboard', async () => {
@@ -383,7 +413,7 @@ describe('SimpleMapEditor', () => {
       const copyButton = buttons.find((b) => b.text() === 'Copy backdrop CSS');
       await copyButton?.trigger('click');
 
-      expect(written).to.eq('background-position: 33% 50%;\nbackground-size: 150%;');
+      expect(written).to.eq('background-position: 33% 0%;\nbackground-size: 150%;');
       Object.defineProperty(navigator, 'clipboard', {value: originalClipboard, configurable: true});
     });
   });
