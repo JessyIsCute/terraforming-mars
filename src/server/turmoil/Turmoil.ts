@@ -196,11 +196,14 @@ export class Turmoil {
   }
 
   public initGlobalEvent(game: IGame) {
-    // Draw the first global event to setup the game
+    // Draw the first global event to setup the game. allowSwap is false here: the 6 parties
+    // chosen for this game shouldn't be able to lose a member to More Parties' swap-in rule
+    // before the game has even started -- that rule is about the event track evolving as the
+    // game progresses, not about second-guessing the initial roster at t=0.
     this.comingGlobalEvent = this.globalEventDealer.draw();
-    this.addNeutralDelegate(this.comingGlobalEvent?.revealedDelegate, game);
+    this.addNeutralDelegate(this.comingGlobalEvent?.revealedDelegate, game, false);
     this.distantGlobalEvent = this.globalEventDealer.draw();
-    this.addNeutralDelegate(this.distantGlobalEvent?.revealedDelegate, game);
+    this.addNeutralDelegate(this.distantGlobalEvent?.revealedDelegate, game, false);
   }
 
   public getPartyByName(name: PartyName): IParty {
@@ -377,15 +380,64 @@ export class Turmoil {
     this.addNeutralDelegate(this.distantGlobalEvent?.revealedDelegate, game);
   }
 
-  private addNeutralDelegate(partyName: PartyName | undefined, game: IGame) {
-    // More Parties: global events are printed with one of the 6 official parties, but a
-    // moreParties game may not have that party in play (only 6 of the 12 available parties are
-    // chosen). Skip silently rather than erroring, same as any other reference to content not
-    // in this game.
-    if (partyName && this.parties.some((party) => party.name === partyName)) {
-      this.sendDelegateToParty('NEUTRAL', partyName, game);
-      game.log('A neutral delegate was added to the ${0} party', (b) => b.partyName(partyName));
+  private addNeutralDelegate(partyName: PartyName | undefined, game: IGame, allowSwap: boolean = true) {
+    if (partyName === undefined) {
+      return;
     }
+    if (!this.parties.some((party) => party.name === partyName)) {
+      // More Parties: a global event may be printed with a party that isn't one of the 6
+      // currently in play (only 6 of the 12 available parties are chosen per game). Rather than
+      // silently skipping the delegate, swap the referenced party into play -- see
+      // swapInParty(). Outside moreParties (or during the initial setup reveal, see
+      // initGlobalEvent) there's no swap to perform, so fall back to the old silent-skip
+      // behavior.
+      if (!allowSwap || !game.gameOptions.morePartiesExpansion) {
+        return;
+      }
+      this.swapInParty(partyName, game);
+    }
+    this.sendDelegateToParty('NEUTRAL', partyName, game);
+    game.log('A neutral delegate was added to the ${0} party', (b) => b.partyName(partyName));
+  }
+
+  /**
+   * More Parties: bring `newPartyName` into play, replacing whichever currently-active party
+   * has the fewest delegates (ties broken by leftmost board position, i.e. lowest index in
+   * `this.parties`). Never replaces the ruling or dominant party -- the only way either could
+   * otherwise have the fewest delegates is an early-game tie at zero.
+   */
+  private swapInParty(newPartyName: PartyName, game: IGame): void {
+    const candidates = this.parties.filter((party) => party !== this.rulingParty && party !== this.dominantParty);
+    const min = Math.min(...candidates.map((party) => party.delegates.size));
+    const outgoing = candidates.find((party) => party.delegates.size === min);
+    if (outgoing === undefined) {
+      return;
+    }
+    const index = this.parties.indexOf(outgoing);
+
+    // Return the outgoing party's delegates to the reserve rather than removing them from the
+    // game, then clear its own delegate set -- the party object itself is discarded (dropped
+    // from this.parties below) but this keeps it internally consistent if anything still holds
+    // a reference to it.
+    for (const delegate of Array.from(outgoing.delegates.values())) {
+      this.delegateReserve.add(delegate);
+    }
+    outgoing.delegates.clear();
+    outgoing.partyLeader = undefined;
+
+    const incoming = new MORE_PARTIES_ALL[newPartyName]();
+    this.parties = this.parties.map((party, i) => i === index ? incoming : party);
+
+    const agendaStyle = this.politicalAgendasData.agendaStyle;
+    this.politicalAgendasData.agendas.set(
+      newPartyName,
+      agendaStyle === 'Standard' ?
+        {bonusId: incoming.bonuses[0].id, policyId: incoming.policies[0].id} :
+        PoliticalAgendas.getRandomAgenda(incoming),
+    );
+
+    game.log('${0} replaced ${1} in play, having the fewest delegates', (b) => b.partyName(newPartyName).partyName(outgoing.name));
+    this.checkDominantParty();
   }
 
   private executeAlliedOnPolicyEnd(player: IPlayer | undefined): void {

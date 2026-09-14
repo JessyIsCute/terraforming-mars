@@ -40,7 +40,9 @@ export class PoliticalAgendas {
     };
   }
 
-  private static getRandomAgenda(party: IParty): Agenda {
+  // Public: also used by Turmoil.swapInParty (More Parties) to seed an agenda for a party that
+  // enters play mid-game.
+  public static getRandomAgenda(party: IParty): Agenda {
     const bonus: IBonus = PoliticalAgendas.randomElement(party.bonuses);
     const policy: IPolicy = PoliticalAgendas.randomElement(party.policies);
 

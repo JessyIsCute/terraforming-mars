@@ -83,7 +83,6 @@ export class GlobalEventDealer {
       corporateBetterments: gameOptions.corporateBettermentsExpansion,
       idesOfMars: gameOptions.idesOfMarsExpansion,
       robAntilles: gameOptions.robAntillesExpansion,
-      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       moreParties: gameOptions.morePartiesExpansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       venusPhase2: gameOptions.venusPhase2Expansion,

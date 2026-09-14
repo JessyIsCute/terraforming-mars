@@ -27,6 +27,7 @@ import {VENUS_PHASE_2_CARD_MANIFEST} from './venusPhase2/VenusPhase2CardManifest
 import {INDUSTRIES_CARD_MANIFEST} from './industries/IndustriesCardManifest';
 import {HIGH_ORBIT_CARD_MANIFEST} from './highOrbit/HighOrbitCardManifest';
 import {SOLARIS_CARD_MANIFEST} from './solaris/SolarisCardManifest';
+import {MORE_PARTIES_CARD_MANIFEST} from './moreParties/MorePartiesCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -55,4 +56,5 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   INDUSTRIES_CARD_MANIFEST,
   HIGH_ORBIT_CARD_MANIFEST,
   SOLARIS_CARD_MANIFEST,
+  MORE_PARTIES_CARD_MANIFEST,
 ];
