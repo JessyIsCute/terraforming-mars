@@ -1,5 +1,6 @@
 <template>
-  <div class="map-editor">
+  <SimpleMapEditor v-if="simpleBoardType !== undefined" :boardType="simpleBoardType"/>
+  <div v-else class="map-editor">
     <h1 v-i18n>Custom Map Editor</h1>
 
     <div class="map-editor-layout">
@@ -193,6 +194,8 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import Board from '@/client/components/Board.vue';
+import SimpleMapEditor from '@/client/components/SimpleMapEditor.vue';
+import {SimpleBoardType} from '@/common/boards/SimpleCustomBoardDefinition';
 import {BoardName} from '@/common/boards/BoardName';
 import {DEFAULT_EXPANSIONS} from '@/common/cards/GameModule';
 import {SpaceType} from '@/common/boards/SpaceType';
@@ -314,7 +317,7 @@ const GRID_TRACK_MARGIN_RIGHT = 100;
 
 export default defineComponent({
   name: 'MapEditor',
-  components: {Board},
+  components: {Board, SimpleMapEditor},
   data() {
     const rows = 9;
     return {
@@ -354,6 +357,22 @@ export default defineComponent({
     this.adoptCodeFromMapLibrary();
   },
   computed: {
+    // ?board=venus|moon switches the whole screen to the much simpler SimpleMapEditor instead of
+    // this component's own Mars-only editor -- Moon/Venus Phase 2 don't have global parameters,
+    // milestones/awards, or an arbitrary outline to carve, so reusing this component's template
+    // for them would mean branching nearly every section of it. App.vue's route match doesn't
+    // need to know about this -- it already just flips to the map-editor screen regardless of
+    // query string.
+    simpleBoardType(): SimpleBoardType | undefined {
+      const board = new URLSearchParams(window.location.search).get('board');
+      if (board === 'moon') {
+        return 'moon';
+      }
+      if (board === 'venus') {
+        return 'venusPhase2';
+      }
+      return undefined;
+    },
     BoardName(): typeof BoardName {
       return BoardName;
     },

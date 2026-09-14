@@ -7,6 +7,37 @@ import {blankCustomBoard} from '@/common/boards/CustomBoardDefinition';
 import {SpaceType} from '@/common/boards/SpaceType';
 
 describe('MapEditor', () => {
+  describe('?board= mode switch', () => {
+    afterEach(() => {
+      window.history.pushState(null, '', '/');
+    });
+
+    it('renders the Mars editor when there is no ?board= param', () => {
+      const wrapper = mount(MapEditor, {...globalConfig});
+      expect(wrapper.find('.map-editor').exists()).is.true;
+      expect(wrapper.find('.simple-map-editor').exists()).is.false;
+    });
+
+    it('renders SimpleMapEditor for ?board=venus', () => {
+      window.history.pushState(null, '', '/map-editor?board=venus');
+      const wrapper = mount(MapEditor, {...globalConfig});
+      expect(wrapper.find('.simple-map-editor').exists()).is.true;
+      expect(wrapper.find('.map-editor').exists()).is.false;
+    });
+
+    it('renders SimpleMapEditor for ?board=moon', () => {
+      window.history.pushState(null, '', '/map-editor?board=moon');
+      const wrapper = mount(MapEditor, {...globalConfig});
+      expect(wrapper.find('.simple-map-editor').exists()).is.true;
+    });
+
+    it('falls back to the Mars editor for an unrecognized ?board= value', () => {
+      window.history.pushState(null, '', '/map-editor?board=jupiter');
+      const wrapper = mount(MapEditor, {...globalConfig});
+      expect(wrapper.find('.map-editor').exists()).is.true;
+    });
+  });
+
   it('mounts with a full 9-row hexagon and a valid code', () => {
     const wrapper = mount(MapEditor, {...globalConfig});
     const hexes = wrapper.findAll('.map-editor-hex');
