@@ -9,6 +9,7 @@ import {Priority} from '../../deferredActions/Priority';
 import {Resource} from '../../../common/Resource';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
+import {digit} from '../Options';
 import {SerializedCard} from '../../SerializedCard';
 
 /**
@@ -26,14 +27,18 @@ export class CostIndex extends CorporationCard implements ICorporationCard {
   constructor() {
     super({
       name: CardName.COST_INDEX,
-      startingMegaCredits: 40,
+      startingMegaCredits: 36,
       resourceType: CardResource.DATA,
+
+      behavior: {
+        stock: {steel: 4, titanium: 4},
+      },
 
       metadata: {
         cardNumber: 'X01', // Renumber
-        description: 'You start with 40 M€.',
+        description: 'You start with 36 M€, 4 steel, and 4 titanium.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(40).br;
+          b.megacredits(36).nbsp.steel(4, {digit}).nbsp.titanium(4, {digit}).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;

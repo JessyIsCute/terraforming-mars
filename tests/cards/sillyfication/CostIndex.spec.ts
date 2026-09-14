@@ -17,10 +17,14 @@ describe('CostIndex', () => {
     player.playedCards.push(card);
   });
 
-  it('starts with 40 M€ and stores data on itself', () => {
-    expect(card.startingMegaCredits).to.eq(40);
+  it('starts with 36 M€, 4 steel, 4 titanium, and stores data on itself', () => {
+    expect(card.startingMegaCredits).to.eq(36);
     expect(card.resourceType).to.eq(CardResource.DATA);
     expect(card.resourceCount).to.eq(0);
+
+    card.play(player);
+    expect(player.steel).to.eq(4);
+    expect(player.titanium).to.eq(4);
   });
 
   it('a card costing more than the data here (0) banks the difference and flips to cheap', () => {

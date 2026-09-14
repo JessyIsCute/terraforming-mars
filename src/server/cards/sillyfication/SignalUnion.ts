@@ -11,6 +11,7 @@ import {SelectCard} from '../../inputs/SelectCard';
 import {Resource} from '../../../common/Resource';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
+import {AltSecondaryTag} from '../../../common/cards/render/AltSecondaryTag';
 import {SerializedCard} from '../../SerializedCard';
 
 const MC_PER_DATA_REMOVED = 2;
@@ -38,11 +39,17 @@ export class SignalUnion extends CorporationCard implements ICorporationCard, IA
         production: {megacredits: 3},
       },
 
+      firstAction: {
+        text: 'Draw 2 cards which can hold a data resource',
+        drawCard: {count: 2, resource: CardResource.DATA},
+      },
+
       metadata: {
         cardNumber: 'X00', // Renumber
-        description: 'You start with 40 M€ and 3 M€ production.',
+        description: 'You start with 40 M€ and 3 M€ production. As your first action, draw 2 cards which can hold a data resource.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(40).nbsp.production((pb) => pb.megacredits(3)).br;
+          b.cards(2, {secondaryTag: AltSecondaryTag.DATA}).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;
