@@ -46,7 +46,7 @@ export abstract class IndustryStandardProject extends StandardProjectCard {
             `Spend ${cost} M€ to place an industry tile, raise your ${label} production 1 step, ` +
             `and distribute ${distributionCount} ${label} across two spaces adjacent to it.`,
             (eb) => {
-              eb.megacredits(cost).startAction.production((pb) => {
+              eb.megacredits(cost).startAction.tile(tileType).production((pb) => {
                 switch (resource) {
                 case Resource.MEGACREDITS: pb.megacredits(1); break;
                 case Resource.STEEL: pb.steel(1); break;

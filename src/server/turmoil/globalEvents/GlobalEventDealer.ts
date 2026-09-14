@@ -89,6 +89,10 @@ export class GlobalEventDealer {
       venusPhase2: gameOptions.venusPhase2Expansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       industries: gameOptions.industriesExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      highOrbit: gameOptions.highOrbitExpansion,
+      // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      solaris: gameOptions.solarisExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

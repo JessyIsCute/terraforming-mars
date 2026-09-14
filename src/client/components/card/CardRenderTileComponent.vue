@@ -181,14 +181,27 @@ const TILE_CLASSES: Record<TileType, Classes> = {
   [TileType.PARADISE_CITY]: {
     tile: 'card-tile-paradise-city',
   },
-  // Industries: standard projects describe their effect as text, not a rendered tile icon.
-  [TileType.INDUSTRY_HEAT]: {},
-  [TileType.INDUSTRY_MONEY]: {},
-  [TileType.INDUSTRY_ENERGY]: {},
-  [TileType.INDUSTRY_STEEL]: {},
-  [TileType.INDUSTRY_PLANT]: {},
-  [TileType.INDUSTRY_TITANIUM]: {},
-  [TileType.INDUSTRY_WILD]: {},
+  [TileType.INDUSTRY_HEAT]: {
+    tile: 'card-tile-industry-heat',
+  },
+  [TileType.INDUSTRY_MONEY]: {
+    tile: 'card-tile-industry-money',
+  },
+  [TileType.INDUSTRY_ENERGY]: {
+    tile: 'card-tile-industry-energy',
+  },
+  [TileType.INDUSTRY_STEEL]: {
+    tile: 'card-tile-industry-steel',
+  },
+  [TileType.INDUSTRY_PLANT]: {
+    tile: 'card-tile-industry-plant',
+  },
+  [TileType.INDUSTRY_TITANIUM]: {
+    tile: 'card-tile-industry-titanium',
+  },
+  [TileType.INDUSTRY_WILD]: {
+    tile: 'card-tile-industry-wild',
+  },
 };
 
 export default defineComponent({

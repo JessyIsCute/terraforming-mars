@@ -51,4 +51,7 @@ export enum CardResource {
   LOOT = 'Loot',
   BUDGET = 'Budget',
   RELIC = 'Relic',
+
+  // High Orbit (fan expansion)
+  ORE = 'Ore',
 }

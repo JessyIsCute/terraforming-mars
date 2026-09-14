@@ -472,6 +472,8 @@ export class Server {
         moreParties: options.morePartiesExpansion,
         venusPhase2: options.venusPhase2Expansion,
         industries: options.industriesExpansion,
+        highOrbit: options.highOrbitExpansion,
+        solaris: options.solarisExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

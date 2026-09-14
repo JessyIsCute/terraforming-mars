@@ -540,6 +540,31 @@ input[type="radio"]:checked+.filterDiv::after {
   background-image: url("./assets/tags/tag-none.png");
 }
 
+// High Orbit (fan): no dedicated icon art yet -- a satellite emoji placeholder, same
+// CSS-only trick used for the expansion-icon-* classes below.
+.tag-infrastructure {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🛰️";
+    font-size: 18px;
+    line-height: 30px;
+  }
+}
+
+// Solaris (fan): no dedicated icon art yet -- a galaxy emoji placeholder, same trick.
+.tag-galactic {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🌌";
+    font-size: 18px;
+    line-height: 30px;
+  }
+}
+
 .tag-asterisk {
   background-image: url("./assets/underworld/asterisk-tag.png");
 }
@@ -1245,6 +1270,30 @@ input[type="radio"]:checked+.filterDiv::after {
 
   &::before {
     content: "🏭";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
+// High Orbit: a satellite emoji, same CSS-only trick as above.
+.expansion-icon-highOrbit {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🛰️";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
+// Solaris: a galaxy emoji, same CSS-only trick as above.
+.expansion-icon-solaris {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🌌";
     font-size: 18px;
     line-height: 1.35;
   }

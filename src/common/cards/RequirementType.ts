@@ -33,4 +33,7 @@ export enum RequirementType {
     // Underworld
     CORRUPTION = 'Corruption',
     UNDERGROUND_TOKENS = 'Underground tokens',
+
+    // High Orbit (fan)
+    RELATIVE_TAG = 'Relative tag',
 }

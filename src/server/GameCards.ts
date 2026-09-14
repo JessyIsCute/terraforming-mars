@@ -33,6 +33,8 @@ import {IDES_OF_MARS_CARD_MANIFEST} from './cards/idesofmars/IdesOfMarsCardManif
 import {ROB_ANTILLES_CARD_MANIFEST} from './cards/robantilles/RobAntillesCardManifest';
 import {VENUS_PHASE_2_CARD_MANIFEST} from './cards/venusPhase2/VenusPhase2CardManifest';
 import {INDUSTRIES_CARD_MANIFEST} from './cards/industries/IndustriesCardManifest';
+import {HIGH_ORBIT_CARD_MANIFEST} from './cards/highOrbit/HighOrbitCardManifest';
+import {SOLARIS_CARD_MANIFEST} from './cards/solaris/SolarisCardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
@@ -84,6 +86,8 @@ export class GameCards {
       [gameOptions.deltaProjectExpansion, DELTA_PROJECT_CARD_MANIFEST],
       [gameOptions.venusPhase2Expansion, VENUS_PHASE_2_CARD_MANIFEST],
       [gameOptions.industriesExpansion, INDUSTRIES_CARD_MANIFEST],
+      [gameOptions.highOrbitExpansion, HIGH_ORBIT_CARD_MANIFEST],
+      [gameOptions.solarisExpansion, SOLARIS_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests
@@ -92,10 +96,19 @@ export class GameCards {
   }
 
   private instantiate<T extends ICard>(manifest: CardManifest<T>): Array<T> {
-    return CardManifest.values(manifest)
-      .filter((factory) => factory.instantiate !== false)
-      .filter((factory) => isCompatibleWith(factory, this.gameOptions))
-      .map((factory) => new factory.Factory());
+    const result: Array<T> = [];
+    for (const factory of CardManifest.values(manifest)) {
+      if (factory.instantiate === false || !isCompatibleWith(factory, this.gameOptions)) {
+        continue;
+      }
+      // High Orbit (fan) "Silver" cards: push multiple separately-instantiated copies into
+      // the deck instead of one, so different players can each own their own copy.
+      const copies = factory.copiesInDeck ?? 1;
+      for (let i = 0; i < copies; i++) {
+        result.push(new factory.Factory());
+      }
+    }
+    return result;
   }
 
   public getProjectCards() {
