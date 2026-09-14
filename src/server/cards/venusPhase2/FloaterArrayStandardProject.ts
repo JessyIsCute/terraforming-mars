@@ -14,7 +14,7 @@ export class FloaterArrayStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 19 M€ to place a Floater Array on the Venus surface. Adjacent Gas Mines and Cloud Cities each score 1 VP per adjacent Floater Array at game end. Floaters (from any of your cards) each knock 3 M€ off this cost.', (eb) => {
+        b.standardProject('Spend 19 M€ (3 M€ off per floater spent) to place a Floater Array on Venus. Adjacent Gas Mines/Cloud Cities score 1 VP each at game end.', (eb) => {
           eb.megacredits(19).startAction.plainText('Floater Array');
         }),
       ),

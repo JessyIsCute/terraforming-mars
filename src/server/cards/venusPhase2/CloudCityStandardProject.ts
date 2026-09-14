@@ -15,7 +15,7 @@ export class CloudCityStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 25 M€ to place a Cloud City on the Venus surface and raise your M€ production 1 step. Floaters (from any of your cards) each knock 3 M€ off this cost.', (eb) => {
+        b.standardProject('Spend 25 M€ (3 M€ off per floater spent) to place a Cloud City on Venus and raise your M€ production 1 step.', (eb) => {
           eb.megacredits(25).startAction.plainText('Cloud City').production((pb) => pb.megacredits(1));
         }),
       ),

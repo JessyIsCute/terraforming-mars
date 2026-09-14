@@ -15,7 +15,7 @@ export class GasMineStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 21 M€ to place a Gas Mine on a gaslight space on the Venus surface and raise your heat production 1 step. Floaters (from any of your cards) each knock 3 M€ off this cost.', (eb) => {
+        b.standardProject('Spend 21 M€ (3 M€ off per floater spent) to place a Gas Mine on a Venus gaslight space and raise heat production 1 step.', (eb) => {
           eb.megacredits(21).startAction.plainText('Gas Mine').production((pb) => pb.heat(1));
         }),
       ),
