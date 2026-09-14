@@ -59,7 +59,11 @@ const description = computed<string>(() => {
     margin-left: 80px !important;
   }
 
-  > div:first-child {
+  // :deep() because TurmoilAgenda's root is no longer a single element (it has a sibling
+  // <Teleport> for its hover tooltip), so Vue can't tag it with this component's scope
+  // attribute the way it does for an ordinary single-root child component -- an unqualified
+  // `> div:first-child` silently stops matching once that scope-id requirement can't be met.
+  > :deep(div:first-child) {
     text-align: center;
     height: 50px;
   }
