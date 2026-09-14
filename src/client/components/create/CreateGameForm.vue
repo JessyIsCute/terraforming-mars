@@ -224,6 +224,12 @@
                                 <span v-i18n>More Parties</span>&nbsp;<span title="A fan expansion: adds 6 new Turmoil parties (Populists, Spome, Empower, Bureaucrats, Centrists, Transhumanists), required by cards from other fan expansions that reference them">(&#945;)</span>&nbsp;<a :href="wikiUrls.moreParties" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
+                            <input type="checkbox" name="venusPhase2" id="venusPhase2-checkbox" v-model="expansions.venusPhase2">
+                            <label for="venusPhase2-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-venusPhase2"></div>
+                                <span v-i18n>Venus: Phase 2</span>&nbsp;<span title="A fan expansion: a separate Venus surface board with 3 new standard projects (Cloud City, Gas Mine, Floater Array), discountable with floaters from any of your cards, and a finer 1% Venus track step">(&#945;)</span>&nbsp;<a :href="wikiUrls.venusPhase2" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
+
                             <input type="checkbox" name="industries" id="industries-checkbox" v-model="expansions.industries">
                             <label for="industries-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-industries"></div>

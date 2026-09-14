@@ -1,0 +1,32 @@
+// Venus Phase 2's own board. No painted board texture exists (unlike Moon's board.png), so the
+// hex grid is positioned generically -- same customSpacePixel/customBoardPixelSize formula the
+// map editor's custom Mars boards already use -- rather than ~30 hand-tuned per-space CSS rules.
+// A full-planet render sits behind it as an atmospheric backdrop, the same trick
+// .board-cont--custom already uses for custom Mars boards over the painted Tharsis art.
+.venus-board-cont {
+  display: inline-block;
+  vertical-align: top;
+  width: auto;
+  max-width: 95vw;
+  max-height: 82vh;
+  overflow: auto;
+  overflow-anchor: none;
+  margin: 20px auto 0;
+  background: #0c0a14 url("./assets/venusPhase2/venus-planet-backdrop.png") no-repeat center / cover;
+  border-radius: 6px;
+
+  .board--venus {
+    position: relative;
+    margin: 20px;
+    overflow-anchor: none;
+  }
+}
+
+.venus-board-outer-spaces {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 6px;
+  margin: 8px;
+}

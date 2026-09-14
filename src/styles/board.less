@@ -385,6 +385,19 @@
   background: url("./assets/tiles/paradise_city_board_tile.png") no-repeat center / 46px;
 }
 
+// Venus Phase 2: the Venus surface board's own 3 tiles.
+.board-space-tile--venus-cloud-city {
+  background: url("./assets/tiles/venus_cloud_city_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--venus-gas-mine {
+  background: url("./assets/tiles/venus_gas_mine_board_tile.png") no-repeat center / 46px;
+}
+
+.board-space-tile--venus-floater-array {
+  background: url("./assets/tiles/venus_floater_array_board_tile.png") no-repeat center / 46px;
+}
+
 // Industries: dedicated board art per resource flavor.
 .board-space-tile--industry_heat {
   background: url("./assets/tiles/industry_heat_board_tile.png") no-repeat center / 46px;
@@ -660,6 +673,14 @@
 
 .board-space-type-land-noctis {
   background-color: #fff6;
+}
+
+// Venus Phase 2: Gas Mine-only spaces get a yellow tint, matching the Gas Mine tile art's
+// own color scheme, so they read as visibly reserved before a tile is placed.
+.board-space-type-gaslight {
+  background: url(./assets/hex_white.png) no-repeat;
+  background-color: rgba(230, 190, 40, 0.55);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
 }
 
 .board-space-type-ocean {

@@ -204,6 +204,9 @@ export default defineComponent({
           break;
         case SpaceType.RESTRICTED:
           break;
+        case SpaceType.GASLIGHT:
+          css += ' board-space-type-gaslight';
+          break;
         default:
           css += ' board-space-type-land';
 

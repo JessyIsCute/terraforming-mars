@@ -1263,6 +1263,18 @@ input[type="radio"]:checked+.filterDiv::after {
   }
 }
 
+// Venus Phase 2: a cloud emoji (Venus's cloud decks), same CSS-only trick as above.
+.expansion-icon-venusPhase2 {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "☁️";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
 // Industries: a factory emoji, same CSS-only trick as above.
 .expansion-icon-industries {
   background-image: none;

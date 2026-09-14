@@ -28,6 +28,11 @@
     <MoonBoard :model="game.moon" :tileView="tileView" id="shortkey-moonBoard"/>
   </template>
 
+  <template v-if="game.venusPhase2">
+    <a class="hotkey-target"></a>
+    <VenusSurfaceBoard :model="game.venusPhase2" :tileView="tileView" id="shortkey-venusBoard"/>
+  </template>
+
   <template v-if="game.gameOptions.expansions.pathfinders">
     <a class="hotkey-target"></a>
     <PlanetaryTracks :tracks="game.pathfinders" :gameOptions="game.gameOptions"/>
@@ -59,6 +64,7 @@ import Milestones from '@/client/components/Milestones.vue';
 import Awards from '@/client/components/Awards.vue';
 import Turmoil from '@/client/components/turmoil/Turmoil.vue';
 import MoonBoard from '@/client/components/moon/MoonBoard.vue';
+import VenusSurfaceBoard from '@/client/components/venusPhase2/VenusSurfaceBoard.vue';
 import PlanetaryTracks from '@/client/components/pathfinders/PlanetaryTracks.vue';
 import ConglomeratesTeams from '@/client/components/conglomerates/ConglomeratesTeams.vue';
 import {TileView} from './board/TileView';
@@ -88,6 +94,7 @@ export default defineComponent({
     Awards,
     Turmoil,
     MoonBoard,
+    VenusSurfaceBoard,
     PlanetaryTracks,
     ConglomeratesTeams,
   },
@@ -95,7 +102,7 @@ export default defineComponent({
     highlightSpace(spaceId: SpaceId) {
       scrollToSpace(spaceId);
 
-      const regions = ['main_board', 'moon_board', 'moon_board_outer_spaces'];
+      const regions = ['main_board', 'moon_board', 'moon_board_outer_spaces', 'venus_board', 'venus_board_outer_spaces'];
       for (const region of regions) {
         const board = document.getElementById(region);
         if (board !== null) {

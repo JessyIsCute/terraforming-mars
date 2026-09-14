@@ -24,6 +24,7 @@ import {GameModel} from '../../common/models/GameModel';
 import {Turmoil} from '../turmoil/Turmoil';
 import {createPathfindersModel} from './PathfindersModel';
 import {MoonModel} from '../../common/models/MoonModel';
+import {VenusPhase2Model} from '../../common/models/VenusPhase2Model';
 import {CardName} from '../../common/cards/CardName';
 import {AwardScorer} from '../awards/AwardScorer';
 import {SpaceId} from '../../common/Types';
@@ -87,6 +88,7 @@ export class Server {
       turmoil: turmoil,
       undoCount: game.undoCount,
       venusScaleLevel: game.getVenusScaleLevel(),
+      venusPhase2: this.getVenusPhase2Model(game),
     };
   }
 
@@ -504,6 +506,16 @@ export class Server {
         miningRate: moonData.miningRate,
         habitatRate: moonData.habitatRate,
         spaces: this.getSpaces(moonData.moon),
+      };
+    }
+    return undefined;
+  }
+
+  private static getVenusPhase2Model(game: IGame): VenusPhase2Model | undefined {
+    const venusPhase2Data = game.venusPhase2Data;
+    if (venusPhase2Data) {
+      return {
+        spaces: this.getSpaces(venusPhase2Data.venusSurface),
       };
     }
     return undefined;
