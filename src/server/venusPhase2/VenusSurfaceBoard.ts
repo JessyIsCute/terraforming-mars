@@ -57,18 +57,20 @@ export class VenusSurfaceBoard extends Board {
         b.voided.push(space.voided === true);
       }
     } else {
-      // A true regular hexagon (side length 4 -- see VENUS_SURFACE_ROWS): mostly open land for
-      // Cloud City/Floater Array, with a handful of gaslight spaces reserved for Gas Mine
-      // scattered through it, plus Stratopolis/Maxwell Base's own reserved spots (near the top
-      // and bottom edges, mirrored) -- falls back to the off-grid placement below only if one of
-      // those two cards isn't even in this game's deck.
-      b.row(3).land().land().gaslight().land();
-      b.row(2).land().gaslight().land().land().land();
-      b.row(1).land().land().gaslight().land().land().land();
-      b.row(0).land().stratopolis().land().gaslight().land().land().land();
-      b.row(1).land().land().gaslight().land().land().land();
-      b.row(2).land().gaslight().land().land().land();
-      b.row(3).land().maxwellBase().gaslight().land();
+      // A true regular hexagon (side length 4 -- see VENUS_SURFACE_ROWS), designed in the map
+      // editor and exported via its "Copy as default board source" button: open land for Cloud
+      // City/Floater Array, gaslight spaces for Gas Mine, energy/heat/card placement bonuses
+      // scattered through it, two voided hexes punched out of the middle row, and Stratopolis/
+      // Maxwell Base's own reserved spots (mirrored near the top and bottom edges) -- falls back
+      // to the off-grid placement below only if one of those two cards isn't even in this game's
+      // deck.
+      b.row(3).gaslight(SpaceBonus.HEAT).land().land(SpaceBonus.ENERGY).land();
+      b.row(2).land().land().gaslight(SpaceBonus.HEAT).gaslight(SpaceBonus.HEAT, SpaceBonus.HEAT, SpaceBonus.HEAT).land(SpaceBonus.ENERGY);
+      b.row(1).land(SpaceBonus.DRAW_CARD, SpaceBonus.DRAW_CARD).gaslight(SpaceBonus.HEAT, SpaceBonus.HEAT).stratopolis().land(SpaceBonus.ENERGY).gaslight(SpaceBonus.HEAT).land();
+      b.row(0).void().gaslight(SpaceBonus.HEAT).land().land().land(SpaceBonus.ENERGY).land().void();
+      b.row(1).land(SpaceBonus.ENERGY, SpaceBonus.ENERGY).land(SpaceBonus.ENERGY).gaslight(SpaceBonus.HEAT, SpaceBonus.HEAT).land(SpaceBonus.ENERGY).maxwellBase().gaslight(SpaceBonus.HEAT, SpaceBonus.HEAT);
+      b.row(2).land().gaslight(SpaceBonus.HEAT).gaslight(SpaceBonus.HEAT).land(SpaceBonus.ENERGY).gaslight(SpaceBonus.HEAT, SpaceBonus.HEAT);
+      b.row(3).land(SpaceBonus.ENERGY, SpaceBonus.DRAW_CARD).gaslight(SpaceBonus.HEAT).land().land(SpaceBonus.DRAW_CARD, SpaceBonus.DRAW_CARD);
     }
 
     const spaces = b.build(gameOptions);

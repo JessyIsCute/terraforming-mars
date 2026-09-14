@@ -3,6 +3,7 @@ import {VenusSurfaceBoard, VENUS_STRATOPOLIS, VENUS_MAXWELL_BASE} from '../../sr
 import {SeededRandom} from '../../src/common/utils/Random';
 import {DEFAULT_GAME_OPTIONS} from '../../src/server/game/GameOptions';
 import {SpaceType} from '../../src/common/boards/SpaceType';
+import {SpaceBonus} from '../../src/common/boards/SpaceBonus';
 import {blankSimpleBoard} from '../../src/common/boards/SimpleCustomBoardDefinition';
 import {TestPlayer} from '../TestPlayer';
 
@@ -30,11 +31,18 @@ describe('VenusSurfaceBoard with a custom definition', () => {
     expect(board.getSpaceOrThrow(VENUS_MAXWELL_BASE).spaceType).to.eq(SpaceType.COLONY);
   });
 
-  it('assigns the same grid ids as the default path, regardless of definition content', () => {
-    const def = blankSimpleBoard('venusPhase2', 'All Land');
-    const custom = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def}, new SeededRandom(0));
-    const stock = VenusSurfaceBoard.newInstance(DEFAULT_GAME_OPTIONS, new SeededRandom(0));
-    expect(custom.spaces.map((s) => s.id)).to.deep.eq(stock.spaces.map((s) => s.id));
+  it('assigns ids purely by grid position, unaffected by a definition\'s painted content', () => {
+    // Deliberately compares two custom boards, not the hard-coded default -- that default is now
+    // a bespoke, changeable design (see the map-editor-exported layout in VenusSurfaceBoard.ts),
+    // not a good target for a test about the generic id-derivation scheme.
+    const blank = blankSimpleBoard('venusPhase2', 'All Land');
+    const painted = blankSimpleBoard('venusPhase2', 'Painted');
+    painted.spaces[0].spaceType = SpaceType.GASLIGHT;
+    painted.spaces[0].bonus = [SpaceBonus.HEAT];
+
+    const blankBoard = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: blank}, new SeededRandom(0));
+    const paintedBoard = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: painted}, new SeededRandom(0));
+    expect(paintedBoard.spaces.map((s) => s.id)).to.deep.eq(blankBoard.spaces.map((s) => s.id));
   });
 
   it('places a map-editor-chosen reservation on that exact grid cell instead of the off-grid fallback', () => {
@@ -83,19 +91,20 @@ describe('VenusSurfaceBoard with a custom definition', () => {
   });
 
   it('omits a voided cell from the board entirely, without shifting later cells\' ids', () => {
-    const def = blankSimpleBoard('venusPhase2', 'Punch A Hole');
-    def.spaces[5].voided = true;
+    const withoutVoid = blankSimpleBoard('venusPhase2', 'No Hole');
+    const withVoid = blankSimpleBoard('venusPhase2', 'Punch A Hole');
+    withVoid.spaces[5].voided = true;
 
-    const board = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def}, new SeededRandom(0));
-    const gridSpaces = board.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
+    const boardWithoutVoid = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: withoutVoid}, new SeededRandom(0));
+    const boardWithVoid = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: withVoid}, new SeededRandom(0));
+    const gridSpaces = boardWithVoid.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
 
     expect(gridSpaces).to.have.length(36);
     expect(gridSpaces.map((s) => s.id)).to.not.include('206'); // idx 5 + idOffset 1 = 206.
-    const stock = VenusSurfaceBoard.newInstance(DEFAULT_GAME_OPTIONS, new SeededRandom(0));
-    const stockIdsMinusVoided = stock.spaces
+    const idsWithoutTheVoidedOne = boardWithoutVoid.spaces
       .filter((s) => s.spaceType !== SpaceType.COLONY && s.id !== '206')
       .map((s) => s.id);
-    expect(gridSpaces.map((s) => s.id)).to.deep.eq(stockIdsMinusVoided);
+    expect(gridSpaces.map((s) => s.id)).to.deep.eq(idsWithoutTheVoidedOne);
   });
 
   it('a voided cell is excluded from land placement', () => {
