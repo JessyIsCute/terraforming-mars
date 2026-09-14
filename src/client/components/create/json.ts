@@ -30,3 +30,4 @@ export const IDES_OF_MARS_EXPANSION = 'idesOfMarsExpansion';
 export const ROB_ANTILLES_EXPANSION = 'robAntillesExpansion';
 export const MORE_PARTIES_EXPANSION = 'morePartiesExpansion';
 export const VENUS_PHASE_2_EXPANSION = 'venusPhase2Expansion';
+export const INDUSTRIES_EXPANSION = 'industriesExpansion';

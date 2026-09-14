@@ -316,6 +316,7 @@ export class Game implements IGame, Logger {
         robAntilles: partialOptions.robAntillesExpansion ?? false,
         moreParties: partialOptions.morePartiesExpansion ?? false,
         venusPhase2: partialOptions.venusPhase2Expansion ?? false,
+        industries: partialOptions.industriesExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};

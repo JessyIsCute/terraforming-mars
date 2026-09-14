@@ -32,6 +32,7 @@ import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './cards/corporatebetterments/
 import {IDES_OF_MARS_CARD_MANIFEST} from './cards/idesofmars/IdesOfMarsCardManifest';
 import {ROB_ANTILLES_CARD_MANIFEST} from './cards/robantilles/RobAntillesCardManifest';
 import {VENUS_PHASE_2_CARD_MANIFEST} from './cards/venusPhase2/VenusPhase2CardManifest';
+import {INDUSTRIES_CARD_MANIFEST} from './cards/industries/IndustriesCardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
@@ -82,6 +83,7 @@ export class GameCards {
       // via its `compatibility: 'deltaProject'`) still need this manifest present here.
       [gameOptions.deltaProjectExpansion, DELTA_PROJECT_CARD_MANIFEST],
       [gameOptions.venusPhase2Expansion, VENUS_PHASE_2_CARD_MANIFEST],
+      [gameOptions.industriesExpansion, INDUSTRIES_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests

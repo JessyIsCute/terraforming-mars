@@ -86,6 +86,15 @@ export enum TileType {
     VENUS_CLOUD_CITY, // 55
     VENUS_GAS_MINE, // 56
     VENUS_FLOATER_ARRAY, // 57
+
+    // Industries
+    INDUSTRY_HEAT, // 58
+    INDUSTRY_MONEY, // 59
+    INDUSTRY_ENERGY, // 60
+    INDUSTRY_STEEL, // 61
+    INDUSTRY_PLANT, // 62
+    INDUSTRY_TITANIUM, // 63
+    INDUSTRY_WILD, // 64
   }
 
 export const tileTypeToString: Record<TileType, string> = {
@@ -148,6 +157,13 @@ export const tileTypeToString: Record<TileType, string> = {
   [TileType.VENUS_CLOUD_CITY]: 'Cloud City',
   [TileType.VENUS_GAS_MINE]: 'Gas Mine',
   [TileType.VENUS_FLOATER_ARRAY]: 'Floater Array',
+  [TileType.INDUSTRY_HEAT]: CardName.HEAT_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_MONEY]: CardName.MONEY_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_ENERGY]: CardName.ENERGY_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_STEEL]: CardName.STEEL_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_PLANT]: CardName.PLANT_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_TITANIUM]: CardName.TITANIUM_INDUSTRY_STANDARD_PROJECT,
+  [TileType.INDUSTRY_WILD]: CardName.WILD_INDUSTRY_STANDARD_PROJECT,
 } as const;
 
 export const HAZARD_TILES = new Set([TileType.DUST_STORM_MILD, TileType.DUST_STORM_SEVERE, TileType.EROSION_MILD, TileType.EROSION_SEVERE]);

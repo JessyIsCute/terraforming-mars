@@ -76,6 +76,13 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.VENUS_CLOUD_CITY]: 'venus-cloud-city',
   [TileType.VENUS_GAS_MINE]: 'venus-gas-mine',
   [TileType.VENUS_FLOATER_ARRAY]: 'venus-floater-array',
+  [TileType.INDUSTRY_HEAT]: 'industry_heat',
+  [TileType.INDUSTRY_MONEY]: 'industry_money',
+  [TileType.INDUSTRY_ENERGY]: 'industry_energy',
+  [TileType.INDUSTRY_STEEL]: 'industry_steel',
+  [TileType.INDUSTRY_PLANT]: 'industry_plant',
+  [TileType.INDUSTRY_TITANIUM]: 'industry_titanium',
+  [TileType.INDUSTRY_WILD]: 'industry_wild',
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([
@@ -121,6 +128,13 @@ const descriptions: Record<TileType, string> = {
   [TileType.NEURAL_INSTANCE]: 'Neural Instance: MarsBot gains VP for adjacent non-human spaces',
   [TileType.INVAK_CITY]: 'Invak City: counts as a city and a greenery',
   [TileType.ANIMAL_DOME]: 'Animal Dome: placed next to no other tile. Adjacency bonus: 1 animal',
+  [TileType.INDUSTRY_HEAT]: 'Heat Industry: raises heat production, distributes heat nearby',
+  [TileType.INDUSTRY_MONEY]: 'Money Industry: raises M€ production, distributes M€ nearby',
+  [TileType.INDUSTRY_ENERGY]: 'Energy Industry: raises energy production, distributes energy nearby',
+  [TileType.INDUSTRY_STEEL]: 'Steel Industry: raises steel production, distributes steel nearby',
+  [TileType.INDUSTRY_PLANT]: 'Plant Industry: raises plant production, distributes plants nearby',
+  [TileType.INDUSTRY_TITANIUM]: 'Titanium Industry: raises titanium production, distributes titanium nearby',
+  [TileType.INDUSTRY_WILD]: 'Wild Industry: raises a chosen production, distributes that resource nearby',
 };
 
 export default defineComponent({

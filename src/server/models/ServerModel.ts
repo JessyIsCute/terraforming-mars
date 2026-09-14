@@ -471,6 +471,7 @@ export class Server {
         robAntilles: options.robAntillesExpansion,
         moreParties: options.morePartiesExpansion,
         venusPhase2: options.venusPhase2Expansion,
+        industries: options.industriesExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

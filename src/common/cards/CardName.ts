@@ -1436,4 +1436,13 @@ export enum CardName {
   CLOUD_CITY_STANDARD_PROJECT = 'Venus Cloud City',
   GAS_MINE_STANDARD_PROJECT = 'Gas Mine',
   FLOATER_ARRAY_STANDARD_PROJECT = 'Floater Array',
+
+  // Industries (fan expansion)
+  HEAT_INDUSTRY_STANDARD_PROJECT = 'Heat Industry',
+  MONEY_INDUSTRY_STANDARD_PROJECT = 'Money Industry',
+  ENERGY_INDUSTRY_STANDARD_PROJECT = 'Energy Industry',
+  STEEL_INDUSTRY_STANDARD_PROJECT = 'Steel Industry',
+  PLANT_INDUSTRY_STANDARD_PROJECT = 'Plant Industry',
+  TITANIUM_INDUSTRY_STANDARD_PROJECT = 'Titanium Industry',
+  WILD_INDUSTRY_STANDARD_PROJECT = 'Wild Industry',
 }

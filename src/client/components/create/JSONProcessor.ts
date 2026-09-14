@@ -97,6 +97,7 @@ export class JSONProcessor {
       robAntilles: json_constants.ROB_ANTILLES_EXPANSION,
       moreParties: json_constants.MORE_PARTIES_EXPANSION,
       venusPhase2: json_constants.VENUS_PHASE_2_EXPANSION,
+      industries: json_constants.INDUSTRIES_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];
