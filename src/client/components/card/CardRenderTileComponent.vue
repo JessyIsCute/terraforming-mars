@@ -166,11 +166,15 @@ const TILE_CLASSES: Record<TileType, Classes> = {
   // Harbor Borealis's source art has a visible Getty Images watermark, so it isn't wired up
   // yet -- still rendering as a generic empty tile pending a clean asset.
   [TileType.HARBOR_BOREALIS]: {},
-  // Real art exists (see assets/venusPhase2/ once wired up) but the CSS/asset plumbing for the
-  // Venus surface board is a later pass -- rendering as a generic empty tile until then.
-  [TileType.VENUS_CLOUD_CITY]: {},
-  [TileType.VENUS_GAS_MINE]: {},
-  [TileType.VENUS_FLOATER_ARRAY]: {},
+  [TileType.VENUS_CLOUD_CITY]: {
+    tile: 'card-tile-venus-cloud-city',
+  },
+  [TileType.VENUS_GAS_MINE]: {
+    tile: 'card-tile-venus-gas-mine',
+  },
+  [TileType.VENUS_FLOATER_ARRAY]: {
+    tile: 'card-tile-venus-floater-array',
+  },
   [TileType.INDUSTRIAL_METROPOLIS]: {
     tile: 'card-tile-industrial-metropolis',
   },
