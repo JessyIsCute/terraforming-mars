@@ -4,6 +4,7 @@
       <h1 v-i18n>Map library</h1>
       <div class="map-library-header-links">
         <a v-if="isAdmin" class="btn" :href="`${paths.GAMES_OVERVIEW}?serverId=${serverId}`" v-i18n>Games overview</a>
+        <a v-if="isAdmin" class="btn" :href="`${paths.CARD_LIBRARY}?serverId=${serverId}`" v-i18n>Card library</a>
         <a class="btn btn-primary" :href="paths.MAP_EDITOR" v-i18n>Open map editor</a>
       </div>
     </div>

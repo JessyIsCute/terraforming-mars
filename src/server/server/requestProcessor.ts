@@ -108,6 +108,7 @@ const handlers: Map<string, IHandler> = new Map(
     [paths.API_SPECTATOR, ApiSpectator.INSTANCE],
     [paths.API_WAITING_FOR, ApiWaitingFor.INSTANCE],
     [paths.AUTOPASS, Autopass.INSTANCE],
+    [paths.CARD_LIBRARY, ServeApp.INSTANCE],
     [paths.CARDS, ServeApp.INSTANCE],
     [paths.CUSTOM_CARD_MAKER, ServeApp.INSTANCE],
     [paths.API_CUSTOM_CARD_LIBRARY, ApiCustomCardLibrary.INSTANCE],

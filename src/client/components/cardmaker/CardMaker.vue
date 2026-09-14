@@ -6,6 +6,7 @@
       then compose its icons from the real icon set. Submit it for review — once an admin approves
       it, it becomes available in any game with "Custom Cards" enabled.
     </p>
+    <p class="card-maker-intro"><a :href="paths.CARD_LIBRARY" v-i18n>Browse submitted &amp; approved cards</a></p>
 
     <div class="card-maker-layout">
       <div class="card-maker-controls">
@@ -477,6 +478,7 @@ export default defineComponent({
     };
   },
   computed: {
+    paths: () => paths,
     MAX_CUSTOM_CARD_NAME_LENGTH: () => MAX_CUSTOM_CARD_NAME_LENGTH,
     MAX_CUSTOM_CARD_DESCRIPTION_LENGTH: () => MAX_CUSTOM_CARD_DESCRIPTION_LENGTH,
     MAX_CUSTOM_CARD_EFFECT_DESCRIPTION_LENGTH: () => MAX_CUSTOM_CARD_EFFECT_DESCRIPTION_LENGTH,
