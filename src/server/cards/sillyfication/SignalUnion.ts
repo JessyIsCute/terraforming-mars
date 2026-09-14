@@ -18,11 +18,12 @@ const MC_PER_DATA_REMOVED = 2;
 /**
  * A Pharmacy-Union-style flip corporation, gated to games with Pathfinders (both the Mars tag
  * and the data resource are Pathfinders concepts). Front side carries a Mars tag: once its
- * owner has played 2 Mars tags in a generation (across separate cards, not counting the
- * corporation's own reveal - see the `card.name === this.name` guard below), it banks a data
- * on every card that can hold one, then flips to its Earth-tagged back side. The back side's
- * action cashes data back in for M€, and the card always flips back to its Mars side at the
- * end of the generation (win or lose the action).
+ * owner has played 2 Mars tags in a generation, it banks a data on every card that can hold
+ * one, then flips to its Earth-tagged back side. Its own reveal carries a Mars tag too, so
+ * (as with Pharmacy Union) that counts toward the very first generation's total - one more
+ * real Mars tag played that generation is enough to flip it. The back side's action cashes
+ * data back in for M€, and the card always flips back to its Mars side at the end of the
+ * generation (win or lose the action).
  */
 export class SignalUnion extends CorporationCard implements ICorporationCard, IActionCard {
   private flipped = false;
@@ -33,11 +34,15 @@ export class SignalUnion extends CorporationCard implements ICorporationCard, IA
       name: CardName.SIGNAL_UNION,
       startingMegaCredits: 40,
 
+      behavior: {
+        production: {megacredits: 3},
+      },
+
       metadata: {
         cardNumber: 'X00', // Renumber
-        description: 'You start with 40 M€.',
+        description: 'You start with 40 M€ and 3 M€ production.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(40).br;
+          b.megacredits(40).nbsp.production((pb) => pb.megacredits(3)).br;
           b.corpBox('effect', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;
@@ -61,7 +66,7 @@ export class SignalUnion extends CorporationCard implements ICorporationCard, IA
   }
 
   public onCardPlayed(player: IPlayer, card: ICard): PlayerInput | undefined {
-    if (this.flipped || card.name === this.name) {
+    if (this.flipped) {
       return undefined;
     }
     const marsTags = player.tags.cardTagCount(card, Tag.MARS);

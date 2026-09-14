@@ -20,8 +20,9 @@ describe('SignalUnion', () => {
     player.playedCards.push(card);
   });
 
-  it('starts with 40 M€ and a Mars tag on its front side', () => {
+  it('starts with 40 M€, 3 M€ production, and a Mars tag on its front side', () => {
     expect(card.startingMegaCredits).to.eq(40);
+    expect(card.behavior).to.deep.eq({production: {megacredits: 3}});
     expect(card.tags).to.deep.eq([Tag.MARS]);
   });
 
@@ -54,16 +55,17 @@ describe('SignalUnion', () => {
     expect(card.tags).to.deep.eq([Tag.EARTH]);
   });
 
-  it("the corporation's own reveal does not count toward its Mars tag total", () => {
-    // onCardPlayed firing with the corp's own card (card.name === this.name) must not count -
-    // otherwise a single real Mars tag play would wrongly complete the "2nd tag" threshold.
+  it("the corporation's own reveal counts toward its first-generation Mars tag total", () => {
+    // onCardPlayed fires with the corp's own card (card === this) as part of its reveal, the
+    // same way Pharmacy Union's own tags count toward its trigger - so just one more real
+    // Mars tag that generation is enough to complete the "2nd tag" threshold.
     card.onCardPlayed(player, card);
     runAllActions(game);
     expect(card.tags).to.deep.eq([Tag.MARS]);
 
     card.onCardPlayed(player, fakeCard({tags: [Tag.MARS]}));
     runAllActions(game);
-    expect(card.tags).to.deep.eq([Tag.MARS]); // still just 1 real Mars tag - no flip yet
+    expect(card.tags).to.deep.eq([Tag.EARTH]);
   });
 
   it('has no action and cannot flip back mid-generation while on its Mars side', () => {
