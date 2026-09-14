@@ -22,35 +22,35 @@ describe('GlobalEnergyInfrastructure', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('raises energy production 1 step on play', () => {
+  it('raises energy production 3 steps on play', () => {
     card.play(player);
-    expect(player.production.energy).to.eq(1);
+    expect(player.production.energy).to.eq(3);
   });
 
-  it('gains a flat 3 energy when a power tag is played', () => {
+  it('gains 1 energy production when a power tag is played', () => {
     player.tagsForTest = {power: 4};
-    player.energy = 0;
+    player.production.override({energy: 0});
 
     card.onCardPlayed(player, new EnergySaving());
 
-    expect(player.energy).to.eq(3);
+    expect(player.production.energy).to.eq(1);
   });
 
   it('does not trigger for a card without a power tag', () => {
     player.tagsForTest = {power: 4};
-    player.energy = 0;
+    player.production.override({energy: 0});
 
     card.onCardPlayed(player, new MicroCredits());
 
-    expect(player.energy).to.eq(0);
+    expect(player.production.energy).to.eq(0);
   });
 
   it('does not scale with power tag count', () => {
     player.tagsForTest = {power: 8};
-    player.energy = 0;
+    player.production.override({energy: 0});
 
     card.onCardPlayed(player, new EnergySaving());
 
-    expect(player.energy).to.eq(3);
+    expect(player.production.energy).to.eq(1);
   });
 });
