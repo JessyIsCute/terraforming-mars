@@ -21,6 +21,7 @@ export const paths = {
   API_WAITING_FOR: 'api/waitingfor',
   AUTH_DISCORD_CALLBACK: 'auth/discord/callback',
   AUTOPASS: 'autopass',
+  CARD_LIBRARY: 'card-library',
   CARDS: 'cards',
   CUSTOM_CARD_MAKER: 'card-maker',
   END_GAME_LOG: 'end_game_log',

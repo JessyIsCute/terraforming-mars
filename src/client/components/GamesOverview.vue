@@ -4,6 +4,8 @@
       <p v-i18n>The following games are available on this server:</p>
       <p class="games-overview-admin-links">
         <a :href="`${paths.MAP_LIBRARY}?serverId=${serverId}`" v-i18n>Map library admin</a>
+        &nbsp;|&nbsp;
+        <a :href="`${paths.CARD_LIBRARY}?serverId=${serverId}`" v-i18n>Card library admin</a>
       </p>
       <div class="games-overview-actions">
         <button type="button" class="btn btn-error" :disabled="bulkPurging" @click="purgeFinishedAndAbandoned" v-i18n>
