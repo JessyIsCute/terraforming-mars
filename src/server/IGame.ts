@@ -61,12 +61,20 @@ export interface IGame extends Logger {
   generation: number;
   /**
    * High Orbit (fan): tracks which CardNames have already been played THIS generation, across
-   * all players. Used by Planetary Outpost -- since it's a "Silver" card with several separate
-   * physical copies in the deck (see CardFactorySpec.copiesInDeck), a per-card-instance flag
+   * all players. Used by Planetary Outpost -- since several separate physical copies of it
+   * exist in the shared supply (see infrastructureSupply below), a per-card-instance flag
    * wouldn't work; this is a generation-scoped, game-wide set instead. Reset in
    * `startGeneration`.
    */
   cardsPlayedThisGeneration: Set<CardName>;
+  /**
+   * High Orbit (fan): remaining unclaimed physical copies of each Infrastructure card design,
+   * shared across all players -- these cards are never shuffled into the project deck (see
+   * GameCards.getProjectCards). Populated from HighOrbitCardManifest.HIGH_ORBIT_SUPPLY in
+   * `Game.newInstance` when highOrbitExpansion is enabled, decremented as players acquire
+   * copies via `Player.getHighOrbitInfrastructureOptions`.
+   */
+  infrastructureSupply: Map<CardName, number>;
   /**
    * Solaris (fan): Anti Fraud Investigation. When true, no player may remove resources from
    * any card for the rest of the generation. Set true by Anti Fraud Investigation's play

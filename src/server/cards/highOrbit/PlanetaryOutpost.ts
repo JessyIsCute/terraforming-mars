@@ -1,26 +1,34 @@
 import {CardName} from '../../../common/cards/CardName';
 import {CardType} from '../../../common/cards/CardType';
+import {Tag} from '../../../common/cards/Tag';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 import {IProjectCard} from '../IProjectCard';
 import {IPlayer, CanAffordOptions} from '../../IPlayer';
-import {SilverCard} from './SilverCard';
+import {Card} from '../Card';
 
 /**
- * High Orbit (fan): Planetary Outpost. On play: become the first player. Only one copy of
- * Planetary Outpost can be played per generation, across all players -- since this is a
- * "Silver" card with 5 separate physical copies in the deck (see
- * CardFactorySpec.copiesInDeck), that constraint can't be tracked on a single card instance.
- * Instead it's tracked game-wide, by CardName, in the new `IGame.cardsPlayedThisGeneration`
- * set (see Game.ts, reset each generation in `startGeneration`).
+ * High Orbit (fan): Planetary Outpost. Unlike the other 17 High Orbit designs, it carries the
+ * Building tag (not Infrastructure) and is acquired/paid for via standard M€ rules, not the
+ * Titanium/4:1 substitution -- an explicit exception in the source material. It still comes
+ * from the same shared, contested supply (see IGame.infrastructureSupply,
+ * Player.getHighOrbitInfrastructureOptions), so it keeps its own tableau-duplicate guard
+ * (vanilla Terraforming Mars never needed this since a CardName was always unique in the deck).
+ *
+ * On play: become the first player. Only one copy of Planetary Outpost can be played per
+ * generation, across all players -- since several separate physical copies exist in the shared
+ * supply, that constraint can't be tracked on a single card instance. Instead it's tracked
+ * game-wide, by CardName, in `IGame.cardsPlayedThisGeneration` (see Game.ts, reset each
+ * generation in `startGeneration`).
  *
  * No VP on this card -- the source material shows an ambiguous icon but no confirming VP text.
  */
-export class PlanetaryOutpost extends SilverCard implements IProjectCard {
+export class PlanetaryOutpost extends Card implements IProjectCard {
   constructor() {
     super({
       type: CardType.ACTIVE,
       name: CardName.PLANETARY_OUTPOST,
+      tags: [Tag.BUILDING],
       cost: 4,
 
       metadata: {
@@ -34,8 +42,8 @@ export class PlanetaryOutpost extends SilverCard implements IProjectCard {
     });
   }
 
-  public override bespokeCanPlay(player: IPlayer, canAffordOptions: CanAffordOptions): boolean {
-    if (!super.bespokeCanPlay(player, canAffordOptions)) {
+  public override bespokeCanPlay(player: IPlayer, _canAffordOptions: CanAffordOptions): boolean {
+    if (player.tableau.has(this.name)) {
       return false;
     }
     return !player.game.cardsPlayedThisGeneration.has(this.name);

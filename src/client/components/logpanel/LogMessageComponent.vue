@@ -40,6 +40,7 @@ import {defineComponent} from 'vue';
 import {Color} from '@/common/Color';
 import {CardName} from '@/common/cards/CardName';
 import {CardType} from '@/common/cards/CardType';
+import {Tag} from '@/common/cards/Tag';
 import {LogMessage} from '@/common/logs/LogMessage';
 import {LogMessageType} from '@/common/logs/LogMessageType';
 import {LogMessageData, LogMessageDataAttrs} from '@/common/logs/LogMessageData';
@@ -108,7 +109,9 @@ export default defineComponent({
       }
 
       const suffixFreeCardName = card.name.split(':')[0];
-      const className = cardTypeToCss[card.type];
+      // High Orbit (fan): Infrastructure-tagged "Silver" cards get a distinct silver badge
+      // regardless of CardType, matching CardTitle.vue's override for the full card face.
+      const className = card.tags.includes(Tag.INFRASTRUCTURE) ? 'background-color-infrastructure' : cardTypeToCss[card.type];
 
       if (className === undefined) {
         return suffixFreeCardName;

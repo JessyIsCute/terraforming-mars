@@ -14,6 +14,7 @@ import {defineComponent} from 'vue';
 import {CardType} from '@/common/cards/CardType';
 import CardCorporationLogo from '@/client/components/card/CardCorporationLogo.vue';
 import {CardName} from '@/common/cards/CardName';
+import {Tag} from '@/common/cards/Tag';
 import {fitTextWhenReady} from '@/client/utils/textFit';
 
 type Refs = {
@@ -38,6 +39,13 @@ export default defineComponent({
     displayTitle: {
       type: String,
       default: undefined,
+    },
+    // High Orbit (fan): Infrastructure-tagged "Silver" cards render with a distinct silver
+    // header regardless of CardType -- they still need to be ACTIVE/AUTOMATED for normal
+    // tableau/action/tag semantics, so this is a visual override, not a type change.
+    tags: {
+      type: Array as () => Array<Tag>,
+      default: () => [],
     },
   },
   components: {
@@ -75,10 +83,15 @@ export default defineComponent({
     isPrelude(): boolean {
       return this.type === CardType.PRELUDE;
     },
+    isInfrastructure(): boolean {
+      return this.tags.includes(Tag.INFRASTRUCTURE);
+    },
     getClasses(): string {
       const classes: Array<String> = ['card-title'];
 
-      if (this.type === CardType.AUTOMATED) {
+      if (this.isInfrastructure()) {
+        classes.push('background-color-infrastructure');
+      } else if (this.type === CardType.AUTOMATED) {
         classes.push('background-color-automated');
       } else if (this.type === CardType.ACTIVE) {
         classes.push('background-color-active');
