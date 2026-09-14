@@ -46,7 +46,7 @@
 
           <span v-for="expansion in allModules" :key="expansion">
             <input type="checkbox" :name="expansion" :id="`${expansion}-checkbox`" v-model="expansions[expansion]">
-            <label :for="`${expansion}-checkbox`" class="expansion-button">
+            <label :for="`${expansion}-checkbox`" class="expansion-button tooltip" :data-tooltip="moduleName(expansion)">
               <div class='expansion-icon' :class="expansionIconClass(expansion)"></div>
             </label>
           </span>
@@ -215,7 +215,7 @@ import {byType, getCard, getCardOrThrow, getCards} from '@/client/cards/ClientCa
 import {COMMUNITY_COLONY_NAMES, OFFICIAL_COLONY_NAMES, PATHFINDERS_COLONY_NAMES} from '@/common/colonies/AllColonies';
 import {ColonyModel} from '@/common/models/ColonyModel';
 import {ColonyName} from '@/common/colonies/ColonyName';
-import {GameModule, GAME_MODULES} from '@/common/cards/GameModule';
+import {GameModule, GAME_MODULES, MODULE_NAMES} from '@/common/cards/GameModule';
 import {Tag} from '@/common/cards/Tag';
 import {getColony} from '@/client/colonies/ClientColonyManifest';
 import {ClientCard} from '@/common/cards/ClientCard';
@@ -478,6 +478,9 @@ export default defineComponent({
       case 'moon': return 'expansion-icon-themoon';
       default: return `expansion-icon-${expansion}`;
       }
+    },
+    moduleName(expansion: GameModule): string {
+      return MODULE_NAMES[expansion];
     },
     filterByTags(card: ClientCard): boolean {
       if (card.tags.length === 0) {
