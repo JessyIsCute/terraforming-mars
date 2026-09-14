@@ -16,7 +16,7 @@ describe('SignalUnion', () => {
 
   beforeEach(() => {
     card = new SignalUnion();
-    [game, player] = testGame(1);
+    [game, player] = testGame(1, {pathfindersExpansion: true});
     player.playedCards.push(card);
   });
 
@@ -24,6 +24,15 @@ describe('SignalUnion', () => {
     expect(card.startingMegaCredits).to.eq(40);
     expect(card.behavior).to.deep.eq({production: {megacredits: 3}});
     expect(card.tags).to.deep.eq([Tag.MARS]);
+  });
+
+  it('as its first action, draws 2 cards which can hold a data resource', () => {
+    player.cardsInHand = [];
+    player.defer(card.initialAction(player));
+    runAllActions(game);
+
+    expect(player.cardsInHand).to.have.length(2);
+    expect(player.cardsInHand.every((c) => c.resourceType === CardResource.DATA)).is.true;
   });
 
   it('a single Mars tag played does not flip the card', () => {
