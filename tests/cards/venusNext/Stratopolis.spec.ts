@@ -8,6 +8,7 @@ import {TestPlayer} from '../../TestPlayer';
 import {cast} from '@/common/utils/utils';
 import {SpaceName} from '../../../src/common/boards/SpaceName';
 import {VenusPhase2Expansion} from '../../../src/server/venusPhase2/VenusPhase2Expansion';
+import {VENUS_STRATOPOLIS} from '../../../src/server/venusPhase2/VenusSurfaceBoard';
 
 describe('Stratopolis', () => {
   let card: Stratopolis;
@@ -61,7 +62,7 @@ describe('Stratopolis', () => {
 
     venusPhase2Card.play(venusPhase2Player);
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(venusPhase2Game).venusSurface;
-    expect(venusSurface.getSpaceOrThrow(SpaceName.STRATOPOLIS).tile?.card).to.eq(venusPhase2Card.name);
+    expect(venusSurface.getSpaceOrThrow(VENUS_STRATOPOLIS).tile?.card).to.eq(venusPhase2Card.name);
     // The reserved spot doesn't exist on Mars at all once Venus Phase 2 is on (not just
     // "unoccupied") -- BoardBuilder.addExpansionColonySpaces skips it entirely for this board.
     expect(() => venusPhase2Game.board.getSpaceOrThrow(SpaceName.STRATOPOLIS)).to.throw();

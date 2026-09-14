@@ -8,6 +8,7 @@ import {ActionCard} from '../ActionCard';
 import {CanAffordOptions, IPlayer} from '../../IPlayer';
 import {PlayerInput} from '../../PlayerInput';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
+import {VENUS_STRATOPOLIS} from '../../venusPhase2/VenusSurfaceBoard';
 
 export class Stratopolis extends ActionCard {
   constructor() {
@@ -58,14 +59,14 @@ export class Stratopolis extends ActionCard {
   public override bespokeCanPlay(player: IPlayer, _canAffordOptions: CanAffordOptions): boolean {
     if (player.game.gameOptions.venusPhase2Expansion) {
       const venusSurface = VenusPhase2Expansion.venusPhase2Data(player.game).venusSurface;
-      return venusSurface.getSpaceOrThrow(SpaceName.STRATOPOLIS).tile === undefined;
+      return venusSurface.getSpaceOrThrow(VENUS_STRATOPOLIS).tile === undefined;
     }
     return player.game.board.getSpaceOrThrow(SpaceName.STRATOPOLIS).tile === undefined;
   }
 
   public override bespokePlay(player: IPlayer): PlayerInput | undefined {
     if (player.game.gameOptions.venusPhase2Expansion) {
-      VenusPhase2Expansion.addReservedCityTile(player, SpaceName.STRATOPOLIS, this.name);
+      VenusPhase2Expansion.addReservedCityTile(player, VENUS_STRATOPOLIS, this.name);
       return undefined;
     }
     const space = player.game.board.getSpaceOrThrow(SpaceName.STRATOPOLIS);

@@ -14,6 +14,7 @@ import {AppliedScience} from '../../../src/server/cards/prelude2/AppliedScience'
 import {cast} from '@/common/utils/utils';
 import {SpaceName} from '../../../src/common/boards/SpaceName';
 import {VenusPhase2Expansion} from '../../../src/server/venusPhase2/VenusPhase2Expansion';
+import {VENUS_MAXWELL_BASE} from '../../../src/server/venusPhase2/VenusSurfaceBoard';
 
 describe('MaxwellBase', () => {
   let card: MaxwellBase;
@@ -100,7 +101,7 @@ describe('MaxwellBase', () => {
 
     cast(venusPhase2Card.play(venusPhase2Player), undefined);
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(venusPhase2Game).venusSurface;
-    expect(venusSurface.getSpaceOrThrow(SpaceName.MAXWELL_BASE).tile?.card).to.eq(venusPhase2Card.name);
+    expect(venusSurface.getSpaceOrThrow(VENUS_MAXWELL_BASE).tile?.card).to.eq(venusPhase2Card.name);
     expect(() => venusPhase2Game.board.getSpaceOrThrow(SpaceName.MAXWELL_BASE)).to.throw();
   });
 });

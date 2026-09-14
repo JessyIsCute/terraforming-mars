@@ -2,11 +2,18 @@ import {Board} from '../boards/Board';
 import {Space} from '../boards/Space';
 import {IPlayer} from '../IPlayer';
 import {SpaceType} from '../../common/boards/SpaceType';
-import {SpaceName} from '../../common/boards/SpaceName';
 import {SpaceId, isSpaceId, safeCast} from '../../common/Types';
 import {GameOptions} from '../../server/game/GameOptions';
 import {Random} from '../../common/utils/Random';
 import {CardName} from '../../common/cards/CardName';
+
+// Deliberately NOT SpaceName.STRATOPOLIS/MAXWELL_BASE ('72'/'73') -- those are the Mars board's
+// own space ids, and this is a genuinely separate Board instance with its own numeric range
+// (200+). Reusing them would collide once client-side rendering keys off space id (DOM
+// data_space_id, log-highlight lookup), even though server-side lookups stay board-scoped and
+// wouldn't have noticed. Fixed, out-of-band ids -- well clear of the grid's own 200+ range below.
+export const VENUS_STRATOPOLIS: SpaceId = safeCast('298', isSpaceId);
+export const VENUS_MAXWELL_BASE: SpaceId = safeCast('299', isSpaceId);
 
 function colonySpace(id: SpaceId): Space {
   return {id, spaceType: SpaceType.COLONY, x: -1, y: -1, bonus: []};
@@ -61,16 +68,18 @@ class Builder {
     // same "is this card's expansion actually in play" gate BoardBuilder.addExpansionColonySpaces
     // already applies on Mars, so this board doesn't reserve a spot for a card that isn't even
     // in the deck. See expansionSpaceColonies.ts / BoardBuilder.ts for the venusPhase2Expansion
-    // check that keeps them on Mars instead when this expansion is off.
+    // check that keeps them on Mars instead when this expansion is off. Fixed ids (not counted
+    // toward idOffset below), so the grid's own ids stay stable regardless of which of these are
+    // actually reserved in a given game.
     if (gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.STRATOPOLIS)) {
-      this.spaces.push(colonySpace(SpaceName.STRATOPOLIS));
+      this.spaces.push(colonySpace(VENUS_STRATOPOLIS));
     }
     if (gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.MAXWELL_BASE)) {
-      this.spaces.push(colonySpace(SpaceName.MAXWELL_BASE));
+      this.spaces.push(colonySpace(VENUS_MAXWELL_BASE));
     }
 
     const tilesPerRow = [4, 5, 6, 5, 5, 4];
-    const idOffset = this.spaces.length + 1;
+    const idOffset = 1;
     let idx = 0;
 
     for (let row = 0; row < tilesPerRow.length; row++) {

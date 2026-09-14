@@ -4,8 +4,8 @@ import {VenusPhase2Expansion} from '../../src/server/venusPhase2/VenusPhase2Expa
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestingUtils';
 import {SpaceType} from '../../src/common/boards/SpaceType';
-import {SpaceName} from '../../src/common/boards/SpaceName';
 import {TileType} from '../../src/common/TileType';
+import {VENUS_STRATOPOLIS, VENUS_MAXWELL_BASE} from '../../src/server/venusPhase2/VenusSurfaceBoard';
 
 describe('VenusSurfaceBoard', () => {
   let game: IGame;
@@ -18,8 +18,8 @@ describe('VenusSurfaceBoard', () => {
   it('reserves Stratopolis and Maxwell Base off-grid when the Venus expansion is in play', () => {
     const [venusGame] = testGame(2, {venusPhase2Expansion: true, venusNextExtension: true});
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(venusGame).venusSurface;
-    const stratopolis = venusSurface.getSpaceOrThrow(SpaceName.STRATOPOLIS);
-    const maxwellBase = venusSurface.getSpaceOrThrow(SpaceName.MAXWELL_BASE);
+    const stratopolis = venusSurface.getSpaceOrThrow(VENUS_STRATOPOLIS);
+    const maxwellBase = venusSurface.getSpaceOrThrow(VENUS_MAXWELL_BASE);
     expect(stratopolis.spaceType).to.eq(SpaceType.COLONY);
     expect(stratopolis.x).to.eq(-1);
     expect(maxwellBase.spaceType).to.eq(SpaceType.COLONY);
@@ -28,8 +28,8 @@ describe('VenusSurfaceBoard', () => {
   it('does not reserve Stratopolis/Maxwell Base spots when Venus is not in play', () => {
     const [venuslessGame] = testGame(2, {venusPhase2Expansion: true, venusNextExtension: false});
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(venuslessGame).venusSurface;
-    expect(() => venusSurface.getSpaceOrThrow(SpaceName.STRATOPOLIS)).to.throw();
-    expect(() => venusSurface.getSpaceOrThrow(SpaceName.MAXWELL_BASE)).to.throw();
+    expect(() => venusSurface.getSpaceOrThrow(VENUS_STRATOPOLIS)).to.throw();
+    expect(() => venusSurface.getSpaceOrThrow(VENUS_MAXWELL_BASE)).to.throw();
   });
 
   it('has both land and gaslight spaces available before anything is built', () => {
