@@ -40,6 +40,13 @@ export interface SimpleCustomSpaceDef {
   spaceType: SpaceType;
   bonus: Array<SpaceBonus>;
   reserved?: VenusReservedSpot;
+  /**
+   * Removes this cell from the board entirely -- carves the outline or punches a hole, the same
+   * idea as Mars's own void tool. `spaceType`/`bonus` are ignored when this is set (whatever was
+   * last painted underneath, kept only so un-voiding restores it). Mutually exclusive with
+   * `reserved` -- a hex that doesn't exist can't be reserved for a card's city tile.
+   */
+  voided?: boolean;
 }
 
 export interface SimpleCustomBoardDefinition {
@@ -47,7 +54,14 @@ export interface SimpleCustomBoardDefinition {
   boardType: SimpleBoardType;
   /** Display name; shown in the create-game form. */
   name: string;
-  /** One entry per grid cell, in the same order as `simpleBoardLayout(boardType)`. */
+  /**
+   * One entry per grid cell, in the same order as `simpleBoardLayout(boardType)` -- including
+   * voided cells (unlike Mars's `CustomBoardDefinition`, where a void is simply absent). Kept
+   * fixed-length and positional so both board builders can keep incrementing their space-id
+   * counter through a void without it shifting the ids of every cell that comes after --
+   * MoonBoard.vue in particular positions hexes by hand-tuned CSS keyed to that exact id, so a
+   * shifted id would silently stop matching any rule.
+   */
   spaces: Array<SimpleCustomSpaceDef>;
 }
 

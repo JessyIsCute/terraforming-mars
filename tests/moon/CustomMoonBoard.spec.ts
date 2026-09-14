@@ -6,6 +6,7 @@ import {SpaceType} from '../../src/common/boards/SpaceType';
 import {SpaceBonus} from '../../src/common/boards/SpaceBonus';
 import {NamedMoonSpaces} from '../../src/common/moon/NamedMoonSpaces';
 import {blankSimpleBoard} from '../../src/common/boards/SimpleCustomBoardDefinition';
+import {TestPlayer} from '../TestPlayer';
 
 describe('MoonBoard with a custom definition', () => {
   it('builds the grid from the definition instead of the hard-coded default', () => {
@@ -43,5 +44,37 @@ describe('MoonBoard with a custom definition', () => {
     const custom = MoonBoard.newInstance({...DEFAULT_GAME_OPTIONS, customMoonBoard: def}, new SeededRandom(0));
     const stock = MoonBoard.newInstance(DEFAULT_GAME_OPTIONS, new SeededRandom(0));
     expect(custom.spaces.map((s) => s.id)).to.deep.eq(stock.spaces.map((s) => s.id));
+  });
+
+  it('omits a voided cell from the board entirely, without shifting later cells\' ids', () => {
+    const def = blankSimpleBoard('moon', 'All Land');
+    def.spaces[1].voided = true; // second grid cell -- would be 'm03' if present.
+
+    const board = MoonBoard.newInstance({...DEFAULT_GAME_OPTIONS, customMoonBoard: def}, new SeededRandom(0));
+    const gridSpaces = board.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
+
+    expect(gridSpaces).to.have.length(34);
+    expect(gridSpaces.some((s) => s.id === 'm03')).is.false;
+    // Every OTHER cell keeps the exact id it has on the un-voided default board -- MoonBoard.vue
+    // positions hexes by hand-tuned CSS keyed to that literal id, so a shift would silently break
+    // every hex after the void.
+    const stock = MoonBoard.newInstance(DEFAULT_GAME_OPTIONS, new SeededRandom(0));
+    const stockIdsMinusVoided = stock.spaces.filter((s) => s.id !== 'm03').map((s) => s.id);
+    expect(gridSpaces.map((s) => s.id)).to.deep.eq(stockIdsMinusVoided.filter((id) => id.startsWith('m') && id !== 'm01' && id !== 'm37'));
+  });
+
+  it('a voided cell is excluded from mine-tile placement', () => {
+    const def = blankSimpleBoard('moon', 'All Mine');
+    def.spaces.forEach((s) => {
+      s.spaceType = SpaceType.LUNAR_MINE;
+    });
+    def.spaces[0].voided = true;
+
+    const board = MoonBoard.newInstance({...DEFAULT_GAME_OPTIONS, customMoonBoard: def}, new SeededRandom(0));
+    const player = TestPlayer.BLUE.newPlayer();
+    const available = board.getAvailableSpacesForMine(player);
+    // 35 grid spaces, minus the 1 voided, minus the 4 named Mare spaces (always excluded from mine
+    // placement regardless of type -- getAvailableSpacesForMine filters them out by id).
+    expect(available).to.have.length(30);
   });
 });

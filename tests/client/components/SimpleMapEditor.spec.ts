@@ -39,14 +39,25 @@ describe('SimpleMapEditor', () => {
     expect(decoded.spaces).to.have.length(35);
   });
 
-  it('does not offer a bonus palette for Venus (no bonus concept on that board today)', () => {
-    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
-    expect(wrapper.text()).to.not.include('Bonuses');
+  it('offers the same bonus palette on both Venus and Moon', () => {
+    const venus = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    expect(venus.text()).to.include('Bonuses');
+
+    const moon = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+    expect(moon.text()).to.include('Bonuses');
   });
 
-  it('offers a bonus palette for Moon', () => {
-    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
-    expect(wrapper.text()).to.include('Bonuses');
+  it('painting a bonus on Venus stacks bonuses, right-click removes the last one', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'bonus:' + SpaceBonus.TITANIUM;
+    await wrapper.vm.$nextTick();
+    const hex = wrapper.findAll('.simple-map-editor-hex')[0];
+    await hex.trigger('click');
+    await hex.trigger('click');
+    expect(decodeSimpleBoard((wrapper.vm as any).code).spaces[0].bonus).to.deep.eq([SpaceBonus.TITANIUM, SpaceBonus.TITANIUM]);
+
+    await hex.trigger('contextmenu');
+    expect(decodeSimpleBoard((wrapper.vm as any).code).spaces[0].bonus).to.deep.eq([SpaceBonus.TITANIUM]);
   });
 
   it('painting a hex changes its type in the generated code (Venus: land -> gaslight)', async () => {
@@ -203,6 +214,71 @@ describe('SimpleMapEditor', () => {
     // Matches MoonBoard.ts's own real numbering exactly (m01 reserved for Luna Trade Station).
     expect(gridSpaceIds[0]).to.eq('m02');
     expect(gridSpaceIds[gridSpaceIds.length - 1]).to.eq('m36');
+  });
+
+  describe('void tool', () => {
+    it('clicking a hex with the void tool marks it voided and excludes it from the code', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      (wrapper.vm as any).tool = 'void:toggle';
+      await wrapper.vm.$nextTick();
+      await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+
+      expect((wrapper.vm as any).grid[0].voided).is.true;
+      expect(decodeSimpleBoard((wrapper.vm as any).code).spaces[0].voided).is.true;
+    });
+
+    it('clicking an already-voided hex with the void tool again restores it', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      (wrapper.vm as any).tool = 'void:toggle';
+      await wrapper.vm.$nextTick();
+      const hex = wrapper.findAll('.simple-map-editor-hex')[0];
+      await hex.trigger('click');
+      await hex.trigger('click');
+
+      expect((wrapper.vm as any).grid[0].voided).to.eq(false);
+    });
+
+    it('painting any other tool on a voided hex implicitly restores it first', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      (wrapper.vm as any).tool = 'void:toggle';
+      await wrapper.vm.$nextTick();
+      const hex = wrapper.findAll('.simple-map-editor-hex')[0];
+      await hex.trigger('click');
+      expect((wrapper.vm as any).grid[0].voided).is.true;
+
+      (wrapper.vm as any).tool = 'type:' + SpaceType.GASLIGHT;
+      await wrapper.vm.$nextTick();
+      await hex.trigger('click');
+
+      expect((wrapper.vm as any).grid[0].voided).to.eq(false);
+      expect((wrapper.vm as any).grid[0].spaceType).to.eq(SpaceType.GASLIGHT);
+    });
+
+    it('the preview omits a voided hex entirely, on both board types', async () => {
+      for (const boardType of ['venusPhase2', 'moon'] as const) {
+        const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType}});
+        (wrapper.vm as any).tool = 'void:toggle';
+        await wrapper.vm.$nextTick();
+        await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+        await wrapper.vm.$nextTick();
+
+        const model = boardType === 'venusPhase2' ? (wrapper.vm as any).previewModel : (wrapper.vm as any).previewMoonModel;
+        const gridSpaces = model.spaces.filter((s: any) => s.spaceType !== SpaceType.COLONY);
+        const expectedCount = boardType === 'venusPhase2' ? 36 : 34;
+        expect(gridSpaces).to.have.length(expectedCount);
+      }
+    });
+
+    it('the export source emits .void() for a voided cell instead of terrain', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      (wrapper.vm as any).tool = 'void:toggle';
+      await wrapper.vm.$nextTick();
+      await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+      await wrapper.vm.$nextTick();
+
+      const source = (wrapper.vm as any).exportSource as string;
+      expect(source).to.include('.void()');
+    });
   });
 
   describe('backdrop calibration tool (Venus only)', () => {

@@ -81,4 +81,40 @@ describe('VenusSurfaceBoard with a custom definition', () => {
     // The cell just reverts to a normal grid space instead of vanishing.
     expect(board.spaces).to.have.length(37);
   });
+
+  it('omits a voided cell from the board entirely, without shifting later cells\' ids', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Punch A Hole');
+    def.spaces[5].voided = true;
+
+    const board = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def}, new SeededRandom(0));
+    const gridSpaces = board.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
+
+    expect(gridSpaces).to.have.length(36);
+    expect(gridSpaces.map((s) => s.id)).to.not.include('206'); // idx 5 + idOffset 1 = 206.
+    const stock = VenusSurfaceBoard.newInstance(DEFAULT_GAME_OPTIONS, new SeededRandom(0));
+    const stockIdsMinusVoided = stock.spaces
+      .filter((s) => s.spaceType !== SpaceType.COLONY && s.id !== '206')
+      .map((s) => s.id);
+    expect(gridSpaces.map((s) => s.id)).to.deep.eq(stockIdsMinusVoided);
+  });
+
+  it('a voided cell is excluded from land placement', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Punch A Hole');
+    def.spaces[5].voided = true;
+    const board = VenusSurfaceBoard.newInstance({...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def}, new SeededRandom(0));
+
+    const player = TestPlayer.BLUE.newPlayer();
+    // blankSimpleBoard is all-LAND -- 37 grid spaces, minus the 1 voided.
+    expect(board.getAvailableSpacesForLand(player)).to.have.length(36);
+  });
+
+  it('ignores a reservation on a voided cell, falling back off-grid (the board itself does not validate this -- see simpleBoardCodec.spec.ts for the actual guard)', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Contradiction');
+    def.spaces[5].voided = true;
+    def.spaces[5].reserved = 'stratopolis';
+    const gameOptions = {...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def, expansions: {...DEFAULT_GAME_OPTIONS.expansions, venus: true}};
+
+    const board = VenusSurfaceBoard.newInstance(gameOptions, new SeededRandom(0));
+    expect(board.getSpaceOrThrow(VENUS_STRATOPOLIS).x).to.eq(-1);
+  });
 });

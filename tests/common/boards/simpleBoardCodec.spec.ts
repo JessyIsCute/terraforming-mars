@@ -125,6 +125,55 @@ describe('simpleBoardCodec', () => {
     expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
   });
 
+  it('round-trips a voided cell, on either board type', () => {
+    for (const boardType of ['moon', 'venusPhase2'] as const) {
+      const def = blankSimpleBoard(boardType, 'Punch A Hole');
+      def.spaces[3].voided = true;
+
+      const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
+      expect(decoded).to.deep.eq(def);
+      expect(decoded.spaces[3].voided).is.true;
+    }
+  });
+
+  it('a non-voided space round-trips with no voided key at all (not voided: false)', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Plain');
+    const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
+    expect(decoded.spaces.every((s) => !('voided' in s))).is.true;
+  });
+
+  it('round-trips a voided cell together with an unrelated reservation elsewhere on the board', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Both');
+    def.spaces[3].voided = true;
+    def.spaces[5].reserved = 'stratopolis';
+
+    const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
+    expect(decoded).to.deep.eq(def);
+  });
+
+  it('rejects a space that is both voided and reserved', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Contradiction');
+    def.spaces[0].voided = true;
+    def.spaces[0].reserved = 'stratopolis';
+    expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
+  });
+
+  it('rejects a definition where every space is voided', () => {
+    const def = blankSimpleBoard('moon', 'Nothing Left');
+    def.spaces.forEach((s) => {
+      s.voided = true;
+    });
+    expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
+  });
+
+  it('allows all but one space voided', () => {
+    const def = blankSimpleBoard('moon', 'One Left');
+    def.spaces.forEach((s, i) => {
+      s.voided = i !== 0;
+    });
+    expect(() => validateSimpleBoard(def)).to.not.throw();
+  });
+
   it('rejects a decoded wire payload with an unknown board type', () => {
     // Craft a code decode would otherwise accept structurally, but with a board type that isn't
     // 'moon'/'venusPhase2' -- this can't happen through encodeSimpleBoard's typed input, only via

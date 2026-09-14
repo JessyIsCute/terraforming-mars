@@ -36,11 +36,12 @@ export class MoonBoard extends Board {
       // A user-authored layout from the map editor (see SimpleCustomBoardDefinition.ts). Its
       // `spaces` are already in the same row-major order as the grid loop in Builder.build()
       // below (both derive from the same simpleBoardLayout('moon') shape), so this just supplies
-      // the type/bonus arrays that loop reads -- shuffling a player-authored layout wouldn't make
-      // sense, so shuffleMapOption is ignored in this branch.
+      // the type/bonus/voided arrays that loop reads -- shuffling a player-authored layout
+      // wouldn't make sense, so shuffleMapOption is ignored in this branch.
       for (const space of custom.spaces) {
         b.spaceTypes.push(space.spaceType);
         b.bonuses.push(space.bonus);
+        b.voided.push(space.voided === true);
       }
     } else {
       const STEEL = SpaceBonus.STEEL;
@@ -73,6 +74,12 @@ class Builder {
   x: number = 0;
   spaceTypes: Array<SpaceType> = [];
   bonuses: Array<Array<SpaceBonus>> = [];
+  // Parallel to spaceTypes/bonuses, one entry per grid position -- see build()'s loop, which still
+  // increments idx (and thus the id counter) for a voided position, just skips pushing a Space for
+  // it, so every OTHER cell keeps the exact 'm02'..'m36' id it would've had without the void --
+  // MoonBoard.vue positions hexes by hand-tuned CSS keyed to that exact id, so a shifted id would
+  // silently stop matching any rule.
+  voided: Array<boolean> = [];
   spaces: Array<Space> = [];
   private idx: number = 0;
 
@@ -101,6 +108,12 @@ class Builder {
       const tilesInThisRow = tilesPerRow[row];
       const xOffset = row === 3 ? 0 : 6 - tilesInThisRow; // Hack for central line 0-based x coord
       for (let i = 0; i < tilesInThisRow; i++) {
+        // A voided cell doesn't exist on the board at all -- no Space is created for it -- but idx
+        // (and so the id counter) still advances, keeping every later cell's id stable.
+        if (this.voided[idx] === true) {
+          idx++;
+          continue;
+        }
         const spaceId = idx + idOffset;
         const xCoordinate = xOffset + i;
         const space = {
@@ -145,12 +158,26 @@ class Row {
   land(...bonuses: SpaceBonus[]): this {
     this.builder.spaceTypes.push(SpaceType.LAND);
     this.builder.bonuses.push(bonuses);
+    this.builder.voided.push(false);
     return this;
   }
 
   mine(...bonuses: SpaceBonus[]): this {
     this.builder.spaceTypes.push(SpaceType.LUNAR_MINE);
     this.builder.bonuses.push(bonuses);
+    this.builder.voided.push(false);
+    return this;
+  }
+
+  // Removes this hex from the board entirely -- matches the map editor's own void tool. Not used
+  // by this file's own hard-coded default layout today; see the identical method on Venus Phase
+  // 2's own Row class for why it exists anyway (keeps the custom-definition and hand-written
+  // default paths reading the same Builder.voided array, and lets a "Copy as default board
+  // source" export round-trip a void).
+  void(): this {
+    this.builder.spaceTypes.push(SpaceType.LAND);
+    this.builder.bonuses.push([]);
+    this.builder.voided.push(true);
     return this;
   }
 }

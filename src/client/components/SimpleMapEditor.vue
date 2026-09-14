@@ -32,6 +32,19 @@
           </label>
         </fieldset>
 
+        <fieldset class="simple-map-editor-tools">
+          <legend v-i18n>Shape</legend>
+          <p class="simple-map-editor-tools-note" v-i18n>
+            Click a hex to remove it from the board entirely -- click a voided hex again (with any
+            tool) to restore it.
+          </p>
+          <label :title="'Removes the hex from the board entirely -- click again with any tool to restore it.'">
+            <input type="radio" name="tool" value="void:toggle" v-model="tool">
+            <i class="simple-map-editor-swatch simple-map-editor-swatch--void">✕</i>
+            <span v-i18n>Void (no hex)</span>
+          </label>
+        </fieldset>
+
         <fieldset v-if="reservedTools.length > 0" class="simple-map-editor-tools">
           <legend v-i18n>Reserved spots</legend>
           <p class="simple-map-editor-tools-note" v-i18n>Click a hex to reserve it. Each spot can only be on one hex at a time -- picking a new one moves it.</p>
@@ -73,13 +86,13 @@
               :key="i"
               type="button"
               class="simple-map-editor-hex"
-              :class="'simple-map-editor-swatch--' + (cell.reserved ?? cell.spaceType)"
+              :class="'simple-map-editor-swatch--' + (cell.voided ? 'void' : (cell.reserved ?? cell.spaceType))"
               :style="hexStyle(cell)"
               @click="paint(i)"
               @contextmenu.prevent="removeLastBonus(i)"
-              :title="cell.x + ',' + cell.y + (cell.reserved ? ' (' + reservedLabel(cell.reserved) + ')' : '')"
+              :title="cell.x + ',' + cell.y + (cell.voided ? ' (void)' : cell.reserved ? ' (' + reservedLabel(cell.reserved) + ')' : '')"
             >
-              <span class="simple-map-editor-hex-bonuses" v-if="cell.bonus.length > 0">
+              <span class="simple-map-editor-hex-bonuses" v-if="!cell.voided && cell.bonus.length > 0">
                 <i
                   v-for="(item, bi) in groupedBonus(cell.bonus)"
                   :key="bi"
@@ -201,15 +214,18 @@ function moonSpaceId(index: number): SpaceId {
 
 type BonusTool = {key: string, bonus: SpaceBonus, css: string, label: string, description: string};
 
-const MOON_BONUS_TOOLS: Array<BonusTool> = [
+// Both boards share the same "gain resource on tile placement" flavor of bonus -- Moon's mine
+// tiles and Venus's Cloud City/Floater Array/Gas Mine tiles all trigger grantSpaceBonuses()
+// generically (Game.ts), so nothing here is actually Moon-specific despite the name.
+const SHARED_BONUS_TOOLS: Array<BonusTool> = [
   {key: 'bonus:' + SpaceBonus.STEEL, bonus: SpaceBonus.STEEL, css: 'steel', label: 'Steel', description: 'Gain 1 steel when you place a tile on this space.'},
   {key: 'bonus:' + SpaceBonus.TITANIUM, bonus: SpaceBonus.TITANIUM, css: 'titanium', label: 'Titanium', description: 'Gain 1 titanium when you place a tile on this space.'},
   {key: 'bonus:' + SpaceBonus.DRAW_CARD, bonus: SpaceBonus.DRAW_CARD, css: 'card', label: 'Card', description: 'Draw 1 card when you place a tile on this space.'},
 ];
 
 const BONUS_TOOLS_BY_BOARD: Record<SimpleBoardType, Array<BonusTool>> = {
-  moon: MOON_BONUS_TOOLS,
-  venusPhase2: [],
+  moon: SHARED_BONUS_TOOLS,
+  venusPhase2: SHARED_BONUS_TOOLS,
 };
 
 type ReservedTool = {key: string, spot: VenusReservedSpot, css: string, label: string, description: string};
@@ -289,6 +305,9 @@ export default defineComponent({
       if (this.tool === 'reserved:clear') {
         return 'Unreserve the hex you click, if it was reserved.';
       }
+      if (this.tool === 'void:toggle') {
+        return 'Removes the hex from the board entirely -- click again with any tool to restore it.';
+      }
       const all = [...this.terrainTools, ...this.bonusTools, ...this.reservedTools];
       return all.find((t) => t.key === this.tool)?.description ?? '';
     },
@@ -317,7 +336,10 @@ export default defineComponent({
         ...(hasStratopolis ? [] : [{id: VENUS_STRATOPOLIS, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []}]),
         ...(hasMaxwellBase ? [] : [{id: VENUS_MAXWELL_BASE, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []}]),
       ];
-      return {spaces: [...fallback, ...this.grid.map((s, i): SpaceModel => this.toSpaceModel(s, i))]};
+      // A voided cell doesn't exist on the real board at all (VenusSurfaceBoard.ts's build() skips
+      // creating a Space for it) -- mirror that here rather than showing a phantom hex.
+      const painted = this.grid.flatMap((s, i): Array<SpaceModel> => s.voided === true ? [] : [this.toSpaceModel(s, i)]);
+      return {spaces: [...fallback, ...painted]};
     },
     previewMoonModel(): MoonModel {
       // Unlike VenusSurfaceBoard.vue, MoonBoard.vue's own template unconditionally looks up
@@ -327,8 +349,13 @@ export default defineComponent({
         {id: NamedMoonSpaces.LUNA_TRADE_STATION, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []},
         {id: NamedMoonSpaces.MOMENTUM_VIRIUM, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []},
       ];
+      // A voided cell doesn't exist on the real board at all (MoonBoard.ts's build() skips
+      // creating a Space for it, though it still keeps moonSpaceId's numbering stable for every
+      // cell after it) -- mirror that here rather than showing a phantom hex.
+      const painted = this.grid.flatMap((s, i): Array<SpaceModel> =>
+        s.voided === true ? [] : [{id: moonSpaceId(i), x: s.x, y: s.y, spaceType: s.spaceType, bonus: s.bonus}]);
       return {
-        spaces: [...reserved, ...this.grid.map((s, i): SpaceModel => ({id: moonSpaceId(i), x: s.x, y: s.y, spaceType: s.spaceType, bonus: s.bonus}))],
+        spaces: [...reserved, ...painted],
         habitatRate: 0,
         miningRate: 0,
         logisticRate: 0,
@@ -347,6 +374,9 @@ export default defineComponent({
         rows.push(this.grid.filter((s) => s.y === y));
       }
       const tool = (space: SimpleCustomSpaceDef): string => {
+        if (space.voided === true) {
+          return '.void()';
+        }
         const method = space.reserved === 'stratopolis' ? 'stratopolis' :
           space.reserved === 'maxwellBase' ? 'maxwellBase' :
             space.spaceType === SpaceType.LAND ? 'land' :
@@ -388,6 +418,16 @@ export default defineComponent({
     },
     paint(index: number): void {
       const space = this.grid[index];
+      if (this.tool === 'void:toggle') {
+        space.voided = !space.voided;
+        this.grid = [...this.grid];
+        return;
+      }
+      // Any other tool implicitly restores a voided hex before applying itself -- a hex that
+      // doesn't exist can't be painted, reserved, or given a bonus.
+      if (space.voided === true) {
+        space.voided = false;
+      }
       if (this.tool.startsWith('type:')) {
         space.spaceType = this.tool.slice(5) as SpaceType;
       } else if (this.tool === 'bonus:clear') {
@@ -596,6 +636,16 @@ export default defineComponent({
     line-height: 14px;
     text-align: center;
     color: #e74c3c;
+  }
+  .simple-map-editor-swatch--void {
+    background: repeating-linear-gradient(45deg, #2a2733, #2a2733 4px, #15131f 4px, #15131f 8px);
+    border: 1px dashed #666;
+    box-sizing: border-box;
+    font-style: normal;
+    font-size: 10px;
+    line-height: 14px;
+    text-align: center;
+    color: #666;
   }
 
   .simple-map-editor-bonus-icon {

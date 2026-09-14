@@ -49,11 +49,12 @@ export class VenusSurfaceBoard extends Board {
       // A user-authored layout from the map editor (see SimpleCustomBoardDefinition.ts). Its
       // `spaces` are already in the same row-major order as the grid loop in Builder.build()
       // below (both derive from the same simpleBoardLayout('venusPhase2') shape), so this just
-      // supplies the type/bonus/reserved arrays that loop reads.
+      // supplies the type/bonus/reserved/voided arrays that loop reads.
       for (const space of custom.spaces) {
         b.spaceTypes.push(space.spaceType);
         b.bonuses.push(space.bonus);
         b.reservedNames.push(space.reserved);
+        b.voided.push(space.voided === true);
       }
     } else {
       // A true regular hexagon (side length 4 -- see VENUS_SURFACE_ROWS): mostly open land for
@@ -81,6 +82,10 @@ class Builder {
   spaceTypes: Array<SpaceType> = [];
   bonuses: Array<Array<SpaceBonus>> = [];
   reservedNames: Array<VenusReservedSpot | undefined> = [];
+  // Parallel to spaceTypes/bonuses/reservedNames, one entry per grid position -- see build()'s
+  // loop, which still increments idx for a voided position (just skips pushing a Space for it) so
+  // every OTHER cell's id stays exactly what it would've been without the void.
+  voided: Array<boolean> = [];
   spaces: Array<Space> = [];
 
   public row(startX: number): Row {
@@ -104,6 +109,13 @@ class Builder {
 
     for (const row of hexRowLayout(VENUS_SURFACE_ROWS)) {
       for (let i = 0; i < row.width; i++) {
+        // A voided cell doesn't exist on the board at all -- no Space is created for it -- but idx
+        // still advances, so every cell after it keeps the exact id it would've had without the
+        // void (ids are purely idx-derived; see Builder.spaceId).
+        if (this.voided[idx] === true) {
+          idx++;
+          continue;
+        }
         // A cell reserved for a card that isn't even in this game's deck is just a normal cell of
         // whatever type it was painted -- no point excluding a hex from placement for a card that
         // will never be played (also lets a custom board someone else made, that reserves a spot
@@ -169,6 +181,7 @@ class Row {
     this.builder.spaceTypes.push(SpaceType.LAND);
     this.builder.bonuses.push(bonuses);
     this.builder.reservedNames.push(undefined);
+    this.builder.voided.push(false);
     return this;
   }
 
@@ -176,6 +189,7 @@ class Row {
     this.builder.spaceTypes.push(SpaceType.GASLIGHT);
     this.builder.bonuses.push(bonuses);
     this.builder.reservedNames.push(undefined);
+    this.builder.voided.push(false);
     return this;
   }
 
@@ -186,6 +200,7 @@ class Row {
     this.builder.spaceTypes.push(SpaceType.LAND);
     this.builder.bonuses.push(bonuses);
     this.builder.reservedNames.push('stratopolis');
+    this.builder.voided.push(false);
     return this;
   }
 
@@ -193,6 +208,19 @@ class Row {
     this.builder.spaceTypes.push(SpaceType.LAND);
     this.builder.bonuses.push(bonuses);
     this.builder.reservedNames.push('maxwellBase');
+    this.builder.voided.push(false);
+    return this;
+  }
+
+  // Removes this hex from the board entirely -- matches the map editor's own void tool. Not used
+  // by this file's own hard-coded default layout today, but the custom-definition path and a
+  // hand-written default both read the same Builder.voided array, so this keeps the two paths
+  // consistent and lets the map editor's "Copy as default board source" export round-trip a void.
+  void(): this {
+    this.builder.spaceTypes.push(SpaceType.LAND);
+    this.builder.bonuses.push([]);
+    this.builder.reservedNames.push(undefined);
+    this.builder.voided.push(true);
     return this;
   }
 }
