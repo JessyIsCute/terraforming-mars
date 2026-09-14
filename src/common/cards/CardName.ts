@@ -662,6 +662,7 @@ export enum CardName {
   VENUS_VENTURES = 'Venus Ventures',
   NEREID_BIOSYSTEMS = 'Nereid Biosystems',
   SIGNAL_UNION = 'Signal Union',
+  COST_INDEX = 'Cost Index',
   THE_SYNDICATE = 'The Syndicate',
   EVERGREEN_FOREST = 'Evergreen Forest',
   IDEA_BUDGETING = 'Idea Budgeting',

@@ -68,6 +68,7 @@ import {VenusVentures} from './VenusVentures';
 import {Critterworld} from './Critterworld';
 import {NereidBiosystems} from './NereidBiosystems';
 import {SignalUnion} from './SignalUnion';
+import {CostIndex} from './CostIndex';
 import {TheSyndicate} from './TheSyndicate';
 import {EpsilonDample} from './EpsilonDample';
 import {ZetaTollkeeper} from './ZetaTollkeeper';
@@ -125,6 +126,8 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.NEREID_BIOSYSTEMS]: {Factory: NereidBiosystems},
     // Carries a Mars tag and a data resource, both Pathfinders concepts.
     [CardName.SIGNAL_UNION]: {Factory: SignalUnion, compatibility: 'pathfinders'},
+    // Stores a data resource on itself - a Pathfinders concept.
+    [CardName.COST_INDEX]: {Factory: CostIndex, compatibility: 'pathfinders'},
     [CardName.THE_SYNDICATE]: {Factory: TheSyndicate, compatibility: ['turmoil', 'underworld']},
     [CardName.EPSILON_DAMPLE]: {Factory: EpsilonDample, compatibility: 'deltaProject'},
     [CardName.ZETA_TOLLKEEPER]: {Factory: ZetaTollkeeper, compatibility: 'deltaProject'},
