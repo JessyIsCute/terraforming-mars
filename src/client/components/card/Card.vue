@@ -2,12 +2,12 @@
   <div class="card-container filterDiv hover-hide-res" :class="cardClasses">
       <div class="card-content-wrapper" v-i18n @mouseover="hovering = true" @mouseleave="hovering = false">
           <div v-if="!isStandardProject" class="card-cost-and-tags">
-              <div><CardCost :amount="cost" :newCost="reducedCost" /></div>
+              <div><CardCost :amount="cost" :newCost="reducedCost" :titanium="isInfrastructure" /></div>
               <div v-if="showPlayerCube" :class="playerCubeClass"></div>
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
               <CardTags :tags="tags" />
           </div>
-          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName"/>
+          <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :tags="tags"/>
           <CardContent
               :metadata="cardMetadata"
               :requirements="cardRequirements"
@@ -136,6 +136,11 @@ export default defineComponent({
         tags.push(Tag.EVENT);
       }
       return tags;
+    },
+    // High Orbit (fan): Infrastructure-tagged "Silver" cards render with a distinct silver
+    // header and a Titanium (not M€) cost badge, regardless of CardType.
+    isInfrastructure(): boolean {
+      return this.tags.includes(Tag.INFRASTRUCTURE);
     },
     cost(): number | undefined {
       return this.isProjectCard ? this.cardInstance.cost : undefined;

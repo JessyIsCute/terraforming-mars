@@ -16,10 +16,6 @@ export type CardFactorySpec<T> = {
   instantiate?: boolean;
   // Used for Turmoil's global events. When true, classifeid as a "negative" global event.
   negative?: boolean;
-  // High Orbit (fan): "Silver" cards exist as this many separate physical copies in the
-  // project deck, so multiple players can each independently draw, own, and play their own
-  // copy of the same card. Defaults to 1 (the normal, single-copy case) when unset.
-  copiesInDeck?: number;
 }
 
 export function isCompatibleWith(cf: CardFactorySpec<any>, gameOptions: GameOptions): boolean {

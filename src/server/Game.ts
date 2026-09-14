@@ -73,6 +73,7 @@ import {UnderworldData} from './underworld/UnderworldData';
 import {UnderworldExpansion} from './underworld/UnderworldExpansion';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
+import {HIGH_ORBIT_SUPPLY} from './cards/highOrbit/HighOrbitCardManifest';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -134,6 +135,8 @@ export class Game implements IGame, Logger {
   public generation: number = 1;
   // High Orbit (fan): see IGame.cardsPlayedThisGeneration.
   public cardsPlayedThisGeneration: Set<CardName> = new Set();
+  // High Orbit (fan): see IGame.infrastructureSupply.
+  public infrastructureSupply: Map<CardName, number> = new Map();
   // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration.
   public resourceRemovalBlockedThisGeneration: boolean = false;
   public phase: Phase = Phase.RESEARCH;
@@ -410,6 +413,12 @@ export class Game implements IGame, Logger {
       players.forEach((player) => ConglomeratesExpansion.gainCoordination(player, 2));
     }
 
+    // High Orbit (fan): populate the shared, always-visible Infrastructure card supply --
+    // these cards never enter the project deck (see GameCards.getProjectCards).
+    if (gameOptions.highOrbitExpansion) {
+      game.infrastructureSupply = new Map(Object.entries(HIGH_ORBIT_SUPPLY) as Array<[CardName, number]>);
+    }
+
     // and 2 neutral cities and forests on board
     if (players.length === 1) {
       //  Setup solo player's starting tiles
@@ -532,6 +541,7 @@ export class Game implements IGame, Logger {
       board: this.board.serialize(),
       claimedMilestones: serializeClaimedMilestones(this.claimedMilestones),
       cardsPlayedThisGeneration: Array.from(this.cardsPlayedThisGeneration),
+      infrastructureSupply: Array.from(this.infrastructureSupply.entries()),
       resourceRemovalBlockedThisGeneration: this.resourceRemovalBlockedThisGeneration,
       ceoDeck: this.ceoDeck.serialize(),
       colonies: this.colonies.map((colony) => colony.serialize()),
@@ -1986,6 +1996,7 @@ export class Game implements IGame, Logger {
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);
     game.cardsPlayedThisGeneration = new Set<CardName>(d.cardsPlayedThisGeneration ?? []);
+    game.infrastructureSupply = new Map<CardName, number>(d.infrastructureSupply ?? []);
     game.resourceRemovalBlockedThisGeneration = d.resourceRemovalBlockedThisGeneration ?? false;
     game.researchedPlayers = new Set<PlayerId>(d.researchedPlayers);
 

@@ -101,12 +101,7 @@ export class GameCards {
       if (factory.instantiate === false || !isCompatibleWith(factory, this.gameOptions)) {
         continue;
       }
-      // High Orbit (fan) "Silver" cards: push multiple separately-instantiated copies into
-      // the deck instead of one, so different players can each own their own copy.
-      const copies = factory.copiesInDeck ?? 1;
-      for (let i = 0; i < copies; i++) {
-        result.push(new factory.Factory());
-      }
+      result.push(new factory.Factory());
     }
     return result;
   }
@@ -115,7 +110,11 @@ export class GameCards {
     const cards = this.getCards<IProjectCard>('projectCards');
     this.addCustomCards(cards, this.gameOptions.includedCards);
     this.addCustomCardLibrary(cards);
-    return cards.filter(isIProjectCard);
+    // High Orbit (fan): Infrastructure cards are never shuffled into the project deck -- they
+    // sit in a shared, always-visible supply (see IGame.infrastructureSupply) and are acquired
+    // via Player.getHighOrbitInfrastructureOptions as a normal action instead.
+    const highOrbitCardNames = new Set<CardName>(CardManifest.keys(HIGH_ORBIT_CARD_MANIFEST.projectCards));
+    return cards.filter(isIProjectCard).filter((card) => !highOrbitCardNames.has(card.name));
   }
   public getStandardProjects() {
     return this.getCards<IStandardProjectCard>('standardProjects');

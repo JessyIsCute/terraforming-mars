@@ -14,12 +14,12 @@ describe('PlanetaryOutpost', () => {
   beforeEach(() => {
     card = new PlanetaryOutpost();
     [game, player, player2] = testGame(2);
-    player.tagsForTest = {[Tag.SPACE]: 1};
   });
 
-  it('cannot play without more Space tags than Infrastructure tags', () => {
-    player.tagsForTest = {};
-    expect(card.canPlay(player)).is.false;
+  it('carries the Building tag, not Infrastructure, and has no Space/Infrastructure requirement', () => {
+    expect(card.tags).to.include(Tag.BUILDING);
+    expect(card.tags).to.not.include(Tag.INFRASTRUCTURE);
+    expect(card.canPlay(player)).is.true;
   });
 
   it('makes the player the first player on play', () => {

@@ -1,7 +1,7 @@
 import * as constants from '../common/constants';
 import {PlayerId} from '../common/Types';
 import {MILESTONE_COST, REDS_RULING_POLICY_COST} from '../common/constants';
-import {cardsFromJSON, ceosFromJSON, corporationCardsFromJSON, newCorporationCard, preludesFromJSON} from './createCard';
+import {cardsFromJSON, ceosFromJSON, corporationCardsFromJSON, newCorporationCard, newProjectCard, preludesFromJSON} from './createCard';
 import {CardName} from '../common/cards/CardName';
 import {CardType} from '../common/cards/CardType';
 import {Color} from '../common/Color';
@@ -1650,6 +1650,72 @@ export class Player implements IPlayer {
     return options ?? [];
   }
 
+  // High Orbit (fan): Infrastructure cards are never dealt into hand or drawn from the project
+  // deck (see GameCards.getProjectCards) -- they sit in a shared, always-visible supply
+  // (IGame.infrastructureSupply) and any player may acquire one as a normal action, from
+  // generation 1 onward, provided the design's own requirements are met and copies remain.
+  //
+  // Cost is native Titanium (1-4), substitutable at 4 M€ per Titanium not spent -- a bespoke,
+  // self-contained rate that must NOT go through the shared per-player getTitaniumValue()
+  // system (normally 3), so payment is built directly from Payment.of() + player.pay() here
+  // rather than reusing SelectPaymentDeferred's titanium handling. Planetary Outpost is the one
+  // documented exception: no Infrastructure tag, and it's "paid via standard M€ rules" --
+  // meaning the normal SelectPaymentDeferred flow, same as any other card purchase.
+  public getHighOrbitInfrastructureOptions(): Array<PlayerInput> {
+    if (!this.game.gameOptions.highOrbitExpansion) {
+      return [];
+    }
+    const result: Array<PlayerInput> = [];
+    for (const [cardName, remaining] of this.game.infrastructureSupply) {
+      if (remaining <= 0) {
+        continue;
+      }
+      const card = newProjectCard(cardName);
+      if (card === undefined || !card.canPlay(this)) {
+        continue;
+      }
+
+      if (cardName === CardName.PLANETARY_OUTPOST) {
+        if (!this.canAfford({cost: card.cost, titanium: true})) {
+          continue;
+        }
+        result.push(
+          new SelectOption(message('Acquire ${0} (${1} M€)', (b) => b.card(card).number(card.cost)), 'Confirm')
+            .andThen(() => {
+              this.game.infrastructureSupply.set(cardName, remaining - 1);
+              // SelectPaymentDeferred already deducts the payment itself before calling this
+              // callback -- passing `payment` on to playCard here would charge it a second time.
+              this.game.defer(new SelectPaymentDeferred(this, card.cost, {canUseTitanium: true})).andThen(() => {
+                this.playCard(card);
+              });
+              return undefined;
+            }),
+        );
+        continue;
+      }
+
+      const minTitanium = Math.max(0, card.cost - Math.floor(this.megaCredits / 4));
+      const maxTitanium = Math.min(card.cost, this.titanium);
+      if (minTitanium > maxTitanium) {
+        continue;
+      }
+      result.push(
+        new SelectAmount(
+          message('Acquire ${0}: spend how much titanium toward its ${1} titanium cost? (4 M€ per titanium not spent)', (b) => b.card(card).number(card.cost)),
+          'Confirm',
+          minTitanium,
+          maxTitanium,
+        ).andThen((titaniumSpent) => {
+          const megacreditsDue = (card.cost - titaniumSpent) * 4;
+          this.game.infrastructureSupply.set(cardName, remaining - 1);
+          this.playCard(card, Payment.of({megacredits: megacreditsDue, titanium: titaniumSpent}));
+          return undefined;
+        }),
+      );
+    }
+    return result;
+  }
+
   private headStartIsInEffect() {
     if (this.game.phase === Phase.PRELUDES && this.playedCards.has(CardName.HEAD_START)) {
       if (this.actionsTakenThisRound < 2) {
@@ -1920,6 +1986,9 @@ export class Player implements IPlayer {
     // Game.getStandardProjects), each offered here as its own action with a "spend how many
     // floaters?" prompt first.
     action.options.push(...this.getVenusPhase2StandardProjectOptions());
+
+    // High Orbit (fan): acquire an Infrastructure card from the shared supply.
+    action.options.push(...this.getHighOrbitInfrastructureOptions());
 
     // Pass
     action.options.push(this.passOption());

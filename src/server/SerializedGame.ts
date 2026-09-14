@@ -32,6 +32,9 @@ export type SerializedGame = {
     // High Orbit (fan): see IGame.cardsPlayedThisGeneration. Optional for backward compatibility
     // with saves from before this field existed.
     cardsPlayedThisGeneration?: Array<CardName>;
+    // High Orbit (fan): see IGame.infrastructureSupply. Optional for backward compatibility
+    // with saves from before this field existed.
+    infrastructureSupply?: Array<[CardName, number]>;
     // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration. Optional for backward
     // compatibility with saves from before this field existed.
     resourceRemovalBlockedThisGeneration?: boolean;
