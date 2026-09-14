@@ -30,4 +30,5 @@ export const cardResourceCSS = {
   [CardResource.LOOT]: 'card-resource-loot',
   [CardResource.BUDGET]: 'card-resource-budget',
   [CardResource.RELIC]: 'card-resource-relic',
+  [CardResource.ORE]: 'card-resource-ore',
 } satisfies Record<CardResource, string>;

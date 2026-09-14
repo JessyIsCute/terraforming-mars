@@ -229,6 +229,18 @@
                                 <div class="create-game-expansion-icon expansion-icon-industries"></div>
                                 <span v-i18n>Industries</span>&nbsp;<span title="A fan expansion: 7 new standard projects placing industry tiles that raise production and distribute resources nearby">(&#945;)</span>&nbsp;<a :href="wikiUrls.industries" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
+
+                            <input type="checkbox" name="highOrbit" id="highOrbit-checkbox" v-model="expansions.highOrbit">
+                            <label for="highOrbit-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-highOrbit"></div>
+                                <span v-i18n>High Orbit</span>&nbsp;<span title="A fan expansion: adds the Infrastructure tag and 'Silver' cards, which exist as several physical copies in the deck so multiple players can each own their own">(&#945;)</span>&nbsp;<a :href="wikiUrls.highOrbit" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
+
+                            <input type="checkbox" name="solaris" id="solaris-checkbox" v-model="expansions.solaris">
+                            <label for="solaris-checkbox" class="expansion-button">
+                                <div class="create-game-expansion-icon expansion-icon-solaris"></div>
+                                <span v-i18n>Solaris</span>&nbsp;<span title="A fan expansion: adds the Galactic tag on a set of very expensive, high-payoff cards, plus a wide mix of Turmoil-integrated project cards">(&#945;)</span>&nbsp;<a :href="wikiUrls.solaris" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                            </label>
                         </div>
 
                         <div class="create-game-page-column">
