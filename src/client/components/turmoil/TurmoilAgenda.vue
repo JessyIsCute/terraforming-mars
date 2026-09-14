@@ -315,7 +315,7 @@
     <template v-else-if="id === 'spob02'">
       <div class="resource money party-resource">1</div> /
       <div class="tile city-tile tile-size--S"></div>
-      <div class="colony-cube"></div>
+      <div class="resource-tag tag-colony-count party-resource-tag"></div>
     </template>
     <template v-else-if="id === 'spop01'">
       <div class="policy-top-margin"><div class="tile city-tile tile-size--S"></div> : <div class="resource card card-with-border"></div></div>
@@ -327,7 +327,7 @@
       <span class="money resource">15</span>
       (<span class="titanium resource"></span>)
       <span class="red-arrow"></span>
-      <div class="colony-cube"></div>
+      <div class="resource-tag tag-colony-count party-resource-tag"></div>
     </template>
     <template v-else-if="id === 'empb01'">
       <div class="resource money party-resource">1</div> /
@@ -358,7 +358,7 @@
       <div class="policy-top-margin">2 <span class="money resource"></span> / delegate</div>
     </template>
     <template v-else-if="id === 'burb02'">
-      <div class="policy-top-margin">2 <span class="money resource"></span> / influence</div>
+      <div class="policy-top-margin">2 <span class="money resource"></span> / <div class="influence" style="width: 24px; height: 24px; background-size: 24px 24px;"></div></div>
     </template>
     <template v-else-if="id === 'burp03'">
       <div class="policy-top-margin">delegate : <span class="money resource">3</span></div>
