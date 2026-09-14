@@ -55,9 +55,9 @@ export const AGENDA_DESCRIPTIONS: Partial<Record<BonusId | PolicyId, string>> = 
   gp04: 'Spend 5 M€ to gain 3 plants or add 2 microbes to ANY card (Turmoil Greens)',
 
   popb01: 'Gain 1 M€ for every event you have played',
-  popb02: 'Not implemented in this codebase: gain 2 M€ for every population and face-up faction card you have (EPIC campaign concepts)',
+  popb02: 'The player(s) with the most Event cards played gains 1 TR',
   popp01: 'Every time you play a card worth VP (positive or negative), gain or pay twice that many M€',
-  popp02: 'Not implemented in this codebase: action, pay 4 M€ to gain one population from any sector (EPIC campaign concepts)',
+  popp02: 'Action: spend 5 M€ to return one of your played Event cards to your hand. It may not be a card that placed special tiles',
   popp03: 'Every time you play an Event card, draw 1 card',
   popp04: 'Action: spend 4 M€ to buy the first Event card',
 
@@ -70,15 +70,15 @@ export const AGENDA_DESCRIPTIONS: Partial<Record<BonusId | PolicyId, string>> = 
 
   empb01: 'Gain 1 M€ for every energy tag and every card with no tag you have',
   empb02: 'Gain 1 M€ for every energy production level you have',
-  empp01: 'Not implemented in this codebase: Energy resources can be used as 2 M€; 2 M€ can be used as Energy resources (would require payment-system changes)',
+  empp01: 'You may use energy as M€ (2 M€ per energy)',
   empp02: 'Every time you raise or lower your energy production, gain 2 energy',
   empp03: 'You\'re considered having 2 more energy tags',
   empp04: 'Action: choose energy tag, spend 4 M€ to buy the first card with that tag',
 
   burb01: 'Gain 2 M€ for every delegate you have in a party',
   burb02: 'Gain 2 M€ for every influence you have',
-  burp01: 'Not implemented in this codebase: this generation you can take at most 2 actions on cards in play, plus the influence you have (would require a new global action-cap mechanic)',
-  burp02: 'Not implemented in this codebase: at the start of each turn, pay 3 M€ minus the influence you have (no per-turn hook exists here)',
+  burp01: 'Action: spend 5 M€ to buy the first Active card',
+  burp02: 'At the start of each turn, pay 3 M€ minus the influence you have (or as much as possible)',
   burp03: 'Every time you place a delegate, gain 3 M€',
   burp04: 'Every time you play a card, discard a card. Does not apply to the chairman',
 
@@ -93,8 +93,8 @@ export const AGENDA_DESCRIPTIONS: Partial<Record<BonusId | PolicyId, string>> = 
   trab02: 'Gain 2 M€ for every milestone or award you have claimed',
   trap01: 'You\'re considered having 1 more wild tag',
   trap02: 'Every time you play a standard project, gain 2 M€',
-  trap03: 'Not implemented in this codebase: action, pay 5 M€ to buy a postlude (EPIC campaign concept)',
-  trap04: 'Not implemented in this codebase: action, spend 10 M€ to draw 2 milestones or awards and replace an unclaimed one, optionally claiming it immediately (milestones/awards are a fixed list in this codebase, not a drawable pool)',
+  trap03: 'Action: pay 15 M€ to draw and play a Prelude card',
+  trap04: 'Action: spend 10 M€ to draw 1 unused milestone and 1 unused award, swap one in for an unclaimed milestone or unfunded award, then optionally claim/fund it immediately',
 };
 
 /**

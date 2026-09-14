@@ -23,6 +23,8 @@ export interface SerializedPlayer extends DeprecatedFields{
   autoPass: boolean;
   beginner: boolean;
   canUseHeatAsMegaCredits: boolean;
+  // Optional for backward compatibility with games serialized before this field existed.
+  canUseEnergyAsMegaCredits?: boolean;
   canUseTitaniumAsMegacredits: boolean;
   canUsePlantsAsMegaCredits: boolean;
   cardCost: number;

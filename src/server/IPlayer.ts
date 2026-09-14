@@ -93,6 +93,8 @@ export interface IPlayer {
 
   // Helion
   canUseHeatAsMegaCredits: boolean;
+  // Turmoil More Parties: Empower Policy 1, only while that policy is in effect.
+  canUseEnergyAsMegaCredits: boolean;
   // Sistemas Seebeck (fan): set right before an action resolves to mark it as free -
   // takeAction() checks and clears this instead of incrementing actionsTakenThisRound.
   skipNextActionIncrement: boolean;
@@ -393,6 +395,9 @@ export interface IPlayer {
 
   /** Returns the cost a player must spend to claim a milestone. Public for Briber. */
   milestoneCost(): number;
+
+  /** Returns the cost a player must spend to fund an award. Public for TranshumanistsPolicy04. */
+  awardFundingCost(): number;
 
   /** Shorthand for deferring evaluating a PlayerInput */
   defer(input: PlayerInput | undefined | void | (() => PlayerInput | undefined | void), priority?: Priority): void;

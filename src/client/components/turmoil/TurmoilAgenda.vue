@@ -295,8 +295,18 @@
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-event party-resource-tag"></div>
     </template>
+    <template v-else-if="id === 'popb02'">
+      <div class="party-inferior-rating tile party-rating party-tile">&gt;</div>
+      <div class="resource-tag tag-event party-resource-tag"></div> :
+      <div class="rating tile party-rating party-tile"></div>
+    </template>
     <template v-else-if="id === 'popp01'">
       <div class="policy-top-margin">VP : x2 <span class="money resource"></span></div>
+    </template>
+    <template v-else-if="id === 'popp02'">
+      <span class="money resource">5</span>
+      <span class="red-arrow"></span>
+      <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-event"></div></div>
     </template>
     <template v-else-if="id === 'popp03'">
       <div class="policy-top-margin">
@@ -338,6 +348,11 @@
       <div class="resource money party-resource">1</div> /
       <div class="production-box party-production-box"><div class="energy production"></div></div>
     </template>
+    <template v-else-if="id === 'empp01'">
+      <div class="policy-top-margin">
+      <span class="energy resource">1</span> = <span class="money resource">2</span>
+      </div>
+    </template>
     <template v-else-if="id === 'empp02'">
       <div class="policy-top-margin">
       <div class="production-box party-production-box"><div class="energy production"></div></div>
@@ -355,10 +370,20 @@
       <div class="resource card card-with-border policy-card-with-tag"><div class="card-icon tag-power"></div></div>
     </template>
     <template v-else-if="id === 'burb01'">
-      <div class="policy-top-margin">2 <span class="money resource"></span> / delegate</div>
+      <div class="policy-top-margin"><span class="money resource">2</span> / delegate</div>
     </template>
     <template v-else-if="id === 'burb02'">
-      <div class="policy-top-margin">2 <span class="money resource"></span> / <div class="influence" style="width: 24px; height: 24px; background-size: 24px 24px;"></div></div>
+      <div class="policy-top-margin"><span class="money resource">2</span> / <div class="influence" style="width: 24px; height: 24px; background-size: 24px 24px;"></div></div>
+    </template>
+    <template v-else-if="id === 'burp01'">
+      <span class="money resource">5</span>
+      <span class="red-arrow"></span>
+      <div class="resource card card-with-border" style="background: linear-gradient(-60deg, #208cdf 10%, #4da3e6, #208cdf 90%);"></div>
+    </template>
+    <template v-else-if="id === 'burp02'">
+      <div class="policy-top-margin">
+      <span class="money resource">3</span> - <div class="influence" style="width: 24px; height: 24px; background-size: 24px 24px;"></div>
+      </div>
     </template>
     <template v-else-if="id === 'burp03'">
       <div class="policy-top-margin">delegate : <span class="money resource">3</span></div>
@@ -397,7 +422,7 @@
       <div class="resource-tag tag-wild party-resource-tag"></div>
     </template>
     <template v-else-if="id === 'trab02'">
-      <div class="policy-top-margin">2 <span class="money resource"></span> / milestone or award</div>
+      <div class="policy-top-margin"><span class="money resource">2</span> / milestone or award</div>
     </template>
     <template v-else-if="id === 'trap01'">
       <div class="policy-top-margin">
@@ -406,6 +431,18 @@
     </template>
     <template v-else-if="id === 'trap02'">
       <div class="policy-top-margin"><span v-i18n>Standard Project</span> : <span class="money resource">2</span></div>
+    </template>
+    <template v-else-if="id === 'trap03'">
+      <span class="money resource">15</span>
+      <span class="red-arrow"></span>
+      <div class="resource card card-with-border" style="background: linear-gradient(-60deg, rgb(235, 118, 171) 10%, #f2a6c8, rgb(235, 118, 171) 90%);"></div>
+    </template>
+    <template v-else-if="id === 'trap04'">
+      <div class="policy-top-margin">
+      <span class="money resource">10</span>
+      <span class="red-arrow"></span>
+      <span v-i18n style="font-size: 11px;">Milestone/Award</span>
+      </div>
     </template>
     <template v-else-if="isNotImplementedId">
       <div v-i18n>Not implemented</div>
@@ -472,7 +509,7 @@ export default defineComponent({
     // MORE_PARTIES_AGENDA_DESCRIPTIONS / the More Parties party files) and have no real
     // behavior in this codebase -- they share this generic display instead of a bespoke icon.
     isNotImplementedId(): boolean {
-      const notImplementedIds = ['popb02', 'popp02', 'spop04', 'empp01', 'burp01', 'burp02', 'trap03', 'trap04'];
+      const notImplementedIds = ['spop04'];
       return notImplementedIds.includes(this.id);
     },
     resolvedDescription(): string {

@@ -158,6 +158,10 @@ export interface IGame extends Logger {
   hasBeenFunded(award: IAward): boolean;
   allAwardsFunded(): boolean;
   allMilestonesClaimed(): boolean;
+  /** A random milestone compatible with this game but not already in play, or undefined if none remain. */
+  getUnusedMilestoneCandidate(): IMilestone | undefined;
+  /** A random award compatible with this game but not already in play, or undefined if none remain. */
+  getUnusedAwardCandidate(): IAward | undefined;
   hasPassedThisActionPhase(player: IPlayer): boolean;
   // Public for testing.
   incrementFirstPlayer(): void;

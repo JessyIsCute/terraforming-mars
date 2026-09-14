@@ -23,7 +23,7 @@ import {MARS_GLOBAL_PARAMETERS} from './parties/ScientistsMoreParties';
 import {DiscardCards} from '../deferredActions/DiscardCards';
 import {POPULISTS_POLICY_1, POPULISTS_POLICY_3} from './parties/Populists';
 import {CENTRISTS_POLICY_3} from './parties/Centrists';
-import {BUREAUCRATS_POLICY_4} from './parties/Bureaucrats';
+import {BUREAUCRATS_POLICY_2, BUREAUCRATS_POLICY_4} from './parties/Bureaucrats';
 
 /** The value at which a track first grants a bonus of the given kind, or Infinity if never. */
 function bonusThreshold(track: ParameterTrack, kind: ParameterBonus['kind']): number {
@@ -133,6 +133,14 @@ export class TurmoilHandler {
   public static applyOnHabitatTilePlacedEffect(player: IPlayer): void {
     if (PartyHooks.shouldApplyPolicy(player, PartyName.SPOME, 'spop02')) {
       player.stock.add(Resource.MEGACREDITS, 4, {log: true, from: {partyName: PartyName.SPOME}});
+    }
+  }
+
+  // More Parties Bureaucrats P2 hook -- called from Game.startActionsForPlayer, once at the
+  // start of each player's turn (not each action -- a turn is their full 1-2 action allotment).
+  public static applyOnTurnStartEffect(player: IPlayer): void {
+    if (PartyHooks.shouldApplyPolicy(player, PartyName.BUREAUCRATS, 'burp02')) {
+      BUREAUCRATS_POLICY_2.onTurnStart?.(player);
     }
   }
 

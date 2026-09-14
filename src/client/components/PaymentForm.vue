@@ -61,6 +61,7 @@ const DESCRIPTIONS: Record<SpendableResource, string> = {
   steel: 'Steel',
   titanium: 'Titanium',
   heat: 'Heat',
+  energy: 'Energy',
   seeds: 'Seeds',
   auroraiData: 'Data',
   kuiperAsteroids: 'Asteroids',

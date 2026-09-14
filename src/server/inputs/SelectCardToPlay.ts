@@ -64,6 +64,7 @@ export abstract class SelectCardToPlay<T extends IProjectCard | IStandardProject
       floaters: player.getSpendable('floaters'),
       paymentOptions: {
         heat: player.canUseHeatAsMegaCredits,
+        energy: player.canUseEnergyAsMegaCredits,
         lunaTradeFederationTitanium: player.canUseTitaniumAsMegacredits,
         plants: player.canUsePlantsAsMegacredits,
       },

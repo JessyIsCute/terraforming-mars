@@ -120,6 +120,8 @@ export class Player implements IPlayer {
   private steelValue: number = 2;
   // Helion
   public canUseHeatAsMegaCredits: boolean = false;
+  // Turmoil More Parties: Empower Policy 1, only while that policy is in effect.
+  public canUseEnergyAsMegaCredits: boolean = false;
   // Sistemas Seebeck (fan): see IPlayer.skipNextActionIncrement.
   public skipNextActionIncrement: boolean = false;
   // robAntilles (fan, Giga Interferometer): see IPlayer.awaitingAdHocResearch.
@@ -703,6 +705,9 @@ export class Player implements IPlayer {
     if (this.canUseHeatAsMegaCredits) {
       total += this.availableHeat();
     }
+    if (this.canUseEnergyAsMegaCredits) {
+      total += this.availableEnergy() * DEFAULT_PAYMENT_VALUES.energy;
+    }
     if (this.canUseTitaniumAsMegacredits) {
       total += this.titanium * (this.titaniumValue - 1);
     }
@@ -815,6 +820,7 @@ export class Player implements IPlayer {
   private paymentOptionsForCard(card: IProjectCard): PaymentOptions {
     return {
       heat: this.canUseHeatAsMegaCredits,
+      energy: this.canUseEnergyAsMegaCredits,
       steel: this.lastCardPlayed === CardName.LAST_RESORT_INGENUITY || card.tags.includes(Tag.BUILDING) ||
         (card.tags.includes(Tag.CITY) && this.tableau.has(CardName.BLOCKHOUSE)),
       plants: card.tags.includes(Tag.BUILDING) && this.playedCards.has(CardName.MARTIAN_LUMBER_CORP),
@@ -887,6 +893,7 @@ export class Player implements IPlayer {
       steel: payment.steel,
       titanium: payment.titanium,
       plants: payment.plants,
+      energy: payment.energy,
     });
 
     this.stock.deductUnits(standardUnits);
@@ -1408,6 +1415,7 @@ export class Player implements IPlayer {
       titanium: this.titanium - reserveUnits.titanium,
       plants: this.plants - reserveUnits.plants,
       heat: this.availableHeat() - reserveUnits.heat,
+      energy: this.availableEnergy() - reserveUnits.energy,
       floaters: this.getSpendable('floaters'),
       microbes: this.getSpendable('microbes'),
       lunaArchivesScience: this.getSpendable('lunaArchivesScience'),
@@ -1449,6 +1457,7 @@ export class Player implements IPlayer {
       steel: options?.steel ?? false,
       titanium: options?.titanium ?? false,
       heat: this.canUseHeatAsMegaCredits,
+      energy: this.canUseEnergyAsMegaCredits,
       plants: options?.plants ?? false,
       microbes: options?.microbes ?? false,
       floaters: options?.floaters ?? false,
@@ -1485,6 +1494,7 @@ export class Player implements IPlayer {
   private canAffordInternal(options: CanAffordOptions): {redsCost: number, canAfford: boolean} {
     // TODO(kberg): These are set both here and in SelectPayment. Consolidate, perhaps.
     options.heat = this.canUseHeatAsMegaCredits;
+    options.energy = this.canUseEnergyAsMegaCredits;
     options.lunaTradeFederationTitanium = this.canUseTitaniumAsMegacredits;
 
     const reserveUnits = options.reserveUnits ?? Units.EMPTY;
@@ -1959,6 +1969,7 @@ export class Player implements IPlayer {
       steelValue: this.steelValue,
       // Helion
       canUseHeatAsMegaCredits: this.canUseHeatAsMegaCredits,
+      canUseEnergyAsMegaCredits: this.canUseEnergyAsMegaCredits,
       // Martian Lumber Corp
       canUsePlantsAsMegaCredits: this.canUsePlantsAsMegacredits,
       // Luna Trade Federation
@@ -2052,6 +2063,7 @@ export class Player implements IPlayer {
     player.actionsTakenThisRound = d.actionsTakenThisRound;
     player.availableActionsThisRound = d.availableActionsThisRound ?? 2;
     player.canUseHeatAsMegaCredits = d.canUseHeatAsMegaCredits;
+    player.canUseEnergyAsMegaCredits = d.canUseEnergyAsMegaCredits ?? false;
     player.canUsePlantsAsMegacredits = d.canUsePlantsAsMegaCredits;
     player.canUseTitaniumAsMegacredits = d.canUseTitaniumAsMegacredits;
     player.cardCost = d.cardCost;

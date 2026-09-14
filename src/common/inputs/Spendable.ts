@@ -8,6 +8,9 @@ export const SPENDABLE_STANDARD_RESOURCES = [
   'megacredits',
   // Helion corporation can spend heat as M€.
   'heat',
+  // Turmoil More Parties: Empower Policy 1 lets energy be spent as M€ (2 M€ per energy)
+  // while that policy is in effect.
+  'energy',
   // Used for cards with building tags
   'steel',
   // Used for cards with space tags, and as the Luna Trade Federation

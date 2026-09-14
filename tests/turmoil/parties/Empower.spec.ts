@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {
   EMPOWER_BONUS_1,
   EMPOWER_BONUS_2,
+  EMPOWER_POLICY_1,
   EMPOWER_POLICY_3,
   EMPOWER_POLICY_4,
 } from '../../../src/server/turmoil/parties/Empower';
@@ -82,6 +83,18 @@ describe('Empower', () => {
     expect(player.tags.count(Tag.POWER)).to.eq(2);
     EMPOWER_POLICY_3.onPolicyEndForPlayer(player);
     expect(player.tags.extraEnergyTags).to.eq(0);
+  });
+
+  it('policy 1: energy can be spent as M€ (2 M€ per energy) while active, not otherwise', () => {
+    player.megaCredits = 3;
+    player.energy = 2;
+    expect(player.canAfford(5)).is.false;
+
+    EMPOWER_POLICY_1.onPolicyStartForPlayer(player);
+    expect(player.canAfford(5)).is.true; // 3 + 2*2 = 7
+
+    EMPOWER_POLICY_1.onPolicyEndForPlayer(player);
+    expect(player.canAfford(5)).is.false;
   });
 
   it('policy 4: choosing the energy tag (the only option) pays 4 M€ and draws an energy-tagged card', () => {

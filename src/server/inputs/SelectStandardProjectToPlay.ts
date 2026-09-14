@@ -40,6 +40,7 @@ export class SelectStandardProjectToPlay extends SelectCardToPlay<IStandardProje
     const canPayWith = card.canPayWith(this.player);
     const paymentOptions: Partial<PaymentOptions> = {
       heat: this.player.canUseHeatAsMegaCredits,
+      energy: this.player.canUseEnergyAsMegaCredits,
       steel: canPayWith.steel,
       titanium: canPayWith.titanium,
       lunaTradeFederationTitanium: this.player.canUseTitaniumAsMegacredits,

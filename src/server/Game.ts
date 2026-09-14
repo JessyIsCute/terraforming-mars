@@ -49,7 +49,7 @@ import {MoonData} from './moon/MoonData';
 import {MoonExpansion} from './moon/MoonExpansion';
 import {TurmoilHandler} from './turmoil/TurmoilHandler';
 import {SeededRandom, UnseededRandom} from '../common/utils/Random';
-import {chooseMilestonesAndAwards} from './ma/MilestoneAwardSelector';
+import {chooseMilestonesAndAwards, getCandidates} from './ma/MilestoneAwardSelector';
 import {BoardType} from './boards/BoardType';
 import {MultiSet} from 'mnemonist';
 import {GrantVenusAltTrackBonusDeferred} from './venusNext/GrantVenusAltTrackBonusDeferred';
@@ -711,6 +711,33 @@ export class Game implements IGame, Logger {
     return this.claimedMilestones.length >= constants.MAX_MILESTONES;
   }
 
+  // Turmoil More Parties Transhumanists P4: a random milestone/award compatible with this
+  // game's board/expansions but not already in play, for the "swap in an unused one" action.
+  // Lives here (rather than being imported directly by Transhumanists.ts) because
+  // MilestoneAwardSelector/Milestones/Awards transitively import every card class, and Game.ts
+  // is the only place in the turmoil-party dependency graph that can safely hold that import
+  // without creating a circular-import crash (turmoil parties load before cards are fully
+  // defined; Game.ts loads after).
+  public getUnusedMilestoneCandidate(): IMilestone | undefined {
+    const [candidateNames] = getCandidates(this.gameOptions);
+    const inPlay = new Set(this.milestones.map((m) => m.name));
+    const available = candidateNames.filter((name) => !inPlay.has(name));
+    if (available.length === 0) {
+      return undefined;
+    }
+    return milestoneManifest.createOrThrow(available[this.rng.nextInt(available.length)]);
+  }
+
+  public getUnusedAwardCandidate(): IAward | undefined {
+    const [, candidateNames] = getCandidates(this.gameOptions);
+    const inPlay = new Set(this.awards.map((a) => a.name));
+    const available = candidateNames.filter((name) => !inPlay.has(name));
+    if (available.length === 0) {
+      return undefined;
+    }
+    return awardManifest.createOrThrow(available[this.rng.nextInt(available.length)]);
+  }
+
   private playerHasPickedCorporationCard(player: IPlayer, corporationCard: ICorporationCard): void {
     // TODO(kberg): I think we can get rid of this weird validation at a later time.
     player.pickedCorporationCard = corporationCard;
@@ -1260,6 +1287,11 @@ export class Game implements IGame, Logger {
     this.activePlayer = player;
     player.actionsTakenThisGame++;
     player.actionsTakenThisRound = 0;
+
+    // Turmoil More Parties Bureaucrats P2: this is the one place in the codebase that fires
+    // exactly once per player turn (not once per action, and not re-entered by the various
+    // deferred-action/prelude/CEO loops inside Player.takeAction) -- see TurmoilHandler.
+    TurmoilHandler.applyOnTurnStartEffect(player);
 
     player.takeAction();
   }

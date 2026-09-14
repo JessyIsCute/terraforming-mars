@@ -5,15 +5,18 @@ import {Bonus} from '../Bonus';
 import {IPolicy} from '../Policy';
 import {IPlayer} from '../../IPlayer';
 import {ICard} from '../../cards/ICard';
+import {CardType} from '../../../common/cards/CardType';
 import {Resource} from '../../../common/Resource';
 import {DiscardCards} from '../../deferredActions/DiscardCards';
+import {SelectPaymentDeferred} from '../../deferredActions/SelectPaymentDeferred';
+import {TITLES} from '../../inputs/titles';
+import {POLITICAL_AGENDAS_MAX_ACTION_USES} from '../../../common/constants';
 
 /**
- * More Parties: Bureaucrats, one of the 6 new "Political Agendas" parties. Policy 1 (capping
- * blue-card actions per generation) and policy 2 (a "start of each turn" trigger) are not
- * implemented: this codebase has no per-generation blue-card-action cap and no per-player
- * "start of turn" hook to build them on -- both would require substantial new core-engine
- * machinery, out of scope for this pass.
+ * More Parties: Bureaucrats, one of the 6 new "Political Agendas" parties. Policy 1 originally
+ * caps blue-card actions per generation, a mechanic this codebase has no equivalent of --
+ * compromise: spend 5 M€ to buy the first Active card instead, matching the "buy the first X
+ * card" pattern several other More Parties policies already use.
  */
 export class Bureaucrats extends Party implements IParty {
   readonly name = PartyName.BUREAUCRATS;
@@ -57,19 +60,47 @@ class BureaucratsBonus02 extends Bonus {
   }
 }
 
-// Not implemented: would require a new "blue-card actions used this generation" cap mechanic
-// applied globally, which this codebase has no equivalent of today.
+// Compromise: original is "this generation you can take at most 2 actions on cards in play,
+// plus the influence you have," which would require a new global per-generation action-cap
+// mechanic this codebase doesn't have. Replaced with the "buy the first X card" pattern used by
+// several sibling More Parties policies (e.g. Populists P4, Empower P4).
 class BureaucratsPolicy01 implements IPolicy {
   readonly id = 'burp01' as const;
-  readonly description = 'Not implemented in this codebase: this generation you can take at most ' +
-    '2 actions on cards in play, plus the influence you have (would require a new global action-cap mechanic)';
+  readonly description = 'Action: spend 5 M€ to buy the first Active card';
+
+  canAct(player: IPlayer): boolean {
+    return player.canAfford(5) && player.politicalAgendasActionUsedCount < POLITICAL_AGENDAS_MAX_ACTION_USES;
+  }
+
+  action(player: IPlayer) {
+    const game = player.game;
+    player.politicalAgendasActionUsedCount += 1;
+    game.log('${0} used Turmoil ${1} action', (b) => b.player(player).partyName(PartyName.BUREAUCRATS));
+    game.defer(new SelectPaymentDeferred(player, 5, {title: TITLES.payForPartyAction(PartyName.BUREAUCRATS)}))
+      .andThen(() => player.drawCard(1, {cardType: CardType.ACTIVE}));
+    return undefined;
+  }
 }
 
-// Not implemented: this codebase has no per-player "start of turn" hook (only generation-start).
+// No behavior of its own -- its effect is applied directly by
+// TurmoilHandler.applyOnTurnStartEffect, called from Game.startActionsForPlayer (the one place
+// in the codebase that fires exactly once per player turn).
 class BureaucratsPolicy02 implements IPolicy {
   readonly id = 'burp02' as const;
-  readonly description = 'Not implemented in this codebase: at the start of each turn, pay 3 M€ ' +
-    'minus the influence you have (no per-turn hook exists here)';
+  readonly description = 'At the start of each turn, pay 3 M€ minus the influence you have (or as much as possible)';
+
+  onTurnStart(player: IPlayer) {
+    const turmoil = player.game.turmoil;
+    const influence = turmoil === undefined ? 0 : turmoil.getInfluence(player);
+    const required = Math.max(0, 3 - influence);
+    if (required === 0) {
+      return;
+    }
+    const amountToPay = Math.min(required, player.megaCredits);
+    if (amountToPay > 0) {
+      player.game.defer(new SelectPaymentDeferred(player, amountToPay, {title: 'Pay for Turmoil Bureaucrats (start of turn)'}));
+    }
+  }
 }
 
 // No behavior of its own -- its effect is applied directly by

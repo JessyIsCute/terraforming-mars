@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {
   BUREAUCRATS_BONUS_1,
   BUREAUCRATS_BONUS_2,
+  BUREAUCRATS_POLICY_1,
   BUREAUCRATS_POLICY_4,
 } from '../../../src/server/turmoil/parties/Bureaucrats';
 import {IGame} from '../../../src/server/IGame';
@@ -10,6 +11,8 @@ import {testGame} from '../../TestGame';
 import {forcePartiesInPlay, setRulingParty} from '../../TestingUtils';
 import {PartyName} from '../../../src/common/turmoil/PartyName';
 import {ImportedNitrogen} from '../../../src/server/cards/base/ImportedNitrogen';
+import {CardType} from '../../../src/common/cards/CardType';
+import {TurmoilHandler} from '../../../src/server/turmoil/TurmoilHandler';
 
 describe('Bureaucrats', () => {
   let game: IGame;
@@ -83,5 +86,51 @@ describe('Bureaucrats', () => {
     game.deferredActions.runAll(() => {});
 
     expect(player.cardsInHand.length).to.eq(beforeHand);
+  });
+
+  it('policy 1: pays 5 M€ and draws an Active card', () => {
+    player.megaCredits = 10;
+    expect(BUREAUCRATS_POLICY_1.canAct(player)).is.true;
+    BUREAUCRATS_POLICY_1.action(player);
+    game.deferredActions.runAll(() => {});
+    expect(player.megaCredits).to.eq(5);
+    expect(player.cardsInHand).to.have.lengthOf(1);
+    expect(player.cardsInHand[0].type).to.eq(CardType.ACTIVE);
+  });
+
+  it('policy 1 cannot act without enough M€', () => {
+    player.megaCredits = 0;
+    expect(BUREAUCRATS_POLICY_1.canAct(player)).is.false;
+  });
+
+  it('policy 2: pays 3 M€ minus influence at the start of a turn, while ruling', () => {
+    setRulingParty(game, PartyName.BUREAUCRATS, 'burp02');
+    player.megaCredits = 10;
+    game.turmoil!.addInfluenceBonus(player, 1);
+
+    TurmoilHandler.applyOnTurnStartEffect(player);
+    game.deferredActions.runAll(() => {});
+
+    expect(player.megaCredits).to.eq(8); // 10 - (3 - 1)
+  });
+
+  it('policy 2: no charge once influence covers the full 3 M€', () => {
+    setRulingParty(game, PartyName.BUREAUCRATS, 'burp02');
+    player.megaCredits = 10;
+    game.turmoil!.addInfluenceBonus(player, 3);
+
+    TurmoilHandler.applyOnTurnStartEffect(player);
+    game.deferredActions.runAll(() => {});
+
+    expect(player.megaCredits).to.eq(10);
+  });
+
+  it('policy 2: has no effect when Bureaucrats is not ruling with that policy', () => {
+    player.megaCredits = 10;
+
+    TurmoilHandler.applyOnTurnStartEffect(player);
+    game.deferredActions.runAll(() => {});
+
+    expect(player.megaCredits).to.eq(10);
   });
 });

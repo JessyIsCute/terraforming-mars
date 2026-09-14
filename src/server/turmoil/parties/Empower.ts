@@ -13,8 +13,12 @@ import {ChooseTagPolicy} from './ChooseTagPolicy';
  * references a "nuclear" tag and a "radiation" tag alongside the energy (Power) tag, and an
  * "industry" tag -- none of those exist in this codebase, so bonus A/B and policy 4 are adapted
  * to use only the Power tag, per the source document's own guidance to ignore such references.
- * Policy 1's energy<->M€ currency conversion is not implemented: it would require extending the
- * payment system to accept Energy as an alternate currency everywhere, which is out of scope here.
+ * Policy 1's "energy resources can be used as 2 M€" half is implemented, mirroring Helion's
+ * canUseHeatAsMegaCredits (Player.canUseEnergyAsMegaCredits, threaded through the payment
+ * system the same way). Its "2 M€ can be used as Energy resources" reverse direction is not
+ * implemented -- this codebase's payment system only ever converts alternate currencies *into*
+ * M€ for a M€-denominated cost, never the other way around (spending M€ to satisfy a resource
+ * cost), and Helion itself is one-directional for the same reason ("You may not use M€ as heat").
  */
 export class Empower extends Party implements IParty {
   readonly name = PartyName.EMPOWER;
@@ -49,12 +53,19 @@ class EmpowerBonus02 extends Bonus {
   }
 }
 
-// Not implemented: would require extending the payment system to accept Energy as an alternate
-// currency, and M€ as a substitute for Energy costs, everywhere -- out of scope for this pass.
-class EmpowerPolicy01 implements IPolicy {
+// Adapted: only the "energy as M€" half is implemented (see the class comment above); the
+// reverse "M€ as energy" half is dropped, matching Helion's own one-directional precedent.
+class EmpowerPolicy01 extends Policy {
   readonly id = 'empp01' as const;
-  readonly description = 'Not implemented in this codebase: Energy resources can be used as 2 M€; ' +
-    '2 M€ can be used as Energy resources (would require payment-system changes)';
+  readonly description = 'You may use energy as M€ (2 M€ per energy)';
+
+  override onPolicyStartForPlayer(player: IPlayer): void {
+    player.canUseEnergyAsMegaCredits = true;
+  }
+
+  override onPolicyEndForPlayer(player: IPlayer): void {
+    player.canUseEnergyAsMegaCredits = false;
+  }
 }
 
 // No behavior of its own -- its effect is applied directly by

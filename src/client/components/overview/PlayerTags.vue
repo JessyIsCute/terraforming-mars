@@ -215,7 +215,7 @@ export default defineComponent({
 
     // Other modifiers
     if (this.playerView.game.turmoil?.ruling === PartyName.UNITY &&
-      this.playerView.game.turmoil.politicalAgendas?.unity.policyId === 'up04') {
+      this.playerView.game.turmoil.politicalAgendas?.unity?.policyId === 'up04') {
       details[Tag.SPACE].discount += 2;
     }
 
