@@ -8,6 +8,7 @@ import {Resource} from '../../../common/Resource';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
+import {AltSecondaryTag} from '../../../common/cards/render/AltSecondaryTag';
 import {RemoveResourcesFromCard} from '../../deferredActions/RemoveResourcesFromCard';
 import {all, digit} from '../Options';
 
@@ -19,17 +20,21 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
       startingMegaCredits: 36,
       resourceType: CardResource.ANIMAL,
       victoryPoints: {resourcesHere: {}, per: 4},
-      initialActionText: 'Draw 2 cards with an animal tag',
 
       behavior: {
         addResources: 8,
       },
 
+      firstAction: {
+        text: 'Draw 2 cards which can hold an animal resource',
+        drawCard: {count: 2, resource: CardResource.ANIMAL},
+      },
+
       metadata: {
         cardNumber: 'XC3',
-        description: 'You start with 36 M€ and add 8 animals to this card. As your first action, draw 2 cards with an animal tag.',
+        description: 'You start with 36 M€ and add 8 animals to this card. As your first action, draw 2 cards which can hold an animal resource.',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(36).nbsp.resource(CardResource.ANIMAL, {amount: 8, digit}).nbsp.cards(2, {secondaryTag: Tag.ANIMAL});
+          b.megacredits(36).nbsp.resource(CardResource.ANIMAL, {amount: 8, digit}).nbsp.cards(2, {secondaryTag: AltSecondaryTag.ANIMAL_RESOURCE});
           b.corpBox('effect-action', (cea) => {
             cea.vSpace(Size.MEDIUM);
             cea.br;
@@ -44,11 +49,6 @@ export class Critterworld extends CorporationCard implements ICorporationCard, I
         }),
       },
     });
-  }
-
-  public override initialAction(player: IPlayer) {
-    player.drawCard(2, {include: (card) => card.tags.includes(Tag.ANIMAL)});
-    return undefined;
   }
 
   public onResourceAdded(player: IPlayer, card: ICard, count: number) {

@@ -8,6 +8,9 @@ export enum AltSecondaryTag {
   TURMOIL = 'turmoil',
   FLOATER = 'floater',
   DATA = 'data',
+  // 'animal-resource' (not 'animal') to avoid colliding with Tag.ANIMAL's own 'tag-animal' icon -
+  // this one is the animal *resource* icon, for "cards that can hold an animal" renders.
+  ANIMAL_RESOURCE = 'animal-resource',
   BLUE = 'blue',
   NO_TAGS = 'no_tags',
 

@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {Critterworld} from '../../../src/server/cards/sillyfication/Critterworld';
+import {CardResource} from '../../../src/common/CardResource';
 import {Fish} from '../../../src/server/cards/base/Fish';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
@@ -39,12 +40,12 @@ describe('Critterworld', () => {
     expect(card.resourceCount).to.eq(3);
   });
 
-  it('initial action draws 2 animal-tag cards', () => {
+  it('initial action draws 2 cards which can hold an animal resource', () => {
     player.cardsInHand = [];
     player.defer(card.initialAction(player));
     runAllActions(game);
     expect(player.cardsInHand).to.have.length(2);
-    expect(player.cardsInHand.every((c) => c.tags.includes('animal' as any))).is.true;
+    expect(player.cardsInHand.every((c) => c.resourceType === CardResource.ANIMAL)).is.true;
   });
 
   it('action removes 1 animal from this card (the only eligible card) and pays 1 M€ per 2 animals here', () => {
