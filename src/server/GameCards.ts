@@ -31,6 +31,7 @@ import {DELTA_PROJECT_CARD_MANIFEST} from './cards/delta/DeltaProjectCardManifes
 import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './cards/corporatebetterments/CorporateBettermentsCardManifest';
 import {IDES_OF_MARS_CARD_MANIFEST} from './cards/idesofmars/IdesOfMarsCardManifest';
 import {ROB_ANTILLES_CARD_MANIFEST} from './cards/robantilles/RobAntillesCardManifest';
+import {VENUS_PHASE_2_CARD_MANIFEST} from './cards/venusPhase2/VenusPhase2CardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
@@ -80,6 +81,7 @@ export class GameCards {
       // from this pool - but other cards depending on the expansion (e.g. Epsilon Dample,
       // via its `compatibility: 'deltaProject'`) still need this manifest present here.
       [gameOptions.deltaProjectExpansion, DELTA_PROJECT_CARD_MANIFEST],
+      [gameOptions.venusPhase2Expansion, VENUS_PHASE_2_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests

@@ -83,6 +83,13 @@ import {AlliedParty} from '../common/turmoil/Types';
 import {PlayedCards} from './cards/PlayedCards';
 import {From} from './logs/From';
 import {SelectStandardProjectToPlay} from './inputs/SelectStandardProjectToPlay';
+import {SelectAmount} from './inputs/SelectAmount';
+import {RemoveResourcesFromCard} from './deferredActions/RemoveResourcesFromCard';
+import {StandardProjectCard} from './cards/StandardProjectCard';
+import {VenusPhase2Expansion} from './venusPhase2/VenusPhase2Expansion';
+import {CloudCityStandardProject} from './cards/venusPhase2/CloudCityStandardProject';
+import {GasMineStandardProject} from './cards/venusPhase2/GasMineStandardProject';
+import {FloaterArrayStandardProject} from './cards/venusPhase2/FloaterArrayStandardProject';
 
 const THROW_STATE_ERRORS = Boolean(process.env.THROW_STATE_ERRORS);
 const DEFAULT_GLOBAL_PARAMETER_STEPS = {
@@ -1577,6 +1584,57 @@ export class Player implements IPlayer {
       });
   }
 
+  // Venus Phase 2's 3 tiles let a player spend floaters (pulled from ANY of their played cards,
+  // not one fixed card -- there's no precedent for that in the shared Payment system, so this
+  // stays entirely outside it) for a 3 M€ discount each, chosen interactively before paying.
+  // Each returns a SelectAmount ("how many floaters?") that, once answered, removes that many
+  // floaters one at a time (RemoveResourcesFromCard already handles "pick a card when more than
+  // one qualifies"), then pays the discounted M€ cost and runs the project via the card's own
+  // (public) payAndExecute -- the same call the grouped Standard Projects form itself uses.
+  public getVenusPhase2StandardProjectOptions(): Array<PlayerInput> {
+    const options = VenusPhase2Expansion.ifVenusPhase2(this.game, (data) => {
+      const result: Array<PlayerInput> = [];
+      const specs: Array<{card: StandardProjectCard, hasSpace: boolean}> = [
+        {card: new CloudCityStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForLand(this).length > 0},
+        {card: new GasMineStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForGaslight(this).length > 0},
+        {card: new FloaterArrayStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForLand(this).length > 0},
+      ];
+      for (const {card, hasSpace} of specs) {
+        if (!hasSpace) {
+          continue;
+        }
+        const maxFloaters = Math.min(this.getResourceCount(CardResource.FLOATER), Math.floor(card.cost / 3));
+        if (this.megaCredits + maxFloaters * 3 < card.cost) {
+          continue;
+        }
+        result.push(
+          new SelectAmount(
+            message('Spend how many floaters on ${0}? (3 M€ off each)', (b) => b.string(card.name)),
+            'Confirm',
+            0,
+            maxFloaters,
+          ).andThen((count) => {
+            for (let i = 0; i < count; i++) {
+              this.game.defer(new RemoveResourcesFromCard(this, CardResource.FLOATER, 1, {source: 'self', mandatory: true, blockable: false}));
+            }
+            // BACK_OF_THE_LINE (the lowest-priority slot) so this always resolves after every
+            // floater removal above -- those default to LOSE_RESOURCE_OR_PRODUCTION priority,
+            // which runs *before* this deferred action's own default (DEFAULT) priority would,
+            // so without an explicit lower priority here the discounted payment/placement could
+            // fire before the floaters it's discounted against are actually removed.
+            this.game.defer(new SimpleDeferredAction(this, () => {
+              card.payAndExecute(this, Payment.of({megacredits: card.cost - count * 3}));
+              return undefined;
+            }, Priority.BACK_OF_THE_LINE));
+            return undefined;
+          }),
+        );
+      }
+      return result;
+    });
+    return options ?? [];
+  }
+
   private headStartIsInEffect() {
     if (this.game.phase === Phase.PRELUDES && this.playedCards.has(CardName.HEAD_START)) {
       if (this.actionsTakenThisRound < 2) {
@@ -1840,6 +1898,11 @@ export class Player implements IPlayer {
 
     // Standard Projects
     action.options.push(this.getStandardProjectOption());
+
+    // Venus Phase 2's 3 standard projects -- excluded from the grouped form above (see
+    // Game.getStandardProjects), each offered here as its own action with a "spend how many
+    // floaters?" prompt first.
+    action.options.push(...this.getVenusPhase2StandardProjectOptions());
 
     // Pass
     action.options.push(this.passOption());
