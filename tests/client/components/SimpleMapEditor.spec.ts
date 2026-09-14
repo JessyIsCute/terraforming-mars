@@ -204,4 +204,111 @@ describe('SimpleMapEditor', () => {
     expect(gridSpaceIds[0]).to.eq('m02');
     expect(gridSpaceIds[gridSpaceIds.length - 1]).to.eq('m36');
   });
+
+  describe('backdrop calibration tool (Venus only)', () => {
+    it('does not offer the backdrop tool for Moon', () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+      expect(wrapper.find('.simple-map-editor-backdrop-tools').exists()).is.false;
+      expect(wrapper.find('.simple-map-editor-backdrop-drag').exists()).is.false;
+    });
+
+    it('starts centered at 100% scale and drives the CSS custom properties accordingly', () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      const vm = wrapper.vm as any;
+      expect(vm.backdropX).to.eq(50);
+      expect(vm.backdropY).to.eq(50);
+      expect(vm.backdropScale).to.eq(100);
+      expect(vm.backdropStyleVars).to.deep.eq({
+        '--venus-backdrop-position': '50% 50%',
+        '--venus-backdrop-size': '100%',
+      });
+      expect(vm.backdropCss).to.eq('background-position: 50% 50%;\nbackground-size: 100%;');
+    });
+
+    it('scrolling over the backdrop scales it up/down, clamped to 50-300%', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      const drag = wrapper.find('.simple-map-editor-backdrop-drag');
+
+      await drag.trigger('wheel', {deltaY: -1});
+      expect((wrapper.vm as any).backdropScale).to.eq(105);
+
+      await drag.trigger('wheel', {deltaY: 1});
+      await drag.trigger('wheel', {deltaY: 1});
+      expect((wrapper.vm as any).backdropScale).to.eq(95);
+
+      (wrapper.vm as any).backdropScale = 300;
+      await drag.trigger('wheel', {deltaY: -1});
+      expect((wrapper.vm as any).backdropScale).to.eq(300); // clamped at the max
+
+      (wrapper.vm as any).backdropScale = 50;
+      await drag.trigger('wheel', {deltaY: 1});
+      expect((wrapper.vm as any).backdropScale).to.eq(50); // clamped at the min
+    });
+
+    it('dragging the backdrop moves its position, clamped to 0-100%', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      const vm = wrapper.vm as any;
+      const el = wrapper.find('.simple-map-editor-backdrop-drag').element as HTMLElement;
+      // jsdom's getBoundingClientRect is all-zero by default -- stub a real size so the
+      // pixel-delta-to-percent math has something to divide by.
+      el.getBoundingClientRect = () => ({width: 200, height: 200, x: 0, y: 0, top: 0, left: 0, right: 200, bottom: 200, toJSON: () => ({})});
+
+      el.dispatchEvent(new MouseEvent('mousedown', {clientX: 100, clientY: 100, bubbles: true}));
+      expect(vm.draggingBackdrop).is.true;
+
+      window.dispatchEvent(new MouseEvent('mousemove', {clientX: 120, clientY: 80}));
+      expect(vm.backdropX).to.eq(60); // +20px / 200px width = +10%, from a 50% start
+      expect(vm.backdropY).to.eq(40); // -20px / 200px height = -10%, from a 50% start
+
+      window.dispatchEvent(new MouseEvent('mouseup'));
+      expect(vm.draggingBackdrop).is.false;
+
+      // Further movement after mouseup shouldn't do anything -- the window listeners were removed.
+      window.dispatchEvent(new MouseEvent('mousemove', {clientX: 0, clientY: 0}));
+      expect(vm.backdropX).to.eq(60);
+    });
+
+    it('Reset restores the default centered/100% state', async () => {
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      const vm = wrapper.vm as any;
+      vm.backdropX = 10;
+      vm.backdropY = 90;
+      vm.backdropScale = 250;
+      await wrapper.vm.$nextTick();
+
+      const buttons = wrapper.findAll('.simple-map-editor-backdrop-tools button');
+      const resetButton = buttons.find((b) => b.text() === 'Reset');
+      await resetButton?.trigger('click');
+
+      expect(vm.backdropX).to.eq(50);
+      expect(vm.backdropY).to.eq(50);
+      expect(vm.backdropScale).to.eq(100);
+    });
+
+    it('Copy backdrop CSS writes the current CSS to the clipboard', async () => {
+      let written = '';
+      const originalClipboard = navigator.clipboard;
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: (text: string) => {
+            written = text;
+            return Promise.resolve();
+          },
+        },
+        configurable: true,
+      });
+
+      const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+      (wrapper.vm as any).backdropX = 33;
+      (wrapper.vm as any).backdropScale = 150;
+      await wrapper.vm.$nextTick();
+
+      const buttons = wrapper.findAll('.simple-map-editor-backdrop-tools button');
+      const copyButton = buttons.find((b) => b.text() === 'Copy backdrop CSS');
+      await copyButton?.trigger('click');
+
+      expect(written).to.eq('background-position: 33% 50%;\nbackground-size: 150%;');
+      Object.defineProperty(navigator, 'clipboard', {value: originalClipboard, configurable: true});
+    });
+  });
 });

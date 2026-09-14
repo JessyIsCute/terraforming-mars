@@ -12,7 +12,14 @@
   overflow: auto;
   overflow-anchor: none;
   margin: 20px auto 0;
-  background: #0c0a14 url("./assets/venusPhase2/venus-planet-backdrop.png") no-repeat center / cover;
+  // Custom properties (not a literal position/size) so the map editor's backdrop-alignment tool
+  // can override them live via an inline style on an ancestor element -- CSS custom properties
+  // inherit through the DOM regardless of Vue component boundaries, so SimpleMapEditor.vue's
+  // preview doesn't need this component's own template to expose a prop for it. Defaults here are
+  // exactly today's fixed values, so nothing changes for a real game that doesn't set them.
+  --venus-backdrop-position: center;
+  --venus-backdrop-size: cover;
+  background: #0c0a14 url("./assets/venusPhase2/venus-planet-backdrop.png") no-repeat var(--venus-backdrop-position) / var(--venus-backdrop-size);
   border-radius: 6px;
 
   .board--venus {

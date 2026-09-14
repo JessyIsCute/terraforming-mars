@@ -115,8 +115,40 @@
 
     <div class="simple-map-editor-preview">
       <h3 v-i18n>Preview</h3>
+
+      <fieldset v-if="boardType === 'venusPhase2'" class="simple-map-editor-tools simple-map-editor-backdrop-tools">
+        <legend v-i18n>Backdrop alignment</legend>
+        <p class="simple-map-editor-tools-note" v-i18n>
+          Drag the backdrop below to reposition it; scroll over it (or use the slider) to scale it.
+          One-time calibration -- copy the resulting CSS and it becomes the new fixed default.
+        </p>
+        <label class="simple-map-editor-backdrop-scale">
+          <span v-i18n>Scale</span>
+          <input type="range" min="50" max="300" step="1" v-model.number="backdropScale">
+          <span>{{ backdropScale }}%</span>
+        </label>
+        <div class="simple-map-editor-actions">
+          <button type="button" @click="resetBackdrop" v-i18n>Reset</button>
+          <button type="button" @click="copyBackdropCss" v-i18n>Copy backdrop CSS</button>
+        </div>
+        <label class="simple-map-editor-code">
+          <span v-i18n>Backdrop CSS</span>
+          <textarea readonly rows="3" :value="backdropCss" @focus="($event.target as HTMLTextAreaElement).select()"></textarea>
+        </label>
+      </fieldset>
+
       <div class="simple-map-editor-preview-zoom">
-        <VenusSurfaceBoard v-if="boardType === 'venusPhase2'" :model="previewModel" tileView="show"/>
+        <div
+          v-if="boardType === 'venusPhase2'"
+          ref="backdropDragEl"
+          class="simple-map-editor-backdrop-drag"
+          :class="{'simple-map-editor-backdrop-drag--active': draggingBackdrop}"
+          :style="backdropStyleVars"
+          @mousedown="startBackdropDrag"
+          @wheel.prevent="onBackdropWheel"
+        >
+          <VenusSurfaceBoard :model="previewModel" tileView="show"/>
+        </div>
         <MoonBoard v-else :model="previewMoonModel" tileView="show"/>
       </div>
     </div>
@@ -223,6 +255,13 @@ export default defineComponent({
       loadInput: '',
       loadError: '',
       MAX_SIMPLE_BOARD_NAME_LENGTH,
+      // Venus-only backdrop calibration tool -- see backdropStyleVars/backdropCss below. Starts
+      // at plain percentages (not the real board's own 'center'/'cover' defaults) since a slider
+      // needs actual numbers to move; visually close enough to start tuning from.
+      backdropX: 50,
+      backdropY: 50,
+      backdropScale: 100,
+      draggingBackdrop: false,
     };
   },
   computed: {
@@ -321,6 +360,19 @@ export default defineComponent({
       });
       return lines.join('\n');
     },
+    // Drives .venus-board-cont's --venus-backdrop-position/--venus-backdrop-size custom
+    // properties (see venusphase2.less) via inline style on this wrapper -- CSS custom properties
+    // inherit through the DOM regardless of Vue component boundaries, so VenusSurfaceBoard.vue's
+    // own template needs no prop for this.
+    backdropStyleVars(): Record<string, string> {
+      return {
+        '--venus-backdrop-position': `${this.backdropX}% ${this.backdropY}%`,
+        '--venus-backdrop-size': `${this.backdropScale}%`,
+      };
+    },
+    backdropCss(): string {
+      return `background-position: ${this.backdropX}% ${this.backdropY}%;\nbackground-size: ${this.backdropScale}%;`;
+    },
   },
   methods: {
     toSpaceModel(s: SimpleCustomSpaceDef, i: number): SpaceModel {
@@ -407,6 +459,47 @@ export default defineComponent({
         // the code be pasted in manually instead.
       }
       window.location.href = `${paths.NEW_GAME}?${key}=1`;
+    },
+    // Drag-to-reposition for the backdrop calibration tool. Listens on window (not the element
+    // itself) for move/up so dragging still tracks correctly if the cursor leaves the small
+    // preview box mid-drag -- a local-only listener would silently stop updating at the edge.
+    startBackdropDrag(event: MouseEvent): void {
+      const el = this.$refs.backdropDragEl as HTMLElement | undefined;
+      if (el === undefined) {
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startBackdropX = this.backdropX;
+      const startBackdropY = this.backdropY;
+      this.draggingBackdrop = true;
+
+      const onMove = (moveEvent: MouseEvent) => {
+        const dxPercent = ((moveEvent.clientX - startX) / rect.width) * 100;
+        const dyPercent = ((moveEvent.clientY - startY) / rect.height) * 100;
+        this.backdropX = Math.min(100, Math.max(0, startBackdropX + dxPercent));
+        this.backdropY = Math.min(100, Math.max(0, startBackdropY + dyPercent));
+      };
+      const onUp = () => {
+        this.draggingBackdrop = false;
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    },
+    onBackdropWheel(event: WheelEvent): void {
+      const delta = event.deltaY > 0 ? -5 : 5;
+      this.backdropScale = Math.min(300, Math.max(50, this.backdropScale + delta));
+    },
+    resetBackdrop(): void {
+      this.backdropX = 50;
+      this.backdropY = 50;
+      this.backdropScale = 100;
+    },
+    copyBackdropCss(): void {
+      navigator.clipboard?.writeText(this.backdropCss);
     },
   },
 });
@@ -595,11 +688,26 @@ export default defineComponent({
     margin-top: 24px;
     h3 { color: #fff; }
   }
+  .simple-map-editor-backdrop-tools {
+    max-width: 480px;
+    .simple-map-editor-actions { margin-top: 6px; }
+  }
+  .simple-map-editor-backdrop-scale {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    input[type=range] { flex: 1; }
+  }
   .simple-map-editor-preview-zoom {
     zoom: 1.6;
     width: fit-content;
     max-width: 100%;
     overflow-x: auto;
+  }
+  .simple-map-editor-backdrop-drag {
+    cursor: grab;
+    user-select: none;
+    &--active { cursor: grabbing; }
   }
 }
 </style>
