@@ -40,6 +40,10 @@ export interface NewGameConfig {
   board: BoardNameType;
   /** Opaque map-editor code, required when `board` is `BoardName.CUSTOM`. */
   customBoardCode?: string;
+  /** Opaque map-editor code overriding the Moon board's own hard-coded default layout. */
+  customMoonBoardCode?: string;
+  /** Opaque map-editor code overriding the Venus Phase 2 board's own hard-coded default layout. */
+  customVenusSurfaceBoardCode?: string;
   seed: number;
   randomFirstPlayer: boolean;
 

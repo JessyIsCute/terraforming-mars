@@ -12,6 +12,8 @@ import {FakeClock} from '../common/FakeClock';
 import {blankCustomBoard} from '../../src/common/boards/CustomBoardDefinition';
 import {encodeCustomBoard} from '../../src/common/boards/customBoardCodec';
 import {SpaceType} from '../../src/common/boards/SpaceType';
+import {blankSimpleBoard} from '../../src/common/boards/SimpleCustomBoardDefinition';
+import {encodeSimpleBoard} from '../../src/common/boards/simpleBoardCodec';
 
 function customBoardGameConfig(customBoardCode: string): NewGameConfig {
   return {
@@ -62,6 +64,24 @@ function customBoardGameConfig(customBoardCode: string): NewGameConfig {
     customCeos: [],
     startingCeos: 0,
     startingPreludes: 0,
+  };
+}
+
+function simpleBoardGameConfig(overrides: {moon?: boolean, venusPhase2?: boolean, customMoonBoardCode?: string, customVenusSurfaceBoardCode?: string}): NewGameConfig {
+  return {
+    ...customBoardGameConfig(''),
+    board: BoardName.THARSIS,
+    customBoardCode: undefined,
+    expansions: {
+      corpera: true, promo: false, venus: false, colonies: false, prelude: false, prelude2: false,
+      turmoil: false, community: false, ares: false, moon: overrides.moon ?? false, pathfinders: false, ceo: false,
+      starwars: false, underworld: false, deltaProject: false, sillyfication: false, betterMars: false,
+      customCards: false, conglomerates: false,
+      corporateBetterments: false, idesOfMars: false, robAntilles: false, moreParties: false,
+      venusPhase2: overrides.venusPhase2 ?? false, industries: false, highOrbit: false, solaris: false,
+    },
+    customMoonBoardCode: overrides.customMoonBoardCode,
+    customVenusSurfaceBoardCode: overrides.customVenusSurfaceBoardCode,
   };
 }
 
@@ -220,6 +240,75 @@ describe('ApiCreateGame', () => {
     });
     await Promise.all([emit, post]);
     expect(res.statusCode).not.eq(statusCode.ok);
+  });
+
+  it('creates a game from a custom Moon board code', async () => {
+    const def = blankSimpleBoard('moon', 'Custom Moon');
+    def.spaces[0].spaceType = SpaceType.LUNAR_MINE;
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(simpleBoardGameConfig({moon: true, customMoonBoardCode: encodeSimpleBoard(def)})));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).eq(statusCode.ok);
+    const model = JSON.parse(res.content) as SimpleGameModel;
+    const game = await scaffolding.ctx.gameLoader.getGame(model.id);
+    expect(game!.gameOptions.customMoonBoard?.name).eq('Custom Moon');
+    const gridSpaces = game!.moonData!.moon.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
+    expect(gridSpaces[0].spaceType).to.eq(SpaceType.LUNAR_MINE);
+  });
+
+  it('creates a game from a custom Venus Phase 2 board code', async () => {
+    const def = blankSimpleBoard('venusPhase2', 'Custom Venus');
+    def.spaces[0].spaceType = SpaceType.GASLIGHT;
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(simpleBoardGameConfig({venusPhase2: true, customVenusSurfaceBoardCode: encodeSimpleBoard(def)})));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).eq(statusCode.ok);
+    const model = JSON.parse(res.content) as SimpleGameModel;
+    const game = await scaffolding.ctx.gameLoader.getGame(model.id);
+    expect(game!.gameOptions.customVenusSurfaceBoard?.name).eq('Custom Venus');
+    const gridSpaces = game!.venusPhase2Data!.venusSurface.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
+    expect(gridSpaces[0].spaceType).to.eq(SpaceType.GASLIGHT);
+  });
+
+  it('rejects a custom Moon board with a broken code', async () => {
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(simpleBoardGameConfig({moon: true, customMoonBoardCode: 'TMBS1-not-valid'})));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).not.eq(statusCode.ok);
+  });
+
+  it('rejects a custom board code meant for the other simple board type', async () => {
+    const wrongType = blankSimpleBoard('venusPhase2', 'Wrong Type');
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(simpleBoardGameConfig({moon: true, customMoonBoardCode: encodeSimpleBoard(wrongType)})));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).not.eq(statusCode.ok);
+  });
+
+  it('ignores a custom Moon board code when the Moon expansion is not enabled', async () => {
+    const def = blankSimpleBoard('moon', 'Should Be Ignored');
+    const post = scaffolding.post(apiCreateGame, res);
+    const emit = Promise.resolve().then(() => {
+      req.emitString(JSON.stringify(simpleBoardGameConfig({moon: false, customMoonBoardCode: encodeSimpleBoard(def)})));
+      req.emitter.emit('end');
+    });
+    await Promise.all([emit, post]);
+    expect(res.statusCode).eq(statusCode.ok);
+    const model = JSON.parse(res.content) as SimpleGameModel;
+    const game = await scaffolding.ctx.gameLoader.getGame(model.id);
+    expect(game!.gameOptions.customMoonBoard).is.undefined;
   });
 
   it('red rover solo game', async () => {

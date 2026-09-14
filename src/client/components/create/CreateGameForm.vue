@@ -113,6 +113,19 @@
                               <label for="moonStandardProjectVariant1-checkbox">
                                   <span v-i18n>Standard Project Variant #1</span>&nbsp;<a :href="wikiUrls.moonStandardProjectVariant" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                               </label>
+
+                              <div class="create-game-subsection-label" style="margin-top: 4px;">
+                                <label for="custom-moon-board-code" v-i18n>Custom Moon board code (optional)</label>
+                                <textarea
+                                  id="custom-moon-board-code"
+                                  rows="2"
+                                  style="width: 100%; font-family: monospace; font-size: 11px;"
+                                  placeholder="Paste a TMBS1… code from the Moon map editor"
+                                  v-model="customMoonBoardCodeInput"
+                                  @input="applyCustomMoonBoardCode"></textarea>
+                                <div v-if="customMoonBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customMoonBoardCodeError }}</div>
+                                <div v-else-if="customMoonBoardName !== ''" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom Moon board: {{ customMoonBoardName }}</div>
+                              </div>
                             </template>
 
                             <template v-if="expansions.turmoil">
@@ -229,6 +242,21 @@
                                 <div class="create-game-expansion-icon expansion-icon-venusPhase2"></div>
                                 <span v-i18n>Venus: Phase 2</span>&nbsp;<span title="A fan expansion: a separate Venus surface board with 3 new standard projects (Cloud City, Gas Mine, Floater Array), discountable with floaters from any of your cards, and a finer 1% Venus track step">(&#945;)</span>&nbsp;<a :href="wikiUrls.venusPhase2" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
+
+                            <template v-if="expansions.venusPhase2">
+                              <div class="create-game-subsection-label" style="margin-top: 4px;">
+                                <label for="custom-venus-board-code" v-i18n>Custom Venus Phase 2 board code (optional)</label>
+                                <textarea
+                                  id="custom-venus-board-code"
+                                  rows="2"
+                                  style="width: 100%; font-family: monospace; font-size: 11px;"
+                                  placeholder="Paste a TMBS1… code from the Venus map editor"
+                                  v-model="customVenusSurfaceBoardCodeInput"
+                                  @input="applyCustomVenusSurfaceBoardCode"></textarea>
+                                <div v-if="customVenusSurfaceBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customVenusSurfaceBoardCodeError }}</div>
+                                <div v-else-if="customVenusSurfaceBoardName !== ''" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom Venus board: {{ customVenusSurfaceBoardName }}</div>
+                              </div>
+                            </template>
 
                             <input type="checkbox" name="industries" id="industries-checkbox" v-model="expansions.industries">
                             <label for="industries-checkbox" class="expansion-button">
@@ -680,6 +708,7 @@ import {Color, PLAYER_COLORS} from '@/common/Color';
 import {BoardName} from '@/common/boards/BoardName';
 import {RandomBoardOption} from '@/common/boards/RandomBoardOption';
 import {decodeCustomBoard} from '@/common/boards/customBoardCodec';
+import {decodeSimpleBoard} from '@/common/boards/simpleBoardCodec';
 import {CardName} from '@/common/cards/CardName';
 import CeosFilter from '@/client/components/create/CeosFilter.vue';
 import CorporationsFilter from '@/client/components/create/CorporationsFilter.vue';
@@ -725,6 +754,14 @@ type FormModel = {
   customBoardName: string;
   customBoardCodeInput: string;
   customBoardCodeError: string;
+  /** Same idea as the customBoard* fields above, but for the Moon/Venus Phase 2 boards -- these
+   *  aren't a board *selection*, just an optional override of that board's own default layout. */
+  customMoonBoardCodeInput: string;
+  customMoonBoardName: string;
+  customMoonBoardCodeError: string;
+  customVenusSurfaceBoardCodeInput: string;
+  customVenusSurfaceBoardName: string;
+  customVenusSurfaceBoardCodeError: string;
 };
 
 export default defineComponent({
@@ -739,6 +776,12 @@ export default defineComponent({
       customBoardName: '',
       customBoardCodeInput: '',
       customBoardCodeError: '',
+      customMoonBoardCodeInput: '',
+      customMoonBoardName: '',
+      customMoonBoardCodeError: '',
+      customVenusSurfaceBoardCodeInput: '',
+      customVenusSurfaceBoardName: '',
+      customVenusSurfaceBoardCodeError: '',
     };
   },
   components: {
@@ -806,6 +849,8 @@ export default defineComponent({
     setDocumentTitle('Create New Game');
     this.restoreLastSettings();
     this.adoptCustomBoardFromEditor();
+    this.adoptCustomMoonBoardFromEditor();
+    this.adoptCustomVenusSurfaceBoardFromEditor();
     this.adoptBoardFromQuery();
 
     // Set the viewport width to width=device-width on the create game form so mobile browsers use their actual CSS viewport width.
@@ -916,6 +961,71 @@ export default defineComponent({
         this.customBoardCode = undefined;
         this.customBoardName = '';
         this.customBoardCodeError = e instanceof Error ? e.message : String(e);
+      }
+    },
+    // Same "Play with this map" hand-off as adoptCustomBoardFromEditor above, but for
+    // SimpleMapEditor.vue's Moon/Venus Phase 2 modes -- no board-radio side effect, since these
+    // aren't a board *selection*, just an optional override applied when that expansion is on.
+    adoptCustomMoonBoardFromEditor() {
+      if (!window.location.search.includes('customMoonBoardCode=1')) {
+        return;
+      }
+      let code: string | null = null;
+      try {
+        code = window.localStorage?.getItem('customMoonBoardCode') ?? null;
+      } catch (e) {
+        code = null;
+      }
+      if (code === null) {
+        return;
+      }
+      this.customMoonBoardCodeInput = code;
+      this.applyCustomMoonBoardCode();
+    },
+    applyCustomMoonBoardCode() {
+      const code = this.customMoonBoardCodeInput.trim();
+      if (code === '') {
+        this.customMoonBoardName = '';
+        this.customMoonBoardCodeError = '';
+        return;
+      }
+      try {
+        this.customMoonBoardName = decodeSimpleBoard(code).name;
+        this.customMoonBoardCodeError = '';
+      } catch (e) {
+        this.customMoonBoardName = '';
+        this.customMoonBoardCodeError = e instanceof Error ? e.message : String(e);
+      }
+    },
+    adoptCustomVenusSurfaceBoardFromEditor() {
+      if (!window.location.search.includes('customVenusSurfaceBoardCode=1')) {
+        return;
+      }
+      let code: string | null = null;
+      try {
+        code = window.localStorage?.getItem('customVenusSurfaceBoardCode') ?? null;
+      } catch (e) {
+        code = null;
+      }
+      if (code === null) {
+        return;
+      }
+      this.customVenusSurfaceBoardCodeInput = code;
+      this.applyCustomVenusSurfaceBoardCode();
+    },
+    applyCustomVenusSurfaceBoardCode() {
+      const code = this.customVenusSurfaceBoardCodeInput.trim();
+      if (code === '') {
+        this.customVenusSurfaceBoardName = '';
+        this.customVenusSurfaceBoardCodeError = '';
+        return;
+      }
+      try {
+        this.customVenusSurfaceBoardName = decodeSimpleBoard(code).name;
+        this.customVenusSurfaceBoardCodeError = '';
+      } catch (e) {
+        this.customVenusSurfaceBoardName = '';
+        this.customVenusSurfaceBoardCodeError = e instanceof Error ? e.message : String(e);
       }
     },
     restoreLastSettings() {
@@ -1509,6 +1619,10 @@ export default defineComponent({
         includedCards,
         board,
         customBoardCode: this.board === BoardName.CUSTOM ? this.customBoardCode : undefined,
+        customMoonBoardCode: this.customMoonBoardCodeError === '' && this.customMoonBoardCodeInput.trim() !== '' ?
+          this.customMoonBoardCodeInput.trim() : undefined,
+        customVenusSurfaceBoardCode: this.customVenusSurfaceBoardCodeError === '' && this.customVenusSurfaceBoardCodeInput.trim() !== '' ?
+          this.customVenusSurfaceBoardCodeInput.trim() : undefined,
         seed,
         solarPhaseOption,
         aresExtremeVariant: this.aresExtremeVariant,

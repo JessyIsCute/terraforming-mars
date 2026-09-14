@@ -5,6 +5,7 @@ import {Database} from '../database/Database';
 import {BoardName} from '../../common/boards/BoardName';
 import {RandomBoardOption} from '../../common/boards/RandomBoardOption';
 import {decodeCustomBoard} from '../../common/boards/customBoardCodec';
+import {decodeSimpleBoard} from '../../common/boards/simpleBoardCodec';
 import {Cloner} from '../database/Cloner';
 import {Game} from '../Game';
 import {GameOptions} from '../game/GameOptions';
@@ -94,9 +95,30 @@ export class ApiCreateGame extends Handler {
         gameReq.board = boards[Math.floor(Math.random() * boards.length)];
       }
 
+      // Unlike Mars's customBoard, these aren't a board *selection* -- Moon/Venus Phase 2 are
+      // always-on secondary boards bundled with their expansion, so a code here is just an
+      // optional override of that board's own hard-coded default layout, silently ignored (not
+      // decoded at all) if the matching expansion isn't even on.
+      let customMoonBoard: GameOptions['customMoonBoard'] = undefined;
+      if (gameReq.expansions.moon && gameReq.customMoonBoardCode !== undefined) {
+        customMoonBoard = decodeSimpleBoard(gameReq.customMoonBoardCode);
+        if (customMoonBoard.boardType !== 'moon') {
+          throw new Error(`That code is for ${customMoonBoard.boardType}, not the Moon.`);
+        }
+      }
+      let customVenusSurfaceBoard: GameOptions['customVenusSurfaceBoard'] = undefined;
+      if (gameReq.expansions.venusPhase2 && gameReq.customVenusSurfaceBoardCode !== undefined) {
+        customVenusSurfaceBoard = decodeSimpleBoard(gameReq.customVenusSurfaceBoardCode);
+        if (customVenusSurfaceBoard.boardType !== 'venusPhase2') {
+          throw new Error(`That code is for ${customVenusSurfaceBoard.boardType}, not Venus Phase 2.`);
+        }
+      }
+
       const gameOptions: GameOptions = {
         altVenusBoard: gameReq.altVenusBoard,
         customBoard,
+        customMoonBoard,
+        customVenusSurfaceBoard,
         globalParameters: customBoard?.globalParameters,
         aresExtension: gameReq.expansions.ares,
         aresHazards: true, // Not a runtime option.
