@@ -19,8 +19,7 @@ export class AdvancedSchools extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'B39',
         renderData: CardRenderer.builder((b) => {
-          b.tag(Tag.SCIENCE).startEffect.megacredits(3).br;
-          b.tag(Tag.SCIENCE, {all}).startEffect.megacredits(1, {all});
+          b.tag(Tag.SCIENCE).startEffect.megacredits(3).nbsp.tag(Tag.SCIENCE, {all}).startEffect.megacredits(1, {all});
         }),
         description: 'Gain 3 M€ for each science tag you have (including this). ' +
           'Other players gain 1 M€ for each science tag they have.',

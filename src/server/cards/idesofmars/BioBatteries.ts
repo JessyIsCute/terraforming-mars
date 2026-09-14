@@ -3,6 +3,7 @@ import {Card} from '../Card';
 import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
+import {digit} from '../Options';
 
 export class BioBatteries extends Card implements IProjectCard {
   constructor() {
@@ -20,7 +21,7 @@ export class BioBatteries extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'IM135',
         renderData: CardRenderer.builder((b) => {
-          b.minus().plants(4).production((pb) => pb.energy(2));
+          b.minus().plants(4, {digit}).production((pb) => pb.energy(2));
         }),
         description: 'Spend 4 plants and increase your energy production 2 steps.',
       },

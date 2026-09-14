@@ -28,8 +28,6 @@ export class AirTransportCompany extends Card implements IProjectCard {
         cardNumber: 'I49',
         renderData: CardRenderer.builder((b) => {
           b.resource(CardResource.FLOATER, 2).asterix();
-          b.br;
-          b.plainText('Move up to 4 floaters between two cards of yours.');
         }),
         description: 'Requires that you own at least 2 Venus tags. Add 2 floaters to any card. ' +
           'Move up to 4 floaters between two cards of yours.',
