@@ -468,6 +468,7 @@ export class Server {
         idesOfMars: options.idesOfMarsExpansion,
         robAntilles: options.robAntillesExpansion,
         moreParties: options.morePartiesExpansion,
+        industries: options.industriesExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

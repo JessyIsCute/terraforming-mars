@@ -29,3 +29,4 @@ export const CORPORATE_BETTERMENTS_EXPANSION = 'corporateBettermentsExpansion';
 export const IDES_OF_MARS_EXPANSION = 'idesOfMarsExpansion';
 export const ROB_ANTILLES_EXPANSION = 'robAntillesExpansion';
 export const MORE_PARTIES_EXPANSION = 'morePartiesExpansion';
+export const INDUSTRIES_EXPANSION = 'industriesExpansion';

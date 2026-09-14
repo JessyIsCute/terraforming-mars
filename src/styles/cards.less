@@ -1238,6 +1238,18 @@ input[type="radio"]:checked+.filterDiv::after {
   }
 }
 
+// Industries: a factory emoji, same CSS-only trick as above.
+.expansion-icon-industries {
+  background-image: none;
+  text-align: center;
+
+  &::before {
+    content: "🏭";
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
 .card-standard-project {
   height: 155px;
   width: 235px;

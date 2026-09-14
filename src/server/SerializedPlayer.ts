@@ -94,5 +94,6 @@ export interface SerializedPlayer extends DeprecatedFields{
   victoryPointsByGeneration: Array<number>;
   user?: DiscordId;
   warmongerCards: number;
+  industryTilesPlaced?: number;
   withinDeflectionZone: boolean;
 }

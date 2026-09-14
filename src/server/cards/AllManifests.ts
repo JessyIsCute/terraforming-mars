@@ -23,6 +23,7 @@ import {CONGLOMERATES_CARD_MANIFEST} from './conglomerates/ConglomeratesCardMani
 import {CORPORATE_BETTERMENTS_CARD_MANIFEST} from './corporatebetterments/CorporateBettermentsCardManifest';
 import {IDES_OF_MARS_CARD_MANIFEST} from './idesofmars/IdesOfMarsCardManifest';
 import {ROB_ANTILLES_CARD_MANIFEST} from './robantilles/RobAntillesCardManifest';
+import {INDUSTRIES_CARD_MANIFEST} from './industries/IndustriesCardManifest';
 
 export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   BASE_CARD_MANIFEST,
@@ -47,4 +48,5 @@ export const ALL_MODULE_MANIFESTS: Array<ModuleManifest> = [
   CORPORATE_BETTERMENTS_CARD_MANIFEST,
   IDES_OF_MARS_CARD_MANIFEST,
   ROB_ANTILLES_CARD_MANIFEST,
+  INDUSTRIES_CARD_MANIFEST,
 ];

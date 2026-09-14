@@ -173,6 +173,8 @@ export class Player implements IPlayer {
   public removingPlayers: Array<PlayerId> = [];
   // Warmonger
   public warmongerCards: number = 0;
+  // Industries (fan expansion)
+  public industryTilesPlaced: number = 0;
   // For Playwrights corp.
   // removedFromPlayCards is a bit of a misname: it's a temporary storage for
   // cards that provide 'next card' discounts. This will clear between turns.
@@ -2016,6 +2018,7 @@ export class Player implements IPlayer {
       // Lawsuit
       removingPlayers: this.removingPlayers,
       warmongerCards: this.warmongerCards,
+      industryTilesPlaced: this.industryTilesPlaced,
       // Playwrights
       removedFromPlayCards: this.removedFromPlayCards.map(toName),
       // Standard Technology: Underworld
@@ -2096,6 +2099,7 @@ export class Player implements IPlayer {
     }));
     player.removingPlayers = d.removingPlayers;
     player.warmongerCards = d.warmongerCards ?? 0;
+    player.industryTilesPlaced = d.industryTilesPlaced ?? 0;
     player.tags.extraScienceTags = d.scienceTagCount;
     player.tags.extraPlantTags = d.plantTagCount;
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;

@@ -1429,4 +1429,13 @@ export enum CardName {
   ELECTORAL_CAMPAIGN = 'Electoral Campaign',
   METEOR_SHOWER_RA = 'Meteor Shower',
   TAX_THE_RICH = 'Tax The Rich',
+
+  // Industries (fan expansion)
+  HEAT_INDUSTRY_STANDARD_PROJECT = 'Heat Industry',
+  MONEY_INDUSTRY_STANDARD_PROJECT = 'Money Industry',
+  ENERGY_INDUSTRY_STANDARD_PROJECT = 'Energy Industry',
+  STEEL_INDUSTRY_STANDARD_PROJECT = 'Steel Industry',
+  PLANT_INDUSTRY_STANDARD_PROJECT = 'Plant Industry',
+  TITANIUM_INDUSTRY_STANDARD_PROJECT = 'Titanium Industry',
+  WILD_INDUSTRY_STANDARD_PROJECT = 'Wild Industry',
 }
