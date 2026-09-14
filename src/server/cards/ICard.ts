@@ -221,6 +221,15 @@ export interface ICard {
   onColonyAddedByAnyPlayer?(cardOwner: IPlayer, colonyOwner: IPlayer): void;
   onColonyAdded?: never;
 
+  /**
+   * Callback when ANY player completes a trade action (a standard colony trade, or a card-based
+   * trade action that ultimately calls `Colony.trade`).
+   *
+   * @param cardOwner the player who owns this card.
+   * @param player the player who performed the trade.
+   */
+  onTradeByAnyPlayer?(cardOwner: IPlayer, player: IPlayer): void;
+
   onNonCardTagAdded?(player: IPlayer, tag: Tag): void;
   onNonCardTagAddedByAnyPlayer?(cardOwner: IPlayer, tag: Tag): void;
 

@@ -10,5 +10,7 @@ export class MoonCards {
     CardName.APPLIED_SCIENCE,
     CardName.SPIRE,
     CardName.SPIRE_TECH,
+    // High Orbit (fan)
+    CardName.SCIENCE_FACILITY,
   ]);
 }

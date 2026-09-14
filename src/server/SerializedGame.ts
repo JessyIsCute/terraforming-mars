@@ -20,6 +20,7 @@ import {AwardName} from '../common/ma/AwardName';
 import {GlobalParameter} from '../common/GlobalParameter';
 import {MilestoneName} from '../common/ma/MilestoneName';
 import {Tag} from '../common/cards/Tag';
+import {CardName} from '../common/cards/CardName';
 
 export type SerializedGame = {
     activePlayer: PlayerId;
@@ -28,6 +29,9 @@ export type SerializedGame = {
     beholdTheEmperor?: boolean;
     backstabbingPlayer?: PlayerId;
     board: SerializedBoard;
+    // High Orbit (fan): see IGame.cardsPlayedThisGeneration. Optional for backward compatibility
+    // with saves from before this field existed.
+    cardsPlayedThisGeneration?: Array<CardName>;
     ceoDeck: SerializedDeck;
     currentSeed: number;
     claimedMilestones: Array<SerializedClaimedMilestone>;

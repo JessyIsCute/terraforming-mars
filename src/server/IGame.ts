@@ -59,6 +59,14 @@ export interface IGame extends Logger {
   resettable: boolean;
   skipGeneration1Actions: boolean;
   generation: number;
+  /**
+   * High Orbit (fan): tracks which CardNames have already been played THIS generation, across
+   * all players. Used by Planetary Outpost -- since it's a "Silver" card with several separate
+   * physical copies in the deck (see CardFactorySpec.copiesInDeck), a per-card-instance flag
+   * wouldn't work; this is a generation-scoped, game-wide set instead. Reset in
+   * `startGeneration`.
+   */
+  cardsPlayedThisGeneration: Set<CardName>;
   readonly players: ReadonlyArray<IPlayer>;
   readonly playersInGenerationOrder: ReadonlyArray<IPlayer>;
 

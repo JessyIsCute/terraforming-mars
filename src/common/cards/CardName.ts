@@ -1445,4 +1445,26 @@ export enum CardName {
   PLANT_INDUSTRY_STANDARD_PROJECT = 'Plant Industry',
   TITANIUM_INDUSTRY_STANDARD_PROJECT = 'Titanium Industry',
   WILD_INDUSTRY_STANDARD_PROJECT = 'Wild Industry',
+
+  // High Orbit (fan)
+  SPACE_TRADING_STATION = 'Space Trading Station',
+  ORBITAL_HEADQUARTERS = 'Orbital Headquarters',
+  OBSERVATORY = 'Observatory',
+  PROPELLANT_DEPOT = 'Propellant Depot',
+  AUTO_FACTORY = 'Auto Factory',
+  ASTEROID_MINE = 'Asteroid Mine',
+  FREIGHTER = 'Freighter',
+  ORBITAL_SHIPYARD = 'Orbital Shipyard',
+  NAVIGATIONAL_BEACON = 'Navigational Beacon',
+
+  // High Orbit (fan)
+  COMSAT = 'Comsat',
+  WEATHER_SATELLITE = 'Weather Satellite',
+  HYDROPONICS = 'Hydroponics',
+  SALVAGE_DEPOT = 'Salvage Depot',
+  POWERSAT = 'Powersat',
+  PLANETARY_OUTPOST = 'Planetary Outpost',
+  SPACE_HABITAT = 'Space Habitat',
+  SCIENCE_FACILITY = 'Science Facility',
+  PROBE = 'Probe',
 }

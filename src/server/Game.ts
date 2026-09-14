@@ -132,6 +132,8 @@ export class Game implements IGame, Logger {
   public globalsPerGeneration: Array<Partial<Record<GlobalParameter, number>>> = [];
 
   public generation: number = 1;
+  // High Orbit (fan): see IGame.cardsPlayedThisGeneration.
+  public cardsPlayedThisGeneration: Set<CardName> = new Set();
   public phase: Phase = Phase.RESEARCH;
   public projectDeck: ProjectDeck;
   public preludeDeck: PreludeDeck;
@@ -527,6 +529,7 @@ export class Game implements IGame, Logger {
       backstabbingPlayer: this.backstabbingPlayer,
       board: this.board.serialize(),
       claimedMilestones: serializeClaimedMilestones(this.claimedMilestones),
+      cardsPlayedThisGeneration: Array.from(this.cardsPlayedThisGeneration),
       ceoDeck: this.ceoDeck.serialize(),
       colonies: this.colonies.map((colony) => colony.serialize()),
       corporationDeck: this.corporationDeck.serialize(),
@@ -975,6 +978,7 @@ export class Game implements IGame, Logger {
     this.updateGlobalsForTheGeneration();
 
     this.generation++;
+    this.cardsPlayedThisGeneration.clear();
     this.log('Generation ${0}', (b) => b.forNewGeneration().number(this.generation));
     this.setNextFirstPlayer();
 
@@ -1977,6 +1981,7 @@ export class Game implements IGame, Logger {
     }
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);
+    game.cardsPlayedThisGeneration = new Set<CardName>(d.cardsPlayedThisGeneration ?? []);
     game.researchedPlayers = new Set<PlayerId>(d.researchedPlayers);
 
     game.lastSaveId = d.lastSaveId;
