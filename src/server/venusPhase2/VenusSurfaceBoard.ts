@@ -2,6 +2,7 @@ import {Board} from '../boards/Board';
 import {Space} from '../boards/Space';
 import {IPlayer} from '../IPlayer';
 import {SpaceType} from '../../common/boards/SpaceType';
+import {SpaceBonus} from '../../common/boards/SpaceBonus';
 import {SpaceId, isSpaceId, safeCast} from '../../common/Types';
 import {GameOptions} from '../../server/game/GameOptions';
 import {Random} from '../../common/utils/Random';
@@ -38,14 +39,27 @@ export class VenusSurfaceBoard extends Board {
 
   public static newInstance(gameOptions: GameOptions, _rng: Random): VenusSurfaceBoard {
     const b = new Builder();
-    // A modest, roughly-Moon-sized surface: mostly open land for Cloud City/Floater Array, with
-    // a handful of gaslight spaces reserved for Gas Mine scattered through it.
-    b.row(2).land().land().gaslight().land();
-    b.row(1).land().gaslight().land().land().land();
-    b.row(0).land().land().gaslight().land().land().land();
-    b.row(0).land().land().land().gaslight().land();
-    b.row(1).land().land().gaslight().land().land();
-    b.row(2).land().gaslight().land().land();
+    const custom = gameOptions.customVenusSurfaceBoard;
+
+    if (custom !== undefined) {
+      // A user-authored layout from the map editor (see SimpleCustomBoardDefinition.ts). Its
+      // `spaces` are already in the same row-major order as the grid loop in Builder.build()
+      // below (both derive from the same simpleBoardLayout('venusPhase2') shape), so this just
+      // supplies the type/bonus arrays that loop reads.
+      for (const space of custom.spaces) {
+        b.spaceTypes.push(space.spaceType);
+        b.bonuses.push(space.bonus);
+      }
+    } else {
+      // A modest, roughly-Moon-sized surface: mostly open land for Cloud City/Floater Array, with
+      // a handful of gaslight spaces reserved for Gas Mine scattered through it.
+      b.row(2).land().land().gaslight().land();
+      b.row(1).land().gaslight().land().land().land();
+      b.row(0).land().land().gaslight().land().land().land();
+      b.row(0).land().land().land().gaslight().land();
+      b.row(1).land().land().gaslight().land().land();
+      b.row(2).land().gaslight().land().land();
+    }
 
     const spaces = b.build(gameOptions);
     return new VenusSurfaceBoard(spaces);
@@ -56,6 +70,7 @@ class Builder {
   y: number = -1;
   x: number = 0;
   spaceTypes: Array<SpaceType> = [];
+  bonuses: Array<Array<SpaceBonus>> = [];
   spaces: Array<Space> = [];
 
   public row(startX: number): Row {
@@ -93,7 +108,7 @@ class Builder {
           spaceType: this.spaceTypes[idx],
           x: xCoordinate,
           y: row,
-          bonus: [],
+          bonus: this.bonuses[idx] ?? [],
         };
         this.spaces.push(space);
         idx++;
@@ -116,13 +131,15 @@ class Row {
   constructor(private builder: Builder) {
   }
 
-  land(): this {
+  land(...bonuses: Array<SpaceBonus>): this {
     this.builder.spaceTypes.push(SpaceType.LAND);
+    this.builder.bonuses.push(bonuses);
     return this;
   }
 
-  gaslight(): this {
+  gaslight(...bonuses: Array<SpaceBonus>): this {
     this.builder.spaceTypes.push(SpaceType.GASLIGHT);
+    this.builder.bonuses.push(bonuses);
     return this;
   }
 }

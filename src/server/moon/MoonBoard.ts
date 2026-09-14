@@ -29,25 +29,39 @@ export class MoonBoard extends Board {
   }
 
   public static newInstance(gameOptions: GameOptions, rng: Random): MoonBoard {
-    const STEEL = SpaceBonus.STEEL;
-    const DRAW_CARD = SpaceBonus.DRAW_CARD;
-    const TITANIUM = SpaceBonus.TITANIUM;
-
     const b = new Builder();
-    b.row(2).land().land(STEEL, DRAW_CARD).land().mine(TITANIUM);
-    b.row(1).mine(TITANIUM, TITANIUM).mine(/* Mare Imbrium */).land(STEEL).land().land();
-    b.row(0).mine().land(STEEL).land(STEEL, TITANIUM).mine(/* Mare Serenatis*/).mine(TITANIUM).land(STEEL, STEEL);
-    b.row(0).land(STEEL).land().land().mine(TITANIUM).mine(TITANIUM);
-    b.row(0).land().mine(TITANIUM).mine(/* Mare Nubium */).land().mine(/* Mare Nectaris */).land(STEEL);
-    b.row(1).land().land(STEEL).land(STEEL).land(DRAW_CARD, DRAW_CARD).land(STEEL);
-    b.row(2).land(DRAW_CARD, DRAW_CARD).mine(TITANIUM).mine(TITANIUM, TITANIUM).land();
+    const custom = gameOptions.customMoonBoard;
 
-    if (gameOptions.shuffleMapOption!== undefined && gameOptions.shuffleMapOption) {
-      b.shuffle(rng,
-        NamedMoonSpaces.MARE_IMBRIUM,
-        NamedMoonSpaces.MARE_NECTARIS,
-        NamedMoonSpaces.MARE_NUBIUM,
-        NamedMoonSpaces.MARE_SERENITATIS);
+    if (custom !== undefined) {
+      // A user-authored layout from the map editor (see SimpleCustomBoardDefinition.ts). Its
+      // `spaces` are already in the same row-major order as the grid loop in Builder.build()
+      // below (both derive from the same simpleBoardLayout('moon') shape), so this just supplies
+      // the type/bonus arrays that loop reads -- shuffling a player-authored layout wouldn't make
+      // sense, so shuffleMapOption is ignored in this branch.
+      for (const space of custom.spaces) {
+        b.spaceTypes.push(space.spaceType);
+        b.bonuses.push(space.bonus);
+      }
+    } else {
+      const STEEL = SpaceBonus.STEEL;
+      const DRAW_CARD = SpaceBonus.DRAW_CARD;
+      const TITANIUM = SpaceBonus.TITANIUM;
+
+      b.row(2).land().land(STEEL, DRAW_CARD).land().mine(TITANIUM);
+      b.row(1).mine(TITANIUM, TITANIUM).mine(/* Mare Imbrium */).land(STEEL).land().land();
+      b.row(0).mine().land(STEEL).land(STEEL, TITANIUM).mine(/* Mare Serenatis*/).mine(TITANIUM).land(STEEL, STEEL);
+      b.row(0).land(STEEL).land().land().mine(TITANIUM).mine(TITANIUM);
+      b.row(0).land().mine(TITANIUM).mine(/* Mare Nubium */).land().mine(/* Mare Nectaris */).land(STEEL);
+      b.row(1).land().land(STEEL).land(STEEL).land(DRAW_CARD, DRAW_CARD).land(STEEL);
+      b.row(2).land(DRAW_CARD, DRAW_CARD).mine(TITANIUM).mine(TITANIUM, TITANIUM).land();
+
+      if (gameOptions.shuffleMapOption!== undefined && gameOptions.shuffleMapOption) {
+        b.shuffle(rng,
+          NamedMoonSpaces.MARE_IMBRIUM,
+          NamedMoonSpaces.MARE_NECTARIS,
+          NamedMoonSpaces.MARE_NUBIUM,
+          NamedMoonSpaces.MARE_SERENITATIS);
+      }
     }
     const spaces = b.build();
     return new MoonBoard(spaces);

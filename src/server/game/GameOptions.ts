@@ -8,12 +8,17 @@ import {AgendaStyle} from '../../common/turmoil/Types';
 import {Expansion} from '../../common/cards/GameModule';
 import {EscapeVelocityOptions} from '../../common/game/NewGameConfig';
 import {CustomBoardDefinition} from '../../common/boards/CustomBoardDefinition';
+import {SimpleCustomBoardDefinition} from '../../common/boards/SimpleCustomBoardDefinition';
 import {GlobalParametersConfig} from '../../common/GlobalParameterConfig';
 
 export type GameOptions = {
   boardName: BoardName;
   /** The board layout when `boardName` is `BoardName.CUSTOM`. Persisted for the life of the game. */
   customBoard?: CustomBoardDefinition;
+  /** A user-authored Moon surface layout. Absent means MoonBoard's own hard-coded default. */
+  customMoonBoard?: SimpleCustomBoardDefinition;
+  /** A user-authored Venus surface layout. Absent means VenusSurfaceBoard's own hard-coded default. */
+  customVenusSurfaceBoard?: SimpleCustomBoardDefinition;
   /** Global-parameter track overrides (from a custom board). Absent means the official tracks. */
   globalParameters?: GlobalParametersConfig;
   clonedGamedId: GameId | undefined;
@@ -103,6 +108,8 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
   aresExtremeVariant: false,
   boardName: BoardName.THARSIS,
   customBoard: undefined,
+  customMoonBoard: undefined,
+  customVenusSurfaceBoard: undefined,
   globalParameters: undefined,
   bannedCards: [],
   includedCards: [],
