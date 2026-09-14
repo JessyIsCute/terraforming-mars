@@ -15,14 +15,20 @@ describe('VenusSurfaceBoard', () => {
     [game, player] = testGame(2, {venusPhase2Expansion: true});
   });
 
-  it('reserves Stratopolis and Maxwell Base off-grid when the Venus expansion is in play', () => {
+  it('reserves Stratopolis and Maxwell Base on the default board\'s own hard-coded grid spots', () => {
     const [venusGame] = testGame(2, {venusPhase2Expansion: true, venusNextExtension: true});
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(venusGame).venusSurface;
     const stratopolis = venusSurface.getSpaceOrThrow(VENUS_STRATOPOLIS);
     const maxwellBase = venusSurface.getSpaceOrThrow(VENUS_MAXWELL_BASE);
     expect(stratopolis.spaceType).to.eq(SpaceType.COLONY);
-    expect(stratopolis.x).to.eq(-1);
     expect(maxwellBase.spaceType).to.eq(SpaceType.COLONY);
+    // On the grid (a real position), not the off-grid fallback -- the shipped default reserves
+    // both on its own hexagon rather than leaving them in the separate off-grid tray.
+    expect(stratopolis.x).to.not.eq(-1);
+    expect(maxwellBase.x).to.not.eq(-1);
+    // Excluded from normal tile placement, same as any other COLONY-type space.
+    expect(venusSurface.getAvailableSpacesForLand(player).map((s) => s.id)).to.not.include(stratopolis.id);
+    expect(venusSurface.getAvailableSpacesForLand(player).map((s) => s.id)).to.not.include(maxwellBase.id);
   });
 
   it('does not reserve Stratopolis/Maxwell Base spots when Venus is not in play', () => {

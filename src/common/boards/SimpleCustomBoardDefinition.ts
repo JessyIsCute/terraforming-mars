@@ -24,11 +24,22 @@ export const VENUS_SURFACE_ROWS = 7;
  */
 export type SimpleBoardType = 'moon' | 'venusPhase2';
 
+/**
+ * Marks this cell as Venus Phase 2's reserved landing spot for Stratopolis/Maxwell Base --
+ * mutually exclusive with `spaceType` in practice (the board-building code overrides a reserved
+ * cell's type to `SpaceType.COLONY` regardless of what's painted here, the same way Mars's own
+ * Noctis City reserved flag excludes a space from normal tile placement). At most one cell may
+ * carry each value; absent (on every cell) falls back to the pre-existing off-grid placement.
+ * Meaningless for `moon` -- Luna Trade Station/Momentum Virium aren't user-placeable.
+ */
+export type VenusReservedSpot = 'stratopolis' | 'maxwellBase';
+
 export interface SimpleCustomSpaceDef {
   x: number;
   y: number;
   spaceType: SpaceType;
   bonus: Array<SpaceBonus>;
+  reserved?: VenusReservedSpot;
 }
 
 export interface SimpleCustomBoardDefinition {

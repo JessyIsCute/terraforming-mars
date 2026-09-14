@@ -79,6 +79,52 @@ describe('simpleBoardCodec', () => {
     expect(() => decodeSimpleBoard('TMBS1!!!not-valid-base64!!!')).to.throw(SimpleBoardCodecError);
   });
 
+  it('round-trips a chosen Stratopolis/Maxwell Base reservation on Venus', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Reserved');
+    def.spaces[5].reserved = 'stratopolis';
+    def.spaces[10].reserved = 'maxwellBase';
+
+    const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
+    expect(decoded).to.deep.eq(def);
+    expect(decoded.spaces[5].reserved).to.eq('stratopolis');
+    expect(decoded.spaces[10].reserved).to.eq('maxwellBase');
+  });
+
+  it('an unreserved space round-trips with no reserved key at all (not reserved: undefined)', () => {
+    // Guards against a subtle equality footgun: {reserved: undefined} and a missing 'reserved'
+    // key are different objects under a strict deep-eq, even though both mean "not reserved".
+    const def = blankSimpleBoard('venusPhase2', 'Plain');
+    const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
+    expect(decoded.spaces.every((s) => !('reserved' in s))).is.true;
+  });
+
+  it('rejects two spaces both reserved for Stratopolis', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Bad');
+    def.spaces[0].reserved = 'stratopolis';
+    def.spaces[1].reserved = 'stratopolis';
+    expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
+  });
+
+  it('rejects two spaces both reserved for Maxwell Base', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Bad');
+    def.spaces[0].reserved = 'maxwellBase';
+    def.spaces[1].reserved = 'maxwellBase';
+    expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
+  });
+
+  it('allows one Stratopolis reservation and one Maxwell Base reservation together', () => {
+    const def = blankSimpleBoard('venusPhase2', 'Fine');
+    def.spaces[0].reserved = 'stratopolis';
+    def.spaces[1].reserved = 'maxwellBase';
+    expect(() => validateSimpleBoard(def)).to.not.throw();
+  });
+
+  it('rejects a reservation on a Moon board', () => {
+    const def = blankSimpleBoard('moon', 'Bad');
+    def.spaces[0].reserved = 'stratopolis';
+    expect(() => validateSimpleBoard(def)).to.throw(SimpleBoardCodecError);
+  });
+
   it('rejects a decoded wire payload with an unknown board type', () => {
     // Craft a code decode would otherwise accept structurally, but with a board type that isn't
     // 'moon'/'venusPhase2' -- this can't happen through encodeSimpleBoard's typed input, only via

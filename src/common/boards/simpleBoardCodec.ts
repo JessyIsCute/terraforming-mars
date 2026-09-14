@@ -6,6 +6,7 @@ import {
   SimpleBoardType,
   SimpleCustomBoardDefinition,
   SimpleCustomSpaceDef,
+  VenusReservedSpot,
   simpleBoardLayout,
 } from './SimpleCustomBoardDefinition';
 import {bytesToBase64url, base64urlToBytes} from '../utils/base64url';
@@ -24,15 +25,17 @@ export class SimpleBoardCodecError extends Error {
 
 // The JSON shape actually put on the wire. Short keys, and bonus/space type are carried as their
 // raw enum values (SpaceType is a string enum, SpaceBonus a numeric one) -- these boards are tiny
-// (29-31 cells), so plain JSON + base64url keeps this codec far shorter than Mars's bit-packed
+// (29-37 cells), so plain JSON + base64url keeps this codec far shorter than Mars's bit-packed
 // one, at the cost of a longer code string. Position (x, y) is NOT carried per-cell -- the shape
-// is fixed per board type (`simpleBoardLayout`), so `s` is just the ordered list of (type, bonus)
-// pairs matching that layout.
+// is fixed per board type (`simpleBoardLayout`), so `s` is just the ordered list of
+// (type, bonus, reserved?) tuples matching that layout. `reserved` is a plain JSON array element,
+// not a fixed-length TS tuple slot, so codes from before it existed still decode fine -- `wire.s[i]`
+// just has 2 elements instead of 3, read defensively below.
 interface WireDefinition {
   v: 1;
   t: SimpleBoardType;
   n: string;
-  s: Array<[SpaceType, Array<number>]>;
+  s: Array<[SpaceType, Array<number>, VenusReservedSpot?]>;
 }
 
 export function encodeSimpleBoard(def: SimpleCustomBoardDefinition): string {
@@ -41,7 +44,8 @@ export function encodeSimpleBoard(def: SimpleCustomBoardDefinition): string {
     v: 1,
     t: def.boardType,
     n: def.name,
-    s: def.spaces.map((space): [SpaceType, Array<number>] => [space.spaceType, space.bonus]),
+    s: def.spaces.map((space): [SpaceType, Array<number>, VenusReservedSpot?] =>
+      space.reserved === undefined ? [space.spaceType, space.bonus] : [space.spaceType, space.bonus, space.reserved]),
   };
   const bytes = new TextEncoder().encode(JSON.stringify(wire));
   return PREFIX + bytesToBase64url(bytes);
@@ -75,11 +79,12 @@ export function decodeSimpleBoard(code: string): SimpleCustomBoardDefinition {
     version: 1,
     boardType: wire.t,
     name: wire.n,
-    spaces: wire.s.map(([spaceType, bonus], i): SimpleCustomSpaceDef => ({
+    spaces: wire.s.map(([spaceType, bonus, reserved], i): SimpleCustomSpaceDef => ({
       x: layout[i]?.x ?? -1,
       y: layout[i]?.y ?? -1,
       spaceType,
       bonus,
+      ...(reserved === undefined ? {} : {reserved}),
     })),
   };
   validateSimpleBoard(def);
@@ -95,6 +100,8 @@ export function validateSimpleBoard(def: SimpleCustomBoardDefinition): void {
     throw new SimpleBoardCodecError(`Expected ${layout.length} spaces, got ${def.spaces.length}`);
   }
   const allowedTypes: ReadonlyArray<SpaceType> = SIMPLE_BOARD_SPACE_TYPES[def.boardType];
+  let stratopolisCount = 0;
+  let maxwellBaseCount = 0;
   for (let i = 0; i < def.spaces.length; i++) {
     const space = def.spaces[i];
     const expected = layout[i];
@@ -105,10 +112,30 @@ export function validateSimpleBoard(def: SimpleCustomBoardDefinition): void {
     if (!allowedTypes.includes(space.spaceType)) {
       throw new SimpleBoardCodecError(`Space type '${space.spaceType}' is not valid for board type '${def.boardType}'`);
     }
+    if (space.reserved !== undefined) {
+      if (def.boardType !== 'venusPhase2') {
+        throw new SimpleBoardCodecError(`'reserved' is not valid for board type '${def.boardType}'`);
+      }
+      if (space.reserved !== 'stratopolis' && space.reserved !== 'maxwellBase') {
+        throw new SimpleBoardCodecError(`Invalid reserved spot '${space.reserved}'`);
+      }
+      if (space.reserved === 'stratopolis') {
+        stratopolisCount++;
+      }
+      if (space.reserved === 'maxwellBase') {
+        maxwellBaseCount++;
+      }
+    }
     for (const bonus of space.bonus) {
       if (typeof bonus !== 'number' || SpaceBonus[bonus] === undefined) {
         throw new SimpleBoardCodecError(`Invalid space bonus '${bonus}'`);
       }
     }
+  }
+  if (stratopolisCount > 1) {
+    throw new SimpleBoardCodecError('At most one space may be reserved for Stratopolis');
+  }
+  if (maxwellBaseCount > 1) {
+    throw new SimpleBoardCodecError('At most one space may be reserved for Maxwell Base');
   }
 }

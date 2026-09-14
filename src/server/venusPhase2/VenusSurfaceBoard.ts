@@ -7,14 +7,16 @@ import {SpaceId, isSpaceId, safeCast} from '../../common/Types';
 import {GameOptions} from '../../server/game/GameOptions';
 import {Random} from '../../common/utils/Random';
 import {CardName} from '../../common/cards/CardName';
-import {VENUS_SURFACE_ROWS} from '../../common/boards/SimpleCustomBoardDefinition';
+import {VENUS_SURFACE_ROWS, VenusReservedSpot} from '../../common/boards/SimpleCustomBoardDefinition';
 import {hexRowLayout} from '../../common/boards/CustomBoardDefinition';
 
 // Deliberately NOT SpaceName.STRATOPOLIS/MAXWELL_BASE ('72'/'73') -- those are the Mars board's
 // own space ids, and this is a genuinely separate Board instance with its own numeric range
 // (200+). Reusing them would collide once client-side rendering keys off space id (DOM
 // data_space_id, log-highlight lookup), even though server-side lookups stay board-scoped and
-// wouldn't have noticed. Fixed, out-of-band ids -- well clear of the grid's own 200+ range below.
+// wouldn't have noticed. Fixed regardless of where the reserved space actually ends up (on-grid,
+// picked via the map editor, or the off-grid fallback below) -- Stratopolis.ts/MaxwellBase.ts look
+// these ids up directly and never need to know which case applies.
 export const VENUS_STRATOPOLIS: SpaceId = safeCast('298', isSpaceId);
 export const VENUS_MAXWELL_BASE: SpaceId = safeCast('299', isSpaceId);
 
@@ -47,22 +49,25 @@ export class VenusSurfaceBoard extends Board {
       // A user-authored layout from the map editor (see SimpleCustomBoardDefinition.ts). Its
       // `spaces` are already in the same row-major order as the grid loop in Builder.build()
       // below (both derive from the same simpleBoardLayout('venusPhase2') shape), so this just
-      // supplies the type/bonus arrays that loop reads.
+      // supplies the type/bonus/reserved arrays that loop reads.
       for (const space of custom.spaces) {
         b.spaceTypes.push(space.spaceType);
         b.bonuses.push(space.bonus);
+        b.reservedNames.push(space.reserved);
       }
     } else {
       // A true regular hexagon (side length 4 -- see VENUS_SURFACE_ROWS): mostly open land for
       // Cloud City/Floater Array, with a handful of gaslight spaces reserved for Gas Mine
-      // scattered through it.
+      // scattered through it, plus Stratopolis/Maxwell Base's own reserved spots (near the top
+      // and bottom edges, mirrored) -- falls back to the off-grid placement below only if one of
+      // those two cards isn't even in this game's deck.
       b.row(3).land().land().gaslight().land();
       b.row(2).land().gaslight().land().land().land();
       b.row(1).land().land().gaslight().land().land().land();
-      b.row(0).land().land().land().gaslight().land().land().land();
+      b.row(0).land().stratopolis().land().gaslight().land().land().land();
       b.row(1).land().land().gaslight().land().land().land();
       b.row(2).land().gaslight().land().land().land();
-      b.row(3).land().land().gaslight().land();
+      b.row(3).land().maxwellBase().gaslight().land();
     }
 
     const spaces = b.build(gameOptions);
@@ -75,6 +80,7 @@ class Builder {
   x: number = 0;
   spaceTypes: Array<SpaceType> = [];
   bonuses: Array<Array<SpaceBonus>> = [];
+  reservedNames: Array<VenusReservedSpot | undefined> = [];
   spaces: Array<Space> = [];
 
   public row(startX: number): Row {
@@ -83,42 +89,64 @@ class Builder {
     return new Row(this);
   }
   public build(gameOptions: GameOptions): Array<Space> {
-    // Stratopolis/MaxwellBase's reserved off-grid spots, relocated here from the Mars board --
-    // same "is this card's expansion actually in play" gate BoardBuilder.addExpansionColonySpaces
-    // already applies on Mars, so this board doesn't reserve a spot for a card that isn't even
-    // in the deck. See expansionSpaceColonies.ts / BoardBuilder.ts for the venusPhase2Expansion
-    // check that keeps them on Mars instead when this expansion is off. Fixed ids (not counted
-    // toward idOffset below), so the grid's own ids stay stable regardless of which of these are
-    // actually reserved in a given game.
-    if (gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.STRATOPOLIS)) {
-      this.spaces.push(colonySpace(VENUS_STRATOPOLIS));
-    }
-    if (gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.MAXWELL_BASE)) {
-      this.spaces.push(colonySpace(VENUS_MAXWELL_BASE));
-    }
-
     // A true regular hexagon, built with hexRowLayout -- the exact same proven formula Mars's own
     // boards use (see VENUS_SURFACE_ROWS's own comment). customSpacePixel (the generic pixel-layout
     // formula both this board's client component and the map editor's preview use) requires
     // exactly this kind of shape; an earlier hand-rolled attempt looked plausible but wasn't
     // actually regular (mismatched edge lengths) and rendered with visible gaps and a stray hex.
+    const stratopolisInPlay = gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.STRATOPOLIS);
+    const maxwellBaseInPlay = gameOptions.expansions.venus || gameOptions.includedCards.includes(CardName.MAXWELL_BASE);
+    let foundStratopolis = false;
+    let foundMaxwellBase = false;
+
     const idOffset = 1;
     let idx = 0;
 
     for (const row of hexRowLayout(VENUS_SURFACE_ROWS)) {
       for (let i = 0; i < row.width; i++) {
-        const spaceId = idx + idOffset;
-        const xCoordinate = row.xOffset + i;
+        // A cell reserved for a card that isn't even in this game's deck is just a normal cell of
+        // whatever type it was painted -- no point excluding a hex from placement for a card that
+        // will never be played (also lets a custom board someone else made, that reserves a spot
+        // for a card you don't have in your deck, still work sensibly).
+        let reservedName = this.reservedNames[idx];
+        if (reservedName === 'stratopolis' && !stratopolisInPlay) {
+          reservedName = undefined;
+        }
+        if (reservedName === 'maxwellBase' && !maxwellBaseInPlay) {
+          reservedName = undefined;
+        }
+
+        const spaceId = reservedName === 'stratopolis' ? VENUS_STRATOPOLIS :
+          reservedName === 'maxwellBase' ? VENUS_MAXWELL_BASE :
+            Builder.spaceId(idx + idOffset);
+        const spaceType = reservedName !== undefined ? SpaceType.COLONY : this.spaceTypes[idx];
+
         const space: Space = {
-          id: Builder.spaceId(spaceId),
-          spaceType: this.spaceTypes[idx],
-          x: xCoordinate,
+          id: spaceId,
+          spaceType,
+          x: row.xOffset + i,
           y: row.y,
           bonus: this.bonuses[idx] ?? [],
         };
         this.spaces.push(space);
+        if (reservedName === 'stratopolis') {
+          foundStratopolis = true;
+        }
+        if (reservedName === 'maxwellBase') {
+          foundMaxwellBase = true;
+        }
         idx++;
       }
+    }
+
+    // Stratopolis/MaxwellBase's reserved off-grid fallback, relocated here from the Mars board --
+    // only used when no on-grid cell claimed the reservation above (an older custom code, or the
+    // hard-coded default's own reservation being skipped because that card isn't in the deck).
+    if (stratopolisInPlay && !foundStratopolis) {
+      this.spaces.push(colonySpace(VENUS_STRATOPOLIS));
+    }
+    if (maxwellBaseInPlay && !foundMaxwellBase) {
+      this.spaces.push(colonySpace(VENUS_MAXWELL_BASE));
     }
 
     return this.spaces;
@@ -140,12 +168,31 @@ class Row {
   land(...bonuses: Array<SpaceBonus>): this {
     this.builder.spaceTypes.push(SpaceType.LAND);
     this.builder.bonuses.push(bonuses);
+    this.builder.reservedNames.push(undefined);
     return this;
   }
 
   gaslight(...bonuses: Array<SpaceBonus>): this {
     this.builder.spaceTypes.push(SpaceType.GASLIGHT);
     this.builder.bonuses.push(bonuses);
+    this.builder.reservedNames.push(undefined);
+    return this;
+  }
+
+  // The underlying type barely matters once reserved (build() always forces SpaceType.COLONY for
+  // a reserved cell) -- LAND is just a reasonable placeholder for the "in this game but that card
+  // isn't in play" fallback case, where the reservation gets ignored and the cell reverts to it.
+  stratopolis(...bonuses: Array<SpaceBonus>): this {
+    this.builder.spaceTypes.push(SpaceType.LAND);
+    this.builder.bonuses.push(bonuses);
+    this.builder.reservedNames.push('stratopolis');
+    return this;
+  }
+
+  maxwellBase(...bonuses: Array<SpaceBonus>): this {
+    this.builder.spaceTypes.push(SpaceType.LAND);
+    this.builder.bonuses.push(bonuses);
+    this.builder.reservedNames.push('maxwellBase');
     return this;
   }
 }

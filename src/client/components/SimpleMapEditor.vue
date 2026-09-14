@@ -7,9 +7,13 @@
         {{ boardType === 'moon' ? 'Venus Phase 2 Map Editor' : 'Moon Map Editor' }}
       </a>
     </div>
-    <p class="simple-map-editor-note" v-i18n>
-      {{ boardType === 'moon' ? 'The Luna Trade Station and Momentum Virium reserved spots' : 'The Stratopolis and Maxwell Base reserved spots' }}
-      shown in the preview below are placed automatically by the game and can't be painted here.
+    <p v-if="boardType === 'moon'" class="simple-map-editor-note" v-i18n>
+      The Luna Trade Station and Momentum Virium reserved spots shown in the preview below are
+      placed automatically by the game and can't be painted here.
+    </p>
+    <p v-else class="simple-map-editor-note" v-i18n>
+      Reserve a hex below for Stratopolis or Maxwell Base with the tools under "Reserved spots" --
+      leave both unreserved to keep the default off-grid placement instead.
     </p>
 
     <div class="simple-map-editor-layout">
@@ -24,6 +28,21 @@
           <label v-for="t in terrainTools" :key="t.key" :title="t.description">
             <input type="radio" name="tool" :value="t.key" v-model="tool">
             <i class="simple-map-editor-swatch" :class="'simple-map-editor-swatch--' + t.spaceType"></i>
+            <span>{{ t.label }}</span>
+          </label>
+        </fieldset>
+
+        <fieldset v-if="reservedTools.length > 0" class="simple-map-editor-tools">
+          <legend v-i18n>Reserved spots</legend>
+          <p class="simple-map-editor-tools-note" v-i18n>Click a hex to reserve it. Each spot can only be on one hex at a time -- picking a new one moves it.</p>
+          <label :title="'Unreserve the hex you click, if it was reserved.'">
+            <input type="radio" name="tool" value="reserved:clear" v-model="tool">
+            <i class="simple-map-editor-swatch simple-map-editor-swatch--clear-reserved">∅</i>
+            <span v-i18n>Clear reservation</span>
+          </label>
+          <label v-for="t in reservedTools" :key="t.key" :title="t.description">
+            <input type="radio" name="tool" :value="t.key" v-model="tool">
+            <i class="simple-map-editor-swatch" :class="'simple-map-editor-swatch--' + t.css"></i>
             <span>{{ t.label }}</span>
           </label>
         </fieldset>
@@ -54,11 +73,11 @@
               :key="i"
               type="button"
               class="simple-map-editor-hex"
-              :class="'simple-map-editor-swatch--' + cell.spaceType"
+              :class="'simple-map-editor-swatch--' + (cell.reserved ?? cell.spaceType)"
               :style="hexStyle(cell)"
               @click="paint(i)"
               @contextmenu.prevent="removeLastBonus(i)"
-              :title="cell.x + ',' + cell.y"
+              :title="cell.x + ',' + cell.y + (cell.reserved ? ' (' + reservedLabel(cell.reserved) + ')' : '')"
             >
               <span class="simple-map-editor-hex-bonuses" v-if="cell.bonus.length > 0">
                 <i
@@ -119,6 +138,7 @@ import {
   SimpleBoardType,
   SimpleCustomBoardDefinition,
   SimpleCustomSpaceDef,
+  VenusReservedSpot,
   blankSimpleBoard,
 } from '@/common/boards/SimpleCustomBoardDefinition';
 import {decodeSimpleBoard, encodeSimpleBoard} from '@/common/boards/simpleBoardCodec';
@@ -158,6 +178,23 @@ const MOON_BONUS_TOOLS: Array<BonusTool> = [
 const BONUS_TOOLS_BY_BOARD: Record<SimpleBoardType, Array<BonusTool>> = {
   moon: MOON_BONUS_TOOLS,
   venusPhase2: [],
+};
+
+type ReservedTool = {key: string, spot: VenusReservedSpot, css: string, label: string, description: string};
+
+const RESERVED_TOOLS: Array<ReservedTool> = [
+  {key: 'reserved:stratopolis', spot: 'stratopolis', css: 'stratopolis', label: 'Stratopolis', description: 'Reserve this hex for the Stratopolis card\'s city tile.'},
+  {key: 'reserved:maxwellBase', spot: 'maxwellBase', css: 'maxwellBase', label: 'Maxwell Base', description: 'Reserve this hex for the Maxwell Base card\'s city tile.'},
+];
+
+const RESERVED_TOOLS_BY_BOARD: Record<SimpleBoardType, Array<ReservedTool>> = {
+  moon: [],
+  venusPhase2: RESERVED_TOOLS,
+};
+
+const RESERVED_LABELS: Record<VenusReservedSpot, string> = {
+  stratopolis: 'Stratopolis',
+  maxwellBase: 'Maxwell Base',
 };
 
 const TERRAIN_LABELS: Record<SpaceType, {label: string, description: string}> = {
@@ -203,11 +240,17 @@ export default defineComponent({
     bonusTools(): Array<BonusTool> {
       return BONUS_TOOLS_BY_BOARD[this.boardType];
     },
+    reservedTools(): Array<ReservedTool> {
+      return RESERVED_TOOLS_BY_BOARD[this.boardType];
+    },
     currentToolHint(): string {
       if (this.tool === 'bonus:clear') {
         return 'Remove every bonus from the hex you click.';
       }
-      const all = [...this.terrainTools, ...this.bonusTools];
+      if (this.tool === 'reserved:clear') {
+        return 'Unreserve the hex you click, if it was reserved.';
+      }
+      const all = [...this.terrainTools, ...this.bonusTools, ...this.reservedTools];
       return all.find((t) => t.key === this.tool)?.description ?? '';
     },
     definition(): SimpleCustomBoardDefinition {
@@ -222,16 +265,20 @@ export default defineComponent({
       return encodeSimpleBoard(this.definition);
     },
     previewModel(): VenusPhase2Model {
-      // The reserved Stratopolis/Maxwell Base spots are always present in a real game (gated by
-      // the Venus expansion, not by this editable definition) -- included here as fixed stubs
-      // purely so the preview looks like a real board; VenusSurfaceBoard.vue itself renders them
-      // generically (filtered by SpaceType.COLONY), so this is optional for it not to crash,
-      // unlike Moon's reserved spaces below.
-      const reserved: Array<SpaceModel> = [
-        {id: VENUS_STRATOPOLIS, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []},
-        {id: VENUS_MAXWELL_BASE, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []},
+      // A hex the user reserved gets the real fixed id/COLONY type here too, so the preview shows
+      // it exactly where it'll actually land in a game (VenusSurfaceBoard.vue renders it on the
+      // main grid, same as any other cell, now that it has a real (x, y)). Whichever of the two
+      // *isn't* reserved on-grid still gets its off-grid stub, matching the board-building
+      // fallback in VenusSurfaceBoard.ts -- these are always present in a real game (gated by the
+      // Venus expansion, not by this editable definition), so the preview isn't misleadingly
+      // missing one just because this particular layout didn't place it yet.
+      const hasStratopolis = this.grid.some((s) => s.reserved === 'stratopolis');
+      const hasMaxwellBase = this.grid.some((s) => s.reserved === 'maxwellBase');
+      const fallback: Array<SpaceModel> = [
+        ...(hasStratopolis ? [] : [{id: VENUS_STRATOPOLIS, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []}]),
+        ...(hasMaxwellBase ? [] : [{id: VENUS_MAXWELL_BASE, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []}]),
       ];
-      return {spaces: [...reserved, ...this.grid.map((s, i): SpaceModel => this.toSpaceModel(s, i))]};
+      return {spaces: [...fallback, ...this.grid.map((s, i): SpaceModel => this.toSpaceModel(s, i))]};
     },
     previewMoonModel(): MoonModel {
       // Unlike VenusSurfaceBoard.vue, MoonBoard.vue's own template unconditionally looks up
@@ -261,9 +308,11 @@ export default defineComponent({
         rows.push(this.grid.filter((s) => s.y === y));
       }
       const tool = (space: SimpleCustomSpaceDef): string => {
-        const method = space.spaceType === SpaceType.LAND ? 'land' :
-          space.spaceType === SpaceType.LUNAR_MINE ? 'mine' : 'gaslight';
-        const bonusArgs = space.bonus.map((b) => `SpaceBonus.${SpaceBonus[b]}`).join(', ');
+        const method = space.reserved === 'stratopolis' ? 'stratopolis' :
+          space.reserved === 'maxwellBase' ? 'maxwellBase' :
+            space.spaceType === SpaceType.LAND ? 'land' :
+              space.spaceType === SpaceType.LUNAR_MINE ? 'mine' : 'gaslight';
+        const bonusArgs = space.reserved !== undefined ? '' : space.bonus.map((b) => `SpaceBonus.${SpaceBonus[b]}`).join(', ');
         return `.${method}(${bonusArgs})`;
       };
       const lines = rows.map((row) => {
@@ -275,6 +324,14 @@ export default defineComponent({
   },
   methods: {
     toSpaceModel(s: SimpleCustomSpaceDef, i: number): SpaceModel {
+      // Mirrors VenusSurfaceBoard.ts's own build(): a reserved cell always becomes COLONY-typed
+      // with the fixed id, regardless of whatever terrain was painted underneath it.
+      if (s.reserved === 'stratopolis') {
+        return {id: VENUS_STRATOPOLIS, x: s.x, y: s.y, spaceType: SpaceType.COLONY, bonus: []};
+      }
+      if (s.reserved === 'maxwellBase') {
+        return {id: VENUS_MAXWELL_BASE, x: s.x, y: s.y, spaceType: SpaceType.COLONY, bonus: []};
+      }
       return {id: customSpaceId(i), x: s.x, y: s.y, spaceType: s.spaceType, bonus: s.bonus};
     },
     paint(index: number): void {
@@ -287,8 +344,23 @@ export default defineComponent({
         if (space.bonus.length < MAX_HEX_BONUSES) {
           space.bonus.push(Number(this.tool.slice(6)) as SpaceBonus);
         }
+      } else if (this.tool === 'reserved:clear') {
+        delete space.reserved;
+      } else if (this.tool.startsWith('reserved:')) {
+        const spot = this.tool.slice(9) as VenusReservedSpot;
+        // Only one hex may hold a given reservation -- picking a new one moves it, rather than
+        // leaving the old hex stuck reserved with no way back to it.
+        for (const other of this.grid) {
+          if (other.reserved === spot) {
+            delete other.reserved;
+          }
+        }
+        space.reserved = spot;
       }
       this.grid = [...this.grid];
+    },
+    reservedLabel(spot: VenusReservedSpot): string {
+      return RESERVED_LABELS[spot];
     },
     removeLastBonus(index: number): void {
       const space = this.grid[index];
@@ -420,6 +492,18 @@ export default defineComponent({
   .simple-map-editor-swatch--land { background: #8a6d3b; }
   .simple-map-editor-swatch--lunar_mine { background: #6b6b78; }
   .simple-map-editor-swatch--gaslight { background: #e6be28; }
+  .simple-map-editor-swatch--stratopolis { background: #4aa8ff; }
+  .simple-map-editor-swatch--maxwellBase { background: #ff6b4a; }
+  .simple-map-editor-swatch--clear-reserved {
+    background: transparent;
+    border: 1px dashed #999;
+    box-sizing: border-box;
+    font-style: normal;
+    font-size: 10px;
+    line-height: 14px;
+    text-align: center;
+    color: #e74c3c;
+  }
 
   .simple-map-editor-bonus-icon {
     display: inline-block;

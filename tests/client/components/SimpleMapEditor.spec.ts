@@ -112,6 +112,81 @@ describe('SimpleMapEditor', () => {
     expect(moon.findComponent({name: 'MoonBoard'}).exists()).is.true;
   });
 
+  it('does not offer reservation tools for Moon (only Venus has Stratopolis/Maxwell Base)', () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+    expect(wrapper.text()).to.not.include('Reserved spots');
+  });
+
+  it('reserving a hex for Stratopolis marks it, and clearing unreserves it', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'reserved:stratopolis';
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+    expect((wrapper.vm as any).grid[0].reserved).to.eq('stratopolis');
+    expect(decodeSimpleBoard((wrapper.vm as any).code).spaces[0].reserved).to.eq('stratopolis');
+
+    (wrapper.vm as any).tool = 'reserved:clear';
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+    expect((wrapper.vm as any).grid[0].reserved).is.undefined;
+  });
+
+  it('reserving a new hex for the same spot moves it off the old one (only one at a time)', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'reserved:stratopolis';
+    await wrapper.vm.$nextTick();
+    const hexes = wrapper.findAll('.simple-map-editor-hex');
+    await hexes[0].trigger('click');
+    await hexes[1].trigger('click');
+
+    expect((wrapper.vm as any).grid[0].reserved).is.undefined;
+    expect((wrapper.vm as any).grid[1].reserved).to.eq('stratopolis');
+  });
+
+  it('Stratopolis and Maxwell Base can be reserved independently on different hexes', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    const hexes = wrapper.findAll('.simple-map-editor-hex');
+
+    (wrapper.vm as any).tool = 'reserved:stratopolis';
+    await wrapper.vm.$nextTick();
+    await hexes[0].trigger('click');
+
+    (wrapper.vm as any).tool = 'reserved:maxwellBase';
+    await wrapper.vm.$nextTick();
+    await hexes[1].trigger('click');
+
+    expect((wrapper.vm as any).grid[0].reserved).to.eq('stratopolis');
+    expect((wrapper.vm as any).grid[1].reserved).to.eq('maxwellBase');
+  });
+
+  it('the preview shows a reservation on the main grid with the real fixed id, not the off-grid tray', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'reserved:stratopolis';
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+    await wrapper.vm.$nextTick();
+
+    const model = (wrapper.vm as any).previewModel;
+    const stratopolisSpace = model.spaces.find((s: any) => s.id === '298');
+    expect(stratopolisSpace).to.exist;
+    expect(stratopolisSpace.x).to.not.eq(-1);
+    expect(stratopolisSpace.spaceType).to.eq(SpaceType.COLONY);
+    // Maxwell Base wasn't reserved on-grid, so it still falls back to the off-grid stub.
+    const maxwellBaseSpace = model.spaces.find((s: any) => s.id === '299');
+    expect(maxwellBaseSpace.x).to.eq(-1);
+  });
+
+  it('the export source emits .stratopolis()/.maxwellBase() for reserved cells instead of terrain', async () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    (wrapper.vm as any).tool = 'reserved:stratopolis';
+    await wrapper.vm.$nextTick();
+    await wrapper.findAll('.simple-map-editor-hex')[0].trigger('click');
+    await wrapper.vm.$nextTick();
+
+    const source = (wrapper.vm as any).exportSource as string;
+    expect(source).to.include('.stratopolis()');
+  });
+
   it('gives the Moon preview real m-prefixed ids MoonBoard.vue positions by CSS, not generic ones', () => {
     // MoonBoard.vue's template positions every grid hex via hand-tuned CSS keyed to its exact id
     // ('.moon-space-m02'..'.moon-space-m36' in moon.less) -- a generic id (customSpaceId's
