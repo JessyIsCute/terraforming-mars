@@ -7,6 +7,8 @@ import {SpaceId, isSpaceId, safeCast} from '../../common/Types';
 import {GameOptions} from '../../server/game/GameOptions';
 import {Random} from '../../common/utils/Random';
 import {CardName} from '../../common/cards/CardName';
+import {VENUS_SURFACE_ROWS} from '../../common/boards/SimpleCustomBoardDefinition';
+import {hexRowLayout} from '../../common/boards/CustomBoardDefinition';
 
 // Deliberately NOT SpaceName.STRATOPOLIS/MAXWELL_BASE ('72'/'73') -- those are the Mars board's
 // own space ids, and this is a genuinely separate Board instance with its own numeric range
@@ -51,15 +53,16 @@ export class VenusSurfaceBoard extends Board {
         b.bonuses.push(space.bonus);
       }
     } else {
-      // A modest, roughly-Moon-sized surface: mostly open land for Cloud City/Floater Array, with
-      // a handful of gaslight spaces reserved for Gas Mine scattered through it.
-      b.row(3).land().land().gaslight();
-      b.row(2).land().gaslight().land().land();
-      b.row(1).land().land().gaslight().land().land();
-      b.row(0).land().land().land().gaslight().land().land();
-      b.row(1).land().gaslight().land().land().land();
-      b.row(2).land().land().gaslight().land();
-      b.row(3).gaslight().land().land();
+      // A true regular hexagon (side length 4 -- see VENUS_SURFACE_ROWS): mostly open land for
+      // Cloud City/Floater Array, with a handful of gaslight spaces reserved for Gas Mine
+      // scattered through it.
+      b.row(3).land().land().gaslight().land();
+      b.row(2).land().gaslight().land().land().land();
+      b.row(1).land().land().gaslight().land().land().land();
+      b.row(0).land().land().land().gaslight().land().land().land();
+      b.row(1).land().land().gaslight().land().land().land();
+      b.row(2).land().gaslight().land().land().land();
+      b.row(3).land().land().gaslight().land();
     }
 
     const spaces = b.build(gameOptions);
@@ -94,26 +97,23 @@ class Builder {
       this.spaces.push(colonySpace(VENUS_MAXWELL_BASE));
     }
 
-    // A proper symmetric hex diamond: odd row count, a single peak row dead center (row 3 of
-    // 0-6), tapering evenly on both sides. customSpacePixel (the generic pixel-layout formula
-    // both this board's own client component and the map editor's preview use) assumes exactly
-    // this shape -- an earlier 6-row version ([4,5,6,5,5,4], no true center row) broke that
-    // assumption and rendered with visible gaps and a stray disconnected hex.
-    const tilesPerRow = [3, 4, 5, 6, 5, 4, 3];
+    // A true regular hexagon, built with hexRowLayout -- the exact same proven formula Mars's own
+    // boards use (see VENUS_SURFACE_ROWS's own comment). customSpacePixel (the generic pixel-layout
+    // formula both this board's client component and the map editor's preview use) requires
+    // exactly this kind of shape; an earlier hand-rolled attempt looked plausible but wasn't
+    // actually regular (mismatched edge lengths) and rendered with visible gaps and a stray hex.
     const idOffset = 1;
     let idx = 0;
 
-    for (let row = 0; row < tilesPerRow.length; row++) {
-      const tilesInThisRow = tilesPerRow[row];
-      const xOffset = 6 - tilesInThisRow;
-      for (let i = 0; i < tilesInThisRow; i++) {
+    for (const row of hexRowLayout(VENUS_SURFACE_ROWS)) {
+      for (let i = 0; i < row.width; i++) {
         const spaceId = idx + idOffset;
-        const xCoordinate = xOffset + i;
+        const xCoordinate = row.xOffset + i;
         const space: Space = {
           id: Builder.spaceId(spaceId),
           spaceType: this.spaceTypes[idx],
           x: xCoordinate,
-          y: row,
+          y: row.y,
           bonus: this.bonuses[idx] ?? [],
         };
         this.spaces.push(space);

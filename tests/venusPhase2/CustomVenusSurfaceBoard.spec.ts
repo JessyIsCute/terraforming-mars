@@ -14,7 +14,7 @@ describe('VenusSurfaceBoard with a custom definition', () => {
       {...DEFAULT_GAME_OPTIONS, customVenusSurfaceBoard: def}, new SeededRandom(0));
 
     const gridSpaces = board.spaces.filter((s) => s.spaceType !== SpaceType.COLONY);
-    expect(gridSpaces).to.have.length(30);
+    expect(gridSpaces).to.have.length(37);
     expect(gridSpaces[0].spaceType).to.eq(SpaceType.GASLIGHT);
     expect(gridSpaces.every((s, i) => i === 0 || s.spaceType === SpaceType.LAND)).is.true;
   });

@@ -134,6 +134,19 @@ import {groupSpaceBonuses, GroupedSpaceBonus} from '@/client/utils/spaceBonusIco
 const VENUS_STRATOPOLIS: SpaceId = safeCast('298', isSpaceId);
 const VENUS_MAXWELL_BASE: SpaceId = safeCast('299', isSpaceId);
 
+// MoonBoard.vue positions every grid hex via hand-tuned CSS keyed to its exact id (.moon-space-m02
+// .. .moon-space-m36 in moon.less) -- unlike VenusSurfaceBoard.vue, which positions generically by
+// (x, y). A generic id (like customSpaceId's Mars-style '100', '101'...) matches no CSS rule at
+// all, so every hex falls back to its default (unstyled) position -- they end up stacked on top of
+// each other, which is what a "only one tile visible, plus a weird scrollbar" report looks like.
+// This mirrors MoonBoard.ts's own real idOffset (2, since 'm01' is reserved for Luna Trade
+// Station) exactly, so the preview uses the very same ids a real game would for this layout.
+function moonSpaceId(index: number): SpaceId {
+  const id = index + 2;
+  const strId = id < 10 ? '0' + id : String(id);
+  return safeCast('m' + strId, isSpaceId);
+}
+
 type BonusTool = {key: string, bonus: SpaceBonus, css: string, label: string, description: string};
 
 const MOON_BONUS_TOOLS: Array<BonusTool> = [
@@ -229,7 +242,7 @@ export default defineComponent({
         {id: NamedMoonSpaces.MOMENTUM_VIRIUM, x: -1, y: -1, spaceType: SpaceType.COLONY, bonus: []},
       ];
       return {
-        spaces: [...reserved, ...this.grid.map((s, i): SpaceModel => this.toSpaceModel(s, i))],
+        spaces: [...reserved, ...this.grid.map((s, i): SpaceModel => ({id: moonSpaceId(i), x: s.x, y: s.y, spaceType: s.spaceType, bonus: s.bonus}))],
         habitatRate: 0,
         miningRate: 0,
         logisticRate: 0,

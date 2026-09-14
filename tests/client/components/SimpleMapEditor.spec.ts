@@ -20,15 +20,15 @@ describe('SimpleMapEditor', () => {
     expect(links).to.include('map-editor?board=venus');
   });
 
-  it('mounts a Venus board with 30 hexes and a valid code', () => {
+  it('mounts a Venus board with 37 hexes and a valid code', () => {
     const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
     const hexes = wrapper.findAll('.simple-map-editor-hex');
-    expect(hexes.length).to.eq(30);
+    expect(hexes.length).to.eq(37);
     const code = (wrapper.vm as any).code as string;
     expect(code.startsWith('TMBS1')).to.be.true;
     const decoded = decodeSimpleBoard(code);
     expect(decoded.boardType).to.eq('venusPhase2');
-    expect(decoded.spaces).to.have.length(30);
+    expect(decoded.spaces).to.have.length(37);
   });
 
   it('mounts a Moon board with 35 hexes', () => {
@@ -100,8 +100,8 @@ describe('SimpleMapEditor', () => {
     const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
     const source = (wrapper.vm as any).exportSource as string;
     const lines = source.split('\n');
-    expect(lines).to.have.length(7); // Venus's own tilesPerRow has 7 rows.
-    expect(lines[0]).to.match(/^b\.row\(\d+\)(\.land\(\)){3};$/);
+    expect(lines).to.have.length(7); // Venus's own hexRowLayout has 7 rows (side length 4).
+    expect(lines[0]).to.match(/^b\.row\(\d+\)(\.land\(\)){4};$/);
   });
 
   it('renders the real board preview component for the given board type', () => {
@@ -110,5 +110,23 @@ describe('SimpleMapEditor', () => {
 
     const moon = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
     expect(moon.findComponent({name: 'MoonBoard'}).exists()).is.true;
+  });
+
+  it('gives the Moon preview real m-prefixed ids MoonBoard.vue positions by CSS, not generic ones', () => {
+    // MoonBoard.vue's template positions every grid hex via hand-tuned CSS keyed to its exact id
+    // ('.moon-space-m02'..'.moon-space-m36' in moon.less) -- a generic id (customSpaceId's
+    // Mars-style '100', '101'...) matches no CSS rule, so every hex silently falls back to its
+    // default position and they all stack on top of each other. Unlike Venus's board, which
+    // positions generically by (x, y) and doesn't care what the ids are.
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+    const model = (wrapper.vm as any).previewMoonModel;
+    const gridSpaceIds: Array<string> = model.spaces
+      .filter((s: any) => s.spaceType !== SpaceType.COLONY)
+      .map((s: any) => s.id);
+    expect(gridSpaceIds).to.have.length(35);
+    expect(gridSpaceIds.every((id) => /^m\d{2}$/.test(id))).is.true;
+    // Matches MoonBoard.ts's own real numbering exactly (m01 reserved for Luna Trade Station).
+    expect(gridSpaceIds[0]).to.eq('m02');
+    expect(gridSpaceIds[gridSpaceIds.length - 1]).to.eq('m36');
   });
 });
