@@ -11,6 +11,7 @@ import {AresData} from '../common/ares/AresData';
 import {LogMessage} from '../common/logs/LogMessage';
 import {SerializedBoard} from './boards/SerializedBoard';
 import {SerializedMoonData} from './moon/SerializedMoonData';
+import {SerializedVenusPhase2Data} from './venusPhase2/SerializedVenusPhase2Data';
 import {SerializedPathfindersData} from './pathfinders/SerializedPathfindersData';
 import {SerializedDeck} from './cards/SerializedDeck';
 import {UnderworldData} from './underworld/UnderworldData';
@@ -73,6 +74,7 @@ export type SerializedGame = {
     undoCount: number;
     underworldData: UnderworldData;
     conglomerates?: ConglomeratesData;
+    venusPhase2Data: SerializedVenusPhase2Data | undefined;
     venusScaleLevel: number;
     verminInEffect: boolean;
 }

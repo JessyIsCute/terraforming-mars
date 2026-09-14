@@ -88,6 +88,7 @@ describe('ApiGame', () => {
             'turmoil': false,
             'underworld': false,
             'venus': false,
+            'venusPhase2': false,
           },
           'fastModeOption': false,
           'includedCards': [],

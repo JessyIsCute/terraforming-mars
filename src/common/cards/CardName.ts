@@ -1429,4 +1429,11 @@ export enum CardName {
   ELECTORAL_CAMPAIGN = 'Electoral Campaign',
   METEOR_SHOWER_RA = 'Meteor Shower',
   TAX_THE_RICH = 'Tax The Rich',
+
+  // Venus Phase 2
+  // Named "Venus Cloud City" (not just "Cloud City") -- CLOUD_CITY_RA already claims that exact
+  // display string for its own, unrelated Rob Antilles card.
+  CLOUD_CITY_STANDARD_PROJECT = 'Venus Cloud City',
+  GAS_MINE_STANDARD_PROJECT = 'Gas Mine',
+  FLOATER_ARRAY_STANDARD_PROJECT = 'Floater Array',
 }

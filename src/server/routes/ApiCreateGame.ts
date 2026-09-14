@@ -129,6 +129,7 @@ export class ApiCreateGame extends Handler {
         idesOfMarsExpansion: gameReq.expansions.idesOfMars,
         robAntillesExpansion: gameReq.expansions.robAntilles,
         morePartiesExpansion: gameReq.expansions.moreParties,
+        venusPhase2Expansion: gameReq.expansions.venusPhase2,
         moonStandardProjectVariant1: gameReq.moonStandardProjectVariant1,
         pathfindersExpansion: gameReq.expansions.pathfinders,
         politicalAgendasExtension: gameReq.politicalAgendasExtension,

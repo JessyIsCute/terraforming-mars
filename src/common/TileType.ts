@@ -81,6 +81,11 @@ export enum TileType {
     ANIMAL_DOME, // 52
     SEDIMENT, // 53
     BIOLOGICAL_DOME, // 54
+
+    // Venus Phase 2
+    VENUS_CLOUD_CITY, // 55
+    VENUS_GAS_MINE, // 56
+    VENUS_FLOATER_ARRAY, // 57
   }
 
 export const tileTypeToString: Record<TileType, string> = {
@@ -140,6 +145,9 @@ export const tileTypeToString: Record<TileType, string> = {
   [TileType.ANIMAL_DOME]: CardName.LIVESTOCK_GIANT_DOME,
   [TileType.SEDIMENT]: CardName.SEDIMENTARY_ROCKS,
   [TileType.BIOLOGICAL_DOME]: CardName.MOBILE_BIOLOGICAL_DOME,
+  [TileType.VENUS_CLOUD_CITY]: 'Cloud City',
+  [TileType.VENUS_GAS_MINE]: 'Gas Mine',
+  [TileType.VENUS_FLOATER_ARRAY]: 'Floater Array',
 } as const;
 
 export const HAZARD_TILES = new Set([TileType.DUST_STORM_MILD, TileType.DUST_STORM_SEVERE, TileType.EROSION_MILD, TileType.EROSION_SEVERE]);

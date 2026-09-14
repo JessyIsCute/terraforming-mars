@@ -47,6 +47,8 @@ import {GlobalParameter} from '../common/GlobalParameter';
 import {AresSetup} from './ares/AresSetup';
 import {MoonData} from './moon/MoonData';
 import {MoonExpansion} from './moon/MoonExpansion';
+import {VenusPhase2Data} from './venusPhase2/VenusPhase2Data';
+import {VenusPhase2Expansion} from './venusPhase2/VenusPhase2Expansion';
 import {TurmoilHandler} from './turmoil/TurmoilHandler';
 import {SeededRandom, UnseededRandom} from '../common/utils/Random';
 import {chooseMilestonesAndAwards, getCandidates} from './ma/MilestoneAwardSelector';
@@ -168,6 +170,7 @@ export class Game implements IGame, Logger {
   public turmoil: Turmoil | undefined;
   public aresData: AresData | undefined;
   public moonData: MoonData | undefined;
+  public venusPhase2Data: VenusPhase2Data | undefined;
   public pathfindersData: PathfindersData | undefined;
   public underworldData: UnderworldData = UnderworldExpansion.initializeGameWithoutUnderworld();
   public conglomerates: ConglomeratesData = ConglomeratesExpansion.initializeEmpty();
@@ -223,7 +226,14 @@ export class Game implements IGame, Logger {
     this.id = id;
     this.name = name;
     this.gameOptions = {...gameOptions};
-    this.parameters = this.gameOptions.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS;
+    const baseParameters = this.gameOptions.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS;
+    // Venus Phase 2 halves the Venus track's step (2 -> 1), doubling how many raise-actions the
+    // track takes to fill without changing any existing card's absolute requirement threshold
+    // (8/16 are still reached at the same raw value, just via twice as many single steps). This
+    // wins over a simultaneously-selected custom board's own venus.step, if any.
+    this.parameters = this.gameOptions.venusPhase2Expansion ?
+      {...baseParameters, venus: {...baseParameters.venus, step: 1}} :
+      baseParameters;
     this.oxygenLevel = this.parameters.oxygen.min;
     this.temperature = this.parameters.temperature.min;
     this.venusScaleLevel = this.parameters.venus.min;
@@ -305,6 +315,7 @@ export class Game implements IGame, Logger {
         idesOfMars: partialOptions.idesOfMarsExpansion ?? false,
         robAntilles: partialOptions.robAntillesExpansion ?? false,
         moreParties: partialOptions.morePartiesExpansion ?? false,
+        venusPhase2: partialOptions.venusPhase2Expansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -405,6 +416,10 @@ export class Game implements IGame, Logger {
 
     if (gameOptions.moonExpansion) {
       game.moonData = MoonExpansion.initialize(gameOptions, rng);
+    }
+
+    if (gameOptions.venusPhase2Expansion) {
+      game.venusPhase2Data = VenusPhase2Expansion.initialize(gameOptions, rng);
     }
 
     if (gameOptions.pathfindersExpansion) {
@@ -552,6 +567,7 @@ export class Game implements IGame, Logger {
       underworldData: this.underworldData,
       conglomerates: this.conglomerates,
       undoCount: this.undoCount,
+      venusPhase2Data: VenusPhase2Data.serialize(this.venusPhase2Data),
       venusScaleLevel: this.venusScaleLevel,
       verminInEffect: this.verminInEffect,
     };
@@ -1374,22 +1390,26 @@ export class Game implements IGame, Logger {
 
     // PoliticalAgendas Reds P3 hook
     if (increments === -1) {
-      this.venusScaleLevel = Math.max(venus.min, this.venusScaleLevel + increments * 2);
+      this.venusScaleLevel = Math.max(venus.min, this.venusScaleLevel + increments * venus.step);
       return -1;
     }
 
     // Literal typing makes |increments| a const
-    const steps = Math.min(increments, (venus.max - this.venusScaleLevel) / 2);
+    const steps = Math.min(increments, (venus.max - this.venusScaleLevel) / venus.step);
 
     if (this.phase !== Phase.SOLAR) {
-      this.applyParameterBonuses(player, venus.bonuses, this.venusScaleLevel, this.venusScaleLevel + steps * 2);
+      this.applyParameterBonuses(player, venus.bonuses, this.venusScaleLevel, this.venusScaleLevel + steps * venus.step);
       if (this.gameOptions.altVenusBoard) {
-        const newValue = this.venusScaleLevel + steps * 2;
+        const newValue = this.venusScaleLevel + steps * venus.step;
         const minimalBaseline = Math.max(this.venusScaleLevel, constants.ALT_VENUS_MINIMUM_BONUS);
         const maximumBaseline = Math.min(newValue, venus.max);
-        const standardResourcesGranted = Math.max((maximumBaseline - minimalBaseline) / 2, 0);
+        // The `/2` here is alt-Venus-board's own "1 wild resource per 2 track units" pacing
+        // constant -- unrelated to the raise-step size above, so it stays literal. Floored
+        // because Venus Phase 2's 1-unit raise step can now land on an odd track value, which
+        // would otherwise hand GainResources a fractional count it can never satisfy.
+        const standardResourcesGranted = Math.max(Math.floor((maximumBaseline - minimalBaseline) / 2), 0);
 
-        const grantWildResource = this.venusScaleLevel + (steps * 2) >= venus.max;
+        const grantWildResource = this.venusScaleLevel + (steps * venus.step) >= venus.max;
         // The second half of this expression removes any increases earler than 16-to-18.
         if (grantWildResource || standardResourcesGranted > 0) {
           this.defer(new GrantVenusAltTrackBonusDeferred(player, standardResourcesGranted, grantWildResource));
@@ -1412,7 +1432,7 @@ export class Game implements IGame, Logger {
       aphrodite.stock.add(Resource.MEGACREDITS, 2 * steps, {log: true, from: {card: CardName.APHRODITE}});
     }
 
-    this.venusScaleLevel += steps * 2;
+    this.venusScaleLevel += steps * venus.step;
 
     return steps;
   }
@@ -1791,6 +1811,13 @@ export class Game implements IGame, Logger {
         // sell patents is not displayed as a card
         case CardName.SELL_PATENTS_STANDARD_PROJECT:
           return false;
+        // Venus Phase 2's 3 tiles have their own floater-discount flow (Player.ts's
+        // getVenusPhase2StandardProjectOptions) instead of the grouped Standard Projects form,
+        // since that form has no way to ask "how many floaters?" before computing the cost.
+        case CardName.CLOUD_CITY_STANDARD_PROJECT:
+        case CardName.GAS_MINE_STANDARD_PROJECT:
+        case CardName.FLOATER_ARRAY_STANDARD_PROJECT:
+          return false;
           // For buffer gas, show ONLY IF in solo AND 63TR mode
         case CardName.BUFFER_GAS_STANDARD_PROJECT:
           return this.isSoloMode() && gameOptions.soloTR;
@@ -1929,6 +1956,10 @@ export class Game implements IGame, Logger {
     // Reload moon elements if needed
     if (d.moonData !== undefined && gameOptions.moonExpansion === true) {
       game.moonData = MoonData.deserialize(d.moonData, players);
+    }
+
+    if (d.venusPhase2Data !== undefined && gameOptions.venusPhase2Expansion === true) {
+      game.venusPhase2Data = VenusPhase2Data.deserialize(d.venusPhase2Data, players);
     }
 
     if (d.pathfindersData !== undefined && gameOptions.pathfindersExpansion === true) {

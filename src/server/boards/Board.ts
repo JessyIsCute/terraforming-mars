@@ -420,6 +420,9 @@ export function isSpecialTile(tileType: TileType | undefined): boolean {
   case TileType.MOON_HABITAT:
   case TileType.MOON_MINE:
   case TileType.MOON_ROAD:
+  case TileType.VENUS_CLOUD_CITY:
+  case TileType.VENUS_GAS_MINE:
+  case TileType.VENUS_FLOATER_ARRAY:
   case TileType.EROSION_MILD: // Hazard tiles are "special" but they don't count for the typical intent of what a special tile represents.
   case TileType.EROSION_SEVERE:
   case TileType.DUST_STORM_MILD:
