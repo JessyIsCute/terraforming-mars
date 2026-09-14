@@ -48,6 +48,7 @@ const MODULE_ABBREVIATIONS = {
   idesOfMars: 'i',
   robAntilles: 'R',
   moreParties: 'z',
+  venusPhase2: 'e',
 } satisfies Record<GameModule, string>;
 
 const TYPE_ABBREVIATIONS = {
@@ -116,6 +117,7 @@ export function hashToModel(windowLocationHash: string): CardListModel {
       idesOfMars: true,
       robAntilles: true,
       moreParties: true,
+      venusPhase2: true,
     },
     types: {
       event: true,

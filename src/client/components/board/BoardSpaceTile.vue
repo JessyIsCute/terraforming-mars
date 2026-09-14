@@ -71,6 +71,11 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.ANIMAL_DOME]: 'animal_dome',
   [TileType.SEDIMENT]: 'sediment',
   [TileType.BIOLOGICAL_DOME]: 'biological_dome',
+  // Real art exists (see assets/venusPhase2/ once wired up) but the CSS/asset plumbing for the
+  // Venus surface board is a later pass -- these class names are placeholders pending that.
+  [TileType.VENUS_CLOUD_CITY]: 'venus-cloud-city',
+  [TileType.VENUS_GAS_MINE]: 'venus-gas-mine',
+  [TileType.VENUS_FLOATER_ARRAY]: 'venus-floater-array',
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([

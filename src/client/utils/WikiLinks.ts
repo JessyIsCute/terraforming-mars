@@ -31,6 +31,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   idesOfMars: `${FORK_WIKI}/Ides-of-Mars`,
   robAntilles: `${FORK_WIKI}/Rob-Antilles`,
   moreParties: `${FORK_WIKI}/More-Parties`,
+  venusPhase2: `${FORK_WIKI}/Venus-Phase-2`,
 };
 
 export const WIKI_URLS = {
