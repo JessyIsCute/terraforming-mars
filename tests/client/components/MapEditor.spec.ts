@@ -18,6 +18,13 @@ describe('MapEditor', () => {
       expect(wrapper.find('.simple-map-editor').exists()).is.false;
     });
 
+    it('the Mars editor links to both the Moon and Venus editors', () => {
+      const wrapper = mount(MapEditor, {...globalConfig});
+      const links = wrapper.findAll('.map-editor-board-nav a').map((a) => a.attributes('href'));
+      expect(links).to.include('map-editor?board=moon');
+      expect(links).to.include('map-editor?board=venus');
+    });
+
     it('renders SimpleMapEditor for ?board=venus', () => {
       window.history.pushState(null, '', '/map-editor?board=venus');
       const wrapper = mount(MapEditor, {...globalConfig});

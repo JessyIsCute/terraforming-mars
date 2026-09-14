@@ -53,12 +53,13 @@ export class VenusSurfaceBoard extends Board {
     } else {
       // A modest, roughly-Moon-sized surface: mostly open land for Cloud City/Floater Array, with
       // a handful of gaslight spaces reserved for Gas Mine scattered through it.
-      b.row(2).land().land().gaslight().land();
-      b.row(1).land().gaslight().land().land().land();
-      b.row(0).land().land().gaslight().land().land().land();
-      b.row(0).land().land().land().gaslight().land();
-      b.row(1).land().land().gaslight().land().land();
+      b.row(3).land().land().gaslight();
       b.row(2).land().gaslight().land().land();
+      b.row(1).land().land().gaslight().land().land();
+      b.row(0).land().land().land().gaslight().land().land();
+      b.row(1).land().gaslight().land().land().land();
+      b.row(2).land().land().gaslight().land();
+      b.row(3).gaslight().land().land();
     }
 
     const spaces = b.build(gameOptions);
@@ -93,7 +94,12 @@ class Builder {
       this.spaces.push(colonySpace(VENUS_MAXWELL_BASE));
     }
 
-    const tilesPerRow = [4, 5, 6, 5, 5, 4];
+    // A proper symmetric hex diamond: odd row count, a single peak row dead center (row 3 of
+    // 0-6), tapering evenly on both sides. customSpacePixel (the generic pixel-layout formula
+    // both this board's own client component and the map editor's preview use) assumes exactly
+    // this shape -- an earlier 6-row version ([4,5,6,5,5,4], no true center row) broke that
+    // assumption and rendered with visible gaps and a stray disconnected hex.
+    const tilesPerRow = [3, 4, 5, 6, 5, 4, 3];
     const idOffset = 1;
     let idx = 0;
 

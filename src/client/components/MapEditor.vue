@@ -2,6 +2,10 @@
   <SimpleMapEditor v-if="simpleBoardType !== undefined" :boardType="simpleBoardType"/>
   <div v-else class="map-editor">
     <h1 v-i18n>Custom Map Editor</h1>
+    <div class="map-editor-board-nav">
+      <a :href="paths.MAP_EDITOR + '?board=moon'" v-i18n>Moon Map Editor</a>
+      <a :href="paths.MAP_EDITOR + '?board=venus'" v-i18n>Venus Phase 2 Map Editor</a>
+    </div>
 
     <div class="map-editor-layout">
       <div class="map-editor-controls">
@@ -357,6 +361,7 @@ export default defineComponent({
     this.adoptCodeFromMapLibrary();
   },
   computed: {
+    paths: () => paths,
     // ?board=venus|moon switches the whole screen to the much simpler SimpleMapEditor instead of
     // this component's own Mars-only editor -- Moon/Venus Phase 2 don't have global parameters,
     // milestones/awards, or an arbitrary outline to carve, so reusing this component's template
@@ -687,6 +692,18 @@ function buildGrid(rows: number, previous: Map<string, CustomSpaceDef | null> | 
   color: #ddd;
 
   h1 { color: #fff; }
+
+  .map-editor-board-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    a {
+      color: #cfc9e6;
+      font-size: 13px;
+      text-decoration: underline;
+      &:hover { color: #fff; }
+    }
+  }
 
   .map-editor-layout {
     display: flex;

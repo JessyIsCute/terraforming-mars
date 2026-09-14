@@ -45,7 +45,7 @@ export const SIMPLE_BOARD_SPACE_TYPES: Record<SimpleBoardType, [SpaceType, Space
  * custom-definition path read from, so the two can never drift apart.
  */
 export function simpleBoardLayout(boardType: SimpleBoardType): Array<{x: number, y: number}> {
-  const tilesPerRow = boardType === 'moon' ? [4, 5, 6, 5, 6, 5, 4] : [4, 5, 6, 5, 5, 4];
+  const tilesPerRow = boardType === 'moon' ? [4, 5, 6, 5, 6, 5, 4] : [3, 4, 5, 6, 5, 4, 3];
   const layout: Array<{x: number, y: number}> = [];
   for (let row = 0; row < tilesPerRow.length; row++) {
     const tilesInThisRow = tilesPerRow[row];

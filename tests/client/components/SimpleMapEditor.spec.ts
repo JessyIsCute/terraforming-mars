@@ -8,15 +8,27 @@ import {SpaceType} from '@/common/boards/SpaceType';
 import {SpaceBonus} from '@/common/boards/SpaceBonus';
 
 describe('SimpleMapEditor', () => {
-  it('mounts a Venus board with 29 hexes and a valid code', () => {
+  it('links back to the Mars editor and to the other simple board type', () => {
+    const venus = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    let links = venus.findAll('.simple-map-editor-board-nav a').map((a) => a.attributes('href'));
+    expect(links).to.include('map-editor');
+    expect(links).to.include('map-editor?board=moon');
+
+    const moon = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
+    links = moon.findAll('.simple-map-editor-board-nav a').map((a) => a.attributes('href'));
+    expect(links).to.include('map-editor');
+    expect(links).to.include('map-editor?board=venus');
+  });
+
+  it('mounts a Venus board with 30 hexes and a valid code', () => {
     const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
     const hexes = wrapper.findAll('.simple-map-editor-hex');
-    expect(hexes.length).to.eq(29);
+    expect(hexes.length).to.eq(30);
     const code = (wrapper.vm as any).code as string;
     expect(code.startsWith('TMBS1')).to.be.true;
     const decoded = decodeSimpleBoard(code);
     expect(decoded.boardType).to.eq('venusPhase2');
-    expect(decoded.spaces).to.have.length(29);
+    expect(decoded.spaces).to.have.length(30);
   });
 
   it('mounts a Moon board with 35 hexes', () => {
@@ -88,8 +100,8 @@ describe('SimpleMapEditor', () => {
     const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
     const source = (wrapper.vm as any).exportSource as string;
     const lines = source.split('\n');
-    expect(lines).to.have.length(6); // Venus's own tilesPerRow has 6 rows.
-    expect(lines[0]).to.match(/^b\.row\(\d+\)(\.land\(\)){4};$/);
+    expect(lines).to.have.length(7); // Venus's own tilesPerRow has 7 rows.
+    expect(lines[0]).to.match(/^b\.row\(\d+\)(\.land\(\)){3};$/);
   });
 
   it('renders the real board preview component for the given board type', () => {

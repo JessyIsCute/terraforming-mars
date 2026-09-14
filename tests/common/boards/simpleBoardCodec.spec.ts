@@ -22,7 +22,7 @@ describe('simpleBoardCodec', () => {
     const def = blankSimpleBoard('venusPhase2', 'Test Venus');
     const decoded = decodeSimpleBoard(encodeSimpleBoard(def));
     expect(decoded).to.deep.eq(def);
-    expect(decoded.spaces).to.have.length(29);
+    expect(decoded.spaces).to.have.length(30);
   });
 
   it('round-trips varied space types and bonuses on Moon', () => {

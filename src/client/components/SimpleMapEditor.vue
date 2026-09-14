@@ -1,6 +1,12 @@
 <template>
   <div class="simple-map-editor">
     <h1 v-i18n>{{ title }}</h1>
+    <div class="simple-map-editor-board-nav">
+      <a :href="paths.MAP_EDITOR" v-i18n>Mars Map Editor</a>
+      <a :href="paths.MAP_EDITOR + (boardType === 'moon' ? '?board=venus' : '?board=moon')" v-i18n>
+        {{ boardType === 'moon' ? 'Venus Phase 2 Map Editor' : 'Moon Map Editor' }}
+      </a>
+    </div>
     <p class="simple-map-editor-note" v-i18n>
       {{ boardType === 'moon' ? 'The Luna Trade Station and Momentum Virium reserved spots' : 'The Stratopolis and Maxwell Base reserved spots' }}
       shown in the preview below are placed automatically by the game and can't be painted here.
@@ -170,6 +176,7 @@ export default defineComponent({
     };
   },
   computed: {
+    paths: () => paths,
     title(): string {
       return this.boardType === 'moon' ? 'Moon Map Editor' : 'Venus Phase 2 Map Editor';
     },
@@ -326,6 +333,17 @@ export default defineComponent({
   color: #ddd;
 
   h1 { color: #fff; }
+  .simple-map-editor-board-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    a {
+      color: #cfc9e6;
+      font-size: 13px;
+      text-decoration: underline;
+      &:hover { color: #fff; }
+    }
+  }
   .simple-map-editor-note { font-size: 12px; color: #999; max-width: 640px; }
 
   .simple-map-editor-layout {
