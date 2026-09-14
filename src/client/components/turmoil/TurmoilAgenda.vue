@@ -325,6 +325,7 @@
     </template>
     <template v-else-if="id === 'spop03'">
       <span class="money resource">15</span>
+      (<span class="titanium resource"></span>)
       <span class="red-arrow"></span>
       <div class="colony-cube"></div>
     </template>
@@ -383,7 +384,7 @@
     </template>
     <template v-else-if="id === 'cenp03'">
       <div class="policy-top-margin">
-      <div class="resource-tag tag-wild party-resource-tag"></div> : <div class="resource money">4</div>
+      <div class="resource-tag tag-diverse party-resource-tag"></div> : <div class="resource money">4</div>
       </div>
     </template>
     <template v-else-if="id === 'cenp04'">
