@@ -28,6 +28,13 @@ export function addExpansionColonySpaces(spaces: Array<Space>, gameOptions: Game
       }
       continue;
     }
+    // Stratopolis/Maxwell Base's reserved spot moves to the Venus surface board instead of Mars
+    // once Venus Phase 2 is enabled (see VenusSurfaceBoard.ts) -- this is the Mars-board
+    // fallback, kept for games (or the classic Venus Next expansion alone) that don't have
+    // Venus Phase 2 on.
+    if ((entry.card === CardName.STRATOPOLIS || entry.card === CardName.MAXWELL_BASE) && gameOptions.venusPhase2Expansion) {
+      continue;
+    }
     if (gameOptions.expansions[entry.expansion] || gameOptions.includedCards.includes(entry.card)) {
       spaces.push(colonySpace(entry.name));
     }
