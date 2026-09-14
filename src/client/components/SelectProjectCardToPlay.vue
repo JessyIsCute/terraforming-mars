@@ -93,6 +93,7 @@ export default defineComponent({
         'microbes',
         'nereidMicrobes',
         'floaters',
+        'anyFloaters',
         'lunaArchivesScience',
         'seeds',
         'graphene',
@@ -214,6 +215,8 @@ export default defineComponent({
           return canPayWith.seeds === true;
         case 'kuiperAsteroids':
           return canPayWith.kuiperAsteroids === true;
+        case 'anyFloaters':
+          return canPayWith.anyFloaters === true;
         case 'plants':
         case 'microbes':
         case 'nereidMicrobes':
@@ -257,6 +260,7 @@ export default defineComponent({
         case 'kuiperAsteroids':
         case 'auroraiData':
         case 'spireScience':
+        case 'anyFloaters':
           return false;
         default:
           throw new Error('Unknown unit ' + unit);

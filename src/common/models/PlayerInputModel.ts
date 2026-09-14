@@ -55,6 +55,7 @@ export type SelectProjectCardToPlayModel = BaseInputModel & {
   auroraiData: number;
   spireScience: number;
   nereidMicrobes: number;
+  anyFloaters: number;
 }
 
 export type SelectCardModel = BaseInputModel & {

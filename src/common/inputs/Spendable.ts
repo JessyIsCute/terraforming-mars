@@ -17,6 +17,13 @@ export const SPENDABLE_STANDARD_RESOURCES = [
   'titanium',
   // Martian Lumber Corp lets players pay for building tags with plants.
   'plants',
+  // Venus Phase 2's own standard projects (Cloud City/Gas Mine/Floater Array) let a player spend
+  // floaters pulled from ANY of their played cards, not one fixed card -- unlike every card
+  // resource below, which is hardcoded to exactly one CardName via CARD_FOR_SPENDABLE_RESOURCE.
+  // Lives here (not SPENDABLE_CARD_RESOURCES) for the same reason heat/energy do: its available
+  // amount and its deduction both need bespoke handling (Player.maxSpendable/pay) instead of the
+  // generic one-card lookup.
+  'anyFloaters',
 ] as const;
 
 /**

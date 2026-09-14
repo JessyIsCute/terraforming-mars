@@ -4,6 +4,7 @@ import {CardRenderer} from '../render/CardRenderer';
 import {StandardProjectCard} from '../StandardProjectCard';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceFloaterArrayTile} from '../../venusPhase2/PlaceFloaterArrayTile';
+import {StandardProjectCanPayWith} from '../../../common/cards/Types';
 
 export class FloaterArrayStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -28,6 +29,10 @@ export class FloaterArrayStandardProject extends StandardProjectCard {
       return false;
     }
     return super.canAct(player);
+  }
+
+  public override canPayWith(): StandardProjectCanPayWith {
+    return {anyFloaters: true};
   }
 
   actionEssence(player: IPlayer): void {

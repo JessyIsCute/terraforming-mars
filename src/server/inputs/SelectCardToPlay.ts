@@ -11,6 +11,7 @@ import {cardsToModel} from '../models/ModelUtils';
 import {SelectProjectCardToPlayModel} from '../../common/models/PlayerInputModel';
 import {InputError} from './InputError';
 import {Message} from '../../common/logs/Message';
+import {CardResource} from '../../common/CardResource';
 
 export type PlayCardMetadata = {
   reserveUnits: Readonly<Units>;
@@ -62,6 +63,7 @@ export abstract class SelectCardToPlay<T extends IProjectCard | IStandardProject
       cards: cardsToModel(player, this.cards, {showCalculatedCost: true, extras: this.extras, enabled: this.config?.enabled}),
       microbes: player.getSpendable('microbes'),
       floaters: player.getSpendable('floaters'),
+      anyFloaters: player.getResourceCount(CardResource.FLOATER),
       paymentOptions: {
         heat: player.canUseHeatAsMegaCredits,
         energy: player.canUseEnergyAsMegaCredits,

@@ -51,6 +51,7 @@ export default defineComponent({
       case 'auroraiData': return 'resource_icon--auroraidata';
       case 'seeds': return 'resource_icon--seed';
       case 'nereidMicrobes': return 'resource_icon--microbes';
+      case 'anyFloaters': return 'resource_icon--floaters';
       default: return 'resource_icon--' + this.unit;
       }
     },

@@ -73,6 +73,7 @@ const DESCRIPTIONS: Record<SpendableResource, string> = {
   microbes: 'Microbes',
   plants: 'Plants',
   nereidMicrobes: 'Microbes',
+  anyFloaters: 'Floaters',
 };
 
 type DataModel = {

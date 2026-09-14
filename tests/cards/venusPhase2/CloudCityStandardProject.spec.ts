@@ -3,60 +3,60 @@ import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame, runAllActions} from '../../TestingUtils';
 import {CloudCityStandardProject} from '../../../src/server/cards/venusPhase2/CloudCityStandardProject';
-import {GasMineStandardProject} from '../../../src/server/cards/venusPhase2/GasMineStandardProject';
 import {VenusPhase2Expansion} from '../../../src/server/venusPhase2/VenusPhase2Expansion';
 import {Dirigibles} from '../../../src/server/cards/venusNext/Dirigibles';
 import {AerialMappers} from '../../../src/server/cards/venusNext/AerialMappers';
 import {TileType} from '../../../src/common/TileType';
-import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
 import {SelectSpace} from '../../../src/server/inputs/SelectSpace';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
+import {Payment} from '../../../src/common/inputs/Payment';
 import {cast} from '@/common/utils/utils';
-
-// getVenusPhase2StandardProjectOptions() builds its options in a fixed order (Cloud City, Gas
-// Mine, Floater Array), skipping any that lack space/affordability -- as long as a scenario
-// doesn't drop Cloud City specifically, it's always first.
-function cloudCityOption(player: TestPlayer): SelectAmount {
-  return cast(player.getVenusPhase2StandardProjectOptions()[0], SelectAmount);
-}
 
 describe('CloudCityStandardProject', () => {
   let game: IGame;
   let player: TestPlayer;
+  let card: CloudCityStandardProject;
 
   beforeEach(() => {
     [game, player] = testGame(2, {venusPhase2Expansion: true});
+    card = new CloudCityStandardProject();
   });
 
-  it('is not offered in the grouped Standard Projects list', () => {
+  it('is offered in the grouped Standard Projects list', () => {
     const names = game.getStandardProjects().map((c) => c.name);
-    expect(names).to.not.include(new CloudCityStandardProject().name);
-    expect(names).to.not.include(new GasMineStandardProject().name);
+    expect(names).to.include(card.name);
   });
 
-  it('is offered as its own action once affordable', () => {
-    player.megaCredits = 25;
-    expect(player.getVenusPhase2StandardProjectOptions().length).to.eq(3);
+  it('canAct once affordable', () => {
+    player.megaCredits = card.cost - 1;
+    expect(card.canAct(player)).is.false;
+    player.megaCredits = card.cost;
+    expect(card.canAct(player)).is.true;
   });
 
-  it('is not offered when there is no available land space (but Gas Mine still is)', () => {
+  it('canAct accounts for a floater discount even when short on M€', () => {
+    const dirigibles = new Dirigibles();
+    dirigibles.resourceCount = 3; // Worth 9 M€ off.
+    player.playedCards.push(dirigibles);
+
+    player.megaCredits = card.cost - 9 - 1;
+    expect(card.canAct(player)).is.false;
+    player.megaCredits = card.cost - 9;
+    expect(card.canAct(player)).is.true;
+  });
+
+  it('cannot act when there is no available land space, even with plenty of M€', () => {
     player.megaCredits = 999;
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(game).venusSurface;
     for (const space of venusSurface.getAvailableSpacesForLand(player)) {
       VenusPhase2Expansion.addFloaterArrayTile(player, space.id);
     }
-    expect(player.getVenusPhase2StandardProjectOptions().length).to.eq(1);
+    expect(card.canAct(player)).is.false;
   });
 
-  it('is not offered when unaffordable, even with a full floater discount', () => {
-    player.megaCredits = 0;
-    expect(player.getVenusPhase2StandardProjectOptions().length).to.eq(0);
-  });
-
-  it('places a tile and grants +1 M€ production, paying the full 25 M€ with no floaters', () => {
-    player.megaCredits = 25;
-    const amount = cloudCityOption(player);
-    amount.cb(0);
+  it('places a tile and grants +1 M€ production, paying the full cost with no floaters', () => {
+    player.megaCredits = card.cost;
+    card.payAndExecute(player, Payment.of({megacredits: card.cost}));
     runAllActions(game);
 
     const space = cast(player.popWaitingFor(), SelectSpace);
@@ -74,13 +74,12 @@ describe('CloudCityStandardProject', () => {
     const dirigibles = new Dirigibles();
     dirigibles.resourceCount = 3;
     player.playedCards.push(dirigibles);
-    player.megaCredits = 25 - 9; // Full price minus a 3-floater discount.
+    player.megaCredits = card.cost - 9; // Full price minus a 3-floater discount.
 
-    const amount = cloudCityOption(player);
-    expect(amount.max).to.eq(3); // floor(25/3) = 8, but only 3 floaters are actually held.
-    amount.cb(3);
+    card.payAndExecute(player, Payment.of({megacredits: card.cost - 9, anyFloaters: 3}));
     runAllActions(game);
 
+    // A single qualifying card auto-deducts -- no SelectCard prompt.
     expect(dirigibles.resourceCount).to.eq(0);
     expect(player.megaCredits).to.eq(0);
 
@@ -95,10 +94,9 @@ describe('CloudCityStandardProject', () => {
     const mappers = new AerialMappers();
     mappers.resourceCount = 1;
     player.playedCards.push(dirigibles, mappers);
-    player.megaCredits = 25;
+    player.megaCredits = card.cost - 3;
 
-    const amount = cloudCityOption(player);
-    amount.cb(1);
+    card.payAndExecute(player, Payment.of({megacredits: card.cost - 3, anyFloaters: 1}));
     runAllActions(game);
 
     const pick = cast(player.popWaitingFor(), SelectCard);
@@ -107,5 +105,9 @@ describe('CloudCityStandardProject', () => {
 
     expect(dirigibles.resourceCount).to.eq(0);
     expect(mappers.resourceCount).to.eq(1);
+  });
+
+  it('canPayWith advertises anyFloaters', () => {
+    expect(card.canPayWith()).to.deep.eq({anyFloaters: true});
   });
 });

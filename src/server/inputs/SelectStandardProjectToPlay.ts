@@ -48,6 +48,7 @@ export class SelectStandardProjectToPlay extends SelectCardToPlay<IStandardProje
       auroraiData: this.player.tableau.has(CardName.AURORAI),
       spireScience: this.player.tableau.has(CardName.SPIRE),
       kuiperAsteroids: canPayWith.kuiperAsteroids ? this.player.tableau.has(CardName.KUIPER_COOPERATIVE) : false,
+      anyFloaters: canPayWith.anyFloaters,
     };
 
     const reserveUnits = details.reserveUnits;

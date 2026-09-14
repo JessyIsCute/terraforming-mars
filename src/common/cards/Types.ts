@@ -45,6 +45,8 @@ export type StandardProjectCanPayWith = {
   titanium?: boolean,
   seeds?: boolean,
   kuiperAsteroids?: boolean,
+  /** Floaters pulled from ANY of the player's cards, not one fixed card -- see Spendable.ts. */
+  anyFloaters?: boolean,
 }
 
 /**

@@ -1835,13 +1835,6 @@ export class Game implements IGame, Logger {
         // sell patents is not displayed as a card
         case CardName.SELL_PATENTS_STANDARD_PROJECT:
           return false;
-        // Venus Phase 2's 3 tiles have their own floater-discount flow (Player.ts's
-        // getVenusPhase2StandardProjectOptions) instead of the grouped Standard Projects form,
-        // since that form has no way to ask "how many floaters?" before computing the cost.
-        case CardName.CLOUD_CITY_STANDARD_PROJECT:
-        case CardName.GAS_MINE_STANDARD_PROJECT:
-        case CardName.FLOATER_ARRAY_STANDARD_PROJECT:
-          return false;
           // For buffer gas, show ONLY IF in solo AND 63TR mode
         case CardName.BUFFER_GAS_STANDARD_PROJECT:
           return this.isSoloMode() && gameOptions.soloTR;

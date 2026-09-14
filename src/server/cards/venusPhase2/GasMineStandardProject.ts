@@ -5,6 +5,7 @@ import {StandardProjectCard} from '../StandardProjectCard';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceGasMineTile} from '../../venusPhase2/PlaceGasMineTile';
 import {Resource} from '../../../common/Resource';
+import {StandardProjectCanPayWith} from '../../../common/cards/Types';
 
 export class GasMineStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -29,6 +30,10 @@ export class GasMineStandardProject extends StandardProjectCard {
       return false;
     }
     return super.canAct(player);
+  }
+
+  public override canPayWith(): StandardProjectCanPayWith {
+    return {anyFloaters: true};
   }
 
   actionEssence(player: IPlayer): void {

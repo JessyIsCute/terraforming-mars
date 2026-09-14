@@ -737,6 +737,31 @@ describe('SelectProjectCardToPlay', () => {
     expect(saveResponse.payment).deep.eq(Payment.of({megacredits: 0}));
   });
 
+  it('a standard project accepts anyFloaters when its canPayWith allows it', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.CLOUD_CITY_STANDARD_PROJECT, 25,
+      {megacredits: 25},
+      {anyFloaters: 5},
+      {canPayWith: {anyFloaters: true}});
+
+    const tester = new PaymentTester(wrapper);
+    await tester.nextTick();
+
+    tester.expectIsAvailable('anyFloaters');
+  });
+
+  it('a regular (non-standard-project) card never accepts anyFloaters', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.DIRIGIBLES, 10,
+      {megacredits: 10},
+      {anyFloaters: 5});
+
+    const tester = new PaymentTester(wrapper);
+    await tester.nextTick();
+
+    tester.expectIsNotAvailable('anyFloaters');
+  });
+
   it('switching cards updates payment defaults to match new card cost', async () => {
     // Regression: the cardName watch (flush:'pre') must update available units before
     // PaymentForm remounts via :key, so the new instance computes correct greedy defaults.
@@ -751,6 +776,7 @@ describe('SelectProjectCardToPlay', () => {
       paymentOptions: {},
       floaters: 0, graphene: 0, kuiperAsteroids: 0, lunaArchivesScience: 0,
       microbes: 0, seeds: 0, auroraiData: 0, spireScience: 0, nereidMicrobes: 0,
+      anyFloaters: 0,
     };
     const playerView: Partial<PlayerViewModel> = {
       id: 'playerid-foo',
@@ -827,6 +853,7 @@ describe('SelectProjectCardToPlay', () => {
       auroraiData: 0,
       spireScience: 0,
       nereidMicrobes: 0,
+      anyFloaters: 0,
       ...playerInputFields,
     };
     if (options !== undefined) {

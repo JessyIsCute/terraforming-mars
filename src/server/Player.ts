@@ -85,11 +85,6 @@ import {From} from './logs/From';
 import {SelectStandardProjectToPlay} from './inputs/SelectStandardProjectToPlay';
 import {SelectAmount} from './inputs/SelectAmount';
 import {RemoveResourcesFromCard} from './deferredActions/RemoveResourcesFromCard';
-import {StandardProjectCard} from './cards/StandardProjectCard';
-import {VenusPhase2Expansion} from './venusPhase2/VenusPhase2Expansion';
-import {CloudCityStandardProject} from './cards/venusPhase2/CloudCityStandardProject';
-import {GasMineStandardProject} from './cards/venusPhase2/GasMineStandardProject';
-import {FloaterArrayStandardProject} from './cards/venusPhase2/FloaterArrayStandardProject';
 
 const THROW_STATE_ERRORS = Boolean(process.env.THROW_STATE_ERRORS);
 const DEFAULT_GLOBAL_PARAMETER_STEPS = {
@@ -857,6 +852,9 @@ export class Player implements IPlayer {
       auroraiData: card.type === CardType.STANDARD_PROJECT,
       graphene: card.tags.includes(Tag.CITY) || card.tags.includes(Tag.SPACE),
       kuiperAsteroids: card.name === CardName.AQUIFER_STANDARD_PROJECT || card.name === CardName.ASTEROID_STANDARD_PROJECT,
+      // Only Cloud City/Gas Mine/Floater Array (Venus Phase 2's own standard projects) accept
+      // this -- they opt in themselves via their own canPayWith(), not via this regular-card path.
+      anyFloaters: false,
     };
   }
 
@@ -922,6 +920,27 @@ export class Player implements IPlayer {
 
     if (payment.heat > 0) {
       this.defer(this.spendHeat(payment.heat));
+    }
+
+    if (payment.anyFloaters > 0) {
+      // Unlike every removeResourcesOnCard() call below, this isn't bound to one fixed card --
+      // one deferred removal per floater, each independently picking a card (an interactive
+      // SelectCard prompt if more than one qualifies, or a silent auto-deduction if only one
+      // does; see RemoveResourcesFromCard). Lets a single payment draw floaters from several
+      // different cards if the player chooses to.
+      //
+      // Priority.COST (not RemoveResourcesFromCard's own default LOSE_RESOURCE_OR_PRODUCTION):
+      // pay() runs synchronously as part of the card being played, and the card's own effect
+      // (e.g. tile placement) gets deferred at Priority.DEFAULT immediately afterward, in the
+      // very same call stack -- both land in the queue before this method returns, so it's their
+      // relative priority, not queue order, that decides who resolves first. COST already exists
+      // for exactly this "pay before the effect" ordering (paying a blue card action's cost).
+      for (let i = 0; i < payment.anyFloaters; i++) {
+        const removal = new RemoveResourcesFromCard(this, CardResource.FLOATER, 1,
+          {source: 'self', mandatory: true, blockable: false});
+        removal.priority = Priority.COST;
+        this.game.defer(removal);
+      }
     }
 
     const removeResourcesOnCard = (name: CardName, count: number) => {
@@ -1447,6 +1466,10 @@ export class Player implements IPlayer {
       graphene: this.getSpendable('graphene'),
       kuiperAsteroids: this.getSpendable('kuiperAsteroids'),
       nereidMicrobes: this.getSpendable('nereidMicrobes'),
+      // Unlike every card resource above, floaters here aren't bound to one fixed CardName --
+      // this sums across every card the player holds them on (Player.pay() resolves which
+      // card(s) they actually come from, interactively if more than one qualifies).
+      anyFloaters: this.getResourceCount(CardResource.FLOATER),
     };
   }
 
@@ -1490,6 +1513,7 @@ export class Player implements IPlayer {
       graphene: options?.graphene ?? false,
       kuiperAsteroids: options?.kuiperAsteroids ?? false,
       nereidMicrobes: options?.nereidMicrobes ?? false,
+      anyFloaters: options?.anyFloaters ?? false,
     };
 
     // HOOK: Luna Trade Federation
@@ -1597,57 +1621,6 @@ export class Player implements IPlayer {
         title: 'Standard projects',
         buttonLabel: 'Confirm',
       });
-  }
-
-  // Venus Phase 2's 3 tiles let a player spend floaters (pulled from ANY of their played cards,
-  // not one fixed card -- there's no precedent for that in the shared Payment system, so this
-  // stays entirely outside it) for a 3 M€ discount each, chosen interactively before paying.
-  // Each returns a SelectAmount ("how many floaters?") that, once answered, removes that many
-  // floaters one at a time (RemoveResourcesFromCard already handles "pick a card when more than
-  // one qualifies"), then pays the discounted M€ cost and runs the project via the card's own
-  // (public) payAndExecute -- the same call the grouped Standard Projects form itself uses.
-  public getVenusPhase2StandardProjectOptions(): Array<PlayerInput> {
-    const options = VenusPhase2Expansion.ifVenusPhase2(this.game, (data) => {
-      const result: Array<PlayerInput> = [];
-      const specs: Array<{card: StandardProjectCard, hasSpace: boolean}> = [
-        {card: new CloudCityStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForLand(this).length > 0},
-        {card: new GasMineStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForGaslight(this).length > 0},
-        {card: new FloaterArrayStandardProject(), hasSpace: data.venusSurface.getAvailableSpacesForLand(this).length > 0},
-      ];
-      for (const {card, hasSpace} of specs) {
-        if (!hasSpace) {
-          continue;
-        }
-        const maxFloaters = Math.min(this.getResourceCount(CardResource.FLOATER), Math.floor(card.cost / 3));
-        if (this.megaCredits + maxFloaters * 3 < card.cost) {
-          continue;
-        }
-        result.push(
-          new SelectAmount(
-            message('Spend how many floaters on ${0}? (3 M€ off each)', (b) => b.string(card.name)),
-            'Confirm',
-            0,
-            maxFloaters,
-          ).andThen((count) => {
-            for (let i = 0; i < count; i++) {
-              this.game.defer(new RemoveResourcesFromCard(this, CardResource.FLOATER, 1, {source: 'self', mandatory: true, blockable: false}));
-            }
-            // BACK_OF_THE_LINE (the lowest-priority slot) so this always resolves after every
-            // floater removal above -- those default to LOSE_RESOURCE_OR_PRODUCTION priority,
-            // which runs *before* this deferred action's own default (DEFAULT) priority would,
-            // so without an explicit lower priority here the discounted payment/placement could
-            // fire before the floaters it's discounted against are actually removed.
-            this.game.defer(new SimpleDeferredAction(this, () => {
-              card.payAndExecute(this, Payment.of({megacredits: card.cost - count * 3}));
-              return undefined;
-            }, Priority.BACK_OF_THE_LINE));
-            return undefined;
-          }),
-        );
-      }
-      return result;
-    });
-    return options ?? [];
   }
 
   // High Orbit (fan): Infrastructure cards are never dealt into hand or drawn from the project
@@ -1979,13 +1952,9 @@ export class Player implements IPlayer {
       action.options.push(remainingAwards);
     }
 
-    // Standard Projects
+    // Standard Projects -- Cloud City/Gas Mine/Floater Array (Venus Phase 2's own) are included
+    // in this grouped list too now, via their own canPayWith({anyFloaters: true}).
     action.options.push(this.getStandardProjectOption());
-
-    // Venus Phase 2's 3 standard projects -- excluded from the grouped form above (see
-    // Game.getStandardProjects), each offered here as its own action with a "spend how many
-    // floaters?" prompt first.
-    action.options.push(...this.getVenusPhase2StandardProjectOptions());
 
     // High Orbit (fan): acquire an Infrastructure card from the shared supply.
     action.options.push(...this.getHighOrbitInfrastructureOptions());
