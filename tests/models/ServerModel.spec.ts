@@ -122,4 +122,17 @@ describe('ServerModel', () => {
     expect(otherPlayer).is.not.undefined;
     expect(otherPlayer!.globalParameterSteps[GlobalParameter.OXYGEN]).eq(7);
   });
+
+  it('highlights Venus Phase 2\'s Stratopolis/Maxwell Base reserved spots before their tile is placed', () => {
+    const [venusGame, venusPlayer] = testGame(2, {venusPhase2Expansion: true, venusNextExtension: true});
+    game = venusGame;
+    const response = Server.getPlayerModel(venusPlayer);
+    const venusPhase2 = response.game.venusPhase2;
+    expect(venusPhase2).is.not.undefined;
+
+    const stratopolis = venusPhase2!.spaces.find((s) => s.id === '298');
+    const maxwellBase = venusPhase2!.spaces.find((s) => s.id === '299');
+    expect(stratopolis?.highlight).eq('venusReserved');
+    expect(maxwellBase?.highlight).eq('venusReserved');
+  });
 });

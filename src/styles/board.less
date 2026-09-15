@@ -680,6 +680,12 @@
   background-color: #fff6;
 }
 
+// Venus Phase 2: Stratopolis/Maxwell Base's reserved spot, before its city tile is placed --
+// without this it renders identically to plain land and is easy to miss entirely.
+.board-space-type-land-venusReserved {
+  background-color: rgba(120, 200, 255, 0.45);
+}
+
 // Venus Phase 2: Gas Mine-only spaces get a yellow tint, matching the Gas Mine tile art's
 // own color scheme, so they read as visibly reserved before a tile is placed.
 .board-space-type-gaslight {

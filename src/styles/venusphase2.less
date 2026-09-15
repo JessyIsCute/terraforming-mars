@@ -21,7 +21,11 @@
   // override from the editor's wrapper div. The var() fallback below supplies the default instead,
   // which only applies when nothing up the tree has set the property at all. 0% 0% / 92% is the
   // calibrated result of the editor's backdrop tool, confirmed to look right in-browser.
-  background: #0c0a14 url("./assets/venusPhase2/venus-planet-backdrop.png") no-repeat var(--venus-backdrop-position, 0% 0%) / var(--venus-backdrop-size, 92%);
+  //
+  // Deliberately no background-color: the source PNG is a lit sphere on a transparent
+  // background, and a solid fill here would show through as a mismatched dark rectangle around
+  // it instead of blending into the page underneath, wherever the image doesn't fully cover.
+  background: url("./assets/venusPhase2/venus-planet-backdrop.png") no-repeat var(--venus-backdrop-position, 0% 0%) / var(--venus-backdrop-size, 92%);
   border-radius: 6px;
 
   .board--venus {

@@ -5,7 +5,7 @@ import {SpaceType} from '../boards/SpaceType';
 import {SpaceId} from '../Types';
 import {UndergroundResourceToken} from '../underworld/UndergroundResourceToken';
 
-export type SpaceHighlight = undefined | 'noctis' | 'volcanic';
+export type SpaceHighlight = undefined | 'noctis' | 'volcanic' | 'venusReserved';
 
 export type SpaceModel = {
   id: SpaceId;

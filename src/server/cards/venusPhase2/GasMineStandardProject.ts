@@ -6,6 +6,7 @@ import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceGasMineTile} from '../../venusPhase2/PlaceGasMineTile';
 import {Resource} from '../../../common/Resource';
 import {StandardProjectCanPayWith} from '../../../common/cards/Types';
+import {TileType} from '../../../common/TileType';
 
 export class GasMineStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -16,7 +17,7 @@ export class GasMineStandardProject extends StandardProjectCard {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
         b.standardProject('Spend 21 M€ (3 M€ off per floater spent) to place a Gas Mine on a Venus gaslight space and raise heat production 1 step.', (eb) => {
-          eb.megacredits(21).startAction.plainText('Gas Mine').production((pb) => pb.heat(1));
+          eb.megacredits(21).startAction.tile(TileType.VENUS_GAS_MINE).production((pb) => pb.heat(1));
         }),
       ),
     },

@@ -25,6 +25,7 @@ import {Turmoil} from '../turmoil/Turmoil';
 import {createPathfindersModel} from './PathfindersModel';
 import {MoonModel} from '../../common/models/MoonModel';
 import {VenusPhase2Model} from '../../common/models/VenusPhase2Model';
+import {VENUS_STRATOPOLIS, VENUS_MAXWELL_BASE} from '../venusPhase2/VenusSurfaceBoard';
 import {CardName} from '../../common/cards/CardName';
 import {AwardScorer} from '../awards/AwardScorer';
 import {SpaceId} from '../../common/Types';
@@ -514,9 +515,16 @@ export class Server {
   private static getVenusPhase2Model(game: IGame): VenusPhase2Model | undefined {
     const venusPhase2Data = game.venusPhase2Data;
     if (venusPhase2Data) {
-      return {
-        spaces: this.getSpaces(venusPhase2Data.venusSurface),
-      };
+      const spaces = this.getSpaces(venusPhase2Data.venusSurface);
+      // Stratopolis/Maxwell Base's reserved spot has no tile yet -- generic space-type styling
+      // renders it identically to any other plain land hex, so without a highlight it's easy to
+      // miss entirely (unlike Noctis City's own reserved spot on the Mars board, which gets one).
+      for (const space of spaces) {
+        if (space.id === VENUS_STRATOPOLIS || space.id === VENUS_MAXWELL_BASE) {
+          space.highlight = 'venusReserved';
+        }
+      }
+      return {spaces};
     }
     return undefined;
   }
