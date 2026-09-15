@@ -71,6 +71,36 @@
                                 <span v-i18n>Turmoil</span>
                             </label>
 
+                            <template v-if="expansions.turmoil">
+                                <input type="checkbox" name="politicalAgendas" id="politicalAgendas-checkbox" :checked="isPoliticalAgendasExtensionEnabled()" @change="politicalAgendasExtensionToggle()">
+                                <label for="politicalAgendas-checkbox" class="expansion-button">
+                                    <div class="create-game-expansion-icon expansion-icon-agendas"></div>
+                                    <span v-i18n>Agendas</span>&nbsp;<a href="https://www.notion.so/Political-Agendas-8c6b0b018a884692be29b3ef44b340a9" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                                </label>
+
+                                <div class="create-game-page-column-row" v-if="isPoliticalAgendasExtensionEnabled()">
+                                    <div>
+                                    <input type="radio" name="agendaStyle" v-model="politicalAgendasExtension" :value="getPoliticalAgendasExtensionAgendaStyle('random')" id="randomAgendaStyle-radio">
+                                    <label class="label-agendaStyle agendaStyle-random" for="randomAgendaStyle-radio">
+                                        <span class="agendas-text" v-i18n>{{ getPoliticalAgendasExtensionAgendaStyle('random') }}</span>
+                                    </label>
+                                    </div>
+
+                                    <div>
+                                    <input type="radio" name="agendaStyle" v-model="politicalAgendasExtension" :value="getPoliticalAgendasExtensionAgendaStyle('chairman')" id="chairmanAgendaStyle-radio">
+                                    <label class="label-agendaStyle agendaStyle-chairman" for="chairmanAgendaStyle-radio">
+                                        <span class="agendas-text" v-i18n>{{ getPoliticalAgendasExtensionAgendaStyle('chairman') }}</span>
+                                    </label>
+                                    </div>
+                                </div>
+
+                                <input type="checkbox" name="moreParties" id="moreParties-checkbox" v-model="expansions.moreParties">
+                                <label for="moreParties-checkbox" class="expansion-button">
+                                    <div class="create-game-expansion-icon expansion-icon-moreParties"></div>
+                                    <span v-i18n>More Parties</span>&nbsp;<span title="A fan expansion: adds 6 new Turmoil parties (Populists, Spome, Empower, Bureaucrats, Centrists, Transhumanists), required by cards from other fan expansions that reference them">(&#945;)</span>&nbsp;<a :href="wikiUrls.moreParties" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                                </label>
+                            </template>
+
                             <input type="checkbox" name="promo" id="promo-checkbox" v-model="expansions.promo">
                             <label for="promo-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-promo"></div>
@@ -133,30 +163,6 @@
                                 <div v-if="customMoonBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customMoonBoardCodeError }}</div>
                                 <div v-else-if="customMoonBoardName !== ''" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom Moon board: {{ customMoonBoardName }}</div>
                               </div>
-                            </template>
-
-                            <template v-if="expansions.turmoil">
-                                <input type="checkbox" name="politicalAgendas" id="politicalAgendas-checkbox" :checked="isPoliticalAgendasExtensionEnabled()" @change="politicalAgendasExtensionToggle()">
-                                <label for="politicalAgendas-checkbox" class="expansion-button">
-                                    <div class="create-game-expansion-icon expansion-icon-agendas"></div>
-                                    <span v-i18n>Agendas</span>&nbsp;<a href="https://www.notion.so/Political-Agendas-8c6b0b018a884692be29b3ef44b340a9" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                                </label>
-
-                                <div class="create-game-page-column-row" v-if="isPoliticalAgendasExtensionEnabled()">
-                                    <div>
-                                    <input type="radio" name="agendaStyle" v-model="politicalAgendasExtension" :value="getPoliticalAgendasExtensionAgendaStyle('random')" id="randomAgendaStyle-radio">
-                                    <label class="label-agendaStyle agendaStyle-random" for="randomAgendaStyle-radio">
-                                        <span class="agendas-text" v-i18n>{{ getPoliticalAgendasExtensionAgendaStyle('random') }}</span>
-                                    </label>
-                                    </div>
-
-                                    <div>
-                                    <input type="radio" name="agendaStyle" v-model="politicalAgendasExtension" :value="getPoliticalAgendasExtensionAgendaStyle('chairman')" id="chairmanAgendaStyle-radio">
-                                    <label class="label-agendaStyle agendaStyle-chairman" for="chairmanAgendaStyle-radio">
-                                        <span class="agendas-text" v-i18n>{{ getPoliticalAgendasExtensionAgendaStyle('chairman') }}</span>
-                                    </label>
-                                    </div>
-                                </div>
                             </template>
 
                             <input type="checkbox" name="pathfinders" id="pathfinders-checkbox" v-model="expansions.pathfinders">
@@ -230,14 +236,6 @@
                                 <div class="create-game-expansion-icon expansion-icon-robAntilles"></div>
                                 <span v-i18n>Rob Antilles</span>&nbsp;<span title="A fan expansion">(&#945;)</span>&nbsp;<a :href="wikiUrls.robAntilles" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
-
-                            <template v-if="expansions.turmoil">
-                                <input type="checkbox" name="moreParties" id="moreParties-checkbox" v-model="expansions.moreParties">
-                                <label for="moreParties-checkbox" class="expansion-button">
-                                    <div class="create-game-expansion-icon expansion-icon-moreParties"></div>
-                                    <span v-i18n>More Parties</span>&nbsp;<span title="A fan expansion: adds 6 new Turmoil parties (Populists, Spome, Empower, Bureaucrats, Centrists, Transhumanists), required by cards from other fan expansions that reference them">(&#945;)</span>&nbsp;<a :href="wikiUrls.moreParties" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                                </label>
-                            </template>
 
                             <template v-if="expansions.venus">
                                 <input type="checkbox" name="venusPhase2" id="venusPhase2-checkbox" v-model="expansions.venusPhase2">
