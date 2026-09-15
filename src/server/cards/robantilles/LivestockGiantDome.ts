@@ -50,8 +50,7 @@ export class LivestockGiantDome extends Card implements IProjectCard {
           b.plainText('Immediately play an Active card that collects Animals, ignoring its cost and requirements.', true);
         }),
         description: 'Requires a maximum of 7% oxygen. Place the special Animal Dome tile NEXT TO NO OTHER TILE. ' +
-          'Adjacency bonus: 1 Animal. Immediately play an Active card that collects Animals from the deck, ' +
-          'without paying its cost and ignoring its requirements.',
+          'Adjacency bonus: 1 Animal.',
       },
     });
   }

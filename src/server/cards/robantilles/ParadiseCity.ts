@@ -32,8 +32,6 @@ export class ParadiseCity extends Card implements IProjectCard {
           b.plainText('Requires that you own a city adjacent to an ocean. Replace it with the Paradise City tile. ' +
             'It counts as a city. Adjacency bonus: 1 M€.');
         }),
-        description: 'Requires that you own a city tile adjacent to an ocean. Replace it with the Paradise City ' +
-          'tile. It counts as a city.',
         victoryPoints: {item: new CardRenderItem(CardRenderItemType.GREENERY, 1), points: 1, target: 1, asterisk: true},
       },
     });

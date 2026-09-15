@@ -30,8 +30,7 @@ export class TempleOfGaiaAtElysium extends Card implements IProjectCard {
         // so this uses a generic questionmark placeholder icon, same as RedCity.ts.
         victoryPoints: DynamicVictoryPoints.questionmark(1, 3),
         description: 'Requires that the Greens are ruling or that you have 2 delegates there. ' +
-          'Increase your plant production 1 step for each greenery tile you own. ' +
-          '1 VP for every 3 greenery tiles you own.',
+          'Increase your plant production 1 step for each greenery tile you own.',
       },
     });
   }

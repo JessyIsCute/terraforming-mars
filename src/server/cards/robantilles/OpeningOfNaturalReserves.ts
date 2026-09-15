@@ -24,7 +24,6 @@ export class OpeningOfNaturalReserves extends Card implements IProjectCard {
           b.vpText('1 VP per 4 Animals on all your other Animal cards.');
         }),
         victoryPoints: DynamicVictoryPoints.resource(CardResource.ANIMAL, 1, 4),
-        description: '1 VP for every 4 Animal resources on all other Animal cards you own.',
       },
     });
   }

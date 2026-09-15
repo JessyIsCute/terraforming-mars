@@ -20,7 +20,6 @@ export class StatueOfVonBraunOnOlympusMons extends Card implements IProjectCard 
         renderData: CardRenderer.builder((b) => {
           b.vpText('1 VP for every 2 Space tags you own.');
         }),
-        description: '1 VP for every 2 Space tags you own.',
       },
     });
   }

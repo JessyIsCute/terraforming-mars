@@ -32,8 +32,7 @@ export class HarborBorealis extends Card implements IProjectCard {
           b.plainText('Place over an ocean tile adjacent to at least one city. Increase your M€ production 1 step ' +
             'for each ocean adjacent to this tile. Adjacency bonus: 1 steel.');
         }),
-        description: 'Requires 5 oceans in play. Place the Harbor Borealis tile over an ocean adjacent to at least ' +
-          'one city. Increase your M€ production 1 step for each ocean adjacent to this tile.',
+        description: 'Requires 5 oceans in play.',
         victoryPoints: oceans(1, 1),
       },
     });

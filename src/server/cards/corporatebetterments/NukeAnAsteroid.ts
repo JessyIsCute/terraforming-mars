@@ -29,7 +29,7 @@ export class NukeAnAsteroid extends Card implements IProjectCard {
           b.production((pb) => pb.titanium(2)).br;
           b.titanium(5, {digit, all}).nbsp.plainText('distributed among any number of other players', true);
         }),
-        description: 'Increase your titanium production 2 steps. Distribute 5 titanium among any number of other players.',
+        description: 'Increase your titanium production 2 steps.',
       },
     });
   }

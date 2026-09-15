@@ -22,8 +22,7 @@ export class TharsisColossus extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.vpText('1 VP for every 3 Building tags you own.');
         }),
-        description: 'Requires that Mars First are ruling or that you have 2 delegates there. ' +
-          '1 VP for every 3 Building tags you own.',
+        description: 'Requires that Mars First are ruling or that you have 2 delegates there.',
       },
     });
   }

@@ -28,7 +28,7 @@ export class RooftopGardensOfNoctis extends Card implements IProjectCard {
           b.vpText('1 VP for each city tile you own on Mars.');
         }),
         victoryPoints: DynamicVictoryPoints.cities(1, 1, false),
-        description: 'Increase your plant production 1 step. 1 VP for each city tile you own on Mars.',
+        description: 'Increase your plant production 1 step.',
       },
     });
   }

@@ -40,8 +40,8 @@ export class IndustrialMetropolis extends Card implements IProjectCard {
           b.br;
           b.plainText('Place on top of one of your cities. Adjacency bonus: 1 steel.');
         }),
-        description: 'Requires that you own a city. Place the Industrial Metropolis tile on top of one of your ' +
-          'cities. Decrease your Energy production 1 step and increase your Steel production 1 step.',
+        description: 'Requires that you own a city. Decrease your Energy production 1 step and increase your ' +
+          'Steel production 1 step.',
         victoryPoints: {item: new CardRenderItem(CardRenderItemType.EMPTY_TILE_SPECIAL, 1), points: 1, target: 1, asterisk: true},
       },
     });

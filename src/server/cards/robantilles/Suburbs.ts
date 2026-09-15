@@ -32,8 +32,7 @@ export class Suburbs extends Card implements IProjectCard {
           b.br;
           b.plainText('Place the Suburbs tile on top of one of your greenery tiles. It counts as a city. Adjacency bonus: 1 M€.');
         }),
-        description: 'Increase your M€ production 3 steps. Place the Suburbs tile on top of one of your greenery tiles. ' +
-          'It counts as a city. Whoever places a tile adjacent to it gains 1 M€.',
+        description: 'Increase your M€ production 3 steps. Whoever places a tile adjacent to it gains 1 M€.',
       },
     });
   }

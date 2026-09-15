@@ -38,8 +38,6 @@ export class MineralDepot extends Card implements IProjectCard {
             'each, and vice versa.',
             {size: Size.SMALL, uppercase: true});
         }),
-        description: `You may exchange steel for ${STEEL_RATE} M€ each, and titanium for ${TITANIUM_RATE} M€ ` +
-          'each, and vice versa, any number of times.',
       },
     });
   }

@@ -40,7 +40,7 @@ export class SedimentaryRocks extends Card implements IProjectCard {
             'placement rules. Get 3 M€ when you place a City tile above Sediment. Adjacency bonus: 1 titanium.',
             {size: Size.SMALL});
         }),
-        description: 'Requires a maximum of 3 cities on Mars. Place the Sediment special tile.',
+        description: 'Requires a maximum of 3 cities on Mars.',
       },
     });
   }
