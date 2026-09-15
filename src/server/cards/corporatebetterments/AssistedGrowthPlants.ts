@@ -6,6 +6,7 @@ import {CardName} from '../../../common/cards/CardName';
 import {CardRenderer} from '../render/CardRenderer';
 import {IPlayer} from '../../IPlayer';
 import {PlaceGreeneryTile} from '../../deferredActions/PlaceGreeneryTile';
+import * as constants from '../../../common/constants';
 
 export class AssistedGrowthPlants extends Card implements IProjectCard {
   constructor() {
@@ -14,9 +15,6 @@ export class AssistedGrowthPlants extends Card implements IProjectCard {
       name: CardName.ASSISTED_GROWTH_PLANTS,
       tags: [Tag.PLANT, Tag.SCIENCE],
       cost: 35,
-
-      // 14% is the maximum oxygen level, so this requirement effectively means "oxygen at maximum."
-      requirements: {oxygen: 14},
 
       metadata: {
         cardNumber: 'B45',
@@ -28,8 +26,15 @@ export class AssistedGrowthPlants extends Card implements IProjectCard {
     });
   }
 
+  // Bespoke, not a declarative `requirements: {oxygen: 14}` - that flavor of requirement is a
+  // numeric threshold, satisfiable via Inventrix/Special Design's global-parameter-requirement
+  // bonus even when oxygen isn't actually maxed yet. This card means oxygen genuinely at its
+  // hard cap, so it checks the real level directly instead (same approach as Alien Reactor
+  // Ativation's temperature/oxygen-maxed checks).
   public override bespokeCanPlay(player: IPlayer): boolean {
-    return player.game.board.getAvailableSpacesForGreenery(player).length > 0;
+    const game = player.game;
+    return game.getOxygenLevel() >= constants.MAX_OXYGEN_LEVEL &&
+      game.board.getAvailableSpacesForGreenery(player).length > 0;
   }
 
   public override bespokePlay(player: IPlayer) {

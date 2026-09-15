@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {AssistedGrowthPlants} from '../../../src/server/cards/corporatebetterments/AssistedGrowthPlants';
+import {Inventrix} from '../../../src/server/cards/corporation/Inventrix';
 import {TestPlayer} from '../../TestPlayer';
 import {IGame} from '../../../src/server/IGame';
 import {testGame} from '../../TestGame';
@@ -20,6 +21,17 @@ describe('AssistedGrowthPlants', () => {
   it('requires oxygen at maximum', () => {
     setOxygenLevel(game, 13);
     expect(card.canPlay(player)).is.false;
+    setOxygenLevel(game, 14);
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('is not satisfiable via a global-parameter-requirement bonus (Inventrix) - oxygen must actually be maxed', () => {
+    player.playedCards.push(new Inventrix());
+    // Inventrix's +2 global-parameter-requirement bonus would satisfy a plain numeric "oxygen
+    // 14" requirement at oxygen 12, but this card cares whether oxygen is genuinely maxed.
+    setOxygenLevel(game, 12);
+    expect(card.canPlay(player)).is.false;
+
     setOxygenLevel(game, 14);
     expect(card.canPlay(player)).is.true;
   });
