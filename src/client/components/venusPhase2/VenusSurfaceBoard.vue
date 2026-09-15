@@ -8,9 +8,17 @@
         :aresExtension="false"
         :tileView="tileView"
         :pixel="pixelFor(curSpace)"
-        :text="reservedSpaceText(curSpace.id)"
         data-test="venus-board-space"
       />
+      <svg v-if="reservedLegendEntries.length > 0" :width="boardPixelSize.width" :height="boardPixelSize.height" class="venus-board-legend">
+        <g v-for="entry in reservedLegendEntries" :key="entry.id">
+          <line :x1="entry.labelX" :y1="entry.lineY" :x2="entry.dotX" :y2="entry.dotY" class="board-line"/>
+          <circle :cx="entry.dotX" :cy="entry.dotY" r="2" class="board-caption board_caption--black"/>
+          <text class="board-caption" :x="entry.labelX" :y="entry.labelY" :text-anchor="entry.textAnchor">
+            <tspan v-for="(line, idx) in entry.lines" :key="idx" :x="entry.labelX" :dy="idx === 0 ? 0 : 12">{{ line }}</tspan>
+          </text>
+        </g>
+      </svg>
     </div>
     <div v-if="outerSpaces.length > 0" id="venus_board_outer_spaces" class="venus-board-outer-spaces">
       <BoardSpace
@@ -33,15 +41,19 @@ import {SpaceModel} from '@/common/models/SpaceModel';
 import {SpaceId} from '@/common/Types';
 import BoardSpace from '@/client/components/BoardSpace.vue';
 import {TileView} from '../board/TileView';
-import {customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
+import {HEX_HEIGHT, HEX_WIDTH, customBoardPixelSize, customSpacePixel} from '@/common/boards/CustomBoardDefinition';
 
 // Kept in sync with src/server/venusPhase2/VenusSurfaceBoard.ts's own VENUS_STRATOPOLIS/
 // VENUS_MAXWELL_BASE constants -- fixed ids, distinct from the Mars board's SpaceName.STRATOPOLIS/
 // MAXWELL_BASE ('72'/'73'), since this is a genuinely separate board. Labeled the same way whether
 // the reservation landed on-grid (a real map-editor-chosen hex) or the off-grid fallback.
-const RESERVED_SPACE_TEXT: Partial<Record<SpaceId, string>> = {
-  '298': 'Stratopolis',
-  '299': 'Maxwell Base',
+//
+// On-grid, this doubles as the leader-line legend's per-space text lines (see
+// reservedLegendEntries below) -- kept as an array here so a two-word name like "Maxwell Base"
+// renders as two separate <tspan> rows, the same way Noctis City's Mars-board legend does.
+const RESERVED_SPACE_TEXT: Partial<Record<SpaceId, Array<string>>> = {
+  '298': ['Stratopolis'],
+  '299': ['Maxwell', 'Base'],
 };
 
 export default defineComponent({
@@ -77,9 +89,54 @@ export default defineComponent({
     maxX(): number {
       return this.gridSpaces.reduce((max, space) => Math.max(max, space.x), 0);
     },
+    boardPixelSize(): {width: number, height: number} {
+      return customBoardPixelSize(this.maxX, this.maxY);
+    },
     boardStyle(): Record<string, string> {
-      const {width, height} = customBoardPixelSize(this.maxX, this.maxY);
+      const {width, height} = this.boardPixelSize;
       return {width: `${width}px`, height: `${height}px`};
+    },
+    // Noctis-City-style callout labels (a small dot on the space, a leader line, and the name off
+    // to the side) for Stratopolis/Maxwell Base whenever their reservation landed on the main grid
+    // -- computed from each space's actual current pixel position (not hand-tuned per-board pixel
+    // coordinates like Mars's SVG legends use) so this still lines up correctly even when a
+    // map-editor-chosen reservation moved the spot somewhere else on a custom board layout.
+    reservedLegendEntries(): Array<{
+      id: SpaceId,
+      lines: Array<string>,
+      dotX: number,
+      dotY: number,
+      labelX: number,
+      labelY: number,
+      lineY: number,
+      textAnchor: 'start' | 'end',
+    }> {
+      const boardWidth = this.boardPixelSize.width;
+      const entries = [];
+      for (const space of this.gridSpaces) {
+        const lines = RESERVED_SPACE_TEXT[space.id];
+        if (lines === undefined) {
+          continue;
+        }
+        const pixel = this.pixelFor(space);
+        const dotX = pixel.left + HEX_WIDTH / 2;
+        const dotY = pixel.top + HEX_HEIGHT / 2;
+        // Label on whichever side of the dot has more room, so it doesn't run off the board edge.
+        const toRight = dotX < boardWidth / 2;
+        const labelX = dotX + (toRight ? 26 : -26);
+        const labelY = dotY - 22;
+        entries.push({
+          id: space.id,
+          lines,
+          dotX,
+          dotY,
+          labelX,
+          labelY,
+          lineY: labelY + (lines.length > 1 ? 4 : 8),
+          textAnchor: toRight ? 'start' as const : 'end' as const,
+        });
+      }
+      return entries;
     },
   },
   methods: {
@@ -87,7 +144,7 @@ export default defineComponent({
       return customSpacePixel(space.x, space.y, this.maxY);
     },
     reservedSpaceText(id: SpaceId): string | undefined {
-      return RESERVED_SPACE_TEXT[id];
+      return RESERVED_SPACE_TEXT[id]?.join(' ');
     },
   },
 });

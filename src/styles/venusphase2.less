@@ -35,6 +35,19 @@
   }
 }
 
+// Stratopolis/Maxwell Base's Noctis-City-style callout labels (dot + leader line + name), drawn by
+// VenusSurfaceBoard.vue's reservedLegendEntries. Unlike Mars's .board-legend (which uses a fixed
+// negative margin to overlay a hand-tuned SVG on top of a differently-sized parent), this SVG is
+// given the board's own exact pixel dimensions and simply overlaid inset:0, since its coordinates
+// are computed from each space's real position rather than hand-picked against a painted texture.
+.venus-board-legend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
 .venus-board-outer-spaces {
   position: absolute;
   top: 0;
