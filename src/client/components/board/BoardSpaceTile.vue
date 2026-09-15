@@ -83,6 +83,7 @@ const tileTypeToCssClass: Record<TileType, string> = {
   [TileType.INDUSTRY_PLANT]: 'industry_plant',
   [TileType.INDUSTRY_TITANIUM]: 'industry_titanium',
   [TileType.INDUSTRY_WILD]: 'industry_wild',
+  [TileType.MENAGERIE]: 'greenery', // No dedicated art; sits over the player's own greenery tile.
 };
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([

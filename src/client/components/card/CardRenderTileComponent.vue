@@ -202,6 +202,7 @@ const TILE_CLASSES: Record<TileType, Classes> = {
   [TileType.INDUSTRY_WILD]: {
     tile: 'card-tile-industry-wild',
   },
+  [TileType.MENAGERIE]: {},
 };
 
 export default defineComponent({

@@ -47,5 +47,16 @@ export const floaterCards: ReadonlySet<CardName> = new Set([
 
   // Rob Antilles
   CardName.CLOUD_CITY_RA,
+
+  // Venus Phase 2
+  CardName.ATMO_SEQUESTER,
+  CardName.MODULAR_QUARTERS,
+  CardName.NEGATIVE_MASS_FLUIDS,
+  CardName.IONIC_THRUSTERS_SUPPORT,
+  CardName.FLOATER_FACTORY,
+  CardName.NEW_ATHENS,
+  CardName.VENUS_TRADESHIP,
+  CardName.APHRODITE_SHUTTLE_BASE,
+  CardName.ISHTAR_ENERGY_NETWORK,
 ]);
 

@@ -120,6 +120,8 @@ export class Player implements IPlayer {
   // Resource values
   private titaniumValue: number = 3;
   private steelValue: number = 2;
+  // Venus Phase 2's Negative Mass Fluids
+  private floaterValue: number = constants.FLOATERS_VALUE;
   // Helion
   public canUseHeatAsMegaCredits: boolean = false;
   // Turmoil More Parties: Empower Policy 1, only while that policy is in effect.
@@ -348,6 +350,14 @@ export class Player implements IPlayer {
     if (this.steelValue > 0) {
       this.steelValue--;
     }
+  }
+
+  public getFloaterValue(): number {
+    return this.floaterValue;
+  }
+
+  public increaseFloaterValue(): void {
+    this.floaterValue++;
   }
 
   public increaseTerraformRating(steps: number = 1, opts: {log?: boolean, from?: From} = {}) {
@@ -1495,6 +1505,7 @@ export class Player implements IPlayer {
       ...DEFAULT_PAYMENT_VALUES,
       steel: this.getSteelValue(),
       titanium: this.getTitaniumValue(),
+      anyFloaters: this.getFloaterValue(),
     };
 
     const usable: {[key in SpendableResource]: boolean} = {
@@ -2085,6 +2096,7 @@ export class Player implements IPlayer {
       // Resource values
       titaniumValue: this.titaniumValue,
       steelValue: this.steelValue,
+      floaterValue: this.floaterValue,
       // Helion
       canUseHeatAsMegaCredits: this.canUseHeatAsMegaCredits,
       canUseEnergyAsMegaCredits: this.canUseEnergyAsMegaCredits,
@@ -2222,6 +2234,7 @@ export class Player implements IPlayer {
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;
     player.steel = d.steel;
     player.steelValue = d.steelValue;
+    player.floaterValue = d.floaterValue ?? constants.FLOATERS_VALUE;
     player.terraformRating = d.terraformRating;
     player.titanium = d.titanium;
     player.titaniumValue = d.titaniumValue;

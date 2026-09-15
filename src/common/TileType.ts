@@ -95,6 +95,9 @@ export enum TileType {
     INDUSTRY_PLANT, // 62
     INDUSTRY_TITANIUM, // 63
     INDUSTRY_WILD, // 64
+
+    // Venus Phase 2
+    MENAGERIE, // 65
   }
 
 export const tileTypeToString: Record<TileType, string> = {
@@ -164,6 +167,7 @@ export const tileTypeToString: Record<TileType, string> = {
   [TileType.INDUSTRY_PLANT]: CardName.PLANT_INDUSTRY_STANDARD_PROJECT,
   [TileType.INDUSTRY_TITANIUM]: CardName.TITANIUM_INDUSTRY_STANDARD_PROJECT,
   [TileType.INDUSTRY_WILD]: CardName.WILD_INDUSTRY_STANDARD_PROJECT,
+  [TileType.MENAGERIE]: CardName.MENAGERIE,
 } as const;
 
 export const HAZARD_TILES = new Set([TileType.DUST_STORM_MILD, TileType.DUST_STORM_SEVERE, TileType.EROSION_MILD, TileType.EROSION_SEVERE]);
@@ -181,5 +185,5 @@ export const BASE_OCEAN_TILES = new Set([TileType.OCEAN, TileType.WETLANDS]);
 export const GREENERY_TILES = new Set([TileType.GREENERY, TileType.WETLANDS, TileType.INVAK_CITY]);
 // Rob Antilles: tiles placed on top of the player's OWN existing greenery/city tile, mirroring
 // the ocean-upgrade pattern above but for the other two base tile types. See MarsBoard.canCover.
-export const GREENERY_UPGRADE_TILES = new Set([TileType.SUBURBS]);
+export const GREENERY_UPGRADE_TILES = new Set([TileType.SUBURBS, TileType.MENAGERIE]);
 export const CITY_UPGRADE_TILES = new Set([TileType.INDUSTRIAL_METROPOLIS, TileType.PARADISE_CITY]);
