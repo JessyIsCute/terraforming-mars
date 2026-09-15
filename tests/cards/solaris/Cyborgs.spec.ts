@@ -32,11 +32,15 @@ describe('Cyborgs', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('play gains 1 M€', () => {
+  it('play increases M€ production 1 step', () => {
     setRulingParty(game, PartyName.TRANSHUMANISTS);
-    player.megaCredits = 0;
+    player.production.override({megacredits: 0});
     card.play(player);
-    expect(player.megaCredits).to.eq(1);
+    expect(player.production.megacredits).to.eq(1);
+  });
+
+  it('scores 1 VP', () => {
+    expect(card.getVictoryPoints(player)).to.eq(1);
   });
 
   it('Wild tags count as any tag while Cyborgs is in play', () => {

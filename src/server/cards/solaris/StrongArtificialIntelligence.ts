@@ -8,8 +8,8 @@ import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 
 /**
- * Strong Artificial Intelligence (Solaris, fan): the printed tag icons were unresolved "?"
- * placeholders in the source material. Science and Earth were chosen as best-effort fits.
+ * Strong Artificial Intelligence (Solaris, fan): confirmed against the printed card - 2 Wild
+ * tags.
  *
  * Same effect and same implementation approach as Cyborgs -- see
  * Tags.wildTagsMatchAnyTagForTriggers() for the "Wild tags count as any tag of your choice"
@@ -19,7 +19,7 @@ export class StrongArtificialIntelligence extends Card implements IProjectCard {
   constructor() {
     super({
       cost: 11,
-      tags: [Tag.SCIENCE, Tag.EARTH],
+      tags: [Tag.WILD, Tag.WILD],
       name: CardName.STRONG_ARTIFICIAL_INTELLIGENCE,
       type: CardType.AUTOMATED,
 

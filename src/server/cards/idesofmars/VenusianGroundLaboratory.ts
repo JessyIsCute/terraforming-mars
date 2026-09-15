@@ -28,7 +28,7 @@ export class VenusianGroundLaboratory extends Card implements IProjectCard, IAct
         cardNumber: '143',
         renderData: CardRenderer.builder((b) => {
           b.action('Spend an equal amount of M€ and steel to gain that much titanium.', (eb) => {
-            eb.text('x').megacredits(1).text('x').steel(1).startAction.titanium(1, {text: 'x'});
+            eb.text('x').megacredits(1).text('x').steel(1).startAction.text('x').titanium(1);
           }).br;
           b.production((pb) => pb.megacredits(1));
         }),

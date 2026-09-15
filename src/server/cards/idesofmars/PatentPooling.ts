@@ -8,12 +8,12 @@ import {Size} from '../../../common/cards/render/Size';
 import {uppercase} from '../Options';
 
 // No "Action:" or "Effect:" label appears on the printed card, just a plain all-caps
-// one-time instruction with no repeat-use wording, so this is a bespoke on-play behavior
-// (AUTOMATED), not a repeatable action. See batch spec notes for card 23.
+// one-time instruction with no repeat-use wording, so this is a bespoke on-play behavior,
+// not a repeatable action - despite the card being printed as CardType.ACTIVE (blue).
 export class PatentPooling extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.PATENT_POOLING,
       tags: [Tag.SCIENCE],
       cost: 10,

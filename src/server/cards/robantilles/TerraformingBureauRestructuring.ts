@@ -29,8 +29,7 @@ export class TerraformingBureauRestructuring extends Card implements IProjectCar
           b.text('every opponent marks 2 active cards of your choice as used', {size: Size.SMALL, uppercase});
         }),
         // Printed card text has a typo, "Bureacrats"; the requirement itself is Bureaucrats.
-        description: 'Requires that the Bureaucrats are ruling or that you have 2 delegates there. ' +
-          'Every opponent marks 2 active cards of your choice as already used this generation.',
+        description: 'Requires that the Bureaucrats are ruling or that you have 2 delegates there.',
       },
     });
   }

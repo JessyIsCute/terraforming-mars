@@ -8,8 +8,8 @@ import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
 
 /**
- * Cyborgs (Solaris, fan): the printed tag icon was an unresolved "?" placeholder in the source
- * material. Science was chosen as the best-effort fit for the cyborg/transhumanist theme.
+ * Cyborgs (Solaris, fan): confirmed against the printed card - a Wild tag, 1 VP, and 1 M€
+ * production (not a one-time M€ gain).
  *
  * See Tags.wildTagsMatchAnyTagForTriggers() for the implementation and scoping notes on the
  * "Wild tags count as any tag of your choice" passive effect shared with Strong Artificial
@@ -19,26 +19,27 @@ export class Cyborgs extends Card implements IProjectCard {
   constructor() {
     super({
       cost: 14,
-      tags: [Tag.SCIENCE],
+      tags: [Tag.WILD],
       name: CardName.CYBORGS,
       type: CardType.AUTOMATED,
+      victoryPoints: 1,
 
       requirements: {party: PartyName.TRANSHUMANISTS},
 
       behavior: {
-        stock: {megacredits: 1},
+        production: {megacredits: 1},
       },
 
       metadata: {
         cardNumber: 'SOL22',
         renderData: CardRenderer.builder((b) => {
-          b.megacredits(1).br;
+          b.production((pb) => pb.megacredits(1)).br;
           b.effect('Your WILD tags count as any tag of your choice, for other cards\' tag-triggered effects.', (eb) => {
             eb.wild(1).startEffect.text('ANY TAG', {size: Size.SMALL});
           });
         }),
         description: 'Requires that Transhumanists are ruling or that you have 2 delegates there. ' +
-          'Gain 1 M€. Your Wild tags count as any tag of your choice for the purpose of triggering other cards\' tag-based effects.',
+          'Increase your M€ production 1 step. Your Wild tags count as any tag of your choice for the purpose of triggering other cards\' tag-based effects.',
       },
     });
   }

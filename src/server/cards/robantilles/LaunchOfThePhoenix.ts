@@ -10,7 +10,7 @@ export class LaunchOfThePhoenix extends Card implements IProjectCard {
     super({
       type: CardType.EVENT,
       name: CardName.LAUNCH_OF_THE_PHOENIX,
-      tags: [Tag.SCIENCE, Tag.EARTH, Tag.POWER],
+      tags: [Tag.SCIENCE, Tag.EARTH, Tag.SPACE],
       cost: 18,
       victoryPoints: 5,
 

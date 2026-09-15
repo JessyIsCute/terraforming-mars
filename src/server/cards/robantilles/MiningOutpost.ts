@@ -21,7 +21,10 @@ export class MiningOutpost extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'H63',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.minus().energy(1).titanium(1)).br;
+          b.production((pb) => {
+            pb.minus().energy(1).br;
+            pb.plus().titanium(1);
+          }).br;
           b.city();
         }),
         description: 'Decrease your energy production 1 step and increase your titanium production 1 step. Place a city tile.',
