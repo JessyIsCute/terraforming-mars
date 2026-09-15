@@ -390,17 +390,22 @@
   background: url("./assets/tiles/paradise_city_board_tile.png") no-repeat center / 46px;
 }
 
-// Venus Phase 2: the Venus surface board's own 3 tiles.
+// Venus Phase 2: the Venus surface board's own 3 tiles. The source PNGs (from the user's
+// downloaded tile art) are all shot sideways -- rotated 90deg clockwise here to correct them,
+// same technique pathfinders.less's .board-space-tile--crashlanding-rotated uses.
 .board-space-tile--venus-cloud-city {
   background: url("./assets/tiles/venus_cloud_city_board_tile.png") no-repeat center / 46px;
+  transform: rotate(90deg);
 }
 
 .board-space-tile--venus-gas-mine {
   background: url("./assets/tiles/venus_gas_mine_board_tile.png") no-repeat center / 46px;
+  transform: rotate(90deg);
 }
 
 .board-space-tile--venus-floater-array {
   background: url("./assets/tiles/venus_floater_array_board_tile.png") no-repeat center / 46px;
+  transform: rotate(90deg);
 }
 
 // Industries: dedicated board art per resource flavor.

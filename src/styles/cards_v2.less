@@ -2756,12 +2756,15 @@
     background-size: 40px;
     background-repeat: no-repeat;
   }
+  // The source PNGs are all shot sideways -- rotated 90deg clockwise here to correct them (see
+  // the matching .board-space-tile--venus-* comment in board.less).
   .card-tile-venus-cloud-city {
     background-image: url(./assets/tiles/venus_cloud_city.png);
     width: 40px;
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-venus-gas-mine {
     background-image: url(./assets/tiles/venus_gas_mine.png);
@@ -2769,6 +2772,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-venus-floater-array {
     background-image: url(./assets/tiles/venus_floater_array.png);
@@ -2776,6 +2780,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   // Industries: shares its art with the board tile (a plain hex icon, no separate card-scale asset).
   .card-tile-industry-heat {
