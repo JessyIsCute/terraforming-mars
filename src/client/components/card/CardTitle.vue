@@ -84,7 +84,10 @@ export default defineComponent({
       return this.type === CardType.PRELUDE;
     },
     isInfrastructure(): boolean {
-      return this.tags.includes(Tag.INFRASTRUCTURE);
+      // Planetary Outpost (High Orbit, fan) is still visually a Silver card -- paid the same
+      // native-Titanium way as the rest -- even though it deliberately carries no Infrastructure
+      // tag (no Space>Infrastructure requirement either). See PlanetaryOutpost.ts.
+      return this.tags.includes(Tag.INFRASTRUCTURE) || this.title === CardName.PLANETARY_OUTPOST;
     },
     getClasses(): string {
       const classes: Array<String> = ['card-title'];

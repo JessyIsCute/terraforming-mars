@@ -1645,9 +1645,9 @@ export class Player implements IPlayer {
   // Cost is native Titanium (1-4), substitutable at 4 M€ per Titanium not spent -- a bespoke,
   // self-contained rate that must NOT go through the shared per-player getTitaniumValue()
   // system (normally 3), so payment is built directly from Payment.of() + player.pay() here
-  // rather than reusing SelectPaymentDeferred's titanium handling. Planetary Outpost is the one
-  // documented exception: no Infrastructure tag, and it's "paid via standard M€ rules" --
-  // meaning the normal SelectPaymentDeferred flow, same as any other card purchase.
+  // rather than reusing SelectPaymentDeferred's titanium handling. Planetary Outpost pays the
+  // same way as every other design here -- its only documented exception is no Infrastructure
+  // tag and no Space>Infrastructure requirement (see PlanetaryOutpost.ts).
   public getHighOrbitInfrastructureOptions(): Array<PlayerInput> {
     if (!this.game.gameOptions.highOrbitExpansion) {
       return [];
@@ -1667,26 +1667,6 @@ export class Player implements IPlayer {
         }
         const card = newProjectCard(cardName);
         if (card === undefined || !card.canPlay(this)) {
-          continue;
-        }
-
-        if (cardName === CardName.PLANETARY_OUTPOST) {
-          if (!this.canAfford({cost: card.cost, titanium: true})) {
-            continue;
-          }
-          result.push(
-            new SelectOption(message('Acquire ${0} (${1} M€)', (b) => b.card(card).number(card.cost)), 'Confirm')
-              .andThen(() => {
-                row.locked = true;
-                row.slots[slotIndex] = undefined;
-                // SelectPaymentDeferred already deducts the payment itself before calling this
-                // callback -- passing `payment` on to playCard here would charge it a second time.
-                this.game.defer(new SelectPaymentDeferred(this, card.cost, {canUseTitanium: true})).andThen(() => {
-                  this.playCard(card);
-                });
-                return undefined;
-              }),
-          );
           continue;
         }
 

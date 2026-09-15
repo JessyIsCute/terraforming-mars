@@ -7,8 +7,8 @@ import {testGame} from '../../TestGame';
 import {runAllActions} from '../../TestingUtils';
 import {cast} from '../../../src/common/utils/utils';
 import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
-import {SelectOption} from '../../../src/server/inputs/SelectOption';
 import {SpaceTradingStation} from '../../../src/server/cards/highOrbit/SpaceTradingStation';
+import {PlanetaryOutpost} from '../../../src/server/cards/highOrbit/PlanetaryOutpost';
 import {HighOrbitMarketRow} from '../../../src/common/highOrbit/HighOrbitMarket';
 
 function oneRowMarket(...cardNames: Array<CardName | undefined>): Array<HighOrbitMarketRow> {
@@ -134,19 +134,22 @@ describe('High Orbit Infrastructure acquisition', () => {
     expect(player.getHighOrbitInfrastructureOptions()).has.lengthOf(0);
   });
 
-  it('Planetary Outpost carries the Building tag and is offered via standard M€ payment, not Titanium', () => {
+  it('Planetary Outpost pays the same native-Titanium way as every other design', () => {
     game.highOrbitMarket = oneRowMarket(CardName.PLANETARY_OUTPOST);
-    player.megaCredits = 4;
-    player.titanium = 0;
+    player.megaCredits = 16;
+    player.titanium = 4;
 
     const options = player.getHighOrbitInfrastructureOptions();
     expect(options).has.lengthOf(1);
-    const selectOption = cast(options[0], SelectOption);
+    const selectAmount = cast(options[0], SelectAmount);
+    expect(selectAmount.min).to.eq(0);
+    expect(selectAmount.max).to.eq(4);
 
-    selectOption.cb(undefined);
+    selectAmount.cb(4);
     runAllActions(game);
 
-    expect(player.megaCredits).to.eq(0);
+    expect(player.titanium).to.eq(0);
+    expect(player.megaCredits).to.eq(16);
     expect(player.tableau.has(CardName.PLANETARY_OUTPOST)).is.true;
     expect(game.highOrbitMarket[0].locked).is.true;
     expect(game.highOrbitMarket[0].slots[0]).is.undefined;

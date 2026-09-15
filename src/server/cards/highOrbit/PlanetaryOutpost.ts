@@ -8,12 +8,13 @@ import {IPlayer, CanAffordOptions} from '../../IPlayer';
 import {Card} from '../Card';
 
 /**
- * High Orbit (fan): Planetary Outpost. Unlike the other 17 High Orbit designs, it carries the
- * Building tag (not Infrastructure) and is acquired/paid for via standard M€ rules, not the
- * Titanium/4:1 substitution -- an explicit exception in the source material. It still comes
- * from the same shared, contested supply (see IGame.infrastructureSupply,
- * Player.getHighOrbitInfrastructureOptions), so it keeps its own tableau-duplicate guard
- * (vanilla Terraforming Mars never needed this since a CardName was always unique in the deck).
+ * High Orbit (fan): Planetary Outpost. It's still a Silver/Infrastructure-style card -- paid
+ * the same native-Titanium way as the other 17 designs (see
+ * Player.getHighOrbitInfrastructureOptions) -- but unlike them it carries the Building tag
+ * (not Infrastructure) and has no Space>Infrastructure requirement, an explicit exception in
+ * the source material. It still comes from the same shared market (see IGame.highOrbitMarket),
+ * so it keeps its own tableau-duplicate guard (vanilla Terraforming Mars never needed this
+ * since a CardName was always unique in the deck).
  *
  * On play: become the first player. Only one copy of Planetary Outpost can be played per
  * generation, across all players -- since several separate physical copies exist in the shared

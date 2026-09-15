@@ -40,6 +40,7 @@ import CardVictoryPoints from './CardVictoryPoints.vue';
 import CardContent from './CardContent.vue';
 import CardHelp from './CardHelp.vue';
 import {CardType} from '@/common/cards/CardType';
+import {CardName} from '@/common/cards/CardName';
 import {CardMetadata} from '@/common/cards/CardMetadata';
 import {Tag} from '@/common/cards/Tag';
 import {getPreferences} from '@/client/utils/PreferencesManager';
@@ -138,9 +139,11 @@ export default defineComponent({
       return tags;
     },
     // High Orbit (fan): Infrastructure-tagged "Silver" cards render with a distinct silver
-    // header and a Titanium (not M€) cost badge, regardless of CardType.
+    // header and a Titanium (not M€) cost badge, regardless of CardType. Planetary Outpost is
+    // visually a Silver card too (same native-Titanium payment) despite deliberately carrying
+    // no Infrastructure tag -- see PlanetaryOutpost.ts.
     isInfrastructure(): boolean {
-      return this.tags.includes(Tag.INFRASTRUCTURE);
+      return this.tags.includes(Tag.INFRASTRUCTURE) || this.card.name === CardName.PLANETARY_OUTPOST;
     },
     cost(): number | undefined {
       return this.isProjectCard ? this.cardInstance.cost : undefined;

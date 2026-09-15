@@ -111,7 +111,10 @@ export default defineComponent({
       const suffixFreeCardName = card.name.split(':')[0];
       // High Orbit (fan): Infrastructure-tagged "Silver" cards get a distinct silver badge
       // regardless of CardType, matching CardTitle.vue's override for the full card face.
-      const className = card.tags.includes(Tag.INFRASTRUCTURE) ? 'background-color-infrastructure' : cardTypeToCss[card.type];
+      // Planetary Outpost is visually a Silver card too despite carrying no Infrastructure tag
+      // -- see PlanetaryOutpost.ts.
+      const isSilver = card.tags.includes(Tag.INFRASTRUCTURE) || card.name === CardName.PLANETARY_OUTPOST;
+      const className = isSilver ? 'background-color-infrastructure' : cardTypeToCss[card.type];
 
       if (className === undefined) {
         return suffixFreeCardName;
