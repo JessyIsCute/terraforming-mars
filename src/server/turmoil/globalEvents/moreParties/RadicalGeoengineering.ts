@@ -13,6 +13,7 @@ import {SelectOption} from '../../../inputs/SelectOption';
 import {SimpleDeferredAction} from '../../../deferredActions/DeferredAction';
 import {CardRenderer} from '../../../cards/render/CardRenderer';
 import {Size} from '../../../../common/cards/render/Size';
+import {digit} from '../../../cards/Options';
 
 export class RadicalGeoengineering extends GlobalEvent implements IGlobalEvent {
   constructor() {
@@ -24,9 +25,11 @@ export class RadicalGeoengineering extends GlobalEvent implements IGlobalEvent {
       revealedDelegate: PartyName.EMPOWER,
       currentDelegate: PartyName.CENTRISTS,
       renderData: CardRenderer.builder((b) => {
-        b.plus().temperature(1).slash().oxygen(1).slash().venus(1).nbsp;
-        b.minus().temperature(1).slash().oxygen(1).slash().venus(1).br;
-        b.minus().steel(1).slash().tr(5, {size: Size.SMALL}).influence({size: Size.SMALL});
+        b.plus(Size.SMALL).temperature(1, {size: Size.SMALL}).slash(Size.SMALL).oxygen(1, {size: Size.SMALL})
+          .slash(Size.SMALL).venus(1, {size: Size.SMALL}).br;
+        b.minus(Size.SMALL).temperature(1, {size: Size.SMALL}).slash(Size.SMALL).oxygen(1, {size: Size.SMALL})
+          .slash(Size.SMALL).venus(1, {size: Size.SMALL}).br;
+        b.minus(Size.SMALL).steel(1, {size: Size.SMALL}).slash(Size.SMALL).tr(5, {size: Size.SMALL, digit}).influence({size: Size.SMALL});
       }),
     });
   }
