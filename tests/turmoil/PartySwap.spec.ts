@@ -43,6 +43,11 @@ describe('More Parties: party swap', () => {
     turmoil.delegateReserve.clear();
     turmoil.delegateReserve.add('NEUTRAL', 20);
     turmoil.delegateReserve.add(player, 5);
+    // endGeneration() also draws its own new distant event from the real deck and processes its
+    // revealedDelegate the same way -- empty the deck so that draw is always undefined (a no-op)
+    // and doesn't trigger a second, uncontrolled swap on top of the one each test sets up via
+    // fakeEvent()/comingGlobalEvent.
+    turmoil.globalEventDealer.deck.length = 0;
     turmoil.delegateReserve.add(player2, 5);
   });
 

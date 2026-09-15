@@ -40,21 +40,28 @@ export const MORE_PARTIES_CARD_MANIFEST = new ModuleManifest({
   module: 'moreParties',
   globalEvents: {
     [GlobalEventName.INTERSTELLAR_SIGNAL]: {Factory: InterstellarSignal},
-    [GlobalEventName.KUIPERS_EXPANSION]: {Factory: KuipersExpansion},
+    // "Ore" is only ever held on Infrastructure-tagged cards (High Orbit, fan) -- without that
+    // expansion no card could ever hold it, making this event's reward always zero.
+    [GlobalEventName.KUIPERS_EXPANSION]: {Factory: KuipersExpansion, compatibility: 'highOrbit'},
     [GlobalEventName.RADICAL_GEOENGINEERING]: {Factory: RadicalGeoengineering},
     [GlobalEventName.LIFE_EXTENSION]: {Factory: LifeExtension},
     [GlobalEventName.LONELINESS_IN_A_CROWD]: {Factory: LonelinessInACrowd},
     [GlobalEventName.MARINERS_AGREEMENTS]: {Factory: MarinersAgreements},
     [GlobalEventName.OLD_EARTH_RESERVE]: {Factory: OldEarthReserve},
     [GlobalEventName.OVERPOPULATION]: {Factory: Overpopulation},
-    [GlobalEventName.POPULATION_COLLAPSES]: {Factory: PopulationCollapses},
+    // Both clauses (colony markers, M€ per colony owned) are meaningless with no colonies in play.
+    [GlobalEventName.POPULATION_COLLAPSES]: {Factory: PopulationCollapses, compatibility: 'colonies'},
     [GlobalEventName.QUANTUM_BREAKTHROUGH]: {Factory: QuantumBreakthrough},
-    [GlobalEventName.SANCTION_ON_THE_OUTSKIRTS]: {Factory: SanctionOnTheOutskirts},
+    // Primary effect loses Ore (High Orbit-only); the colony-marker clause degrades gracefully
+    // on its own (no-ops with no colonies), so only High Orbit is a hard requirement here.
+    [GlobalEventName.SANCTION_ON_THE_OUTSKIRTS]: {Factory: SanctionOnTheOutskirts, compatibility: 'highOrbit'},
     [GlobalEventName.SPECIATION_OF_HUMANITY]: {Factory: SpeciationOfHumanity},
     [GlobalEventName.UNIVERSAL_UPRISING]: {Factory: UniversalUprising},
-    [GlobalEventName.VENUS_VOLCANISM]: {Factory: VenusVolcanism},
+    // Entirely Venus-themed: raises the Venus track and rewards the Venus tag.
+    [GlobalEventName.VENUS_VOLCANISM]: {Factory: VenusVolcanism, compatibility: 'venus'},
     [GlobalEventName.ANTI_GOVERNMENT_SENTIMENT]: {Factory: AntiGovernmentSentiment},
-    [GlobalEventName.ATMOSPHERIC_PORTS]: {Factory: AtmosphericPorts},
+    // Floater-holding cards only exist in the Venus expansion; the reward is always zero without it.
+    [GlobalEventName.ATMOSPHERIC_PORTS]: {Factory: AtmosphericPorts, compatibility: 'venus'},
     [GlobalEventName.BELT_TIGHTENING_POLICY]: {Factory: BeltTighteningPolicy},
     [GlobalEventName.BLACK_SWAN_MANIFESTATION]: {Factory: BlackSwanManifestation},
     [GlobalEventName.BRAIN_MACHINE_COUPLING]: {Factory: BrainMachineCoupling},
@@ -68,6 +75,7 @@ export const MORE_PARTIES_CARD_MANIFEST = new ModuleManifest({
     [GlobalEventName.FAVORITISM]: {Factory: Favoritism},
     [GlobalEventName.FINANCIAL_CRISIS]: {Factory: FinancialCrisis},
     [GlobalEventName.ILLEGAL_ORBITING]: {Factory: IllegalOrbiting},
-    [GlobalEventName.INDEPENDENT_CARRIERS]: {Factory: IndependentCarriers},
+    // Both clauses (colony bonus, colony markers) are meaningless with no colonies in play.
+    [GlobalEventName.INDEPENDENT_CARRIERS]: {Factory: IndependentCarriers, compatibility: 'colonies'},
   },
 });
