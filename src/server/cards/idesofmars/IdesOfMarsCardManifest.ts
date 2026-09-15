@@ -114,7 +114,7 @@ export const IDES_OF_MARS_CARD_MANIFEST = new ModuleManifest({
     [CardName.FLOATING_RIG]: {Factory: FloatingRig},
     [CardName.ENERGY_SHORTCUT]: {Factory: EnergyShortcut},
     [CardName.AIR_TRANSPORT_COMPANY]: {Factory: AirTransportCompany},
-    [CardName.GREAT_LEAP_FORWARD]: {Factory: GreatLeapForward},
+    [CardName.GREAT_LEAP_FORWARD]: {Factory: GreatLeapForward, compatibility: 'turmoil'},
     [CardName.WATER_CLEANING_BACTERIA]: {Factory: WaterCleaningBacteria},
     [CardName.OVERCONSUMPTION_BENEFITS]: {Factory: OverconsumptionBenefits},
     [CardName.MERCURIAL_LABORATORY]: {Factory: MercurialLaboratory},
