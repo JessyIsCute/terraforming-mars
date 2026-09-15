@@ -43,8 +43,7 @@ export class MartianCommercialSeafleet extends ActionCard implements IProjectCar
             'adjacent ocean tiles.',
             {size: Size.SMALL});
         }),
-        description: 'Requires 3 ocean tiles. Action: spend 1 steel to gain 2 M€ for each city connected to ' +
-          'at least one other city via oceans.',
+        description: 'Requires 3 ocean tiles.',
       },
     });
   }

@@ -28,7 +28,7 @@ export class LunarMantleExcavation extends Card implements IActionCard, IProject
         cardNumber: 'CB24',
         renderData: CardRenderer.builder((b) => {
           b.action('Spend any amount of energy and gain that amount of steel.', (eb) => {
-            eb.text('x').energy(1).startAction.steel(1, {text: 'x'});
+            eb.text('x').energy(1).startAction.text('x').steel(1);
           });
         }),
         description: 'Requires 1 Moon tag. Increase your energy production 1 step.',

@@ -30,7 +30,6 @@ export class MartianRangers extends Card implements IProjectCard {
           b.plainText('Effect: Opponents cannot remove your Animals.', true).br;
           b.plainText('Add 2 Animals to a card that already has at least 1 Animal on it.', true);
         }),
-        description: 'Opponents cannot remove your Animals. Add 2 Animals to a card that already has at least 1 Animal on it.',
       },
     });
   }

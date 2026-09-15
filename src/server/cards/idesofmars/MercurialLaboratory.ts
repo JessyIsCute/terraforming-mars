@@ -26,8 +26,8 @@ export class MercurialLaboratory extends Card implements IProjectCard, IActionCa
         cardNumber: 'I54',
         renderData: CardRenderer.builder((b) => {
           b.action('Spend X M€ and X titanium to gain X steel and X energy.', (eb) => {
-            eb.text('x').megacredits(1, {text: 'x'}).nbsp.text('x').titanium(1, {text: 'x'})
-              .startAction.text('x').steel(1, {text: 'x'}).nbsp.text('x').energy(1, {text: 'x'});
+            eb.text('x').megacredits(1).nbsp.text('x').titanium(1)
+              .startAction.text('x').steel(1).nbsp.text('x').energy(1);
           });
           b.br;
           b.production((pb) => pb.energy(-1));

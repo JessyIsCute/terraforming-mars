@@ -20,7 +20,6 @@ export class GreatLighthouseOfAlbaPatera extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.vpText('1 VP for every 2 Power tags you own.');
         }),
-        description: '1 VP for every 2 Power tags you own.',
       },
     });
   }

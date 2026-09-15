@@ -28,7 +28,7 @@ export class AitkenDrillingOperations extends Card implements IProjectCard, IAct
         cardNumber: 'CB54',
         renderData: CardRenderer.builder((b) => {
           b.action('Spend any amount of steel and gain that amount of titanium.', (eb) => {
-            eb.text('x').steel(1).startAction.titanium(1, {text: 'x'});
+            eb.text('x').steel(1).startAction.text('x').titanium(1);
           }).br;
           b.production((pb) => pb.steel(3));
         }),

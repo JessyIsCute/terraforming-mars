@@ -9,6 +9,7 @@ import {Resource} from '../../../common/Resource';
 import {SelectAmount} from '../../inputs/SelectAmount';
 import {AndOptions} from '../../inputs/AndOptions';
 import {message} from '../../logs/MessageBuilder';
+import {all, digit} from '../Options';
 
 export class NukeAnAsteroid extends Card implements IProjectCard {
   constructor() {
@@ -26,7 +27,7 @@ export class NukeAnAsteroid extends Card implements IProjectCard {
         cardNumber: 'B36',
         renderData: CardRenderer.builder((b) => {
           b.production((pb) => pb.titanium(2)).br;
-          b.titanium(5).nbsp.plainText('distributed among any number of other players', true);
+          b.titanium(5, {digit, all}).nbsp.plainText('distributed among any number of other players', true);
         }),
         description: 'Increase your titanium production 2 steps. Distribute 5 titanium among any number of other players.',
       },

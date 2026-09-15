@@ -15,7 +15,7 @@ import {CardRenderer} from '../render/CardRenderer';
 export class GreatFaceOfCydonia extends Card implements IProjectCard {
   constructor() {
     super({
-      type: CardType.AUTOMATED,
+      type: CardType.ACTIVE,
       name: CardName.GREAT_FACE_OF_CYDONIA,
       tags: [Tag.MARS, Tag.SCIENCE],
       cost: 10,
@@ -29,8 +29,7 @@ export class GreatFaceOfCydonia extends Card implements IProjectCard {
             'Effect: During the research phase, draw 1 additional card. During the first round ' +
             'of the draft variant, you may keep up to 2 cards.', true);
         }),
-        description: 'Requires 3 Science tags. During the research phase, draw 1 additional card. ' +
-          'During the first round of the draft variant, you may keep up to 2 cards.',
+        description: 'Requires 3 Science tags.',
       },
     });
   }

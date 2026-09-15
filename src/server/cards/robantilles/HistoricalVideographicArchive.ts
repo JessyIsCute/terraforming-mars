@@ -27,7 +27,6 @@ export class HistoricalVideographicArchive extends Card implements IProjectCard 
         renderData: CardRenderer.builder((b) => {
           b.vpText('1 VP for each 3 Event cards you have (rounded down).');
         }),
-        description: '1 VP for each 3 Event cards you have, rounded down.',
         victoryPoints: tag(Tag.EVENT, 1, 3),
       },
     });

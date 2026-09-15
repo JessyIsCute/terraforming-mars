@@ -34,8 +34,6 @@ export class BattleOverMars extends Card implements IProjectCard {
             'Remove an unclaimed award or milestone from the game. If you play with random ' +
             'awards/milestones, put a new one of your choice.', true);
         }),
-        description: 'Remove an unclaimed award or milestone from the game. If you play with random ' +
-          'awards or milestones, put a new one of your choice.',
       },
     });
   }
