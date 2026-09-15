@@ -33,7 +33,6 @@ export class SalvageDepot extends SilverActionCard implements IProjectCard {
             eb.energy(1).startAction.cards(1);
           });
         }),
-        description: 'Spend 1 energy to shuffle the discard pile, then draw 1 card from it.',
       },
     });
   }

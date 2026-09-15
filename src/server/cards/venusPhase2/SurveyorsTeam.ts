@@ -21,7 +21,6 @@ export class SurveyorsTeam extends Card implements IActionCard, IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.plainText('Action: reveal the top card of the draw deck. Add it to your hand if it has a Planetary tag. Otherwise, discard it.', true);
         }),
-        description: 'Action: reveal the top card of the draw deck. Add it to your hand if it has a Planetary tag (Venus, Earth, Mars, Jovian, or Moon). Otherwise, discard it.',
       },
     });
   }

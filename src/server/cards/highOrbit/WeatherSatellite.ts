@@ -29,7 +29,6 @@ export class WeatherSatellite extends SilverCard implements ICard, IProjectCard 
             eb.tr(1).startEffect.megacredits(1);
           });
         }),
-        description: 'Whenever you raise your TR, gain 1 M€ per step raised.',
       },
     });
   }

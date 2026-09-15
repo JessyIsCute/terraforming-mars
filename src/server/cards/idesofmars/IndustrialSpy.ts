@@ -23,7 +23,6 @@ export class IndustrialSpy extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.text('Look at a player\'s hand.', {size: Size.SMALL, uppercase: true});
         }),
-        description: 'Look at a player\'s hand.',
       },
     });
   }

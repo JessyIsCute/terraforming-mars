@@ -22,7 +22,6 @@ export class VenusEarthPartnership extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.text('Requires 3 Earth tags and 3 Venus tags.', {size: Size.SMALL});
         }),
-        description: 'Requires 3 Earth tags and 3 Venus tags.',
       },
     });
   }

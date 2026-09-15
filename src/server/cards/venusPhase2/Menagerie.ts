@@ -31,9 +31,7 @@ export class Menagerie extends Card implements IProjectCard {
           b.br;
           b.plainText('Increase your M€ production and add 1 animal to any card for each greenery tile adjacent to Menagerie. Adjacency bonus: 1 animal to any card.', true);
         }),
-        description: 'Requires -10 C or warmer. Place the Menagerie tile on top of one of your greenery tiles. ' +
-          'Increase your M€ production 1 step for each adjacent greenery tile. Add 1 animal to any card for each adjacent greenery tile. ' +
-          'Whoever places a tile adjacent to it gains 1 animal to any card.',
+        description: 'Requires -10 C or warmer.',
       },
     });
   }

@@ -48,7 +48,7 @@ export class SmallDeposit extends ActionCard implements IProjectCard, IActionCar
           b.resource(CardResource.RESOURCE_CUBE, 2).arrow().titanium(2).br;
           b.plainText('Add 6 ore to this card.', /** parens */ true);
         }),
-        description: 'Add 6 ore to this card. Action: spend 2 ore from this card to get 2 steel or 2 titanium.',
+        description: 'Action: spend 2 ore from this card to get 2 steel or 2 titanium.',
       },
     });
   }

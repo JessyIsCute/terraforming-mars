@@ -25,7 +25,7 @@ export class DerivedProducts extends Card implements IProjectCard {
           b.text('Requires 3 VP on your played cards.', {size: Size.SMALL}).br;
           b.production((pb) => pb.megacredits(2));
         }),
-        description: 'Requires 3 VP on your played cards. Increase your M€ production 2 steps.',
+        description: 'Increase your M€ production 2 steps.',
       },
     });
   }

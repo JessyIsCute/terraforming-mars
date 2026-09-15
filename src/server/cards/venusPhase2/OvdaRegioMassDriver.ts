@@ -21,7 +21,6 @@ export class OvdaRegioMassDriver extends Card implements IProjectCard {
             eb.venus(1).startEffect.heat(3);
           });
         }),
-        description: 'Effect: whenever Venus is increased, get 3 heat.',
       },
     });
   }

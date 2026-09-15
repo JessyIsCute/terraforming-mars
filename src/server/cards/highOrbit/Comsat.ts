@@ -30,7 +30,6 @@ export class Comsat extends SilverCard implements ICard, IProjectCard {
             eb.trade().startEffect.megacredits(1);
           });
         }),
-        description: 'Whenever you perform a trade action, gain 1 M€.',
       },
     });
   }

@@ -50,7 +50,7 @@ export class CompanyNationalization extends Card implements IProjectCard {
         }),
         description: 'Requires that Reds are ruling or that you have 2 delegates there. Choose one: ' +
           'Increase your M€ production 2 steps and gain 15 M€; OR gain 12 steel and 4 energy; OR increase your ' +
-          'titanium production 2 steps and gain 3 titanium. Then discard your corporation card.',
+          'titanium production 2 steps and gain 3 titanium.',
       },
     });
   }

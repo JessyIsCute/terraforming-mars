@@ -23,8 +23,6 @@ export class CompanyCartel extends Card implements IProjectCard {
             'Each other player, in turn, chooses one of the remaining cards to add to their hand. Discard the rest.',
             {size: Size.SMALL});
         }),
-        description: 'Draw cards equal to twice the number of players. Choose 2 to add to your hand. ' +
-          'Each other player, in turn, chooses one of the remaining cards to add to their hand. Discard the rest.',
       },
     });
   }

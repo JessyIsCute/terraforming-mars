@@ -43,8 +43,6 @@ export class ScienceFacility extends SilverCard implements IActionCard, IProject
             eb.resource(CardResource.SCIENCE).startAction.cards(4);
           });
         }),
-        description: 'Spend 1 energy and 1 titanium to add 1 science resource to this card, ' +
-          'or spend 1 science resource here to look at the top 4 cards of the deck, keep 1, and discard the rest.',
       },
     });
   }

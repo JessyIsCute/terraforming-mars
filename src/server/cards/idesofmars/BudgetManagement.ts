@@ -27,7 +27,6 @@ export class BudgetManagement extends Card implements IProjectCard, IActionCard 
           }).br;
           b.vpText('1 VP for every 2 Budget resources on this card.');
         }),
-        description: '1 VP for every 2 Budget resources on this card.',
       },
     });
   }

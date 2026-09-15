@@ -42,8 +42,7 @@ export class ManagementCrisis extends Card implements IProjectCard {
           b.br;
           b.tr(-1);
         }),
-        description: 'Requires that Bureaucrats are ruling or that you have 2 delegates there. ' +
-          'For the rest of this generation, all opponents may only take 1 action per turn instead of 2. Decrease your TR 1 step.',
+        description: 'Requires that Bureaucrats are ruling or that you have 2 delegates there. Decrease your TR 1 step.',
       },
     });
   }

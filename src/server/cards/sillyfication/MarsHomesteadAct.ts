@@ -27,8 +27,6 @@ export class MarsHomesteadAct extends PreludeCard {
           }).br;
           b.text('Then, each player, starting with you, may place a city tile on Mars.');
         }),
-        description: 'When any city tile is placed, its owner gains 2 M€ and you gain 1 M€ production. ' +
-          'Then, each player, starting with you, may place a city tile on Mars.',
       },
     });
   }

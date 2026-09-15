@@ -29,9 +29,7 @@ export class AwardCelebration extends Card implements IProjectCard {
             'opponent who also meets it raises their TR 1 step.',
             {size: Size.SMALL});
         }),
-        description: 'Requires that Centrists are ruling or that you have 2 delegates there. Choose an ' +
-          'unclaimed milestone. If you meet its requirement, raise your TR 2 steps. For each opponent who ' +
-          'also meets that milestone\'s requirement, they raise their TR 1 step.',
+        description: 'Requires that Centrists are ruling or that you have 2 delegates there.',
       },
     });
   }

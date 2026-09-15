@@ -38,7 +38,7 @@ export class PlanetaryOutpost extends Card implements IProjectCard {
           b.firstPlayer().br;
           b.text('Only 1 Planetary Outpost may be played per generation.', {size: Size.SMALL});
         }),
-        description: 'Become the first player. Only 1 copy of Planetary Outpost may be played per generation, across all players.',
+        description: 'Become the first player.',
       },
     });
   }

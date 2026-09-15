@@ -29,8 +29,7 @@ export class VenusianCollaboration extends Card implements IProjectCard {
           b.text('1 TR and 1 heat production step for every 10% of Venus.', {size: Size.SMALL}).br;
           b.resource(CardResource.FLOATER, 3).asterix();
         }),
-        description: 'Requires that you have at least 1 floater. Increase your TR 1 step for every 10% of Venus. ' +
-          'Increase your heat production 1 step for every 10% of Venus. Add 3 floaters to ANY card.',
+        description: 'Requires that you have at least 1 floater.',
       },
     });
   }

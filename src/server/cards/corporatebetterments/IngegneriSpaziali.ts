@@ -29,8 +29,6 @@ export class IngegneriSpaziali extends Card implements IProjectCard {
             'Each opponent, in turn, chooses one of the remaining cards to add to their hand. Discard the rest.',
             {size: Size.SMALL});
         }),
-        description: 'Draw and reveal the top 10 cards of the deck. Put all Space cards into your hand. ' +
-          'Each opponent, in turn, chooses one of the remaining cards to add to their hand. Discard the rest.',
       },
     });
   }

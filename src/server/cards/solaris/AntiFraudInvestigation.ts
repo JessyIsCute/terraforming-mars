@@ -40,8 +40,7 @@ export class AntiFraudInvestigation extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.text('For the rest of this generation, no player may remove resources from any card.');
         }),
-        description: 'Requires that the Centrists are ruling or that you have 2 delegates there. ' +
-          'For the rest of this generation, no player may remove resources from any card.',
+        description: 'Requires that the Centrists are ruling or that you have 2 delegates there.',
       },
     });
   }
