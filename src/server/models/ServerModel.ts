@@ -70,6 +70,7 @@ export class Server {
       gameOptions: this.getGameOptionsAsModel(game.gameOptions),
       generation: game.getGeneration(),
       globalsPerGeneration: game.gameIsOver() ? game.globalsPerGeneration : [],
+      highOrbitMarket: game.gameOptions.highOrbitExpansion ? game.highOrbitMarket : undefined,
       isSoloModeWin: game.isSoloModeWin(),
       isTerraformed: game.marsIsTerraformed(),
       lastSoloGeneration: game.lastSoloGeneration(),

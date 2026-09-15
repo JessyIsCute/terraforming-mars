@@ -40,6 +40,11 @@
 
   <DeltaProjectBoard v-if="game.gameOptions.expansions.deltaProject" :players="players"/>
 
+  <template v-if="game.highOrbitMarket">
+    <a class="hotkey-target"></a>
+    <HighOrbitMarket :market="game.highOrbitMarket"/>
+  </template>
+
   <div v-if="players.length > 1" class="player_home_block--milestones-and-awards">
     <a class="hotkey-target"></a>
     <Milestones :milestones="game.milestones" :conglomeratesExpansion="game.gameOptions.expansions.conglomerates" />
@@ -67,6 +72,7 @@ import MoonBoard from '@/client/components/moon/MoonBoard.vue';
 import VenusSurfaceBoard from '@/client/components/venusPhase2/VenusSurfaceBoard.vue';
 import PlanetaryTracks from '@/client/components/pathfinders/PlanetaryTracks.vue';
 import ConglomeratesTeams from '@/client/components/conglomerates/ConglomeratesTeams.vue';
+import HighOrbitMarket from '@/client/components/highOrbit/HighOrbitMarket.vue';
 import {TileView} from './board/TileView';
 import {scrollToSpace} from '@/client/utils/boardScroll';
 
@@ -97,6 +103,7 @@ export default defineComponent({
     VenusSurfaceBoard,
     PlanetaryTracks,
     ConglomeratesTeams,
+    HighOrbitMarket,
   },
   methods: {
     highlightSpace(spaceId: SpaceId) {

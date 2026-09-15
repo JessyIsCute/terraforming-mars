@@ -15,6 +15,7 @@ import {GlobalParameter} from '../GlobalParameter';
 import {Tag} from '../cards/Tag';
 import {ConglomeratesModel} from './ConglomeratesModel';
 import {VenusPhase2Model} from './VenusPhase2Model';
+import {HighOrbitMarketRow} from '../highOrbit/HighOrbitMarket';
 
 // Common data about a game not assocaited with a player (eg the temperature.)
 export type GameModel = {
@@ -30,6 +31,7 @@ export type GameModel = {
   gameOptions: GameOptionsModel;
   generation: number;
   globalsPerGeneration: ReadonlyArray<Partial<Record<GlobalParameter, number>>>,
+  highOrbitMarket: ReadonlyArray<HighOrbitMarketRow> | undefined;
   isSoloModeWin: boolean;
   lastSoloGeneration: number,
   milestones: ReadonlyArray<ClaimedMilestoneModel>;

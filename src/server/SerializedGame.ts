@@ -18,6 +18,7 @@ import {UnderworldData} from './underworld/UnderworldData';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {AwardName} from '../common/ma/AwardName';
 import {GlobalParameter} from '../common/GlobalParameter';
+import {HighOrbitMarketRow} from '../common/highOrbit/HighOrbitMarket';
 import {MilestoneName} from '../common/ma/MilestoneName';
 import {Tag} from '../common/cards/Tag';
 import {CardName} from '../common/cards/CardName';
@@ -32,9 +33,10 @@ export type SerializedGame = {
     // High Orbit (fan): see IGame.cardsPlayedThisGeneration. Optional for backward compatibility
     // with saves from before this field existed.
     cardsPlayedThisGeneration?: Array<CardName>;
-    // High Orbit (fan): see IGame.infrastructureSupply. Optional for backward compatibility
-    // with saves from before this field existed.
-    infrastructureSupply?: Array<[CardName, number]>;
+    // High Orbit (fan): see IGame.highOrbitMarket / IGame.highOrbitDeck. Optional for backward
+    // compatibility with saves from before this field existed (or from the old flat-map shape).
+    highOrbitMarket?: Array<HighOrbitMarketRow>;
+    highOrbitDeck?: Array<CardName>;
     // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration. Optional for backward
     // compatibility with saves from before this field existed.
     resourceRemovalBlockedThisGeneration?: boolean;

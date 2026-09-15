@@ -1,6 +1,7 @@
 import {MarsBoard} from './boards/MarsBoard';
 import {GlobalParametersConfig} from '../common/GlobalParameterConfig';
 import {CardName} from '../common/cards/CardName';
+import {HighOrbitMarketRow} from '../common/highOrbit/HighOrbitMarket';
 import {ClaimedMilestone} from './milestones/ClaimedMilestone';
 import {IColony} from './colonies/IColony';
 import {Color} from '../common/Color';
@@ -62,19 +63,25 @@ export interface IGame extends Logger {
   /**
    * High Orbit (fan): tracks which CardNames have already been played THIS generation, across
    * all players. Used by Planetary Outpost -- since several separate physical copies of it
-   * exist in the shared supply (see infrastructureSupply below), a per-card-instance flag
-   * wouldn't work; this is a generation-scoped, game-wide set instead. Reset in
-   * `startGeneration`.
+   * exist in the shared market (see highOrbitMarket below), a per-card-instance flag wouldn't
+   * work; this is a generation-scoped, game-wide set instead. Reset in `startGeneration`.
    */
   cardsPlayedThisGeneration: Set<CardName>;
   /**
-   * High Orbit (fan): remaining unclaimed physical copies of each Infrastructure card design,
-   * shared across all players -- these cards are never shuffled into the project deck (see
-   * GameCards.getProjectCards). Populated from HighOrbitCardManifest.HIGH_ORBIT_SUPPLY in
-   * `Game.newInstance` when highOrbitExpansion is enabled, decremented as players acquire
-   * copies via `Player.getHighOrbitInfrastructureOptions`.
+   * High Orbit (fan): the shared Infrastructure card market -- always 3 rows of 5 slots (see
+   * HighOrbitMarketRow). These cards are never shuffled into the project deck (see
+   * GameCards.getProjectCards). Dealt from highOrbitDeck in `Game.newInstance` when
+   * highOrbitExpansion is enabled. Buying a card (via `Player.getHighOrbitInfrastructureOptions`)
+   * empties its slot and locks the whole row for the rest of the generation; `startGeneration`
+   * unlocks every row and refills any empty slots from highOrbitDeck.
    */
-  infrastructureSupply: Map<CardName, number>;
+  highOrbitMarket: Array<HighOrbitMarketRow>;
+  /**
+   * High Orbit (fan): the shuffled remainder of physical Infrastructure card copies not
+   * currently dealt into highOrbitMarket. Populated from HighOrbitCardManifest.HIGH_ORBIT_SUPPLY
+   * in `Game.newInstance`, drawn from to refill market slots at the start of each generation.
+   */
+  highOrbitDeck: Array<CardName>;
   /**
    * Solaris (fan): Anti Fraud Investigation. When true, no player may remove resources from
    * any card for the rest of the generation. Set true by Anti Fraud Investigation's play

@@ -51,6 +51,7 @@ import {VenusPhase2Data} from './venusPhase2/VenusPhase2Data';
 import {VenusPhase2Expansion} from './venusPhase2/VenusPhase2Expansion';
 import {TurmoilHandler} from './turmoil/TurmoilHandler';
 import {SeededRandom, UnseededRandom} from '../common/utils/Random';
+import {inplaceShuffle} from './utils/shuffle';
 import {chooseMilestonesAndAwards, getCandidates} from './ma/MilestoneAwardSelector';
 import {BoardType} from './boards/BoardType';
 import {MultiSet} from 'mnemonist';
@@ -74,6 +75,7 @@ import {UnderworldExpansion} from './underworld/UnderworldExpansion';
 import {ConglomeratesData} from './conglomerates/ConglomeratesData';
 import {ConglomeratesExpansion} from './conglomerates/ConglomeratesExpansion';
 import {HIGH_ORBIT_SUPPLY} from './cards/highOrbit/HighOrbitCardManifest';
+import {HighOrbitMarketRow} from '../common/highOrbit/HighOrbitMarket';
 import {SendDelegateToArea} from './deferredActions/SendDelegateToArea';
 import {BuildColony} from './deferredActions/BuildColony';
 import {newInitialDraft, newPreludeDraft, newCEOsDraft, newStandardDraft} from './Draft';
@@ -135,8 +137,9 @@ export class Game implements IGame, Logger {
   public generation: number = 1;
   // High Orbit (fan): see IGame.cardsPlayedThisGeneration.
   public cardsPlayedThisGeneration: Set<CardName> = new Set();
-  // High Orbit (fan): see IGame.infrastructureSupply.
-  public infrastructureSupply: Map<CardName, number> = new Map();
+  // High Orbit (fan): see IGame.highOrbitMarket / IGame.highOrbitDeck.
+  public highOrbitMarket: Array<HighOrbitMarketRow> = [];
+  public highOrbitDeck: Array<CardName> = [];
   // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration.
   public resourceRemovalBlockedThisGeneration: boolean = false;
   public phase: Phase = Phase.RESEARCH;
@@ -413,10 +416,19 @@ export class Game implements IGame, Logger {
       players.forEach((player) => ConglomeratesExpansion.gainCoordination(player, 2));
     }
 
-    // High Orbit (fan): populate the shared, always-visible Infrastructure card supply --
-    // these cards never enter the project deck (see GameCards.getProjectCards).
+    // High Orbit (fan): deal the shared Infrastructure card market -- 3 rows of 5, randomly
+    // dealt from every physical copy of every design. These cards never enter the project deck
+    // (see GameCards.getProjectCards).
     if (gameOptions.highOrbitExpansion) {
-      game.infrastructureSupply = new Map(Object.entries(HIGH_ORBIT_SUPPLY) as Array<[CardName, number]>);
+      const allCopies: Array<CardName> = [];
+      for (const [cardName, count] of Object.entries(HIGH_ORBIT_SUPPLY) as Array<[CardName, number]>) {
+        for (let i = 0; i < count; i++) {
+          allCopies.push(cardName);
+        }
+      }
+      inplaceShuffle(allCopies, rng);
+      game.highOrbitMarket = [0, 1, 2].map(() => ({locked: false, slots: allCopies.splice(0, 5)}));
+      game.highOrbitDeck = allCopies;
     }
 
     // and 2 neutral cities and forests on board
@@ -541,7 +553,8 @@ export class Game implements IGame, Logger {
       board: this.board.serialize(),
       claimedMilestones: serializeClaimedMilestones(this.claimedMilestones),
       cardsPlayedThisGeneration: Array.from(this.cardsPlayedThisGeneration),
-      infrastructureSupply: Array.from(this.infrastructureSupply.entries()),
+      highOrbitMarket: this.highOrbitMarket,
+      highOrbitDeck: this.highOrbitDeck,
       resourceRemovalBlockedThisGeneration: this.resourceRemovalBlockedThisGeneration,
       ceoDeck: this.ceoDeck.serialize(),
       colonies: this.colonies.map((colony) => colony.serialize()),
@@ -993,6 +1006,18 @@ export class Game implements IGame, Logger {
     this.generation++;
     this.cardsPlayedThisGeneration.clear();
     this.resourceRemovalBlockedThisGeneration = false;
+    // High Orbit (fan): unlock every market row and refill any empty slots from the deck. A
+    // JSON round-trip (game.save()/reload) turns an `undefined` array element into `null` --
+    // see the Black Market/MutationMarkets crashes this exact gotcha caused before -- so both
+    // are treated as "empty slot" (can't use `== null` here: eqeqeq forbids it).
+    for (const row of this.highOrbitMarket) {
+      row.locked = false;
+      for (let i = 0; i < row.slots.length; i++) {
+        if ((row.slots[i] === undefined || row.slots[i] === null) && this.highOrbitDeck.length > 0) {
+          row.slots[i] = this.highOrbitDeck.pop();
+        }
+      }
+    }
     this.log('Generation ${0}', (b) => b.forNewGeneration().number(this.generation));
     this.setNextFirstPlayer();
 
@@ -1992,7 +2017,8 @@ export class Game implements IGame, Logger {
     game.passedPlayers = new Set<PlayerId>(d.passedPlayers);
     game.donePlayers = new Set<PlayerId>(d.donePlayers);
     game.cardsPlayedThisGeneration = new Set<CardName>(d.cardsPlayedThisGeneration ?? []);
-    game.infrastructureSupply = new Map<CardName, number>(d.infrastructureSupply ?? []);
+    game.highOrbitMarket = d.highOrbitMarket ?? [];
+    game.highOrbitDeck = d.highOrbitDeck ?? [];
     game.resourceRemovalBlockedThisGeneration = d.resourceRemovalBlockedThisGeneration ?? false;
     game.researchedPlayers = new Set<PlayerId>(d.researchedPlayers);
 
