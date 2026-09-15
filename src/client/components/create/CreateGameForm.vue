@@ -52,6 +52,13 @@
                                 <span v-i18n>Venus Next</span>
                             </label>
 
+                            <template v-if="expansions.venus">
+                                <input type="checkbox" v-model="altVenusBoard" id="altVenusBoard-checkbox">
+                                <label for="altVenusBoard-checkbox">
+                                    <span v-i18n>Alt. Venus Board</span> &nbsp;<a :href="wikiUrls.alternativeVenusBoard" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                                </label>
+                            </template>
+
                             <input type="checkbox" name="colonies" id="colonies-checkbox" v-model="expansions.colonies">
                             <label for="colonies-checkbox" class="expansion-button">
                             <div class="create-game-expansion-icon expansion-icon-colony"></div>
@@ -158,13 +165,6 @@
                                 <span v-i18n>Pathfinders</span>&nbsp;<a :href="wikiUrls.pathfinders" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
                             </label>
 
-                            <template v-if="expansions.venus">
-                                <input type="checkbox" v-model="altVenusBoard" id="altVenusBoard-checkbox">
-                                <label for="altVenusBoard-checkbox">
-                                    <span v-i18n>Alt. Venus Board</span> &nbsp;<a :href="wikiUrls.alternativeVenusBoard" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                                </label>
-                            </template>
-
                             <input type="checkbox" name="ceo" id="ceo-checkbox" v-model="expansions.ceo">
                             <label for="ceo-checkbox" class="expansion-button">
                                 <div class="create-game-expansion-icon expansion-icon-ceo"></div>
@@ -239,25 +239,27 @@
                                 </label>
                             </template>
 
-                            <input type="checkbox" name="venusPhase2" id="venusPhase2-checkbox" v-model="expansions.venusPhase2">
-                            <label for="venusPhase2-checkbox" class="expansion-button">
-                                <div class="create-game-expansion-icon expansion-icon-venusPhase2"></div>
-                                <span v-i18n>Venus: Phase 2</span>&nbsp;<span title="A fan expansion: a separate Venus surface board with 3 new standard projects (Cloud City, Gas Mine, Floater Array), discountable with floaters from any of your cards, and a finer 1% Venus track step">(&#945;)</span>&nbsp;<a :href="wikiUrls.venusPhase2" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
-                            </label>
+                            <template v-if="expansions.venus">
+                                <input type="checkbox" name="venusPhase2" id="venusPhase2-checkbox" v-model="expansions.venusPhase2">
+                                <label for="venusPhase2-checkbox" class="expansion-button">
+                                    <div class="create-game-expansion-icon expansion-icon-venusPhase2"></div>
+                                    <span v-i18n>Venus: Phase 2</span>&nbsp;<span title="A fan expansion: a separate Venus surface board with 3 new standard projects (Cloud City, Gas Mine, Floater Array), discountable with floaters from any of your cards, and a finer 1% Venus track step">(&#945;)</span>&nbsp;<a :href="wikiUrls.venusPhase2" class="tooltip" v-i18n data-tooltip="Link opens in a new tab/window" target="_blank">&#9432;</a>
+                                </label>
 
-                            <template v-if="expansions.venusPhase2">
-                              <div class="create-game-subsection-label" style="margin-top: 4px;">
-                                <label for="custom-venus-board-code" v-i18n>Custom Venus Phase 2 board code (optional)</label>
-                                <textarea
-                                  id="custom-venus-board-code"
-                                  rows="2"
-                                  style="width: 100%; font-family: monospace; font-size: 11px;"
-                                  placeholder="Paste a TMBS1… code from the Venus map editor"
-                                  v-model="customVenusSurfaceBoardCodeInput"
-                                  @input="applyCustomVenusSurfaceBoardCode"></textarea>
-                                <div v-if="customVenusSurfaceBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customVenusSurfaceBoardCodeError }}</div>
-                                <div v-else-if="customVenusSurfaceBoardName !== ''" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom Venus board: {{ customVenusSurfaceBoardName }}</div>
-                              </div>
+                                <template v-if="expansions.venusPhase2">
+                                  <div class="create-game-subsection-label" style="margin-top: 4px;">
+                                    <label for="custom-venus-board-code" v-i18n>Custom Venus Phase 2 board code (optional)</label>
+                                    <textarea
+                                      id="custom-venus-board-code"
+                                      rows="2"
+                                      style="width: 100%; font-family: monospace; font-size: 11px;"
+                                      placeholder="Paste a TMBS1… code from the Venus map editor"
+                                      v-model="customVenusSurfaceBoardCodeInput"
+                                      @input="applyCustomVenusSurfaceBoardCode"></textarea>
+                                    <div v-if="customVenusSurfaceBoardCodeError" style="color: #e74c3c; font-size: 11px;">{{ customVenusSurfaceBoardCodeError }}</div>
+                                    <div v-else-if="customVenusSurfaceBoardName !== ''" style="color: #6c6; font-size: 11px;" v-i18n>Loaded custom Venus board: {{ customVenusSurfaceBoardName }}</div>
+                                  </div>
+                                </template>
                             </template>
 
                             <input type="checkbox" name="industries" id="industries-checkbox" v-model="expansions.industries">
