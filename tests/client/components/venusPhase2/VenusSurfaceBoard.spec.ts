@@ -107,4 +107,17 @@ describe('VenusSurfaceBoard', () => {
     // approximation, not something worth pinning down to a specific percentage here.
     expect((marker.attributes('style') ?? '')).to.include('%');
   });
+
+  it('omits the 30-60 track entirely when showScaleTrack is false', () => {
+    const model: VenusPhase2Model = {spaces: [space('100', 0, 0)]};
+    const wrapper = mount(VenusSurfaceBoard, {
+      ...globalConfig,
+      props: {model, venusScaleLevel: 44, showScaleTrack: false},
+    });
+
+    // SimpleMapEditor.vue's hex-layout preview sets this false -- that page already has its own
+    // separate track-calibration tool, so this component's own copy would otherwise show twice.
+    expect(wrapper.find('.venus-scale-track-2').exists()).to.be.false;
+    expect(wrapper.find('.venus-board-cont').exists()).to.be.true;
+  });
 });

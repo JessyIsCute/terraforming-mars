@@ -6,9 +6,10 @@
        push the hex grid down AND distort the backdrop's sizing relative to the grid (see
        feedback_venus-track-layout for the earlier attempt that did exactly this and had to be
        reverted). Living outside .venus-board-cont means neither the grid nor the backdrop is
-       touched -- this just adds its own row above the whole board block. Always shown (not just
-       once the scale passes 30) so it doesn't pop in mid-generation. -->
-  <div class="venus-scale-track-2-row">
+       touched -- this just adds its own row above the whole board block. Always shown once
+       showScaleTrack is true (not just once the scale passes 30) so it doesn't pop in
+       mid-generation. -->
+  <div v-if="showScaleTrack" class="venus-scale-track-2-row">
     <div class="venus-scale-track-2">
       <div v-if="venus2MarkerStyle !== undefined" class="venus-scale-track-2__marker" :style="venus2MarkerStyle"></div>
     </div>
@@ -91,6 +92,15 @@ export default defineComponent({
     venusScaleLevel: {
       type: Number,
       default: 0,
+    },
+    // False for SimpleMapEditor.vue's hex-layout preview -- that page already has its own,
+    // separate 30-60 track calibration tool right above this preview, so this component's own
+    // copy of the track would otherwise show twice on the same page (once for calibrating,
+    // once floating uselessly above the tiny preview planet with no marker on it, since that
+    // call site has no real venusScaleLevel to show).
+    showScaleTrack: {
+      type: Boolean,
+      default: true,
     },
   },
   components: {

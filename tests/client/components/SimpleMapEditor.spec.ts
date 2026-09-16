@@ -148,6 +148,13 @@ describe('SimpleMapEditor', () => {
     expect(moon.findComponent({name: 'MoonBoard'}).exists()).is.true;
   });
 
+  it('shows the 30-60 track only once (the calibration tool\'s own copy, not a second one inside the hex-grid preview)', () => {
+    const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'venusPhase2'}});
+    // The preview's own VenusSurfaceBoard is told not to render its copy -- see showScaleTrack.
+    expect(wrapper.findAllComponents({name: 'VenusSurfaceBoard'})[0].props('showScaleTrack')).is.false;
+    expect(wrapper.findAll('.venus-scale-track-2')).to.have.lengthOf(1);
+  });
+
   it('does not offer reservation tools for Moon (only Venus has Stratopolis/Maxwell Base)', () => {
     const wrapper = mount(SimpleMapEditor, {...globalConfig, props: {boardType: 'moon'}});
     expect(wrapper.text()).to.not.include('Reserved spots');

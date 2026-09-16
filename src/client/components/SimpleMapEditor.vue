@@ -193,7 +193,7 @@
           @mousedown="startBackdropDrag"
           @wheel.prevent="onBackdropWheel"
         >
-          <VenusSurfaceBoard :model="previewModel" tileView="show"/>
+          <VenusSurfaceBoard :model="previewModel" tileView="show" :showScaleTrack="false"/>
         </div>
         <MoonBoard v-else :model="previewMoonModel" tileView="show"/>
       </div>
