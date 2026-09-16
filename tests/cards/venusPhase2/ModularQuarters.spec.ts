@@ -20,7 +20,7 @@ describe('ModularQuarters', () => {
   it('raises Venus 1 step on play', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
   });
 
   it('adds 2 floaters to an eligible card whenever a Venus Habitat is placed', () => {

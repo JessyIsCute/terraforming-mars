@@ -33,7 +33,7 @@ describe('AtmoSequester', () => {
     runAllActions(game);
 
     expect(player.energy).to.eq(0);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
     expect(dirigibles.resourceCount).to.eq(1);
   });
 });

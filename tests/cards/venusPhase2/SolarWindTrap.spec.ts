@@ -35,6 +35,6 @@ describe('SolarWindTrap', () => {
     runAllActions(game);
 
     expect(card.resourceCount).to.eq(0);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
   });
 });

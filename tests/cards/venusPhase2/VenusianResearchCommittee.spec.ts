@@ -22,7 +22,7 @@ describe('VenusianResearchCommittee', () => {
     const handSizeBefore = player.cardsInHand.length;
     card.play(player);
     runAllActions(game);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
     // Itself has 1 Venus tag, so 1 / 2 = 0 cards drawn.
     expect(player.cardsInHand.length).to.eq(handSizeBefore);
   });

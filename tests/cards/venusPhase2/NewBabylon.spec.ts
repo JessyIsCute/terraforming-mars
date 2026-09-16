@@ -32,7 +32,7 @@ describe('NewBabylon', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
     runAllActions(game);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
     expect(player.production.plants).to.eq(2);
 
     const selectSpace = cast(player.popWaitingFor(), SelectSpace);

@@ -27,7 +27,7 @@ describe('VenusKickstarting', () => {
     game.increaseVenusScaleLevel(player, 3);
     game.increaseVenusScaleLevel(player, 3);
     game.increaseVenusScaleLevel(player, 2);
-    expect(game.getVenusScaleLevel()).to.eq(17);
+    expect(game.getVenusScaleLevel()).to.eq(34);
     expect(card.canPlay(player)).is.false;
   });
 

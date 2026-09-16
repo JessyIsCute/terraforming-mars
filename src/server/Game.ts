@@ -237,12 +237,12 @@ export class Game implements IGame, Logger {
     this.name = name;
     this.gameOptions = {...gameOptions};
     const baseParameters = this.gameOptions.globalParameters ?? DEFAULT_GLOBAL_PARAMETERS;
-    // Venus Phase 2 halves the Venus track's step (2 -> 1), doubling how many raise-actions the
-    // track takes to fill without changing any existing card's absolute requirement threshold
-    // (8/16 are still reached at the same raw value, just via twice as many single steps). This
-    // wins over a simultaneously-selected custom board's own venus.step, if any.
+    // Venus Phase 2 doubles the Venus track's length (0-30 -> 0-60), continuing at the same
+    // official 2-unit step throughout -- 0-30 behaves exactly like the official game (same
+    // bonuses at the same absolute values, 8/16), then the track just keeps going to 60. This
+    // wins over a simultaneously-selected custom board's own venus.max, if any.
     this.parameters = this.gameOptions.venusPhase2Expansion ?
-      {...baseParameters, venus: {...baseParameters.venus, step: 1}} :
+      {...baseParameters, venus: {...baseParameters.venus, max: 60}} :
       baseParameters;
     this.oxygenLevel = this.parameters.oxygen.min;
     this.temperature = this.parameters.temperature.min;
@@ -1448,15 +1448,19 @@ export class Game implements IGame, Logger {
       if (this.gameOptions.altVenusBoard) {
         const newValue = this.venusScaleLevel + steps * venus.step;
         const minimalBaseline = Math.max(this.venusScaleLevel, constants.ALT_VENUS_MINIMUM_BONUS);
-        const maximumBaseline = Math.min(newValue, venus.max);
+        // Alt-Venus-board's own art/resource ramp is pinned to the official 0-30 track -- capped
+        // at MAX_VENUS_SCALE (not venus.max) so Venus Phase 2's extended 30-60 track doesn't
+        // triple the resources granted or push the "reached max" wild-resource bonus out to 60.
+        const altVenusCap = Math.min(venus.max, constants.MAX_VENUS_SCALE);
+        const maximumBaseline = Math.min(newValue, altVenusCap);
         // The `/2` here is alt-Venus-board's own "1 wild resource per 2 track units" pacing
-        // constant -- unrelated to the raise-step size above, so it stays literal. Floored
-        // because Venus Phase 2's 1-unit raise step can now land on an odd track value, which
-        // would otherwise hand GainResources a fractional count it can never satisfy.
+        // constant -- unrelated to the raise-step size above, so it stays literal.
         const standardResourcesGranted = Math.max(Math.floor((maximumBaseline - minimalBaseline) / 2), 0);
 
-        const grantWildResource = this.venusScaleLevel + (steps * venus.step) >= venus.max;
-        // The second half of this expression removes any increases earler than 16-to-18.
+        // Only fire once, on the raise that actually reaches the cap -- without the "was below
+        // it before" half, every further raise past 30 (now possible with Venus Phase 2's
+        // extended track) would re-grant the wild resource, since newValue stays >= the cap.
+        const grantWildResource = this.venusScaleLevel < altVenusCap && newValue >= altVenusCap;
         if (grantWildResource || standardResourcesGranted > 0) {
           this.defer(new GrantVenusAltTrackBonusDeferred(player, standardResourcesGranted, grantWildResource));
         }

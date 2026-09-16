@@ -33,7 +33,7 @@ describe('NewAlexandria', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
     runAllActions(game);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
     expect(player.production.energy).to.eq(0);
     expect(player.production.megacredits).to.eq(3);
 

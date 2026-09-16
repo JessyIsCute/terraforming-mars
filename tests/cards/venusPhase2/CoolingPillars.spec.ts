@@ -23,7 +23,7 @@ describe('CoolingPillars', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
     runAllActions(game);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
     expect(player.production.energy).to.eq(1);
 
     const selectSpace = cast(player.popWaitingFor(), SelectSpace);

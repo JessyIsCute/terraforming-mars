@@ -23,7 +23,7 @@ describe('IshtarEnergyNetwork', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
     runAllActions(game);
-    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 1);
+    expect(game.getVenusScaleLevel()).to.eq(venusBefore + 2);
 
     const selectSpace = cast(player.popWaitingFor(), SelectSpace);
     const target = selectSpace.spaces[0];
