@@ -76,20 +76,25 @@
 // float it off to the right of where the board itself actually sits -- left-aligned here matches
 // the board's real position.
 .venus-scale-track-2-row {
-  margin: 12px 0 0;
+  margin: 4px 0 0;
 }
 
+// venus-track-30-60.png has a fair amount of transparent padding baked in above/below the
+// painted arc itself (real space between the numbers and the image's own edges), which reads as
+// extra empty space above the planet at any display width -- keeping this on the smaller side
+// keeps that padding's absolute height modest too, pending the calibration tool below possibly
+// wanting a cropped version of the source image instead.
 .venus-scale-track-2 {
   position: relative;
-  width: 520px;
-  max-width: 90vw;
+  width: 380px;
+  max-width: 85vw;
   aspect-ratio: 2200 / 715;
   background: url("./assets/venusPhase2/venus-track-30-60.png") no-repeat center / contain;
 
   &__marker {
     position: absolute;
     // left/top set inline per-instance as percentages by VenusSurfaceBoard.vue's
-    // getVenus2CurvePoint -- see that component for where the curve's shape comes from.
+    // VENUS_2_TRACK_POSITIONS -- see that component for where these numbers come from.
     transform: translate(-50%, -50%);
     width: 12px;
     height: 12px;

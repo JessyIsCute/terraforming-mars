@@ -176,14 +176,16 @@ export default defineComponent({
       return entries;
     },
     // Percent-based (not px) so it stays correct regardless of how large venus-track-30-60.png
-    // is actually displayed -- see getVenus2CurvePoint below for where these numbers come from.
-    // undefined below 30: there's nothing on this second curve to point at yet.
+    // is actually displayed -- see VENUS_2_TRACK_POSITIONS below for where these numbers come
+    // from. undefined below 30 (nothing on this curve to point at yet) or for an odd value (never
+    // happens in a real game -- Venus's step is always 2 -- but SimpleMapEditor.vue's calibration
+    // tool can be mid-calibration with gaps).
     venus2MarkerStyle(): Record<string, string> | undefined {
-      if (this.venusScaleLevel < 30) {
+      const point = VENUS_2_TRACK_POSITIONS[this.venusScaleLevel];
+      if (point === undefined) {
         return undefined;
       }
-      const {left, top} = getVenus2CurvePoint(this.venusScaleLevel);
-      return {left: `${left * 100}%`, top: `${top * 100}%`};
+      return {left: `${point.left * 100}%`, top: `${point.top * 100}%`};
     },
   },
   methods: {
@@ -196,23 +198,32 @@ export default defineComponent({
   },
 });
 
-// Fractional (0-1) start/peak/end points read visually off venus-track-30-60.png's own painted
-// arc (2200x715 source), used as the 3 control points of a quadratic Bezier -- an adjustable
-// formula instead of ~16 hand-tuned per-value positions, since this image has had no in-browser
-// check yet and is more likely than not to need a follow-up nudge (see [[venusphase2-expansion]]
-// and this session's earlier reverted flat-track attempt for why that matters here).
-const VENUS_2_CURVE_START = {x: 0.085, y: 0.800};
-const VENUS_2_CURVE_PEAK = {x: 0.490, y: 0.130};
-const VENUS_2_CURVE_END = {x: 0.975, y: 0.800};
-
-function getVenus2CurvePoint(venusScaleLevel: number): {left: number, top: number} {
-  const t = Math.min(Math.max((venusScaleLevel - 30) / 30, 0), 1);
-  // Quadratic Bezier through start/end with an implied control point solved so the curve's own
-  // midpoint (t=0.5) lands exactly on the peak estimated above.
-  const controlX = 2 * VENUS_2_CURVE_PEAK.x - 0.5 * (VENUS_2_CURVE_START.x + VENUS_2_CURVE_END.x);
-  const controlY = 2 * VENUS_2_CURVE_PEAK.y - 0.5 * (VENUS_2_CURVE_START.y + VENUS_2_CURVE_END.y);
-  const left = (1 - t) * (1 - t) * VENUS_2_CURVE_START.x + 2 * (1 - t) * t * controlX + t * t * VENUS_2_CURVE_END.x;
-  const top = (1 - t) * (1 - t) * VENUS_2_CURVE_START.y + 2 * (1 - t) * t * controlY + t * t * VENUS_2_CURVE_END.y;
-  return {left, top};
-}
+// Fractional (0-1) position of each tick mark on venus-track-30-60.png's own painted arc, keyed
+// by the Venus scale value it represents. Venus's step is always 2, so this only ever needs an
+// exact lookup (unlike @venus-vals's interpolated-odd-value approach from an earlier, abandoned
+// 1-unit-step design) -- no in-between value is ever actually reached.
+//
+// These 16 values are a rough estimate from eyeballing the source image, not a calibrated fit --
+// there's no browser available in this environment to verify them against the real rendered curve.
+// SimpleMapEditor.vue's Venus Phase 2 track-calibration tool (click each tick mark in order) exists
+// specifically to replace this object with real, verified positions -- see its "Copy positions"
+// button, which outputs a literal in this exact shape.
+const VENUS_2_TRACK_POSITIONS: Record<number, {left: number, top: number}> = {
+  30: {left: 0.085, top: 0.800},
+  32: {left: 0.134, top: 0.633},
+  34: {left: 0.185, top: 0.490},
+  36: {left: 0.237, top: 0.371},
+  38: {left: 0.291, top: 0.276},
+  40: {left: 0.346, top: 0.204},
+  42: {left: 0.403, top: 0.157},
+  44: {left: 0.461, top: 0.133},
+  46: {left: 0.520, top: 0.133},
+  48: {left: 0.581, top: 0.157},
+  50: {left: 0.643, top: 0.204},
+  52: {left: 0.706, top: 0.276},
+  54: {left: 0.771, top: 0.371},
+  56: {left: 0.838, top: 0.490},
+  58: {left: 0.906, top: 0.633},
+  60: {left: 0.975, top: 0.800},
+};
 </script>
