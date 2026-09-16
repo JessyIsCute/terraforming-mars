@@ -1,4 +1,18 @@
 <template>
+  <!-- The official Mars-board Venus curve only has room painted for 0-30 -- Venus Phase 2's
+       extended 30-60 range gets its own standalone curve here, shown above the Venus board itself.
+       Deliberately a separate top-level element, not a child of .venus-board-cont: that container's
+       backdrop is sized as a percentage of its own box, so a normal-flow child inside it would both
+       push the hex grid down AND distort the backdrop's sizing relative to the grid (see
+       feedback_venus-track-layout for the earlier attempt that did exactly this and had to be
+       reverted). Living outside .venus-board-cont means neither the grid nor the backdrop is
+       touched -- this just adds its own row above the whole board block. Always shown (not just
+       once the scale passes 30) so it doesn't pop in mid-generation. -->
+  <div class="venus-scale-track-2-row">
+    <div class="venus-scale-track-2">
+      <div v-if="venus2MarkerStyle !== undefined" class="venus-scale-track-2__marker" :style="venus2MarkerStyle"></div>
+    </div>
+  </div>
   <div class="venus-board-cont">
     <div class="board board--venus" :style="boardStyle" id="venus_board">
       <BoardSpace
@@ -29,12 +43,6 @@
         :tileView="tileView"
         :text="reservedSpaceText(curSpace.id)"
       />
-    </div>
-    <!-- The official Mars-board Venus curve only has room painted for 0-30 -- Venus Phase 2's
-         extended 30-60 range gets its own standalone curve here instead. Always shown (not just
-         once the scale passes 30) so it doesn't pop in mid-generation. -->
-    <div class="venus-scale-track-2">
-      <div v-if="venus2MarkerStyle !== undefined" class="venus-scale-track-2__marker" :style="venus2MarkerStyle"></div>
     </div>
   </div>
 </template>

@@ -64,17 +64,22 @@
 
 // The 0-30 range still renders on the official Mars-board Venus curve, same as always --
 // this is only the 30-60 extension, since the official curve has no room painted past 30.
-// Anchored to venus-board-cont's own corner via position: absolute (never inserted into normal
-// document flow near the hex grid -- see feedback_venus-track-layout, which is exactly why an
-// earlier attempt at a track display here had to be reverted).
+// A plain normal-flow row, deliberately OUTSIDE .venus-board-cont (see the comment in
+// VenusSurfaceBoard.vue's template for why: that container's backdrop sizing is a percentage of
+// its own box, so a normal-flow child inside it would distort the backdrop as well as push the
+// grid down -- living entirely outside it means this can safely sit in normal flow without
+// touching the board's own layout at all).
+.venus-scale-track-2-row {
+  text-align: center;
+  margin: 12px auto 0;
+}
+
 .venus-scale-track-2 {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 6;
-  width: 220px;
+  position: relative;
+  display: inline-block;
+  width: 340px;
+  max-width: 90vw;
   aspect-ratio: 2200 / 715;
-  pointer-events: none;
   background: url("./assets/venusPhase2/venus-track-30-60.png") no-repeat center / contain;
 
   &__marker {
@@ -82,8 +87,8 @@
     // left/top set inline per-instance as percentages by VenusSurfaceBoard.vue's
     // getVenus2CurvePoint -- see that component for where the curve's shape comes from.
     transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: #fff;
     border: 2px solid #000;
