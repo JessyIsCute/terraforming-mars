@@ -101,6 +101,12 @@ export default defineComponent({
     // -- computed from each space's actual current pixel position (not hand-tuned per-board pixel
     // coordinates like Mars's SVG legends use) so this still lines up correctly even when a
     // map-editor-chosen reservation moved the spot somewhere else on a custom board layout.
+    //
+    // The label is pushed outward along the vector from the board's own center through the dot
+    // (not just left/right), and far enough out (2 hexes' worth) to clear a full ring of
+    // neighboring tiles instead of landing right on top of them -- both axes pick their direction
+    // from which side of the board center the dot falls on, so it's pushed toward whichever edge
+    // is actually closest (and therefore has open backdrop beyond the grid to land in).
     reservedLegendEntries(): Array<{
       id: SpaceId,
       lines: Array<string>,
@@ -111,7 +117,7 @@ export default defineComponent({
       lineY: number,
       textAnchor: 'start' | 'end',
     }> {
-      const boardWidth = this.boardPixelSize.width;
+      const {width: boardWidth, height: boardHeight} = this.boardPixelSize;
       const entries = [];
       for (const space of this.gridSpaces) {
         const lines = RESERVED_SPACE_TEXT[space.id];
@@ -121,10 +127,13 @@ export default defineComponent({
         const pixel = this.pixelFor(space);
         const dotX = pixel.left + HEX_WIDTH / 2;
         const dotY = pixel.top + HEX_HEIGHT / 2;
-        // Label on whichever side of the dot has more room, so it doesn't run off the board edge.
         const toRight = dotX < boardWidth / 2;
-        const labelX = dotX + (toRight ? 26 : -26);
-        const labelY = dotY - 22;
+        const pushDown = dotY < boardHeight / 2;
+        const labelX = dotX + (toRight ? 1 : -1) * HEX_WIDTH * 1.8;
+        const labelY = dotY + (pushDown ? 1 : -1) * HEX_HEIGHT * 1.6;
+        // Touch the leader line to whichever edge of the (possibly 2-line) text block actually
+        // faces back toward the dot, instead of always the first line's baseline.
+        const lineY = pushDown ? labelY - 8 : labelY + 12 * (lines.length - 1) + 3;
         entries.push({
           id: space.id,
           lines,
@@ -132,7 +141,7 @@ export default defineComponent({
           dotY,
           labelX,
           labelY,
-          lineY: labelY + (lines.length > 1 ? 4 : 8),
+          lineY,
           textAnchor: toRight ? 'start' as const : 'end' as const,
         });
       }

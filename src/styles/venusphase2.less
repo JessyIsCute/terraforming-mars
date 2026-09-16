@@ -46,6 +46,10 @@
   left: 0;
   z-index: 5;
   pointer-events: none;
+  // Labels are pushed well outside the grid toward the nearest board edge, which can land them
+  // slightly past this SVG's own width/height (sized to the hex grid, not the label push
+  // distance) -- let them paint there instead of clipping at the SVG's bounding box.
+  overflow: visible;
 }
 
 .venus-board-outer-spaces {
