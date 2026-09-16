@@ -75,15 +75,17 @@
 // against the page's own left padding, not centered in the page. Centering this row instead would
 // float it off to the right of where the board itself actually sits -- left-aligned here matches
 // the board's real position.
+// The negative bottom margin pulls .venus-board-cont's own 20px top margin (plus this row's
+// height) in closer -- venus-track-30-60.png has a lot of transparent padding baked in below the
+// painted arc itself (real space between the numbers and the image's own bottom edge), which
+// otherwise reads as extra empty space above the planet on top of the two elements' own margins.
 .venus-scale-track-2-row {
-  margin: 4px 0 0;
+  margin: 4px 0 -45px;
 }
 
-// venus-track-30-60.png has a fair amount of transparent padding baked in above/below the
-// painted arc itself (real space between the numbers and the image's own edges), which reads as
-// extra empty space above the planet at any display width -- keeping this on the smaller side
-// keeps that padding's absolute height modest too, pending the calibration tool below possibly
-// wanting a cropped version of the source image instead.
+// Same transparent-padding note as the row above -- kept on the smaller side so that dead space
+// stays modest in absolute pixels too, pending the calibration tool below possibly wanting a
+// cropped version of the source image instead.
 .venus-scale-track-2 {
   position: relative;
   width: 380px;
