@@ -52,46 +52,6 @@
   overflow: visible;
 }
 
-// Two plain 0-15 / 15-30 rows standing in for the official board's own Venus track, which is
-// baked into the painted board art at a fixed 0/2/4/.../30 resolution -- fine for the official
-// 2-unit step, but with nowhere to show Venus Phase 2's odd (1-unit-step) values. Sits above the
-// hex grid, inside the same scrollable/backdropped container.
-.venus-scale-track {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 10px 20px 0;
-}
-
-.venus-scale-track-row {
-  display: flex;
-  border-top: 2px solid rgba(255, 255, 255, 0.5);
-}
-
-.venus-scale-tick {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding-top: 2px;
-}
-
-.venus-scale-tick-label {
-  min-width: 14px;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 0 3px black, 0 0 3px black;
-}
-
-.venus-scale-tick--current .venus-scale-tick-label {
-  background: #f5a623;
-  color: black;
-  text-shadow: none;
-  border-radius: 3px;
-  padding: 0 2px;
-}
-
 .venus-board-outer-spaces {
   position: absolute;
   top: 0;

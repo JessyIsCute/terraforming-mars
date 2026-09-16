@@ -1,17 +1,5 @@
 <template>
   <div class="venus-board-cont">
-    <div class="venus-scale-track">
-      <div class="venus-scale-track-row" v-for="row in scaleTrackRows" :key="row[0]">
-        <div
-          v-for="value in row"
-          :key="value"
-          class="venus-scale-tick"
-          :class="{'venus-scale-tick--current': value === venusScaleLevel}"
-        >
-          <span class="venus-scale-tick-label">{{ value }}</span>
-        </div>
-      </div>
-    </div>
     <div class="board board--venus" :style="boardStyle" id="venus_board">
       <BoardSpace
         v-for="curSpace in gridSpaces"
@@ -79,25 +67,11 @@ export default defineComponent({
       type: String as () => TileView,
       default: 'show',
     },
-    // Absent in the map editor's preview (no live game there) -- defaults to 0 so the track still
-    // renders, just with nothing highlighted past the start.
-    venusScaleLevel: {
-      type: Number,
-      default: 0,
-    },
   },
   components: {
     BoardSpace,
   },
   computed: {
-    // Venus Phase 2's 1-unit step means the official board's painted track (baked into the board
-    // art, numbered 0/2/4/.../30 only) has nowhere to show odd values precisely. Two plain 0-15 /
-    // 15-30 rows, built from real DOM elements instead of a fixed image, can show every value and
-    // just highlight whichever tick matches the current level.
-    scaleTrackRows(): [Array<number>, Array<number>] {
-      const range = (start: number, end: number) => Array.from({length: end - start + 1}, (_, i) => start + i);
-      return [range(0, 15), range(15, 30)];
-    },
     // Off-grid vs on-grid is about position, not SpaceType.COLONY, on this board: Stratopolis/
     // Maxwell Base's reserved spot is COLONY-typed either way (so normal tile placement already
     // excludes it -- see VenusSurfaceBoard.ts's getAvailableSpacesForLand/Gaslight), but a

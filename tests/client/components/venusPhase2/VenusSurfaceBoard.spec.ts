@@ -61,33 +61,4 @@ describe('VenusSurfaceBoard', () => {
 
     expect(wrapper.find('.venus-board-legend').exists()).to.be.false;
   });
-
-  it('renders a 0-15 and a 15-30 scale track row, highlighting the current value', () => {
-    const model: VenusPhase2Model = {spaces: [space('100', 0, 0)]};
-    const wrapper = mount(VenusSurfaceBoard, {
-      ...globalConfig,
-      props: {model, venusScaleLevel: 7},
-    });
-
-    const rows = wrapper.findAll('.venus-scale-track-row');
-    expect(rows).to.have.lengthOf(2);
-    expect(rows[0].findAll('.venus-scale-tick')).to.have.lengthOf(16);
-    expect(rows[1].findAll('.venus-scale-tick')).to.have.lengthOf(16);
-
-    const current = wrapper.findAll('.venus-scale-tick--current');
-    expect(current).to.have.lengthOf(1);
-    expect(current[0].text()).to.eq('7');
-  });
-
-  it('highlights the shared boundary value (15) in both rows, since both legitimately show it', () => {
-    const model: VenusPhase2Model = {spaces: [space('100', 0, 0)]};
-    const wrapper = mount(VenusSurfaceBoard, {
-      ...globalConfig,
-      props: {model, venusScaleLevel: 15},
-    });
-
-    const rows = wrapper.findAll('.venus-scale-track-row');
-    expect(rows[0].findAll('.venus-scale-tick--current')).to.have.lengthOf(1);
-    expect(rows[1].findAll('.venus-scale-tick--current')).to.have.lengthOf(1);
-  });
 });
