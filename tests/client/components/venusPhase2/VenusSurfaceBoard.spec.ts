@@ -34,6 +34,27 @@ describe('VenusSurfaceBoard', () => {
     expect(wrapper.find('.board-space-text').exists()).to.be.false;
   });
 
+  it('pushes a reserved-space label away from the board center, not back toward it', () => {
+    const model: VenusPhase2Model = {
+      spaces: [
+        space('298', 0, 0, SpaceType.COLONY), // Stratopolis, in the board's top-left corner here
+        space('100', 6, 6), // just to give the board real extent beyond a single point
+      ],
+    };
+    const wrapper = mount(VenusSurfaceBoard, {
+      ...globalConfig,
+      props: {model},
+    });
+
+    const line = wrapper.find('.venus-board-legend line');
+    expect(line.exists()).to.be.true;
+    // x1/y1 is the label end, x2/y2 is the dot on the space itself (see the template). Stratopolis
+    // sits toward the top-left here, so the label should land further toward that same corner
+    // than the dot -- pulling it back in toward the center would land it on top of other hexes.
+    expect(Number(line.attributes('x1'))).to.be.lessThan(Number(line.attributes('x2')));
+    expect(Number(line.attributes('y1'))).to.be.lessThan(Number(line.attributes('y2')));
+  });
+
   it('falls back to a plain on-hex label in the off-grid outer-spaces tray', () => {
     const model: VenusPhase2Model = {
       spaces: [

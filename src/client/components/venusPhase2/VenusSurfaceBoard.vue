@@ -152,9 +152,11 @@ export default defineComponent({
         const pixel = this.pixelFor(space);
         const dotX = pixel.left + HEX_WIDTH / 2;
         const dotY = pixel.top + HEX_HEIGHT / 2;
-        const toRight = dotX < boardWidth / 2;
-        const pushDown = dotY < boardHeight / 2;
-        const labelX = dotX + (toRight ? 1 : -1) * HEX_WIDTH * 1.8;
+        // Push AWAY from center, toward whichever edge the dot is already closer to (that's
+        // where the open backdrop is, not more hexes).
+        const pushRight = dotX >= boardWidth / 2;
+        const pushDown = dotY >= boardHeight / 2;
+        const labelX = dotX + (pushRight ? 1 : -1) * HEX_WIDTH * 1.8;
         const labelY = dotY + (pushDown ? 1 : -1) * HEX_HEIGHT * 1.6;
         // Touch the leader line to whichever edge of the (possibly 2-line) text block actually
         // faces back toward the dot, instead of always the first line's baseline.
@@ -167,7 +169,8 @@ export default defineComponent({
           labelX,
           labelY,
           lineY,
-          textAnchor: toRight ? 'start' as const : 'end' as const,
+          // Text reads away from the dot, not back over it.
+          textAnchor: pushRight ? 'start' as const : 'end' as const,
         });
       }
       return entries;
