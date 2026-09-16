@@ -203,27 +203,25 @@ export default defineComponent({
 // exact lookup (unlike @venus-vals's interpolated-odd-value approach from an earlier, abandoned
 // 1-unit-step design) -- no in-between value is ever actually reached.
 //
-// These 16 values are a rough estimate from eyeballing the source image, not a calibrated fit --
-// there's no browser available in this environment to verify them against the real rendered curve.
-// SimpleMapEditor.vue's Venus Phase 2 track-calibration tool (click each tick mark in order) exists
-// specifically to replace this object with real, verified positions -- see its "Copy positions"
-// button, which outputs a literal in this exact shape.
+// Calibrated in-browser via SimpleMapEditor.vue's Venus Phase 2 track-calibration tool (click
+// each tick mark in order, then "Copy positions") -- not an eyeballed guess like the values this
+// replaced.
 const VENUS_2_TRACK_POSITIONS: Record<number, {left: number, top: number}> = {
-  30: {left: 0.085, top: 0.800},
-  32: {left: 0.134, top: 0.633},
-  34: {left: 0.185, top: 0.490},
-  36: {left: 0.237, top: 0.371},
-  38: {left: 0.291, top: 0.276},
-  40: {left: 0.346, top: 0.204},
-  42: {left: 0.403, top: 0.157},
-  44: {left: 0.461, top: 0.133},
-  46: {left: 0.520, top: 0.133},
-  48: {left: 0.581, top: 0.157},
-  50: {left: 0.643, top: 0.204},
-  52: {left: 0.706, top: 0.276},
-  54: {left: 0.771, top: 0.371},
-  56: {left: 0.838, top: 0.490},
-  58: {left: 0.906, top: 0.633},
-  60: {left: 0.975, top: 0.800},
+  30: {left: 0.069, top: 0.731},
+  32: {left: 0.121, top: 0.618},
+  34: {left: 0.179, top: 0.504},
+  36: {left: 0.234, top: 0.391},
+  38: {left: 0.290, top: 0.342},
+  40: {left: 0.348, top: 0.253},
+  42: {left: 0.411, top: 0.229},
+  44: {left: 0.474, top: 0.205},
+  46: {left: 0.529, top: 0.205},
+  48: {left: 0.590, top: 0.237},
+  50: {left: 0.653, top: 0.269},
+  52: {left: 0.711, top: 0.342},
+  54: {left: 0.766, top: 0.415},
+  56: {left: 0.819, top: 0.496},
+  58: {left: 0.874, top: 0.609},
+  60: {left: 0.924, top: 0.739},
 };
 </script>
