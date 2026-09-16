@@ -30,6 +30,12 @@
         :text="reservedSpaceText(curSpace.id)"
       />
     </div>
+    <!-- The official Mars-board Venus curve only has room painted for 0-30 -- Venus Phase 2's
+         extended 30-60 range gets its own standalone curve here instead. Always shown (not just
+         once the scale passes 30) so it doesn't pop in mid-generation. -->
+    <div class="venus-scale-track-2">
+      <div v-if="venus2MarkerStyle !== undefined" class="venus-scale-track-2__marker" :style="venus2MarkerStyle"></div>
+    </div>
   </div>
 </template>
 
@@ -66,6 +72,12 @@ export default defineComponent({
     tileView: {
       type: String as () => TileView,
       default: 'show',
+    },
+    // Only used to position the marker on the 30-60 extension curve below -- omitted entirely
+    // (SimpleMapEditor.vue's preview call site, which has no live game) just means no marker.
+    venusScaleLevel: {
+      type: Number,
+      default: 0,
     },
   },
   components: {
@@ -147,6 +159,16 @@ export default defineComponent({
       }
       return entries;
     },
+    // Percent-based (not px) so it stays correct regardless of how large venus-track-30-60.png
+    // is actually displayed -- see getVenus2CurvePoint below for where these numbers come from.
+    // undefined below 30: there's nothing on this second curve to point at yet.
+    venus2MarkerStyle(): Record<string, string> | undefined {
+      if (this.venusScaleLevel < 30) {
+        return undefined;
+      }
+      const {left, top} = getVenus2CurvePoint(this.venusScaleLevel);
+      return {left: `${left * 100}%`, top: `${top * 100}%`};
+    },
   },
   methods: {
     pixelFor(space: SpaceModel): {left: number, top: number} {
@@ -157,4 +179,24 @@ export default defineComponent({
     },
   },
 });
+
+// Fractional (0-1) start/peak/end points read visually off venus-track-30-60.png's own painted
+// arc (2200x715 source), used as the 3 control points of a quadratic Bezier -- an adjustable
+// formula instead of ~16 hand-tuned per-value positions, since this image has had no in-browser
+// check yet and is more likely than not to need a follow-up nudge (see [[venusphase2-expansion]]
+// and this session's earlier reverted flat-track attempt for why that matters here).
+const VENUS_2_CURVE_START = {x: 0.085, y: 0.800};
+const VENUS_2_CURVE_PEAK = {x: 0.490, y: 0.130};
+const VENUS_2_CURVE_END = {x: 0.975, y: 0.800};
+
+function getVenus2CurvePoint(venusScaleLevel: number): {left: number, top: number} {
+  const t = Math.min(Math.max((venusScaleLevel - 30) / 30, 0), 1);
+  // Quadratic Bezier through start/end with an implied control point solved so the curve's own
+  // midpoint (t=0.5) lands exactly on the peak estimated above.
+  const controlX = 2 * VENUS_2_CURVE_PEAK.x - 0.5 * (VENUS_2_CURVE_START.x + VENUS_2_CURVE_END.x);
+  const controlY = 2 * VENUS_2_CURVE_PEAK.y - 0.5 * (VENUS_2_CURVE_START.y + VENUS_2_CURVE_END.y);
+  const left = (1 - t) * (1 - t) * VENUS_2_CURVE_START.x + 2 * (1 - t) * t * controlX + t * t * VENUS_2_CURVE_END.x;
+  const top = (1 - t) * (1 - t) * VENUS_2_CURVE_START.y + 2 * (1 - t) * t * controlY + t * t * VENUS_2_CURVE_END.y;
+  return {left, top};
+}
 </script>

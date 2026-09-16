@@ -61,4 +61,29 @@ describe('VenusSurfaceBoard', () => {
 
     expect(wrapper.find('.venus-board-legend').exists()).to.be.false;
   });
+
+  it('shows no marker on the 30-60 extension curve below 30', () => {
+    const model: VenusPhase2Model = {spaces: [space('100', 0, 0)]};
+    const wrapper = mount(VenusSurfaceBoard, {
+      ...globalConfig,
+      props: {model, venusScaleLevel: 28},
+    });
+
+    expect(wrapper.find('.venus-scale-track-2').exists()).to.be.true;
+    expect(wrapper.find('.venus-scale-track-2__marker').exists()).to.be.false;
+  });
+
+  it('shows the marker on the 30-60 extension curve once Venus reaches 30 or beyond', () => {
+    const model: VenusPhase2Model = {spaces: [space('100', 0, 0)]};
+    const wrapper = mount(VenusSurfaceBoard, {
+      ...globalConfig,
+      props: {model, venusScaleLevel: 44},
+    });
+
+    const marker = wrapper.find('.venus-scale-track-2__marker');
+    expect(marker.exists()).to.be.true;
+    // Just a smoke check that it's positioned somewhere sane -- the exact pixel fit is a visual
+    // approximation, not something worth pinning down to a specific percentage here.
+    expect((marker.attributes('style') ?? '')).to.include('%');
+  });
 });

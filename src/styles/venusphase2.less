@@ -4,6 +4,7 @@
 // A full-planet render sits behind it as an atmospheric backdrop, the same trick
 // .board-cont--custom already uses for custom Mars boards over the painted Tharsis art.
 .venus-board-cont {
+  position: relative;
   display: inline-block;
   vertical-align: top;
   width: auto;
@@ -59,4 +60,33 @@
   display: flex;
   gap: 6px;
   margin: 8px;
+}
+
+// The 0-30 range still renders on the official Mars-board Venus curve, same as always --
+// this is only the 30-60 extension, since the official curve has no room painted past 30.
+// Anchored to venus-board-cont's own corner via position: absolute (never inserted into normal
+// document flow near the hex grid -- see feedback_venus-track-layout, which is exactly why an
+// earlier attempt at a track display here had to be reverted).
+.venus-scale-track-2 {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 6;
+  width: 220px;
+  aspect-ratio: 2200 / 715;
+  pointer-events: none;
+  background: url("./assets/venusPhase2/venus-track-30-60.png") no-repeat center / contain;
+
+  &__marker {
+    position: absolute;
+    // left/top set inline per-instance as percentages by VenusSurfaceBoard.vue's
+    // getVenus2CurvePoint -- see that component for where the curve's shape comes from.
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+  }
 }

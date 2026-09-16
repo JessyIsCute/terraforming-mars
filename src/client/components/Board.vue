@@ -485,7 +485,11 @@ export default defineComponent({
         break;
       case 'venus':
         startValue = parameters.venus.min;
-        endValue = parameters.venus.max;
+        // The painted curve only has room for 0-30 -- Venus Phase 2's 30-60 extension renders on
+        // its own separate curve instead (VenusSurfaceBoard.vue's .venus-scale-track-2), so this
+        // one stays capped and pegged at 30 the same way temperature/oxygen peg past their own
+        // painted max (see the isPegged check below).
+        endValue = Math.min(parameters.venus.max, DEFAULT_GLOBAL_PARAMETERS.venus.max);
         step = parameters.venus.step;
         curValue = this.venusScaleLevel;
         break;

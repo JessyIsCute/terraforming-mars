@@ -203,41 +203,26 @@
     }
   }
 
-  // Each entry: <val> <margin-top> <margin-left> <rotation>. The odd entries (1, 3, 5, ...) don't
-  // exist on the physical board -- they're the midpoint of their two neighboring official marks,
-  // added so Venus Phase 2's 1-unit track step (half the official 2-unit step) has somewhere to
-  // put a box instead of every odd value rendering unpositioned (no matching .val-N rule at all).
+  // Each entry: <val> <margin-top> <margin-left> <rotation>. Venus uses the official 2-unit step
+  // throughout, even with Venus Phase 2 on -- it extends the track's length to 60 rather than
+  // shrinking the step, so only even values ever need a position here (see venusphase2.less's
+  // .venus-scale-track-2 for the 30-60 half, rendered as its own separate curve).
   @venus-vals:
     0 88px 107px -45deg,
-    1 80px 118px -40.5deg,
     2 72px 129px -36deg,
-    3 65px 139.5px -34.5deg,
     4 58px 150px -33deg,
-    5 52px 161.5px -29.5deg,
     6 46px 173px -26deg,
-    7 41px 185px -23deg,
     8 36px 197px -20deg,
-    9 32px 209.5px -17.5deg,
     10 28px 222px -15deg,
-    11 25.5px 234.5px -11.5deg,
     12 23px 247px -8deg,
-    13 21.5px 260.5px -5deg,
     14 20px 274px -2deg,
-    15 20px 287.5px 1deg,
     16 20px 301px 4deg,
-    17 21.5px 314px 6.5deg,
     18 23px 327px 9deg,
-    19 25.5px 339.5px 12deg,
     20 28px 352px 15deg,
-    21 32px 364.5px 18deg,
     22 36px 377px 21deg,
-    23 41px 389px 24deg,
     24 46px 401px 27deg,
-    25 52px 413px 29deg,
     26 58px 425px 31deg,
-    27 65px 435.5px 33deg,
     28 72px 446px 35deg,
-    29 80px 456px 38.5deg,
     30 88px 466px 42deg;
 
   .global-numbers-venus {
