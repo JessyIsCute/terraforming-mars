@@ -13,7 +13,7 @@
       <div v-if="venus2MarkerStyle !== undefined" class="venus-scale-track-2__marker" :style="venus2MarkerStyle"></div>
     </div>
   </div>
-  <div class="venus-board-cont">
+  <div class="venus-board-cont" v-bind="$attrs">
     <div class="board board--venus" :style="boardStyle" id="venus_board">
       <BoardSpace
         v-for="curSpace in gridSpaces"
@@ -72,6 +72,11 @@ const RESERVED_SPACE_TEXT: Partial<Record<SpaceId, Array<string>>> = {
 
 export default defineComponent({
   name: 'VenusSurfaceBoard',
+  // Two root nodes now (the 30-60 track row plus the board itself) -- Vue can't guess which one
+  // GameBoardView.vue's id="shortkey-venusBoard" (or any other fallthrough attr) belongs on, so it
+  // drops them silently without this. Bind explicitly to .venus-board-cont, matching where it used
+  // to land back when this component had a single root.
+  inheritAttrs: false,
   props: {
     model: {
       type: Object as () => VenusPhase2Model,

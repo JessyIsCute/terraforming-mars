@@ -69,15 +69,19 @@
 // its own box, so a normal-flow child inside it would distort the backdrop as well as push the
 // grid down -- living entirely outside it means this can safely sit in normal flow without
 // touching the board's own layout at all).
+//
+// Deliberately NOT centered: .venus-board-cont below is display:inline-block with an ineffective
+// `margin: auto` (auto margins don't center inline-block boxes), so it actually renders flush left
+// against the page's own left padding, not centered in the page. Centering this row instead would
+// float it off to the right of where the board itself actually sits -- left-aligned here matches
+// the board's real position.
 .venus-scale-track-2-row {
-  text-align: center;
-  margin: 12px auto 0;
+  margin: 12px 0 0;
 }
 
 .venus-scale-track-2 {
   position: relative;
-  display: inline-block;
-  width: 340px;
+  width: 520px;
   max-width: 90vw;
   aspect-ratio: 2200 / 715;
   background: url("./assets/venusPhase2/venus-track-30-60.png") no-repeat center / contain;
