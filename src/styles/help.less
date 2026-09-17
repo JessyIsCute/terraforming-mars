@@ -324,9 +324,11 @@
 }
 
 // Each bonus/policy's own row of cards (2 bonuses, then 4 policies), wrapping as needed.
+// A fixed 2-column grid (1 row of 2 bonuses, 2 rows of 2 policies) instead of flex-wrap, so
+// every card is exactly the same size regardless of which section it's in.
 .help-agenda-section {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
@@ -337,8 +339,6 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  flex: 1 1 100px;
-  min-width: 90px;
   padding: 8px 6px;
   background-image: linear-gradient(#9c602d, #25170a);
   border-radius: 8px;
