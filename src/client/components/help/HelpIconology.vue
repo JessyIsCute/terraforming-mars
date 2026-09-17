@@ -301,6 +301,11 @@
                 <div class="help-icon-label" v-i18n>Corruption</div>
                 <div class="expansion-icon expansion-icon-underworld"></div>
             </div>
+            <div>
+                <div class="help-icon-resource resource_icon resource_icon--coordination"></div>
+                <div class="help-icon-label" v-i18n>Coordination</div>
+                <div class="expansion-icon expansion-icon-conglomerates"></div>
+            </div>
         </div>
 
         <div class="help-icons-column">
