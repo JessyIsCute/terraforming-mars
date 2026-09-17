@@ -2,7 +2,7 @@ import {mount, shallowMount} from '@vue/test-utils';
 import {expect} from 'chai';
 import {globalConfig} from '../getLocalVue';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
-import {getAgendaDescription} from '@/client/turmoil/ClientAgendaManifest';
+import {getAgendaOrThrow} from '@/client/turmoil/ClientAgendaManifest';
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
 
 // Every id whose content differs under the More Parties expansion's "Political Agendas" rework
@@ -70,7 +70,7 @@ describe('TurmoilAgenda', () => {
         id: 'rp02',
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('rp02'));
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaOrThrow('rp02').description);
   });
 
   it('shows the More Parties hover description when the expansion is active', () => {
@@ -81,8 +81,8 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('rp02', true));
-    expect(resolvedDescriptionOf(wrapper)).to.not.eq(getAgendaDescription('rp02'));
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaOrThrow('rp02', true).description);
+    expect(resolvedDescriptionOf(wrapper)).to.not.eq(getAgendaOrThrow('rp02').description);
   });
 
   it('falls back to the vanilla description under More Parties for ids whose content is unchanged', () => {
@@ -93,7 +93,7 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('gb01'));
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaOrThrow('gb01').description);
   });
 
   it('teleports a tooltip to <body> on hover, positioned from the trigger, and removes it on mouseleave', async () => {
@@ -109,7 +109,7 @@ describe('TurmoilAgenda', () => {
     await wrapper.find('.agenda-icon').trigger('mouseenter');
     const portal = document.body.querySelector('.agenda-tooltip-portal');
     expect(portal).to.not.be.null;
-    expect(portal!.textContent!.trim()).to.eq(getAgendaDescription('rp02'));
+    expect(portal!.textContent!.trim()).to.eq(getAgendaOrThrow('rp02').description);
 
     await wrapper.find('.agenda-icon').trigger('mouseleave');
     expect(document.body.querySelector('.agenda-tooltip-portal')).to.be.null;
@@ -133,7 +133,7 @@ describe('TurmoilAgenda', () => {
       } else {
         expect(vanilla.html()).to.not.eq(reworked.html());
       }
-      expect(resolvedDescriptionOf(reworked)).to.eq(getAgendaDescription(id, true));
+      expect(resolvedDescriptionOf(reworked)).to.eq(getAgendaOrThrow(id, true).description);
     });
   }
 
@@ -142,7 +142,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.not.include('Not implemented');
-      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription(id));
+      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaOrThrow(id).description);
     });
   }
 
@@ -151,7 +151,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.include('Not implemented');
-      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription(id));
+      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaOrThrow(id).description);
     });
   }
 });

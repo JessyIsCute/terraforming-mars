@@ -467,7 +467,7 @@
 <script lang="ts">
 
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
-import {getAgendaDescription} from '@/client/turmoil/ClientAgendaManifest';
+import {getAgendaOrThrow} from '@/client/turmoil/ClientAgendaManifest';
 import {defineComponent} from 'vue';
 
 export default defineComponent({
@@ -516,7 +516,7 @@ export default defineComponent({
       return notImplementedIds.includes(this.id);
     },
     resolvedDescription(): string {
-      return getAgendaDescription(this.id, this.morePartiesExpansion);
+      return getAgendaOrThrow(this.id, this.morePartiesExpansion).description;
     },
   },
   methods: {

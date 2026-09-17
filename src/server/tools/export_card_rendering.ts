@@ -8,6 +8,7 @@ import {Expansion, GameModule} from '../../common/cards/GameModule';
 import {IGlobalEvent} from '../turmoil/globalEvents/IGlobalEvent';
 import {IClientGlobalEvent} from '../../common/turmoil/IClientGlobalEvent';
 import {IClientAgenda} from '../../common/turmoil/IClientAgenda';
+import {BonusId, PolicyId} from '../../common/turmoil/Types';
 import {ALL_PARTIES, MORE_PARTIES_ALL, PartyFactory} from '../turmoil/Turmoil';
 import {PartyName} from '../../common/turmoil/PartyName';
 import {policyDescription} from '../turmoil/Policy';
@@ -157,24 +158,28 @@ class GlobalEventProcessor {
 
 class AgendaProcessor {
   // Descriptions as they read in a standard game.
-  public static json: Array<IClientAgenda> = [];
+  public static json: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
   // Descriptions as they read in a moreParties game -- the 6 official parties get their
   // "Political Agendas" rework (different content for some ids), and the 6 new parties are
   // only ever in play here. Kept as a separate full set (not just the ids that differ) so
   // client lookups don't need to know or care which ids changed.
-  public static moreJson: Array<IClientAgenda> = [];
+  public static moreJson: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
 
   public static makeJson() {
     AgendaProcessor.json = AgendaProcessor.process(ALL_PARTIES);
     AgendaProcessor.moreJson = AgendaProcessor.process(MORE_PARTIES_ALL);
   }
 
-  private static process(parties: Record<PartyName, PartyFactory>): Array<IClientAgenda> {
-    const json: Array<IClientAgenda> = [];
+  private static process(parties: Record<PartyName, PartyFactory>): Partial<Record<BonusId | PolicyId, IClientAgenda>> {
+    const json: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
     for (const [partyName, PartyClass] of Object.entries(parties) as Array<[PartyName, PartyFactory]>) {
       const party = new PartyClass();
-      party.bonuses.forEach((bonus) => json.push({id: bonus.id, partyName, description: bonus.description}));
-      party.policies.forEach((policy) => json.push({id: policy.id, partyName, description: policyDescription(policy, undefined)}));
+      party.bonuses.forEach((bonus) => {
+        json[bonus.id] = {partyName, description: bonus.description};
+      });
+      party.policies.forEach((policy) => {
+        json[policy.id] = {partyName, description: policyDescription(policy, undefined)};
+      });
     }
     return json;
   }

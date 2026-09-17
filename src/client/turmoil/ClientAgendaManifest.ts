@@ -6,15 +6,20 @@ import agendaJson from '@/genfiles/agendas.json';
 // @ts-ignore agendas-more-parties.json doesn't exist during npm run build
 import moreAgendaJson from '@/genfiles/agendas-more-parties.json';
 
-const agendas: Map<BonusId | PolicyId, IClientAgenda> = new Map();
-(agendaJson as any as Array<IClientAgenda>).forEach((agenda) => agendas.set(agenda.id, agenda));
+const agendas = agendaJson as Partial<Record<BonusId | PolicyId, IClientAgenda>>;
+const moreAgendas = moreAgendaJson as Partial<Record<BonusId | PolicyId, IClientAgenda>>;
 
-const moreAgendas: Map<BonusId | PolicyId, IClientAgenda> = new Map();
-(moreAgendaJson as any as Array<IClientAgenda>).forEach((agenda) => moreAgendas.set(agenda.id, agenda));
-
-export function getAgendaDescription(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): string {
+export function getAgenda(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): IClientAgenda | undefined {
   const source = morePartiesExpansion ? moreAgendas : agendas;
-  return source.get(id)?.description ?? `Unknown agenda ${id}`;
+  return source[id];
+}
+
+export function getAgendaOrThrow(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): IClientAgenda {
+  const agenda = getAgenda(id, morePartiesExpansion);
+  if (agenda === undefined) {
+    throw new Error(`agenda ${id} not found`);
+  }
+  return agenda;
 }
 
 // Always the standard (non-moreParties) ids for a party -- used by the Political Parties help
@@ -22,15 +27,15 @@ export function getAgendaDescription(id: BonusId | PolicyId, morePartiesExpansio
 export function getPartyAgendaIds(partyName: PartyName): {bonuses: Array<BonusId>; policies: Array<PolicyId>} {
   const bonuses: Array<BonusId> = [];
   const policies: Array<PolicyId> = [];
-  agendas.forEach((agenda) => {
-    if (agenda.partyName !== partyName) {
-      return;
+  for (const id of Object.keys(agendas) as Array<BonusId | PolicyId>) {
+    if (agendas[id]?.partyName !== partyName) {
+      continue;
     }
-    if (agenda.id[1] === 'b') {
-      bonuses.push(agenda.id as BonusId);
+    if (id[1] === 'b') {
+      bonuses.push(id as BonusId);
     } else {
-      policies.push(agenda.id as PolicyId);
+      policies.push(id as PolicyId);
     }
-  });
+  }
   return {bonuses, policies};
 }
