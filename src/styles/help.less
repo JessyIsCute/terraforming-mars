@@ -40,7 +40,13 @@
 .help-iconology-container {
   padding: 20px;
   display : flex;
-  flex-flow: row wrap;
+  // Kept to exactly one row of columns (Card Tags / Resources / Tiles / Global Parameters /
+  // Others) rather than wrapping - the widened Resources and Tiles columns (more fan entries,
+  // some rows with several expansion icons) made the 5 columns just barely too wide for
+  // typical viewports, which wrapped the last column onto its own second row instead of
+  // sitting beside the rest. Scrolls horizontally on narrower windows instead.
+  flex-flow: row nowrap;
+  overflow-x: auto;
 }
 
 .help-standard-projects-container {

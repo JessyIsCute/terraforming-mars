@@ -785,13 +785,16 @@ input[type="radio"]:checked+.filterDiv::after {
 // sized) and board.less's `.board-space-tile--venus-*` (hex-space `background` shorthand) so
 // this page doesn't depend on either's ancestor/shorthand assumptions. Same source art (still
 // shot sideways) and rotation fix as both of those - but `.tile`'s own `background-size: 40px
-// 46px` (non-uniform - it's stretched to fit a non-square box) has to be overridden back to a
-// single, uniform value here, or rotating that already-stretched image 90deg comes out visibly
-// squashed. `background-position: center` keeps it centered once the box no longer matches
-// the (now-uniform) image's own aspect ratio.
+// 46px` (non-uniform - stretched to fit a non-square box) has to be overridden to a single,
+// uniform value here, or rotating that already-stretched image 90deg comes out visibly
+// squashed. Sized to the box's *smaller* dimension (40, its width) rather than 46 (its
+// height): a square image at 40x40 stays fully inside the 40x46 box - and, since a square's
+// bounding box doesn't change under a 90deg rotation, stays fully inside it after rotating
+// too. Using 46 instead fit vertically but overflowed (and got clipped) horizontally before
+// the rotation, which became top/bottom clipping after it.
 .venus-cloud-city-tile {
   background-image: url(./assets/tiles/venus_cloud_city_board_tile.png);
-  background-size: 46px;
+  background-size: 40px;
   background-position: center;
   background-repeat: no-repeat;
   transform: rotate(90deg);
@@ -799,7 +802,7 @@ input[type="radio"]:checked+.filterDiv::after {
 
 .venus-gas-mine-tile {
   background-image: url(./assets/tiles/venus_gas_mine_board_tile.png);
-  background-size: 46px;
+  background-size: 40px;
   background-position: center;
   background-repeat: no-repeat;
   transform: rotate(90deg);
@@ -807,7 +810,7 @@ input[type="radio"]:checked+.filterDiv::after {
 
 .venus-floater-array-tile {
   background-image: url(./assets/tiles/venus_floater_array_board_tile.png);
-  background-size: 46px;
+  background-size: 40px;
   background-position: center;
   background-repeat: no-repeat;
   transform: rotate(90deg);
