@@ -3301,3 +3301,12 @@ each(@card_resource_types, {
 .card-resource-cube {
   background-image: url("./assets/cube.png");
 }
+
+// Ore (High Orbit, fan): no sprite yet -- a pickaxe emoji in a plain square placeholder.
+.card-resource-ore {
+  background: #8b5a2b;
+  text-align: center;
+  &::before {
+    content: "⛏️";
+  }
+}
