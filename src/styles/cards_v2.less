@@ -3310,13 +3310,11 @@ each(@card_resource_types, {
   background-image: url("./assets/cube.png");
 }
 
-// Ore (High Orbit, fan): no sprite yet -- a pickaxe emoji in a plain square placeholder.
+// Ore (High Orbit, fan): no sprite yet -- reuses the Graphene icon, flipped 180deg, as a
+// stand-in placeholder.
 .card-resource-ore {
-  background: #8b5a2b;
-  text-align: center;
-  &::before {
-    content: "⛏️";
-  }
+  background-image: url("./assets/resources/graphene.png");
+  transform: rotate(180deg);
 }
 
 // Loot/Budget (Ides of Mars, fan) and Relic (Rob Antilles, fan): no sprites yet either -- same

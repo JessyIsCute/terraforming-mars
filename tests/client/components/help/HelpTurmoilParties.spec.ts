@@ -22,11 +22,14 @@ describe('HelpTurmoilParties', () => {
     }
   });
 
-  it('shows a party badge icon (not just the name) for every party', () => {
+  it('shows a party logo icon (not just the name) for every party', () => {
     const wrapper = shallowMount(HelpTurmoilParties, {
       ...globalConfig,
     });
-    expect(wrapper.findAll('.party-badge')).to.have.lengthOf(12);
+    expect(wrapper.findAll('.card-party')).to.have.lengthOf(12);
+    // "Mars First" is the one party whose logo slug uses a hyphen (card-party--mars-first)
+    // where every other party-slug class on this page uses an underscore.
+    expect(wrapper.find('.card-party--mars-first').exists()).is.true;
   });
 
   it('lays the parties out in a grid, not one long vertical list', () => {

@@ -784,19 +784,32 @@ input[type="radio"]:checked+.filterDiv::after {
 // separate from cards_v2.less's `.card-container .card-tile-venus-*` (nested, card-face-icon
 // sized) and board.less's `.board-space-tile--venus-*` (hex-space `background` shorthand) so
 // this page doesn't depend on either's ancestor/shorthand assumptions. Same source art (still
-// shot sideways) and rotation fix as both of those.
+// shot sideways) and rotation fix as both of those - but `.tile`'s own `background-size: 40px
+// 46px` (non-uniform - it's stretched to fit a non-square box) has to be overridden back to a
+// single, uniform value here, or rotating that already-stretched image 90deg comes out visibly
+// squashed. `background-position: center` keeps it centered once the box no longer matches
+// the (now-uniform) image's own aspect ratio.
 .venus-cloud-city-tile {
   background-image: url(./assets/tiles/venus_cloud_city_board_tile.png);
+  background-size: 46px;
+  background-position: center;
+  background-repeat: no-repeat;
   transform: rotate(90deg);
 }
 
 .venus-gas-mine-tile {
   background-image: url(./assets/tiles/venus_gas_mine_board_tile.png);
+  background-size: 46px;
+  background-position: center;
+  background-repeat: no-repeat;
   transform: rotate(90deg);
 }
 
 .venus-floater-array-tile {
   background-image: url(./assets/tiles/venus_floater_array_board_tile.png);
+  background-size: 46px;
+  background-position: center;
+  background-repeat: no-repeat;
   transform: rotate(90deg);
 }
 

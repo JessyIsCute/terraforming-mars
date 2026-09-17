@@ -312,14 +312,9 @@
                 <div class="tile special-tile"></div>
                 <div class="help-icon-label" v-i18n>Special</div>
             </div>
-        </div>
-
-        <div class="help-icons-column">
+            <br>
             <div>
-                <div class="help-icons-section-heading" v-i18n>Fan Tiles</div>
-            </div>
-            <div>
-                <div class="help-icon-sublabel" v-i18n>The Moon</div>
+                <div class="help-icon-sublabel" v-i18n>Fan Tiles: The Moon</div>
             </div>
             <div>
                 <div class="tile card-tile-lunar-mine"></div>
@@ -338,7 +333,7 @@
             </div>
             <br>
             <div>
-                <div class="help-icon-sublabel" v-i18n>Venus: Phase 2</div>
+                <div class="help-icon-sublabel" v-i18n>Fan Tiles: Venus: Phase 2</div>
             </div>
             <div>
                 <div class="tile venus-cloud-city-tile"></div>
