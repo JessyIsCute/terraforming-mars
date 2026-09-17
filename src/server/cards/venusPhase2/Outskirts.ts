@@ -23,7 +23,7 @@ export class Outskirts extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V68',
         renderData: CardRenderer.builder((b) => {
-          b.tile(TileType.CITY, true).asterix();
+          b.city().asterix();
         }),
         description: 'Requires 13% oxygen or more. Place a City tile adjacent to at least 1 other city tile. ' +
           'Decrease the energy production of the adjacent city\'s owner 1 step. Increase your M€ production 2 steps.',
