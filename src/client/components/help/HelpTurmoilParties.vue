@@ -11,18 +11,16 @@
           </div>
           <div v-if="party.requiresMoreParties" class="help-party-note" v-i18n>Requires the "More Parties" fan expansion</div>
 
-          <div class="help-party-section">
-            <h4 v-i18n>Ruling Bonus</h4>
-            <ul>
-              <li v-for="description in party.bonusDescriptions" :key="description" v-i18n>{{description}}</li>
-            </ul>
+          <div class="help-agenda-row" v-for="id in party.bonusIds" :key="id">
+            <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
+            <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
           </div>
 
-          <div class="help-party-section">
-            <h4 v-i18n>Policy</h4>
-            <ul>
-              <li v-for="description in party.policyDescriptions" :key="description" v-i18n>{{description}}</li>
-            </ul>
+          <div class="help-agenda-divider"></div>
+
+          <div class="help-agenda-row" v-for="id in party.policyIds" :key="id">
+            <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
+            <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
           </div>
         </div>
       </div>
@@ -32,12 +30,14 @@
 
 import {defineComponent} from 'vue';
 import {PartyName} from '@/common/turmoil/PartyName';
+import {BonusId, PolicyId} from '@/common/turmoil/Types';
 import {getAgendaOrThrow, getPartyAgendaIds} from '@/client/turmoil/ClientAgendaManifest';
+import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
 
 type PartyHelpEntry = {
   name: PartyName;
-  bonusDescriptions: Array<string>;
-  policyDescriptions: Array<string>;
+  bonusIds: ReadonlyArray<BonusId>;
+  policyIds: ReadonlyArray<PolicyId>;
   requiresMoreParties: boolean;
 };
 
@@ -52,20 +52,26 @@ const MORE_PARTIES: ReadonlyArray<PartyName> = [
 
 export default defineComponent({
   name: 'HelpTurmoilParties',
+  components: {
+    TurmoilAgenda,
+  },
   computed: {
     parties(): Array<PartyHelpEntry> {
       return Object.values(PartyName).map((name) => {
         const ids = getPartyAgendaIds(name);
         return {
           name,
-          bonusDescriptions: ids.bonuses.map((id) => getAgendaOrThrow(id).description),
-          policyDescriptions: ids.policies.map((id) => getAgendaOrThrow(id).description),
+          bonusIds: ids.bonuses,
+          policyIds: ids.policies,
           requiresMoreParties: MORE_PARTIES.includes(name),
         };
       });
     },
   },
   methods: {
+    agendaDescription(id: BonusId | PolicyId, morePartiesExpansion: boolean): string {
+      return getAgendaOrThrow(id, morePartiesExpansion).description;
+    },
     partyNameToCss(party: PartyName): string {
       return party.toLowerCase().split(' ').join('_');
     },
