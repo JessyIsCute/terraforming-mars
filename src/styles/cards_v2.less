@@ -2782,13 +2782,15 @@
     background-repeat: no-repeat;
     transform: rotate(90deg);
   }
-  // Industries: shares its art with the board tile (a plain hex icon, no separate card-scale asset).
+  // Industries: shares its art with the board tile (a plain hex icon, no separate card-scale
+  // asset). The source PNGs are sideways -- same 90deg-clockwise rotation fix as Venus Phase 2.
   .card-tile-industry-heat {
     background-image: url(./assets/tiles/industry_heat_board_tile.png);
     width: 40px;
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-money {
     background-image: url(./assets/tiles/industry_money_board_tile.png);
@@ -2796,6 +2798,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-energy {
     background-image: url(./assets/tiles/industry_energy_board_tile.png);
@@ -2803,6 +2806,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-steel {
     background-image: url(./assets/tiles/industry_steel_board_tile.png);
@@ -2810,6 +2814,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-plant {
     background-image: url(./assets/tiles/industry_plant_board_tile.png);
@@ -2817,6 +2822,7 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-titanium {
     background-image: url(./assets/tiles/industry_titanium_board_tile.png);
@@ -2824,12 +2830,14 @@
     height: 47px;
     background-size: 40px;
     background-repeat: no-repeat;
+    transform: rotate(90deg);
   }
   .card-tile-industry-wild {
     background-image: url(./assets/tiles/industry_wild_board_tile.png);
     width: 40px;
     height: 47px;
     background-size: 40px;
+    transform: rotate(90deg);
     background-repeat: no-repeat;
   }
   .greenery-tile {
