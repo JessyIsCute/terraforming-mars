@@ -11,16 +11,20 @@
           </div>
           <div v-if="party.requiresMoreParties" class="help-party-note" v-i18n>Requires the "More Parties" fan expansion</div>
 
-          <div class="help-agenda-row" v-for="id in party.bonusIds" :key="id">
-            <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
-            <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
+          <div class="help-agenda-section">
+            <div class="help-agenda-card" v-for="id in party.bonusIds" :key="id">
+              <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
+              <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
+            </div>
           </div>
 
           <div class="help-agenda-divider"></div>
 
-          <div class="help-agenda-row" v-for="id in party.policyIds" :key="id">
-            <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
-            <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
+          <div class="help-agenda-section">
+            <div class="help-agenda-card" v-for="id in party.policyIds" :key="id">
+              <TurmoilAgenda :id="id" :morePartiesExpansion="party.requiresMoreParties" />
+              <div class="help-agenda-description" v-i18n>{{ agendaDescription(id, party.requiresMoreParties) }}</div>
+            </div>
           </div>
         </div>
       </div>

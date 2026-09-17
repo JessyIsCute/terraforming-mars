@@ -286,7 +286,7 @@
 // instead of one long vertical stack, so far more of them are visible on screen at once.
 .help-parties-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   align-items: start;
 }
@@ -298,11 +298,11 @@
   padding: 10px 12px 12px;
   border: 1px solid #444;
   border-radius: 8px;
-  // A fixed 6-column row means each card's width isn't guaranteed to fit .party-name's
-  // normal fixed 165px pill (unlike a viewport-driven auto-fill grid). Letting it size to the
-  // card's own available width instead avoids clipping long names like "Transhumanists" -
-  // clip-path's polygon points are percentages, so the pill's notched shape still scales
-  // correctly at any width.
+  // A fixed-column row means each card's width isn't guaranteed to fit .party-name's normal
+  // fixed 165px pill (unlike a viewport-driven auto-fill grid). Letting it size to the card's
+  // own available width instead avoids clipping long names like "Transhumanists" - clip-path's
+  // polygon points are percentages, so the pill's notched shape still scales correctly at any
+  // width.
   .party-name {
     width: auto;
     min-width: 0;
@@ -323,24 +323,32 @@
   font-style: italic;
 }
 
-// Each bonus/policy shown as its real board icon (left) next to its plain-text effect (right),
-// instead of a plain bulleted list of sentences.
-.help-agenda-row {
+// Each bonus/policy's own row of cards (2 bonuses, then 4 policies), wrapping as needed.
+.help-agenda-section {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-  > div:first-child {
-    flex: 0 0 auto;
-    min-width: 90px;
-    text-align: center;
-  }
+// A bonus/policy shown as its real board icon on its own background tile (matching how it
+// looks on /cards), with its plain-text effect underneath instead of a bare bulleted sentence.
+.help-agenda-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 100px;
+  min-width: 90px;
+  padding: 8px 6px;
+  background-image: linear-gradient(#9c602d, #25170a);
+  border-radius: 8px;
 }
 
 .help-agenda-description {
-  color: #ccc;
-  font-size: 12px;
+  color: #e6d8c3;
+  font-size: 11px;
   line-height: 1.3;
+  text-align: center;
 }
 
 // A plain visual break between the 2 bonuses and 4 policies -- no label needed, the order
