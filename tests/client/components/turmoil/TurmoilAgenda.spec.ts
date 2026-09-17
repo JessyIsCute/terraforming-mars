@@ -2,11 +2,11 @@ import {mount, shallowMount} from '@vue/test-utils';
 import {expect} from 'chai';
 import {globalConfig} from '../getLocalVue';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
-import {AGENDA_DESCRIPTIONS, MORE_PARTIES_AGENDA_DESCRIPTIONS} from '@/common/turmoil/AgendaDescriptions';
+import {getAgendaDescription} from '@/client/turmoil/ClientAgendaManifest';
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
 
 // Every id whose content differs under the More Parties expansion's "Political Agendas" rework
-// -- kept in sync by hand with MORE_PARTIES_AGENDA_DESCRIPTIONS.
+// -- i.e. the *MoreParties.ts party classes exist and override the vanilla class for that party.
 const REWORKED_IDS: ReadonlyArray<BonusId | PolicyId> = [
   'mb01', 'mp02', 'mp03', 'mp04',
   'sp01', 'sp03', 'sp04',
@@ -29,8 +29,8 @@ const NEW_PARTY_IMPLEMENTED_IDS: ReadonlyArray<BonusId | PolicyId> = [
   'trab01', 'trab02', 'trap01', 'trap02', 'trap03', 'trap04',
 ];
 
-// The remaining new-party ids: real game concepts this codebase doesn't model (see
-// MORE_PARTIES_AGENDA_DESCRIPTIONS), sharing the generic "Not implemented" display.
+// The remaining new-party ids: real game concepts this codebase doesn't model, sharing the
+// generic "Not implemented" display.
 const NEW_PARTY_NOT_IMPLEMENTED_IDS: ReadonlyArray<BonusId | PolicyId> = [
   'spop04',
 ];
@@ -70,7 +70,7 @@ describe('TurmoilAgenda', () => {
         id: 'rp02',
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS.rp02);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('rp02'));
   });
 
   it('shows the More Parties hover description when the expansion is active', () => {
@@ -81,8 +81,8 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS.rp02);
-    expect(resolvedDescriptionOf(wrapper)).to.not.eq(AGENDA_DESCRIPTIONS.rp02);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('rp02', true));
+    expect(resolvedDescriptionOf(wrapper)).to.not.eq(getAgendaDescription('rp02'));
   });
 
   it('falls back to the vanilla description under More Parties for ids whose content is unchanged', () => {
@@ -93,7 +93,7 @@ describe('TurmoilAgenda', () => {
         morePartiesExpansion: true,
       },
     });
-    expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS.gb01);
+    expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription('gb01'));
   });
 
   it('teleports a tooltip to <body> on hover, positioned from the trigger, and removes it on mouseleave', async () => {
@@ -106,12 +106,12 @@ describe('TurmoilAgenda', () => {
     });
     expect(document.body.querySelector('.agenda-tooltip-portal')).to.be.null;
 
-    await wrapper.find('div').trigger('mouseenter');
+    await wrapper.find('.agenda-icon').trigger('mouseenter');
     const portal = document.body.querySelector('.agenda-tooltip-portal');
     expect(portal).to.not.be.null;
-    expect(portal!.textContent!.trim()).to.eq(AGENDA_DESCRIPTIONS.rp02);
+    expect(portal!.textContent!.trim()).to.eq(getAgendaDescription('rp02'));
 
-    await wrapper.find('div').trigger('mouseleave');
+    await wrapper.find('.agenda-icon').trigger('mouseleave');
     expect(document.body.querySelector('.agenda-tooltip-portal')).to.be.null;
 
     wrapper.unmount();
@@ -133,7 +133,7 @@ describe('TurmoilAgenda', () => {
       } else {
         expect(vanilla.html()).to.not.eq(reworked.html());
       }
-      expect(resolvedDescriptionOf(reworked)).to.eq(MORE_PARTIES_AGENDA_DESCRIPTIONS[id]);
+      expect(resolvedDescriptionOf(reworked)).to.eq(getAgendaDescription(id, true));
     });
   }
 
@@ -142,7 +142,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.not.include('Not implemented');
-      expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS[id]);
+      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription(id));
     });
   }
 
@@ -151,7 +151,7 @@ describe('TurmoilAgenda', () => {
       const wrapper = shallowMount(TurmoilAgenda, {...globalConfig, props: {id}});
       expect(wrapper.exists()).to.be.true;
       expect(wrapper.text()).to.include('Not implemented');
-      expect(resolvedDescriptionOf(wrapper)).to.eq(AGENDA_DESCRIPTIONS[id]);
+      expect(resolvedDescriptionOf(wrapper)).to.eq(getAgendaDescription(id));
     });
   }
 });

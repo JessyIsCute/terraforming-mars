@@ -29,7 +29,7 @@
 
 import {defineComponent} from 'vue';
 import {PartyName} from '@/common/turmoil/PartyName';
-import {AGENDA_DESCRIPTIONS, PARTY_AGENDA_IDS} from '@/common/turmoil/AgendaDescriptions';
+import {getAgendaDescription, getPartyAgendaIds} from '@/client/turmoil/ClientAgendaManifest';
 
 type PartyHelpEntry = {
   name: PartyName;
@@ -52,11 +52,11 @@ export default defineComponent({
   computed: {
     parties(): Array<PartyHelpEntry> {
       return Object.values(PartyName).map((name) => {
-        const ids = PARTY_AGENDA_IDS[name];
+        const ids = getPartyAgendaIds(name);
         return {
           name,
-          bonusDescriptions: ids.bonuses.map((id) => AGENDA_DESCRIPTIONS[id] ?? `Unknown agenda ${id}`),
-          policyDescriptions: ids.policies.map((id) => AGENDA_DESCRIPTIONS[id] ?? `Unknown agenda ${id}`),
+          bonusDescriptions: ids.bonuses.map((id) => getAgendaDescription(id)),
+          policyDescriptions: ids.policies.map((id) => getAgendaDescription(id)),
           requiresMoreParties: MORE_PARTIES.includes(name),
         };
       });

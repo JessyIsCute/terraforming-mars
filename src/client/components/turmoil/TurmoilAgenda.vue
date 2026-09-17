@@ -1,5 +1,6 @@
 <template>
-  <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+  <div>
+    <div class="agenda-icon" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
     <template v-if="morePartiesExpansion && id === 'mb01'">
       <div class="resource money party-resource">1</div> /
       <div class="resource-tag tag-building party-resource-tag"></div>
@@ -450,21 +451,23 @@
     <template v-else>
       <div>Unknown agenda ID {{id}}</div>
     </template>
-  </div>
-  <Teleport to="body">
-    <div
-      v-if="showTooltip"
-      class="agenda-tooltip-portal"
-      :style="{top: tooltipTop + 'px', left: tooltipLeft + 'px'}">
-      {{ resolvedDescription }}
     </div>
-  </Teleport>
+    <Teleport to="body">
+      <div
+        v-if="showTooltip"
+        class="agenda-tooltip-portal"
+        v-i18n
+        :style="{top: tooltipTop + 'px', left: tooltipLeft + 'px'}">
+        {{ resolvedDescription }}
+      </div>
+    </Teleport>
+  </div>
 </template>
 
 <script lang="ts">
 
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
-import {AGENDA_DESCRIPTIONS, MORE_PARTIES_AGENDA_DESCRIPTIONS} from '@/common/turmoil/AgendaDescriptions';
+import {getAgendaDescription} from '@/client/turmoil/ClientAgendaManifest';
 import {defineComponent} from 'vue';
 
 export default defineComponent({
@@ -513,21 +516,14 @@ export default defineComponent({
       return notImplementedIds.includes(this.id);
     },
     resolvedDescription(): string {
-      if (this.morePartiesExpansion) {
-        const override = MORE_PARTIES_AGENDA_DESCRIPTIONS[this.id];
-        if (override !== undefined) {
-          return override;
-        }
-      }
-      return AGENDA_DESCRIPTIONS[this.id] ?? `Unknown agenda ${this.id}`;
+      return getAgendaDescription(this.id, this.morePartiesExpansion);
     },
   },
   methods: {
-    // The turmoil board is wrapped in an accordion (`overflow: hidden`, needed for its
-    // collapse animation) and scaled down with a CSS transform, both of which clip/reposition
-    // a plain CSS-positioned tooltip anywhere it would extend past that box. Teleporting the
-    // tooltip to <body> and positioning it in the viewport with the trigger's own bounding
-    // rect sidesteps both.
+    // Styled in turmoil.less: the turmoil board's container clips or shrinks anything drawn
+    // inside it, so this tooltip is teleported out to <body> (see the template above) and
+    // positioned here using the icon's real on-screen coordinates, instead of being placed
+    // with plain CSS relative to the icon.
     onMouseEnter(event: MouseEvent) {
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
       this.tooltipTop = rect.bottom + 6;
