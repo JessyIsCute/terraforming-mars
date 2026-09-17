@@ -83,7 +83,7 @@ export const VENUS_PHASE_2_CARD_MANIFEST = new ModuleManifest({
     [CardName.HIGH_PRESSURE_SUITS]: {Factory: HighPressureSuits},
     [CardName.NEW_ALEXANDRIA]: {Factory: NewAlexandria},
     [CardName.GAS_TURBINES]: {Factory: GasTurbines},
-    [CardName.SURVEYORS_TEAM]: {Factory: SurveyorsTeam},
+    [CardName.SURVEYORS_TEAM]: {Factory: SurveyorsTeam, compatibility: 'pathfinders'},
     [CardName.VENUS_AIRCRAFT_HAVEN]: {Factory: VenusAircraftHaven},
     [CardName.VENUS_KICKSTARTING]: {Factory: VenusKickstarting},
     [CardName.FLOATER_FACTORY]: {Factory: FloaterFactory},
