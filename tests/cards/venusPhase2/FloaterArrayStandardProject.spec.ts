@@ -37,6 +37,7 @@ describe('FloaterArrayStandardProject', () => {
     expect(player.megaCredits).to.eq(999 - card.cost);
     expect(player.production.megacredits).to.eq(0);
     expect(player.production.heat).to.eq(0);
+    expect(game.getVenusScaleLevel()).to.eq(2); // 1 raise-step, at the official 2%-per-step rate.
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(game).venusSurface;
     expect(venusSurface.getSpaceOrThrow(target.id).tile?.tileType).to.eq(TileType.VENUS_FLOATER_ARRAY);
   });

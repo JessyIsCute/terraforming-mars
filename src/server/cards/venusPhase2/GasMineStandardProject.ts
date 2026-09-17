@@ -7,6 +7,7 @@ import {PlaceGasMineTile} from '../../venusPhase2/PlaceGasMineTile';
 import {Resource} from '../../../common/Resource';
 import {StandardProjectCanPayWith} from '../../../common/cards/Types';
 import {TileType} from '../../../common/TileType';
+import {LogHelper} from '../../LogHelper';
 
 export class GasMineStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -16,8 +17,8 @@ export class GasMineStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 21 M€ (3 M€ off per floater spent) to place a Gas Mine on a Venus gaslight space and raise heat production 1 step.', (eb) => {
-          eb.megacredits(21).startAction.tile(TileType.VENUS_GAS_MINE).production((pb) => pb.heat(1));
+        b.standardProject('Spend 21 M€ (3 M€ off per floater spent) to place a Gas Mine on a Venus gaslight space, raise heat production 1 step, and raise Venus 1 step.', (eb) => {
+          eb.megacredits(21).startAction.tile(TileType.VENUS_GAS_MINE).production((pb) => pb.heat(1)).venus(1);
         }),
       ),
     },
@@ -30,6 +31,9 @@ export class GasMineStandardProject extends StandardProjectCard {
     if (data.venusSurface.getAvailableSpacesForGaslight(player).length === 0) {
       return false;
     }
+    if (player.game.getVenusScaleLevel() >= player.game.parameters.venus.max) {
+      this.addWarning('maxvenus');
+    }
     return super.canAct(player);
   }
 
@@ -40,5 +44,7 @@ export class GasMineStandardProject extends StandardProjectCard {
   actionEssence(player: IPlayer): void {
     player.game.defer(new PlaceGasMineTile(player));
     player.production.add(Resource.HEAT, 1, {log: true});
+    player.game.increaseVenusScaleLevel(player, 1);
+    LogHelper.logVenusIncrease(player, 1);
   }
 }

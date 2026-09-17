@@ -6,6 +6,7 @@ import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceFloaterArrayTile} from '../../venusPhase2/PlaceFloaterArrayTile';
 import {StandardProjectCanPayWith} from '../../../common/cards/Types';
 import {TileType} from '../../../common/TileType';
+import {LogHelper} from '../../LogHelper';
 
 export class FloaterArrayStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -15,8 +16,8 @@ export class FloaterArrayStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 19 M€ (3 M€ off per floater spent) to place a Floater Array on Venus. Adjacent Gas Mines/Cloud Cities score 1 VP each at game end.', (eb) => {
-          eb.megacredits(19).startAction.tile(TileType.VENUS_FLOATER_ARRAY);
+        b.standardProject('Spend 19 M€ (3 M€ off per floater spent) to place a Floater Array on Venus and raise Venus 1 step. Adjacent Gas Mines/Cloud Cities score 1 VP each at game end.', (eb) => {
+          eb.megacredits(19).startAction.tile(TileType.VENUS_FLOATER_ARRAY).venus(1);
         }),
       ),
     },
@@ -29,6 +30,9 @@ export class FloaterArrayStandardProject extends StandardProjectCard {
     if (data.venusSurface.getAvailableSpacesForLand(player).length === 0) {
       return false;
     }
+    if (player.game.getVenusScaleLevel() >= player.game.parameters.venus.max) {
+      this.addWarning('maxvenus');
+    }
     return super.canAct(player);
   }
 
@@ -38,5 +42,7 @@ export class FloaterArrayStandardProject extends StandardProjectCard {
 
   actionEssence(player: IPlayer): void {
     player.game.defer(new PlaceFloaterArrayTile(player));
+    player.game.increaseVenusScaleLevel(player, 1);
+    LogHelper.logVenusIncrease(player, 1);
   }
 }

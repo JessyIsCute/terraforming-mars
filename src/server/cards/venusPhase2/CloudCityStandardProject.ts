@@ -7,6 +7,7 @@ import {PlaceCloudCityTile} from '../../venusPhase2/PlaceCloudCityTile';
 import {Resource} from '../../../common/Resource';
 import {StandardProjectCanPayWith} from '../../../common/cards/Types';
 import {TileType} from '../../../common/TileType';
+import {LogHelper} from '../../LogHelper';
 
 export class CloudCityStandardProject extends StandardProjectCard {
   constructor(properties = {
@@ -16,8 +17,8 @@ export class CloudCityStandardProject extends StandardProjectCard {
     metadata: {
       cardNumber: '',
       renderData: CardRenderer.builder((b) =>
-        b.standardProject('Spend 25 M€ (3 M€ off per floater spent) to place a Cloud City on Venus and raise your M€ production 1 step.', (eb) => {
-          eb.megacredits(25).startAction.tile(TileType.VENUS_CLOUD_CITY).production((pb) => pb.megacredits(1));
+        b.standardProject('Spend 25 M€ (3 M€ off per floater spent) to place a Cloud City on Venus, raise your M€ production 1 step, and raise Venus 1 step.', (eb) => {
+          eb.megacredits(25).startAction.tile(TileType.VENUS_CLOUD_CITY).production((pb) => pb.megacredits(1)).venus(1);
         }),
       ),
     },
@@ -30,6 +31,9 @@ export class CloudCityStandardProject extends StandardProjectCard {
     if (data.venusSurface.getAvailableSpacesForLand(player).length === 0) {
       return false;
     }
+    if (player.game.getVenusScaleLevel() >= player.game.parameters.venus.max) {
+      this.addWarning('maxvenus');
+    }
     return super.canAct(player);
   }
 
@@ -40,5 +44,7 @@ export class CloudCityStandardProject extends StandardProjectCard {
   actionEssence(player: IPlayer): void {
     player.game.defer(new PlaceCloudCityTile(player));
     player.production.add(Resource.MEGACREDITS, 1, {log: true});
+    player.game.increaseVenusScaleLevel(player, 1);
+    LogHelper.logVenusIncrease(player, 1);
   }
 }
