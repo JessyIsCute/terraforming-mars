@@ -36,6 +36,14 @@ describe('HelpIconology', () => {
     }
   });
 
+  it('lists Corruption as a fan resource that is not stored on cards', () => {
+    const wrapper = shallowMount(HelpIconology, {
+      ...globalConfig,
+    });
+    expect(wrapper.text()).to.contain('Not on Cards');
+    expect(wrapper.find('.tag-corruption-count').exists()).to.be.true;
+  });
+
   it('has a Fan Tiles section with lunar and Venus: Phase 2 tiles', () => {
     const wrapper = shallowMount(HelpIconology, {
       ...globalConfig,

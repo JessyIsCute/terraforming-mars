@@ -290,6 +290,17 @@
                 <div class="help-icon-label" v-i18n>Ore</div>
                 <div class="expansion-icon expansion-icon-highOrbit"></div>
             </div>
+            <br>
+            <div>
+                <div class="help-icon-sublabel" v-i18n>
+                    Fan Expansion Resources (Not on Cards)
+                </div>
+            </div>
+            <div>
+                <div class="help-icon-resource tag-corruption-count"></div>
+                <div class="help-icon-label" v-i18n>Corruption</div>
+                <div class="expansion-icon expansion-icon-underworld"></div>
+            </div>
         </div>
 
         <div class="help-icons-column">
