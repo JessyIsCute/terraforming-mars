@@ -25,10 +25,7 @@ export class RadicalGeoengineering extends GlobalEvent implements IGlobalEvent {
       revealedDelegate: PartyName.EMPOWER,
       currentDelegate: PartyName.CENTRISTS,
       renderData: CardRenderer.builder((b) => {
-        b.plus(Size.SMALL).temperature(1, {size: Size.SMALL}).slash(Size.SMALL).oxygen(1, {size: Size.SMALL})
-          .slash(Size.SMALL).venus(1, {size: Size.SMALL}).br;
-        b.minus(Size.SMALL).temperature(1, {size: Size.SMALL}).slash(Size.SMALL).oxygen(1, {size: Size.SMALL})
-          .slash(Size.SMALL).venus(1, {size: Size.SMALL}).br;
+        b.plus(Size.SMALL).minus(Size.SMALL).asterix(Size.SMALL).br;
         b.minus(Size.SMALL).steel(1, {size: Size.SMALL}).slash(Size.SMALL).tr(5, {size: Size.SMALL, digit}).influence({size: Size.SMALL});
       }),
     });

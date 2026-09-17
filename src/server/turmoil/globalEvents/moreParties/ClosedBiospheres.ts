@@ -11,6 +11,7 @@ import {SelectOption} from '../../../inputs/SelectOption';
 import {AddResourcesToCard} from '../../../deferredActions/AddResourcesToCard';
 import {CardRenderer} from '../../../cards/render/CardRenderer';
 import {Size} from '../../../../common/cards/render/Size';
+import {digit} from '../../../cards/Options';
 
 export class ClosedBiospheres extends GlobalEvent implements IGlobalEvent {
   constructor() {
@@ -20,7 +21,10 @@ export class ClosedBiospheres extends GlobalEvent implements IGlobalEvent {
       revealedDelegate: PartyName.SPOME,
       currentDelegate: PartyName.POPULISTS,
       renderData: CardRenderer.builder((b) => {
-        b.minus().production((pb) => pb.plants(1)).colon().resource(CardResource.FLOATER, 2).or().titanium(3).or().steel(5).plus().influence({size: Size.SMALL});
+        b.minus(Size.SMALL).production((pb) => pb.plants(1, {size: Size.SMALL})).colon(Size.SMALL).br;
+        b.resource(CardResource.FLOATER, {amount: 2, size: Size.SMALL, digit}).or(Size.SMALL)
+          .titanium(3, {size: Size.SMALL, digit}).or(Size.SMALL).steel(5, {size: Size.SMALL, digit})
+          .plus(Size.SMALL).influence({size: Size.SMALL});
       }),
     });
   }
