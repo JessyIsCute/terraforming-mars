@@ -282,14 +282,11 @@
   }
 }
 
-// Parties in columns (as many as fit) instead of one long vertical stack, so far more of them
-// are visible on screen at once.
+// Parties in columns - a fixed 6 per row by default (all 12 parties in exactly 2 rows)
+// instead of one long vertical stack, so far more of them are visible on screen at once.
 .help-parties-grid {
   display: grid;
-  // Wide enough for the full-size .party-name pill (165px) plus the .card-party logo (41px)
-  // side by side with some breathing room - the more compact .party-name-indicator variant
-  // used here before was too narrow for it (clipping long names like "Transhumanists").
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
   align-items: start;
 }
@@ -301,12 +298,23 @@
   padding: 10px 12px 12px;
   border: 1px solid #444;
   border-radius: 8px;
+  // A fixed 6-column row means each card's width isn't guaranteed to fit .party-name's
+  // normal fixed 165px pill (unlike a viewport-driven auto-fill grid). Letting it size to the
+  // card's own available width instead avoids clipping long names like "Transhumanists" -
+  // clip-path's polygon points are percentages, so the pill's notched shape still scales
+  // correctly at any width.
+  .party-name {
+    width: auto;
+    min-width: 0;
+    padding: 0 8px;
+  }
 }
 
 .help-party-label {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .help-party-note {
