@@ -780,6 +780,26 @@ input[type="radio"]:checked+.filterDiv::after {
   background-image: url(./assets/tiles/special.png);
 }
 
+// Venus Phase 2 (fan): the /help Tiles glossary's own simple `.tile` + bare-modifier icons -
+// separate from cards_v2.less's `.card-container .card-tile-venus-*` (nested, card-face-icon
+// sized) and board.less's `.board-space-tile--venus-*` (hex-space `background` shorthand) so
+// this page doesn't depend on either's ancestor/shorthand assumptions. Same source art (still
+// shot sideways) and rotation fix as both of those.
+.venus-cloud-city-tile {
+  background-image: url(./assets/tiles/venus_cloud_city_board_tile.png);
+  transform: rotate(90deg);
+}
+
+.venus-gas-mine-tile {
+  background-image: url(./assets/tiles/venus_gas_mine_board_tile.png);
+  transform: rotate(90deg);
+}
+
+.venus-floater-array-tile {
+  background-image: url(./assets/tiles/venus_floater_array_board_tile.png);
+  transform: rotate(90deg);
+}
+
 .oxygen-tile {
   background-image: url(./assets/global-parameters/oxygen.png);
   width: 46px;

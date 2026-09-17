@@ -3,24 +3,27 @@
       <h2 v-i18n>Political Parties</h2>
       <p v-i18n>The ruling party's bonus is granted to every player at the end of each generation (scaled by how well each player matches it); its policy applies for the whole generation it rules.</p>
 
-      <div class="help-party-block" v-for="party in parties" :key="party.name">
-        <div class="help-party-label">
-          <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
+      <div class="help-parties-grid">
+        <div class="help-party-card" v-for="party in parties" :key="party.name">
+          <div class="help-party-label">
+            <div :class="'party-badge party-badge--'+partyNameToCss(party.name)"></div>
+            <div :class="'party-name party-name-indicator party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
+          </div>
           <div v-if="party.requiresMoreParties" class="help-party-note" v-i18n>Requires the "More Parties" fan expansion</div>
-        </div>
 
-        <div class="help-party-section">
-          <h4 v-i18n>Ruling Bonus</h4>
-          <ul>
-            <li v-for="description in party.bonusDescriptions" :key="description" v-i18n>{{description}}</li>
-          </ul>
-        </div>
+          <div class="help-party-section">
+            <h4 v-i18n>Ruling Bonus</h4>
+            <ul>
+              <li v-for="description in party.bonusDescriptions" :key="description" v-i18n>{{description}}</li>
+            </ul>
+          </div>
 
-        <div class="help-party-section">
-          <h4 v-i18n>Policy</h4>
-          <ul>
-            <li v-for="description in party.policyDescriptions" :key="description" v-i18n>{{description}}</li>
-          </ul>
+          <div class="help-party-section">
+            <h4 v-i18n>Policy</h4>
+            <ul>
+              <li v-for="description in party.policyDescriptions" :key="description" v-i18n>{{description}}</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
