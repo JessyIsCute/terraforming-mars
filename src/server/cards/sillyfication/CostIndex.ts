@@ -18,8 +18,8 @@ import {SerializedCard} from '../../SerializedCard';
  * card, unlike Signal Union which distributes to other cards). Front side rewards playing
  * EXPENSIVE cards: whenever a played card's base cost exceeds the data stored here, it banks
  * the difference and flips to its back side. Back side rewards playing CHEAP cards: whenever a
- * played card's base cost is less than the data stored here, it cashes in that many data for
- * that many M€. The card always flips back to its front side at the end of the generation.
+ * played card's base cost is less than the data stored here, it cashes in that many data for a
+ * flat 5 M€. The card always flips back to its front side at the end of the generation.
  */
 export class CostIndex extends CorporationCard implements ICorporationCard {
   private flipped = false;
@@ -48,8 +48,8 @@ export class CostIndex extends CorporationCard implements ICorporationCard {
             ce.br;
             ce.vSpace();
             ce.br;
-            ce.effect('CHEAP SIDE. Whenever you play a card whose base cost is less than the data here, remove that much data and gain that many M€. At generation end, flip this card back.', (eb) => {
-              eb.text('COST <', {size: Size.SMALL}).resource(CardResource.DATA).startEffect.minus().resource(CardResource.DATA).megacredits(1);
+            ce.effect('CHEAP SIDE. Whenever you play a card whose base cost is less than the data here, remove that much data and gain 5 M€. At generation end, flip this card back.', (eb) => {
+              eb.text('COST <', {size: Size.SMALL}).resource(CardResource.DATA).startEffect.minus().resource(CardResource.DATA).megacredits(5);
             });
           });
         }),
@@ -75,7 +75,7 @@ export class CostIndex extends CorporationCard implements ICorporationCard {
     } else if (this.flipped && cost > 0 && cost < stored) {
       player.defer(() => {
         player.removeResourceFrom(this, cost, {log: true});
-        player.stock.add(Resource.MEGACREDITS, cost, {log: true, from: {card: this}});
+        player.stock.add(Resource.MEGACREDITS, 5, {log: true, from: {card: this}});
         return undefined;
       }, Priority.DEFAULT);
     }

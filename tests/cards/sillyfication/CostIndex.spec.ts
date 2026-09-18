@@ -59,13 +59,13 @@ describe('CostIndex', () => {
       expect(card.resourceCount).to.eq(10);
     });
 
-    it('a card costing less than the data here removes that much data and gains that many M€', () => {
+    it('a card costing less than the data here removes that much data and gains a flat 5 M€', () => {
       const megaCreditsBefore = player.megaCredits;
       card.onCardPlayed(player, fakeCard({cost: 4}));
       runAllActions(game);
 
       expect(card.resourceCount).to.eq(6);
-      expect(player.megaCredits).to.eq(megaCreditsBefore + 4);
+      expect(player.megaCredits).to.eq(megaCreditsBefore + 5);
     });
 
     it('a card costing exactly the same as the data here does nothing', () => {
