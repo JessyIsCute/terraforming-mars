@@ -199,4 +199,15 @@ export class InMemoryDatabase implements IDatabase {
     this.customCardLibraryEntries.delete(id);
     return Promise.resolve();
   }
+  deleteExpiredSessions(): Promise<number> {
+    const now = this.clock.now();
+    let deleted = 0;
+    for (const session of Array.from(this.sessions.values())) {
+      if (session.expirationTimeMillis <= now) {
+        this.sessions.delete(session.id);
+        deleted++;
+      }
+    }
+    return Promise.resolve(deleted);
+  }
 }

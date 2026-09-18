@@ -1,20 +1,20 @@
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
 import {PartyName} from '@/common/turmoil/PartyName';
-import {IClientAgenda} from '@/common/turmoil/IClientAgenda';
+import {ClientAgenda} from '@/common/turmoil/ClientAgenda';
 // @ts-ignore agendas.json doesn't exist during npm run build
 import agendaJson from '@/genfiles/agendas.json';
 // @ts-ignore agendas-more-parties.json doesn't exist during npm run build
 import moreAgendaJson from '@/genfiles/agendas-more-parties.json';
 
-const agendas = agendaJson as Partial<Record<BonusId | PolicyId, IClientAgenda>>;
-const moreAgendas = moreAgendaJson as Partial<Record<BonusId | PolicyId, IClientAgenda>>;
+const agendas = agendaJson as Partial<Record<BonusId | PolicyId, ClientAgenda>>;
+const moreAgendas = moreAgendaJson as Partial<Record<BonusId | PolicyId, ClientAgenda>>;
 
-export function getAgenda(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): IClientAgenda | undefined {
+export function getAgenda(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): ClientAgenda | undefined {
   const source = morePartiesExpansion ? moreAgendas : agendas;
   return source[id];
 }
 
-export function getAgendaOrThrow(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): IClientAgenda {
+export function getAgendaOrThrow(id: BonusId | PolicyId, morePartiesExpansion: boolean = false): ClientAgenda {
   const agenda = getAgenda(id, morePartiesExpansion);
   if (agenda === undefined) {
     throw new Error(`agenda ${id} not found`);

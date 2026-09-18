@@ -41,6 +41,8 @@ const FAKE_DATABASE: IDatabase = {
   setCustomCardLibraryEntryStatus: () => Promise.resolve(),
   updateCustomCardLibraryEntry: () => Promise.resolve(),
   deleteCustomCardLibraryEntry: () => Promise.resolve(),
+
+  deleteExpiredSessions: () => Promise.resolve(0),
 };
 
 let databaseUnderTest: IDatabase = FAKE_DATABASE;

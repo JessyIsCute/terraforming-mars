@@ -1,6 +1,6 @@
 import {PartyName} from './PartyName';
 
-export type IClientAgenda = {
+export type ClientAgenda = {
   partyName: PartyName;
   description: string;
 };

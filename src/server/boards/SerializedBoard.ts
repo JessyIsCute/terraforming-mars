@@ -5,6 +5,7 @@ import {SpaceBonus} from '../../common/boards/SpaceBonus';
 import {SpaceType} from '../../common/boards/SpaceType';
 import {SpaceId} from '../../common/Types';
 import {UndergroundResourceToken} from '../../common/underworld/UndergroundResourceToken';
+import {SpaceCube} from '../../common/boards/SpaceCube';
 
 export interface SerializedBoard {
   spaces: Array<SerializedSpace>;
@@ -16,6 +17,7 @@ export interface SerializedSpace {
   volcanic?: true;
   reserved?: true;
   tile?: Tile;
+  cube?: SpaceCube;
   player?: PlayerId;
   bonus: Array<SpaceBonus>;
   adjacency?: AdjacencyBonus,

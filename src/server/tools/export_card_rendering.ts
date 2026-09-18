@@ -6,8 +6,8 @@ import {CardManifest, GlobalEventManifest, ModuleManifest} from '../cards/Module
 import {ICard, isIActionCard} from '../cards/ICard';
 import {Expansion, GameModule} from '../../common/cards/GameModule';
 import {IGlobalEvent} from '../turmoil/globalEvents/IGlobalEvent';
-import {IClientGlobalEvent} from '../../common/turmoil/IClientGlobalEvent';
-import {IClientAgenda} from '../../common/turmoil/IClientAgenda';
+import {ClientGlobalEvent} from '../../common/turmoil/ClientGlobalEvent';
+import {ClientAgenda} from '../../common/turmoil/ClientAgenda';
 import {BonusId, PolicyId} from '../../common/turmoil/Types';
 import {ALL_PARTIES, MORE_PARTIES_ALL, PartyFactory} from '../turmoil/Turmoil';
 import {PartyName} from '../../common/turmoil/PartyName';
@@ -131,7 +131,7 @@ class CardProcessor {
 }
 
 class GlobalEventProcessor {
-  public static json: Array<IClientGlobalEvent> = [];
+  public static json: Array<ClientGlobalEvent> = [];
   public static makeJson() {
     ALL_MODULE_MANIFESTS.forEach(this.processManifest);
   }
@@ -143,7 +143,7 @@ class GlobalEventProcessor {
   }
 
   private static processGlobalEvent(module: GameModule, globalEvent: IGlobalEvent) {
-    const event: IClientGlobalEvent = {
+    const event: ClientGlobalEvent = {
       module: module,
       name: globalEvent.name,
       description: globalEvent.description,
@@ -158,20 +158,20 @@ class GlobalEventProcessor {
 
 class AgendaProcessor {
   // Descriptions as they read in a standard game.
-  public static json: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
+  public static json: Partial<Record<BonusId | PolicyId, ClientAgenda>> = {};
   // Descriptions as they read in a moreParties game -- the 6 official parties get their
   // "Political Agendas" rework (different content for some ids), and the 6 new parties are
   // only ever in play here. Kept as a separate full set (not just the ids that differ) so
   // client lookups don't need to know or care which ids changed.
-  public static moreJson: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
+  public static moreJson: Partial<Record<BonusId | PolicyId, ClientAgenda>> = {};
 
   public static makeJson() {
     AgendaProcessor.json = AgendaProcessor.process(ALL_PARTIES);
     AgendaProcessor.moreJson = AgendaProcessor.process(MORE_PARTIES_ALL);
   }
 
-  private static process(parties: Record<PartyName, PartyFactory>): Partial<Record<BonusId | PolicyId, IClientAgenda>> {
-    const json: Partial<Record<BonusId | PolicyId, IClientAgenda>> = {};
+  private static process(parties: Record<PartyName, PartyFactory>): Partial<Record<BonusId | PolicyId, ClientAgenda>> {
+    const json: Partial<Record<BonusId | PolicyId, ClientAgenda>> = {};
     for (const [partyName, PartyClass] of Object.entries(parties) as Array<[PartyName, PartyFactory]>) {
       const party = new PartyClass();
       party.bonuses.forEach((bonus) => {

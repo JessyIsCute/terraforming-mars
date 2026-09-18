@@ -170,4 +170,9 @@ export interface IDatabase {
     /** Replaces the whole entry -- used by the admin set-behavior action, which mutates `definition` in place. */
     updateCustomCardLibraryEntry(id: CustomCardEntryId, entry: CustomCardLibraryEntry): Promise<void>;
     deleteCustomCardLibraryEntry(id: CustomCardEntryId): Promise<void>;
+
+    /**
+     * Remove every expired session, returning how many were removed.
+     */
+    deleteExpiredSessions(): Promise<number>;
 }

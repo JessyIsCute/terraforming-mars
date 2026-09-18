@@ -209,4 +209,8 @@ export class MetricsDelegate implements IDatabase {
   deleteCustomCardLibraryEntry(id: CustomCardEntryId): Promise<void> {
     return withDatabaseMetrics('deleteCustomCardLibraryEntry', () => this.delegate.deleteCustomCardLibraryEntry(id));
   }
+
+  deleteExpiredSessions(): Promise<number> {
+    return withDatabaseMetrics('deleteExpiredSessions', () => this.delegate.deleteExpiredSessions());
+  }
 }
