@@ -663,6 +663,8 @@ export enum CardName {
   NEREID_BIOSYSTEMS = 'Nereid Biosystems',
   SIGNAL_UNION = 'Signal Union',
   COST_INDEX = 'Cost Index',
+  CUTOUT_NETWORKS = 'Cutout Networks',
+  DEAD_DROP = 'Dead Drop',
   THE_SYNDICATE = 'The Syndicate',
   EVERGREEN_FOREST = 'Evergreen Forest',
   IDEA_BUDGETING = 'Idea Budgeting',

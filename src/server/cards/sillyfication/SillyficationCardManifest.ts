@@ -69,6 +69,8 @@ import {Critterworld} from './Critterworld';
 import {NereidBiosystems} from './NereidBiosystems';
 import {SignalUnion} from './SignalUnion';
 import {CostIndex} from './CostIndex';
+import {CutoutNetworks} from './CutoutNetworks';
+import {DeadDrop} from './DeadDrop';
 import {TheSyndicate} from './TheSyndicate';
 import {EpsilonDample} from './EpsilonDample';
 import {ZetaTollkeeper} from './ZetaTollkeeper';
@@ -128,6 +130,7 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.SIGNAL_UNION]: {Factory: SignalUnion, compatibility: 'pathfinders'},
     // Stores a data resource on itself - a Pathfinders concept.
     [CardName.COST_INDEX]: {Factory: CostIndex, compatibility: 'pathfinders'},
+    [CardName.CUTOUT_NETWORKS]: {Factory: CutoutNetworks},
     [CardName.THE_SYNDICATE]: {Factory: TheSyndicate, compatibility: ['turmoil', 'underworld']},
     [CardName.EPSILON_DAMPLE]: {Factory: EpsilonDample, compatibility: 'deltaProject'},
     [CardName.ZETA_TOLLKEEPER]: {Factory: ZetaTollkeeper, compatibility: 'deltaProject'},
@@ -145,6 +148,9 @@ export const SILLYFICATION_CARD_MANIFEST = new ModuleManifest({
     [CardName.MARKET_CRASH]: {Factory: MarketCrash, compatibility: ['prelude', 'underworld']},
   },
   projectCards: {
+    // Not dealt out normally - Cutout Networks (see CutoutNetworks.ts) seeds copies into the
+    // deck itself, both at game start and via its repeatable action.
+    [CardName.DEAD_DROP]: {Factory: DeadDrop, instantiate: false},
     [CardName.MICRO_CREDITS]: {Factory: MicroCredits},
     [CardName.ORBITAL_SEED_DISPERSAL]: {Factory: OrbitalSeedDispersal},
     [CardName.THERMAL_FORESTS]: {Factory: ThermalForests},
