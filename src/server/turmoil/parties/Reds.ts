@@ -95,7 +95,7 @@ class RedsPolicy02 implements IPolicy {
 
 class RedsPolicy03 implements IPolicy {
   readonly id = 'rp03' as const;
-  readonly description = 'Pay 4 M€ to reduce a non-maxed global parameter 1 step (do not gain any track bonuses)';
+  readonly description = 'Pay 4 M€ to reduce a non-maxed global parameter 1 step (do not gain any track bonuses; max 3 times per generation)';
 
   private canDecrease(game: IGame, parameter: GlobalParameter) {
     switch (parameter) {

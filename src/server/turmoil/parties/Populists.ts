@@ -86,7 +86,7 @@ class PopulistsPolicy01 implements IPolicy {
 // it's the same underlying concern) as the promo card Astra Mechanica.
 class PopulistsPolicy02 implements IPolicy {
   readonly id = 'popp02' as const;
-  readonly description = 'Action: spend 5 M€ to return one of your played Event cards to your hand. It may not be a card that placed special tiles';
+  readonly description = 'Action: spend 5 M€ to return one of your played Event cards to your hand. It may not be a card that placed special tiles (max 3 times per generation)';
 
   // Mirrors AstraMechanica.UNUSABLE_CARDS: returning these to hand would leave the game in an
   // inconsistent state (they rely on staying in the tableau once played).
@@ -153,7 +153,7 @@ class PopulistsPolicy03 implements IPolicy {
 // so this buys the first Event-*type* card instead, matching the evident intent.
 class PopulistsPolicy04 implements IPolicy {
   readonly id = 'popp04' as const;
-  readonly description = 'Action: spend 4 M€ to buy the first Event card';
+  readonly description = 'Action: spend 4 M€ to buy the first Event card (max 3 times per generation)';
 
   canAct(player: IPlayer): boolean {
     return player.canAfford(4) && player.politicalAgendasActionUsedCount < POLITICAL_AGENDAS_MAX_ACTION_USES;

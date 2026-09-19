@@ -95,7 +95,7 @@ class TranshumanistsPolicy02 implements IPolicy {
 // free -- same shape as the prelude2 card Board of Directors' action.
 class TranshumanistsPolicy03 implements IPolicy {
   readonly id = 'trap03' as const;
-  readonly description = 'Action: pay 15 M€ to draw and play a Prelude card';
+  readonly description = 'Action: pay 15 M€ to draw and play a Prelude card (max 3 times per generation)';
 
   canAct(player: IPlayer): boolean {
     return player.canAfford(15) && player.politicalAgendasActionUsedCount < POLITICAL_AGENDAS_MAX_ACTION_USES &&
@@ -123,7 +123,7 @@ class TranshumanistsPolicy03 implements IPolicy {
 class TranshumanistsPolicy04 implements IPolicy {
   readonly id = 'trap04' as const;
   readonly description = 'Action: spend 10 M€ to draw 1 unused milestone and 1 unused award, swap one ' +
-    'in for an unclaimed milestone or unfunded award, then optionally claim/fund it immediately';
+    'in for an unclaimed milestone or unfunded award, then optionally claim/fund it immediately (max 3 times per generation)';
 
   private hasUnclaimedMilestone(game: IGame): boolean {
     return !game.allMilestonesClaimed() && game.milestones.some((m) => !game.milestoneClaimed(m));

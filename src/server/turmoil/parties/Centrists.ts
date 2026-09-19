@@ -69,7 +69,7 @@ class CentristsBonus02 extends Bonus {
 
 class CentristsPolicy01 implements IPolicy {
   readonly id = 'cenp01' as const;
-  readonly description = 'Action: pay 1 of each standard resource except M€, gain 15 M€';
+  readonly description = 'Action: pay 1 of each standard resource except M€, gain 15 M€ (max 3 times per generation)';
 
   canAct(player: IPlayer): boolean {
     return player.politicalAgendasActionUsedCount < POLITICAL_AGENDAS_MAX_ACTION_USES &&
@@ -90,7 +90,7 @@ class CentristsPolicy01 implements IPolicy {
 
 class CentristsPolicy02 implements IPolicy {
   readonly id = 'cenp02' as const;
-  readonly description = 'Action: pay 7 M€ to raise one of your lowest productions 1 step';
+  readonly description = 'Action: pay 7 M€ to raise one of your lowest productions 1 step (max 3 times per generation)';
 
   private lowestProductions(player: IPlayer): ReadonlyArray<Resource> {
     const min = Math.min(...ALL_RESOURCES.map((resource) => player.production[resource]));

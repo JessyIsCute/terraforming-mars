@@ -28,7 +28,7 @@ export class ChooseTagPolicy implements IPolicy {
   ) {}
 
   get description(): string {
-    return `Action: choose ${this.tagsLabel}, spend ${this.cost} M€ to buy the first card with that tag`;
+    return `Action: choose ${this.tagsLabel}, spend ${this.cost} M€ to buy the first card with that tag (max 3 times per generation)`;
   }
 
   canAct(player: IPlayer): boolean {
