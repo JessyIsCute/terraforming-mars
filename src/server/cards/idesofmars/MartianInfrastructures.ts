@@ -45,7 +45,7 @@ export class MartianInfrastructures extends Card implements IProjectCard {
         cardNumber: 'IM129',
         renderData: CardRenderer.builder((b) => {
           b.effect('Cards and standard projects that place a tile on Mars cost you 2 M€ less.', (eb) => {
-            eb.tile(TileType.CITY).startEffect.megacredits(-2);
+            eb.city().startEffect.megacredits(-2);
           });
           b.br;
           b.production((pb) => pb.minus().energy(1));

@@ -5,7 +5,6 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {IPlayer} from '../../IPlayer';
 import {CardRenderer} from '../render/CardRenderer';
-import {TileType} from '../../../common/TileType';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceVenusCityTile} from '../../venusPhase2/PlaceVenusCityTile';
 
@@ -26,7 +25,7 @@ export class NewBabylon extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V96',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.plants(2)).nbsp.tile(TileType.CITY, true).venus(1);
+          b.production((pb) => pb.plants(2)).nbsp.city().venus(1);
         }),
         description: 'Requires Venus 12% or more. Increase your plant production 2 steps. ' +
           'Place a City tile on Venus and raise Venus 1 step.',

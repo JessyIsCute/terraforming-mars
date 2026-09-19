@@ -6,7 +6,6 @@ import {CardType} from '../../../common/cards/CardType';
 import {CardName} from '../../../common/cards/CardName';
 import {IPlayer} from '../../IPlayer';
 import {CardRenderer} from '../render/CardRenderer';
-import {TileType} from '../../../common/TileType';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 import {PlaceVenusCityTile} from '../../venusPhase2/PlaceVenusCityTile';
 import {Turmoil} from '../../turmoil/Turmoil';
@@ -31,7 +30,7 @@ export class NewRome extends ActionCard implements IProjectCard, IActionCard {
       metadata: {
         cardNumber: 'V91',
         renderData: CardRenderer.builder((b) => {
-          b.tile(TileType.CITY, true).venus(1);
+          b.city().venus(1);
           b.br;
           b.action('Add a delegate to a party you lead.', (eb) => {
             eb.empty().startAction.delegates(1);

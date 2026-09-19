@@ -25,7 +25,7 @@ export class ModularQuarters extends Card implements IProjectCard {
         cardNumber: 'V58',
         renderData: CardRenderer.builder((b) => {
           b.effect('Whenever a Venus Habitat is placed, add 2 floaters to any card.', (eb) => {
-            eb.tile(TileType.CITY).startEffect.resource(CardResource.FLOATER, 2);
+            eb.city().startEffect.resource(CardResource.FLOATER, 2);
           });
         }),
         description: 'Raise Venus 1 step.',

@@ -21,7 +21,7 @@ export class NegativeMassFluids extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V59',
         renderData: CardRenderer.builder((b) => {
-          b.effect('Each floater you spend paying for a Venus standard project is worth 1 M€ extra.', (eb) => {
+          b.city().colon().effect('Each floater you spend paying for a Venus standard project is worth 1 M€ extra.', (eb) => {
             eb.resource(CardResource.FLOATER, 1).startEffect.plus(Size.SMALL).megacredits(1);
           });
         }),

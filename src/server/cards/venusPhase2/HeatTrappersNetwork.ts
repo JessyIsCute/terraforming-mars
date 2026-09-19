@@ -29,7 +29,7 @@ export class HeatTrappersNetwork extends ActionCard implements IProjectCard, IAc
         cardNumber: 'V61',
         renderData: CardRenderer.builder((b) => {
           b.action('Spend 2 heat to gain 1 M€ for each Gas Mine you own on Venus.', (eb) => {
-            eb.heat(2, {digit}).startAction.megacredits(1);
+            eb.heat(2, {digit}).startAction.megacredits(1).slash().tile(TileType.VENUS_GAS_MINE).asterix();
           });
         }),
         description: 'Decrease your energy production 1 step.',

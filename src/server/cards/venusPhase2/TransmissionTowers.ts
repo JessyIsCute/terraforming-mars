@@ -29,7 +29,7 @@ export class TransmissionTowers extends ActionCard implements IProjectCard, IAct
         cardNumber: 'V60',
         renderData: CardRenderer.builder((b) => {
           b.action('Gain 1 energy for each Floating Array you own on Venus.', (eb) => {
-            eb.empty().startAction.energy(1);
+            eb.empty().startAction.energy(1).slash().tile(TileType.VENUS_FLOATER_ARRAY).asterix();
           });
         }),
         description: 'Requires Venus 8% or more. Decrease your M€ production 1 step.',
