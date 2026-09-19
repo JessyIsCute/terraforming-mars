@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {DeadDrop} from '../../../src/server/cards/sillyfication/DeadDrop';
 import {CardType} from '../../../src/common/cards/CardType';
+import {CardName} from '../../../src/common/cards/CardName';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {IGame} from '../../../src/server/IGame';
@@ -71,5 +72,24 @@ describe('DeadDrop', () => {
     expect(game.projectDeck.discardPile).to.include(discardable);
     expect(player.cardsInHand).to.include(keeper);
     expect(player.megaCredits).to.eq(megaCreditsBefore + 5);
+  });
+
+  it('removes itself from the tableau once resolved, so a second physical copy can be played later without a duplicate-name crash', () => {
+    // Simulates what Player.playCard's normal bookkeeping does: the played instance gets
+    // pushed into playedCards before its own effect resolves.
+    const firstCopy = new DeadDrop();
+    player.playedCards.push(firstCopy);
+    player.cardsInHand = [fakeCard({})];
+
+    firstCopy.play(player);
+    runAllActions(game);
+    const orOptions = cast(player.popWaitingFor(), OrOptions);
+    orOptions.options[1].cb(); // Gain 5 M€
+    runAllActions(game);
+
+    expect(player.playedCards.has(CardName.DEAD_DROP)).is.false;
+
+    const secondCopy = new DeadDrop();
+    expect(() => player.playedCards.push(secondCopy)).to.not.throw();
   });
 });
