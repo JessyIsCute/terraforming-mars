@@ -24,7 +24,7 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X41',
         renderData: CardRenderer.builder((b) => {
-          b.effect('When any player plays a Jovian tag, including this, add 1 animal to this card.', (eb) => {
+          b.effect('Each time any Jovian tag is put into play, including this, add 1 animal to this card.', (eb) => {
             eb.tag(Tag.JOVIAN, {all}).startEffect.resource(CardResource.ANIMAL);
           }).br;
           b.vpText('1 VP per animal on this card.');
@@ -38,6 +38,12 @@ export class UranusSeaCreatures extends Card implements IProjectCard {
     const qty = activePlayer.tags.cardTagCount(card, Tag.JOVIAN);
     if (qty > 0) {
       cardOwner.addResourceTo(this, {qty, log: true});
+    }
+  }
+
+  public onNonCardTagAddedByAnyPlayer(cardOwner: IPlayer, tag: Tag): void {
+    if (tag === Tag.JOVIAN) {
+      cardOwner.addResourceTo(this, {qty: 1, log: true});
     }
   }
 }

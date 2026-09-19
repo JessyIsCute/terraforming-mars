@@ -3,6 +3,7 @@ import {UranusSeaCreatures} from '../../../src/server/cards/sillyfication/Uranus
 import {WaterImportFromEuropa} from '../../../src/server/cards/base/WaterImportFromEuropa';
 import {GanymedeColony} from '../../../src/server/cards/base/GanymedeColony';
 import {MicroCredits} from '../../../src/server/cards/sillyfication/MicroCredits';
+import {Tag} from '../../../src/common/cards/Tag';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 
@@ -47,6 +48,16 @@ describe('UranusSeaCreatures', () => {
   it('adds an animal when any other player plays a Jovian tag', () => {
     card.onCardPlayedByAnyPlayer(player, new GanymedeColony(), player2); // 1 jovian tag
     expect(card.resourceCount).to.eq(1);
+  });
+
+  it('adds an animal when a Jovian tag is granted outside of playing a card (e.g. the Delta Project track)', () => {
+    card.onNonCardTagAddedByAnyPlayer(player, Tag.JOVIAN);
+    expect(card.resourceCount).to.eq(1);
+  });
+
+  it('does not react to a non-Jovian synthetic tag', () => {
+    card.onNonCardTagAddedByAnyPlayer(player, Tag.SCIENCE);
+    expect(card.resourceCount).to.eq(0);
   });
 
   it('scores 1 VP per animal', () => {
