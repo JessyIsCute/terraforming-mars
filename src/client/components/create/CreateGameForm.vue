@@ -812,6 +812,11 @@ export default defineComponent({
         this.politicalAgendasExtension = 'Standard';
       }
     },
+    'expansions.moreParties': function(value: boolean) {
+      if (value === true && this.politicalAgendasExtension === 'Standard') {
+        this.politicalAgendasExtension = 'Chairman';
+      }
+    },
     initialDraft(value: boolean) {
       if (value === true && this.preludeDraftVariant === undefined) {
         this.preludeDraftVariant = true;
@@ -1238,7 +1243,7 @@ export default defineComponent({
     },
     politicalAgendasExtensionToggle() {
       if (this.politicalAgendasExtension === 'Standard') {
-        this.politicalAgendasExtension = 'Random';
+        this.politicalAgendasExtension = 'Chairman';
       } else {
         this.politicalAgendasExtension = 'Standard';
       }
