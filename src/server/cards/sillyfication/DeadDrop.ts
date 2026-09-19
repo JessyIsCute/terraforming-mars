@@ -35,9 +35,10 @@ export class DeadDrop extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'X50', // Renumber
         renderData: CardRenderer.builder((b) => {
-          b.minus().cards(1).colon().cards(1).slash().megacredits(5);
+          b.minus().cards(1).colon().cards(1).slash().megacredits(5).br;
+          b.plainText('This event is discarded after being played, and does not enter your event pile.');
         }),
-        description: 'Discard a card. Then draw a card, or gain 5 M€.',
+        description: 'Discard a card. Then draw a card, or gain 5 M€. This event is discarded after being played, and does not enter your event pile.',
       },
     });
   }
