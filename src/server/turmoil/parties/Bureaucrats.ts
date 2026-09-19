@@ -66,7 +66,7 @@ class BureaucratsBonus02 extends Bonus {
 // several sibling More Parties policies (e.g. Populists P4, Empower P4).
 class BureaucratsPolicy01 implements IPolicy {
   readonly id = 'burp01' as const;
-  readonly description = 'Action: spend 5 M€ to buy the first Active card';
+  readonly description = 'Action: spend 5 M€ to buy the first Active card (max 3 times per generation)';
 
   canAct(player: IPlayer): boolean {
     return player.canAfford(5) && player.politicalAgendasActionUsedCount < POLITICAL_AGENDAS_MAX_ACTION_USES;
