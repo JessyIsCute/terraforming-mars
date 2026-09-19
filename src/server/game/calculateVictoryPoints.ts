@@ -30,7 +30,7 @@ export function calculateVictoryPoints(player: IPlayer) {
 
   // Apply the Vermin penalty to other players. Vermin owner is penalized by the card itself.
   if (player.game.verminInEffect && playerOwnsVermin === false) {
-    const cities = player.game.board.getCities(player).length;
+    const cities = player.game.board.getCities(player).length + VenusPhase2Expansion.getCitiesCount(player.game, player);
     builder.setVictoryPoints('victoryPoints', cities * -1, CardName.VERMIN);
   }
 
@@ -146,7 +146,7 @@ function calculateNegativeVP(player: IPlayer): number {
     playerOwnsVermin ||= playedCard.name === CardName.VERMIN;
   }
   if (player.game.verminInEffect && playerOwnsVermin === false) {
-    negativeVP -= player.game.board.getCities(player).length;
+    negativeVP -= player.game.board.getCities(player).length + VenusPhase2Expansion.getCitiesCount(player.game, player);
   }
   return negativeVP;
 }

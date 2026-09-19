@@ -8,6 +8,7 @@ import {IPlayer} from '../../IPlayer';
 import {Space} from '../../boards/Space';
 import {SelectSpace} from '../../inputs/SelectSpace';
 import {CardRenderer} from '../render/CardRenderer';
+import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 
 export class FlyingGarden extends Card implements IProjectCard {
   constructor() {
@@ -41,7 +42,7 @@ export class FlyingGarden extends Card implements IProjectCard {
   }
 
   private hasOffWorldCity(player: IPlayer): boolean {
-    return player.game.board.getCitiesOffMars().length > 0;
+    return player.game.board.getCitiesOffMars().length > 0 || VenusPhase2Expansion.getCitiesCount(player.game) > 0;
   }
 
   // Judgment call: the printed card says "adjacent to an off-world city", but off-world city

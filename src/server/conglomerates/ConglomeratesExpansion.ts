@@ -10,6 +10,7 @@ import {ConglomeratesTeamModel, ConglomeratesTeamScore} from '../../common/model
 import {IParty} from '../turmoil/parties/IParty';
 import {Color, PLAYER_COLORS} from '../../common/Color';
 import {CardName} from '../../common/cards/CardName';
+import {CITY_TILES} from '../../common/TileType';
 
 const MILESTONE_TEAM_VP = 8;
 const AWARD_TEAM_VP = 8;
@@ -331,6 +332,11 @@ export class ConglomeratesExpansion {
    * `calculateVictoryPoints` above), and importing back would create a two-file cycle that
    * crashes at module load ("cannot access before initialization") rather than just at
    * typecheck time -- so this small, stable calculation is duplicated instead.
+   *
+   * Same reasoning for counting Venus Phase 2's Cloud City tiles inline below instead of calling
+   * VenusPhase2Expansion.getCitiesCount: that helper (like this whole file, transitively, via
+   * TurmoilModel -> SelectParty -> SendDelegateToArea -> AresHandler -> Board) sits on the far
+   * side of a cycle through boards/Board.ts, which crashes the same way if crossed.
    */
   private static negativeVPForCorruptionSharing(player: IPlayer): number {
     let negativeVP = 0;
@@ -345,7 +351,9 @@ export class ConglomeratesExpansion {
       playerOwnsVermin ||= playedCard.name === CardName.VERMIN;
     }
     if (player.game.verminInEffect && playerOwnsVermin === false) {
-      negativeVP -= player.game.board.getCities(player).length;
+      const venusCities = player.game.venusPhase2Data?.venusSurface.spaces.filter((space) =>
+        space.tile !== undefined && CITY_TILES.has(space.tile.tileType) && space.player?.id === player.id).length ?? 0;
+      negativeVP -= player.game.board.getCities(player).length + venusCities;
     }
     return negativeVP;
   }

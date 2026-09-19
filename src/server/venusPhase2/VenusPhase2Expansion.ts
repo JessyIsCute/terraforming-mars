@@ -45,6 +45,33 @@ export class VenusPhase2Expansion {
     throw new Error('Assertion error: Using a Venus Phase 2 feature when the expansion is undefined.');
   }
 
+  // "Cities in play" generically should include Cloud City (and Stratopolis/Maxwell Base's own
+  // city tiles) on the Venus surface board -- the same way Moon's own tiles already fold into
+  // similar cross-board totals elsewhere (see e.g. Landlord). Callers with a Mars-specific reason
+  // to stay Mars-only (an explicit "on Mars" card, or an adjacency/geometry check that can't cross
+  // boards) intentionally don't call this.
+  public static getCitiesCount(game: IGame, player?: IPlayer): number {
+    const data = game.venusPhase2Data;
+    if (data === undefined) {
+      return 0;
+    }
+    let cities = data.venusSurface.spaces.filter(Board.isCitySpace);
+    if (player !== undefined) {
+      cities = cities.filter(Board.ownedBy(player));
+    }
+    return cities.length;
+  }
+
+  // Same idea as getCitiesCount, but for any real tile (matching Landlord's "own the most tiles",
+  // which already folds in Moon's spaces the same way).
+  public static getRealTileCount(game: IGame, player: IPlayer): number {
+    const data = game.venusPhase2Data;
+    if (data === undefined) {
+      return 0;
+    }
+    return data.venusSurface.spaces.filter(Board.hasRealTile).filter(Board.ownedBy(player)).length;
+  }
+
   public static initialize(gameOptions: GameOptions, rng: Random): VenusPhase2Data {
     return {
       venusSurface: VenusSurfaceBoard.newInstance(gameOptions, rng),

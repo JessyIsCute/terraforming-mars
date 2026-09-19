@@ -6,6 +6,8 @@ import {IPlayer} from '../../IPlayer';
 import {SelectSpace} from '../../inputs/SelectSpace';
 import {CardRenderer} from '../render/CardRenderer';
 import {all} from '../Options';
+import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
+import {Board} from '../../boards/Board';
 
 /**
  * Sets `Space.coOwner`, the shared-ownership mechanism already used by the Moon expansion's
@@ -31,7 +33,9 @@ export class BattleOfZadonga extends Card implements IProjectCard {
   }
 
   private availableCities(player: IPlayer) {
-    return player.game.board.getCities().filter((space) =>
+    const marsCities = player.game.board.getCities();
+    const venusCities = VenusPhase2Expansion.ifVenusPhase2(player.game, (data) => data.venusSurface.spaces.filter(Board.isCitySpace)) ?? [];
+    return [...marsCities, ...venusCities].filter((space) =>
       space.player !== undefined && space.player.id !== player.id && space.coOwner === undefined);
   }
 

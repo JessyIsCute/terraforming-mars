@@ -178,7 +178,11 @@ export const OCEAN_UPGRADE_TILES = new Set([TileType.OCEAN_CITY, TileType.OCEAN_
 // city and a greenery -- same "counts as two things" pattern as Ocean City/New Holland (ocean +
 // city) and Wetlands (ocean + greenery) above. Suburbs and Paradise City (Rob Antilles) are the
 // same pattern for "counts as a City" specifically.
-export const CITY_TILES = new Set([TileType.CITY, TileType.CAPITAL, TileType.OCEAN_CITY, TileType.RED_CITY, TileType.NEW_HOLLAND, TileType.INVAK_CITY, TileType.SUBURBS, TileType.PARADISE_CITY]);
+// VENUS_CLOUD_CITY is included so Board.isCitySpace correctly classifies it -- it's never placed
+// on the Mars board itself (only ever on VenusSurfaceBoard's own separate space list via
+// VenusPhase2Expansion.addCloudCityTile), so this only matters once something actually counts
+// cities across both boards; see VenusPhase2Expansion.getCitiesCount.
+export const CITY_TILES = new Set([TileType.CITY, TileType.CAPITAL, TileType.OCEAN_CITY, TileType.RED_CITY, TileType.NEW_HOLLAND, TileType.INVAK_CITY, TileType.SUBURBS, TileType.PARADISE_CITY, TileType.VENUS_CLOUD_CITY]);
 export const OCEAN_TILES = new Set([TileType.OCEAN, TileType.OCEAN_CITY, TileType.OCEAN_FARM, TileType.OCEAN_SANCTUARY, TileType.WETLANDS, TileType.NEW_HOLLAND]);
 export const BASE_OCEAN_TILES = new Set([TileType.OCEAN, TileType.WETLANDS]);
 export const GREENERY_TILES = new Set([TileType.GREENERY, TileType.WETLANDS, TileType.INVAK_CITY]);

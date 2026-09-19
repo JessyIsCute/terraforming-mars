@@ -7,6 +7,8 @@ import {IPlayer} from '../../IPlayer';
 import {Resource} from '../../../common/Resource';
 import {SelectPlayer} from '../../inputs/SelectPlayer';
 import {all} from '../Options';
+import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
+import {Board} from '../../boards/Board';
 
 export class Pothole extends Card implements IProjectCard {
   constructor() {
@@ -26,7 +28,9 @@ export class Pothole extends Card implements IProjectCard {
   }
 
   private cityOwners(player: IPlayer): Array<IPlayer> {
-    const owners = player.game.board.getCities()
+    const marsCities = player.game.board.getCities();
+    const venusCities = VenusPhase2Expansion.ifVenusPhase2(player.game, (data) => data.venusSurface.spaces.filter(Board.isCitySpace)) ?? [];
+    const owners = [...marsCities, ...venusCities]
       .map((space) => space.player?.id)
       .filter((id) => id !== undefined);
     return player.game.players.filter((p) => owners.includes(p.id));

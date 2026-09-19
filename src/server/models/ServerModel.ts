@@ -26,6 +26,7 @@ import {createPathfindersModel} from './PathfindersModel';
 import {MoonModel} from '../../common/models/MoonModel';
 import {VenusPhase2Model} from '../../common/models/VenusPhase2Model';
 import {VENUS_STRATOPOLIS, VENUS_MAXWELL_BASE} from '../venusPhase2/VenusSurfaceBoard';
+import {VenusPhase2Expansion} from '../venusPhase2/VenusPhase2Expansion';
 import {CardName} from '../../common/cards/CardName';
 import {AwardScorer} from '../awards/AwardScorer';
 import {SpaceId} from '../../common/Types';
@@ -242,7 +243,7 @@ export class Server {
       cardCost: player.cardCost,
       cardDiscount: player.colonies.cardDiscount,
       cardsInHandNbr: player.cardsInHand.length,
-      citiesCount: game.board.getCities(player).length,
+      citiesCount: game.board.getCities(player).length + VenusPhase2Expansion.getCitiesCount(game, player),
       coloniesCount: player.getColoniesCount(),
       color: player.color,
       energy: player.energy,

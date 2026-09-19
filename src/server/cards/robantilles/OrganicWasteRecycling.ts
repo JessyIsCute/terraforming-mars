@@ -11,6 +11,7 @@ import {Size} from '../../../common/cards/render/Size';
 import {uppercase} from '../Options';
 import {SerializedCard} from '../../SerializedCard';
 import {newProjectCard} from '../../createCard';
+import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
 
 export class OrganicWasteRecycling extends Card implements IProjectCard {
   constructor() {
@@ -55,7 +56,7 @@ export class OrganicWasteRecycling extends Card implements IProjectCard {
 
   public action(player: IPlayer) {
     const orOptions = new OrOptions();
-    const cities = player.game.board.getCities(player).length;
+    const cities = player.game.board.getCities(player).length + VenusPhase2Expansion.getCitiesCount(player.game, player);
     const selectableCards = player.cardsInHand.filter((card) => card.tags.some((tag) => tag === Tag.MICROBE || tag === Tag.PLANT));
 
     if (this.targetCards.length > 0) {

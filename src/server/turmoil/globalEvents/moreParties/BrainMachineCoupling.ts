@@ -7,6 +7,7 @@ import {Turmoil} from '../../Turmoil';
 import {SendDelegateToArea} from '../../../deferredActions/SendDelegateToArea';
 import {CardRenderer} from '../../../cards/render/CardRenderer';
 import {Size} from '../../../../common/cards/render/Size';
+import {VenusPhase2Expansion} from '../../../venusPhase2/VenusPhase2Expansion';
 
 export class BrainMachineCoupling extends GlobalEvent implements IGlobalEvent {
   constructor() {
@@ -27,7 +28,7 @@ export class BrainMachineCoupling extends GlobalEvent implements IGlobalEvent {
   public override bespokeResolvePlayer(player: IPlayer) {
     const game = player.game;
     const turmoil = Turmoil.getTurmoil(game);
-    const cities = game.board.getCities(player).length;
+    const cities = game.board.getCities(player).length + VenusPhase2Expansion.getCitiesCount(game, player);
     const influence = turmoil.getInfluence(player);
     const count = Math.floor((cities + influence) / 2);
     if (count > 0) {
