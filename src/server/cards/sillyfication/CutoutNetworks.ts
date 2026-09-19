@@ -14,6 +14,7 @@ import {Resource} from '../../../common/Resource';
 import {newProjectCard} from '../../createCard';
 import {CardRenderer} from '../render/CardRenderer';
 import {Size} from '../../../common/cards/render/Size';
+import {all} from '../Options';
 import {SerializedCard} from '../../SerializedCard';
 
 /** How many cards deep from the top of the deck the action's planted Dead Drop can land. */
@@ -34,13 +35,14 @@ export class CutoutNetworks extends CorporationCard implements ICorporationCard,
     super({
       name: CardName.CUTOUT_NETWORKS,
       startingMegaCredits: 42,
-      initialActionText: 'Shuffle 1 Dead Drop into the deck for every 20 cards in the deck',
+      initialActionText: 'Shuffle 1 Dead Drop into the deck for every 20 cards in the deck, then every player draws 3 cards',
 
       metadata: {
         cardNumber: 'X51', // Renumber
-        description: 'You start with 42 M€. As your first action, shuffle 1 copy of Dead Drop into the deck for every 20 cards in the deck.',
+        description: 'You start with 42 M€. As your first action, shuffle 1 copy of Dead Drop into the deck for every 20 cards in the deck. Every player draws 3 cards.',
         renderData: CardRenderer.builder((b) => {
           b.megacredits(42).br;
+          b.cards(3, {all}).br;
           b.corpBox('effect-action', (ce) => {
             ce.vSpace(Size.LARGE);
             ce.br;
@@ -74,14 +76,18 @@ export class CutoutNetworks extends CorporationCard implements ICorporationCard,
   public override initialAction(player: IPlayer): PlayerInput | undefined {
     const game = player.game;
     const count = Math.floor(game.projectDeck.size() / 20);
+    for (let i = 0; i < count; i++) {
+      const deadDrop = newProjectCard(CardName.DEAD_DROP) as IProjectCard;
+      game.projectDeck.drawPile.push(deadDrop);
+    }
+    game.projectDeck.shuffle();
     if (count > 0) {
-      for (let i = 0; i < count; i++) {
-        const deadDrop = newProjectCard(CardName.DEAD_DROP) as IProjectCard;
-        game.projectDeck.drawPile.push(deadDrop);
-      }
-      game.projectDeck.shuffle();
       game.log('${0} shuffled ${1} copy(s) of Dead Drop into the deck', (b) => b.player(player).number(count));
     }
+    for (const p of game.players) {
+      p.drawCard(3);
+    }
+    game.log('Every player drew 3 cards');
     return undefined;
   }
 

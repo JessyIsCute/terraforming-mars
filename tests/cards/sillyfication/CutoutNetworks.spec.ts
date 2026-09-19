@@ -29,18 +29,30 @@ describe('CutoutNetworks', () => {
     expect(card.tags).to.deep.eq([]);
   });
 
-  it('first action shuffles 1 Dead Drop into the deck for every 20 cards already there', () => {
+  it('first action shuffles 1 Dead Drop into the deck for every 20 cards already there, then everyone draws 3', () => {
     const sizeBefore = game.projectDeck.size();
     const expectedCount = Math.floor(sizeBefore / 20);
     expect(expectedCount).is.greaterThan(0);
+    const handsBefore = new Map(game.players.map((p) => [p, p.cardsInHand.length]));
 
     player.defer(card.initialAction(player));
     runAllActions(game);
 
-    const deadDrops = [...game.projectDeck.drawPile, ...game.projectDeck.discardPile]
-      .filter((c) => c.name === CardName.DEAD_DROP);
+    // Some seeded copies may have already been drawn into a hand by the "everyone draws 3"
+    // step below, so count everywhere a card can be, not just the deck itself.
+    const everywhere = [
+      ...game.projectDeck.drawPile,
+      ...game.projectDeck.discardPile,
+      ...game.players.flatMap((p) => p.cardsInHand),
+    ];
+    const deadDrops = everywhere.filter((c) => c.name === CardName.DEAD_DROP);
     expect(deadDrops).to.have.length(expectedCount);
-    expect(game.projectDeck.size()).to.eq(sizeBefore + expectedCount);
+    // +expectedCount for the seeded Dead Drops, -3 per player for the draw.
+    expect(game.projectDeck.size()).to.eq(sizeBefore + expectedCount - 3 * game.players.length);
+
+    for (const p of game.players) {
+      expect(p.cardsInHand.length).to.eq((handsBefore.get(p) ?? 0) + 3);
+    }
   });
 
   it('ignores any card played that is not Dead Drop', () => {
