@@ -364,6 +364,49 @@ describe('SelectProjectCardToPlay', () => {
     expect(saveResponse.payment).deep.eq(Payment.of({steel: 4, megacredits: 2}));
   });
 
+  it('Blockhouse: steel is worth 2 M€ extra when paying for a City-tagged card', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.CORPORATE_STRONGHOLD, 16,
+      {steel: 4, megacredits: 0, steelValue: 2, tableau: [{name: CardName.BLOCKHOUSE} as CardModel]},
+      {paymentOptions: {steel: true}});
+
+    await wrapper.vm.$nextTick();
+    expect((wrapper.vm as any).getResourceRate('steel')).to.eq(4);
+  });
+
+  it('does not boost the steel rate for a City-tagged card without Blockhouse in play', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.CORPORATE_STRONGHOLD, 16,
+      {steel: 4, megacredits: 0, steelValue: 2, tableau: []},
+      {paymentOptions: {steel: true}});
+
+    await wrapper.vm.$nextTick();
+    expect((wrapper.vm as any).getResourceRate('steel')).to.eq(2);
+  });
+
+  it('does not boost the steel rate for a Building-only card, even with Blockhouse in play', async () => {
+    const wrapper = setupCardForPurchase(
+      CardName.REGO_PLASTICS, 10,
+      {steel: 4, megacredits: 0, steelValue: 2, tableau: [{name: CardName.BLOCKHOUSE} as CardModel]},
+      {paymentOptions: {steel: true}});
+
+    await wrapper.vm.$nextTick();
+    expect((wrapper.vm as any).getResourceRate('steel')).to.eq(2);
+  });
+
+  it('Blockhouse: steel is worth 2 M€ extra when paying for the City standard project', async () => {
+    // CityStandardProject carries no Tag.CITY of its own, so the rate boost is keyed off
+    // the card name instead -- this is the branch that covers that case.
+    const wrapper = setupCardForPurchase(
+      CardName.CITY_STANDARD_PROJECT, 25,
+      {steel: 7, megacredits: 0, steelValue: 2, tableau: [{name: CardName.BLOCKHOUSE} as CardModel]},
+      {},
+      {canPayWith: {steel: true}});
+
+    await wrapper.vm.$nextTick();
+    expect((wrapper.vm as any).getResourceRate('steel')).to.eq(4);
+  });
+
   it('using titanium metal bonus', async () => {
     // Solar Wind Power will cost 11. Player has 2M€ and 4 Ti. The titanium is
     // artificially inflated to be worth 7M€ each.

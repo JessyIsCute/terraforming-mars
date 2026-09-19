@@ -1,6 +1,7 @@
 // Common code for SelectPayment and SelectProjectCardToPlay
 import {defineComponent} from 'vue';
 import {CardName} from '@/common/cards/CardName';
+import {Tag} from '@/common/cards/Tag';
 import {CardModel} from '@/common/models/CardModel';
 import {SelectPaymentModel, SelectProjectCardToPlayModel} from '@/common/models/PlayerInputModel';
 import {PlayerViewModel} from '@/common/models/PlayerModel';
@@ -70,12 +71,30 @@ export const PaymentWidgetMixin = defineComponent({
     getResourceRate(unit: SpendableResource): number {
       switch (unit) {
       case 'steel':
-        return this.playerView.thisPlayer.steelValue;
+        return this.getSteelResourceRate();
       case 'titanium':
         return this.getTitaniumResourceRate();
       default:
         return DEFAULT_PAYMENT_VALUES[unit];
       }
+    },
+    getSteelResourceRate(): number {
+      const baseValue = this.playerView.thisPlayer.steelValue;
+      return this.hasBlockhouseSteelBonus() ? baseValue + 2 : baseValue;
+    },
+    // Blockhouse: steel is worth 2 M€ extra when paying for a City-tagged card or the
+    // City standard project (which carries no Tag.CITY of its own, so it's checked by name).
+    hasBlockhouseSteelBonus(): boolean {
+      if (this.card === undefined) {
+        return false;
+      }
+      if (!this.playerView.thisPlayer.tableau.some((c) => c.name === CardName.BLOCKHOUSE)) {
+        return false;
+      }
+      if (this.card.name === CardName.CITY_STANDARD_PROJECT) {
+        return true;
+      }
+      return getCard(this.card.name)?.tags.includes(Tag.CITY) === true;
     },
     getTitaniumResourceRate(): number {
       const paymentOptions = this.playerinput.paymentOptions;
