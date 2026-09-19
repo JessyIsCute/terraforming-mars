@@ -18,12 +18,12 @@ describe('NegativeMassFluids', () => {
 
   it('requires owning a Venus Habitat', () => {
     expect(card.canPlay(player)).is.false;
-    VenusPhase2Expansion.addCityTile(player, VenusPhase2Expansion.venusPhase2Data(game).venusSurface.getAvailableSpacesForLand(player)[0].id);
+    VenusPhase2Expansion.addCloudCityTile(player, VenusPhase2Expansion.venusPhase2Data(game).venusSurface.getAvailableSpacesForLand(player)[0].id);
     expect(card.canPlay(player)).is.true;
   });
 
   it('increases the value of floaters spent on Venus standard projects by 1', () => {
-    VenusPhase2Expansion.addCityTile(player, VenusPhase2Expansion.venusPhase2Data(game).venusSurface.getAvailableSpacesForLand(player)[0].id);
+    VenusPhase2Expansion.addCloudCityTile(player, VenusPhase2Expansion.venusPhase2Data(game).venusSurface.getAvailableSpacesForLand(player)[0].id);
     expect(player.getFloaterValue()).to.eq(FLOATERS_VALUE);
     card.play(player);
     expect(player.getFloaterValue()).to.eq(FLOATERS_VALUE + 1);

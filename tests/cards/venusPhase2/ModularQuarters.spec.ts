@@ -29,13 +29,13 @@ describe('ModularQuarters', () => {
 
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(game).venusSurface;
     const space = venusSurface.getAvailableSpacesForLand(player)[0];
-    VenusPhase2Expansion.addCityTile(player, space.id);
+    VenusPhase2Expansion.addCloudCityTile(player, space.id);
     runAllActions(game);
 
     expect(dirigibles.resourceCount).to.eq(2);
   });
 
-  it('does not react to non-City tiles placed on Venus', () => {
+  it('does not react to non-Venus-Habitat tiles placed on Venus', () => {
     const dirigibles = new Dirigibles();
     player.playedCards.push(card, dirigibles);
 

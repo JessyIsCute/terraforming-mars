@@ -156,7 +156,7 @@ export const tileTypeToString: Record<TileType, string> = {
   [TileType.ANIMAL_DOME]: CardName.LIVESTOCK_GIANT_DOME,
   [TileType.SEDIMENT]: CardName.SEDIMENTARY_ROCKS,
   [TileType.BIOLOGICAL_DOME]: CardName.MOBILE_BIOLOGICAL_DOME,
-  [TileType.VENUS_CLOUD_CITY]: 'Cloud City',
+  [TileType.VENUS_CLOUD_CITY]: 'Venus Habitat',
   [TileType.VENUS_GAS_MINE]: 'Gas Mine',
   [TileType.VENUS_FLOATER_ARRAY]: 'Floater Array',
   [TileType.INDUSTRY_HEAT]: CardName.HEAT_INDUSTRY_STANDARD_PROJECT,

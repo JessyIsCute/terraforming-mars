@@ -34,7 +34,7 @@ export class ModularQuarters extends Card implements IProjectCard {
   }
 
   public onTilePlaced(cardOwner: IPlayer, _activePlayer: IPlayer, space: Space, boardType: BoardType): void {
-    if (boardType !== BoardType.VENUS || space.tile?.tileType !== TileType.CITY) {
+    if (boardType !== BoardType.VENUS || space.tile?.tileType !== TileType.VENUS_CLOUD_CITY) {
       return;
     }
     cardOwner.game.defer(new AddResourcesToCard(cardOwner, CardResource.FLOATER, {count: 2}));

@@ -32,7 +32,7 @@ describe('NewRome', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('raises Venus and places a City tile on Venus', () => {
+  it('raises Venus and places a Venus Habitat tile on Venus', () => {
     for (let i = 0; i < 6; i++) {
       game.increaseVenusScaleLevel(player, 3);
     }
@@ -45,7 +45,7 @@ describe('NewRome', () => {
     const target = selectSpace.spaces[0];
     selectSpace.cb(target);
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(game).venusSurface;
-    expect(venusSurface.getSpaceOrThrow(target.id).tile?.tileType).to.eq(TileType.CITY);
+    expect(venusSurface.getSpaceOrThrow(target.id).tile?.tileType).to.eq(TileType.VENUS_CLOUD_CITY);
   });
 
   it('cannot act without leading a party', () => {

@@ -6,7 +6,8 @@ import {CardName} from '../../../common/cards/CardName';
 import {IPlayer} from '../../IPlayer';
 import {CardRenderer} from '../render/CardRenderer';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
-import {PlaceVenusCityTile} from '../../venusPhase2/PlaceVenusCityTile';
+import {PlaceCloudCityTile} from '../../venusPhase2/PlaceCloudCityTile';
+import {TileType} from '../../../common/TileType';
 
 export class NewAlexandria extends Card implements IProjectCard {
   constructor() {
@@ -25,10 +26,10 @@ export class NewAlexandria extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V74',
         renderData: CardRenderer.builder((b) => {
-          b.production((pb) => pb.minus().energy(1).megacredits(3)).nbsp.city().venus(1);
+          b.production((pb) => pb.minus().energy(1).megacredits(3)).nbsp.tile(TileType.VENUS_CLOUD_CITY).venus(1);
         }),
         description: 'Requires Venus 6% or more. Decrease your energy production 1 step and increase your M€ production 3 steps. ' +
-          'Place a City tile on Venus and raise Venus 1 step.',
+          'Place a Venus Habitat tile and raise Venus 1 step.',
       },
     });
   }
@@ -39,7 +40,7 @@ export class NewAlexandria extends Card implements IProjectCard {
   }
 
   public override bespokePlay(player: IPlayer) {
-    player.game.defer(new PlaceVenusCityTile(player));
+    player.game.defer(new PlaceCloudCityTile(player, undefined, 'Select a space on the Venus surface for a Venus Habitat.'));
     return undefined;
   }
 }

@@ -27,7 +27,7 @@ describe('NewAthens', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('raises Venus and places a City tile on Venus', () => {
+  it('raises Venus and places a Venus Habitat tile on Venus', () => {
     const venusBefore = game.getVenusScaleLevel();
     card.play(player);
     runAllActions(game);
@@ -37,6 +37,6 @@ describe('NewAthens', () => {
     const target = selectSpace.spaces[0];
     selectSpace.cb(target);
     const venusSurface = VenusPhase2Expansion.venusPhase2Data(game).venusSurface;
-    expect(venusSurface.getSpaceOrThrow(target.id).tile?.tileType).to.eq(TileType.CITY);
+    expect(venusSurface.getSpaceOrThrow(target.id).tile?.tileType).to.eq(TileType.VENUS_CLOUD_CITY);
   });
 });

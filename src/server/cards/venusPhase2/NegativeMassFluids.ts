@@ -21,7 +21,7 @@ export class NegativeMassFluids extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V59',
         renderData: CardRenderer.builder((b) => {
-          b.city().colon().effect('Each floater you spend paying for a Venus standard project is worth 1 M€ extra.', (eb) => {
+          b.tile(TileType.VENUS_CLOUD_CITY).colon().effect('Each floater you spend paying for a Venus standard project is worth 1 M€ extra.', (eb) => {
             eb.resource(CardResource.FLOATER, 1).startEffect.plus(Size.SMALL).megacredits(1);
           });
         }),
@@ -31,7 +31,7 @@ export class NegativeMassFluids extends Card implements IProjectCard {
   }
 
   public override bespokeCanPlay(player: IPlayer): boolean {
-    return VenusPhase2Expansion.spaces(player.game, TileType.CITY, {ownedBy: player}).length > 0;
+    return VenusPhase2Expansion.spaces(player.game, TileType.VENUS_CLOUD_CITY, {ownedBy: player}).length > 0;
   }
 
   public override bespokePlay(player: IPlayer) {

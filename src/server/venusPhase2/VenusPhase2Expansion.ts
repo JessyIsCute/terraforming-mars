@@ -123,44 +123,6 @@ export class VenusPhase2Expansion {
     });
   }
 
-  // A plain City tile placed on the Venus surface board by one of the Venus Phase 2 cards (e.g.
-  // "New Alexandria") -- distinct from addReservedCityTile below (Stratopolis/Maxwell Base's own
-  // fixed reserved spot, which skips space-bonus granting and ownership validation since that spot
-  // is never contested). This one goes through the same validation/bonus/logging path as
-  // addTile's Cloud City/Gas Mine/Floater Array, just for TileType.CITY, which addTile's own
-  // VENUS_PHASE_2_TILES whitelist deliberately excludes (kept narrow so nothing else that assumes
-  // that set only holds the 3 fan tiles -- e.g. calculateVictoryPoints below -- has to change).
-  public static addCityTile(player: IPlayer, spaceId: SpaceId, cardName: CardName | undefined = undefined): void {
-    const game = player.game;
-    VenusPhase2Expansion.ifVenusPhase2(game, (data) => {
-      const space = data.venusSurface.getSpaceOrThrow(spaceId);
-      if (space.tile !== undefined) {
-        throw new Error('Selected space is occupied');
-      }
-      if (space.player !== undefined && space.player !== player) {
-        throw new Error('This space is land claimed by ' + space.player.name);
-      }
-
-      space.tile = {tileType: TileType.CITY, card: cardName};
-      if (game.phase !== Phase.SOLAR) {
-        space.player = player;
-      }
-
-      if (game.phase !== Phase.SOLAR) {
-        space.bonus.forEach((spaceBonus) => {
-          game.grantSpaceBonus(player, spaceBonus);
-        });
-      }
-
-      if (space.x !== -1 && space.y !== -1) {
-        game.log('${0} placed a ${1} tile at ${2}', (b) => b.player(player).tileType(TileType.CITY).space(space));
-      }
-
-      game.triggerForAllCards((p, c) => c.onTilePlaced?.(p, player, space, BoardType.VENUS));
-      TurmoilHandler.applyOnCityTilePlacedEffect(player);
-    });
-  }
-
   // Places Stratopolis'/MaxwellBase's reserved City tile on the Venus surface board (instead of
   // Mars) when Venus Phase 2 is enabled -- see Stratopolis.ts/MaxwellBase.ts's bespokePlay, which
   // uses the old Mars-board path when the expansion is off.

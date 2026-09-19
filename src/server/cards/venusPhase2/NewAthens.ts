@@ -7,7 +7,8 @@ import {IPlayer} from '../../IPlayer';
 import {CardResource} from '../../../common/CardResource';
 import {CardRenderer} from '../render/CardRenderer';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
-import {PlaceVenusCityTile} from '../../venusPhase2/PlaceVenusCityTile';
+import {PlaceCloudCityTile} from '../../venusPhase2/PlaceCloudCityTile';
+import {TileType} from '../../../common/TileType';
 
 export class NewAthens extends Card implements IProjectCard {
   constructor() {
@@ -29,10 +30,10 @@ export class NewAthens extends Card implements IProjectCard {
       metadata: {
         cardNumber: 'V89',
         renderData: CardRenderer.builder((b) => {
-          b.resource(CardResource.SCIENCE, 1).resource(CardResource.FLOATER, 2).nbsp.city().venus(1);
+          b.resource(CardResource.SCIENCE, 1).resource(CardResource.FLOATER, 2).nbsp.tile(TileType.VENUS_CLOUD_CITY).venus(1);
         }),
         description: 'Requires Venus 8% or more. Add 1 science resource to any card and 2 floaters to any card. ' +
-          'Place a City tile on Venus and raise Venus 1 step.',
+          'Place a Venus Habitat tile and raise Venus 1 step.',
       },
     });
   }
@@ -43,7 +44,7 @@ export class NewAthens extends Card implements IProjectCard {
   }
 
   public override bespokePlay(player: IPlayer) {
-    player.game.defer(new PlaceVenusCityTile(player));
+    player.game.defer(new PlaceCloudCityTile(player, undefined, 'Select a space on the Venus surface for a Venus Habitat.'));
     return undefined;
   }
 }

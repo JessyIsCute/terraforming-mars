@@ -7,7 +7,8 @@ import {CardName} from '../../../common/cards/CardName';
 import {IPlayer} from '../../IPlayer';
 import {CardRenderer} from '../render/CardRenderer';
 import {VenusPhase2Expansion} from '../../venusPhase2/VenusPhase2Expansion';
-import {PlaceVenusCityTile} from '../../venusPhase2/PlaceVenusCityTile';
+import {PlaceCloudCityTile} from '../../venusPhase2/PlaceCloudCityTile';
+import {TileType} from '../../../common/TileType';
 import {Turmoil} from '../../turmoil/Turmoil';
 import {SelectParty} from '../../inputs/SelectParty';
 import {toName} from '../../../common/utils/utils';
@@ -30,7 +31,7 @@ export class NewRome extends ActionCard implements IProjectCard, IActionCard {
       metadata: {
         cardNumber: 'V91',
         renderData: CardRenderer.builder((b) => {
-          b.city().venus(1);
+          b.tile(TileType.VENUS_CLOUD_CITY).venus(1);
           b.br;
           b.action('Add a delegate to a party you lead.', (eb) => {
             eb.empty().startAction.delegates(1);
@@ -47,7 +48,7 @@ export class NewRome extends ActionCard implements IProjectCard, IActionCard {
   }
 
   public override bespokePlay(player: IPlayer) {
-    player.game.defer(new PlaceVenusCityTile(player));
+    player.game.defer(new PlaceCloudCityTile(player, undefined, 'Select a space on the Venus surface for a Venus Habitat.'));
     return undefined;
   }
 
