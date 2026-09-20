@@ -1,7 +1,7 @@
 <template>
     <div class="help-turmoil-parties-container">
       <h2 v-i18n>Political Parties</h2>
-      <p v-i18n>The ruling party's bonus is granted to every player at the end of each generation (scaled by how well each player matches it); its policy applies for the whole generation it rules.</p>
+      <p v-i18n>The ruling party's bonus applies once, scaled by how well each player matches it. Its policy stays active until a new party takes power.</p>
 
       <div class="help-parties-grid">
         <div class="help-party-card" v-for="party in parties" :key="party.name">
@@ -30,9 +30,8 @@
       </div>
     </div>
 </template>
-<script lang="ts">
-
-import {defineComponent} from 'vue';
+<script setup lang="ts">
+import {computed} from 'vue';
 import {PartyName} from '@/common/turmoil/PartyName';
 import {BonusId, PolicyId} from '@/common/turmoil/Types';
 import {getAgendaOrThrow, getPartyAgendaIds} from '@/client/turmoil/ClientAgendaManifest';
@@ -54,37 +53,30 @@ const MORE_PARTIES: ReadonlyArray<PartyName> = [
   PartyName.TRANSHUMANISTS,
 ];
 
-export default defineComponent({
-  name: 'HelpTurmoilParties',
-  components: {
-    TurmoilAgenda,
-  },
-  computed: {
-    parties(): Array<PartyHelpEntry> {
-      return Object.values(PartyName).map((name) => {
-        const ids = getPartyAgendaIds(name);
-        return {
-          name,
-          bonusIds: ids.bonuses,
-          policyIds: ids.policies,
-          requiresMoreParties: MORE_PARTIES.includes(name),
-        };
-      });
-    },
-  },
-  methods: {
-    agendaDescription(id: BonusId | PolicyId, morePartiesExpansion: boolean): string {
-      return getAgendaOrThrow(id, morePartiesExpansion).description;
-    },
-    partyNameToCss(party: PartyName): string {
-      return party.toLowerCase().split(' ').join('_');
-    },
-    // The real .card-party--<slug> party logo images (cards_v2.less's @parties list) use
-    // hyphens, unlike every other party-slug class on this page (party-name--mars_first etc,
-    // which use underscores) - the only place that differs is "mars-first" vs "mars_first".
-    partyLogoSlug(party: PartyName): string {
-      return this.partyNameToCss(party).replace('_', '-');
-    },
-  },
+const parties = computed<Array<PartyHelpEntry>>(() => {
+  return Object.values(PartyName).map((name) => {
+    const ids = getPartyAgendaIds(name);
+    return {
+      name,
+      bonusIds: ids.bonuses,
+      policyIds: ids.policies,
+      requiresMoreParties: MORE_PARTIES.includes(name),
+    };
+  });
 });
+
+function agendaDescription(id: BonusId | PolicyId, morePartiesExpansion: boolean): string {
+  return getAgendaOrThrow(id, morePartiesExpansion).description;
+}
+
+function partyNameToCss(party: PartyName): string {
+  return party.toLowerCase().split(' ').join('_');
+}
+
+// The real .card-party--<slug> party logo images (cards_v2.less's @parties list) use hyphens,
+// unlike every other party-slug class on this page (party-name--mars_first etc, which use
+// underscores) - the only place that differs is "mars-first" vs "mars_first".
+function partyLogoSlug(party: PartyName): string {
+  return partyNameToCss(party).replace('_', '-');
+}
 </script>
