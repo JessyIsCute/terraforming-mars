@@ -15,7 +15,7 @@ describe('MartianAgriculture', () => {
   beforeEach(() => {
     card = new MartianAgriculture();
     restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
-    [game, player] = testGame(1, {turmoilExtension: true, morePartiesExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, morePartiesExpansion: true, moonExpansion: true});
   });
 
   afterEach(() => {
