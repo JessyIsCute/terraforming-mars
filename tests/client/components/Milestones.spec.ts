@@ -81,6 +81,20 @@ describe('Milestones', () => {
     expect(prices).to.deep.eq([12, 12, 12]);
   });
 
+  it('renders four claimed milestones without available spots in learner mode', () => {
+    const names = ['Terraformer', 'Mayor', 'Gardener', 'Builder'] as const;
+    const wrapper = mount(Milestones, {
+      ...globalConfig,
+      props: {
+        milestones: names.map((name) => ({...mockMilestone, name})),
+        preferences: {...PreferencesManager.INSTANCE.values(), learner_mode: true},
+      },
+    });
+
+    expect(wrapper.findAll('.milestone-award-inline.paid').map((claim) => claim.text())).to.deep.eq(names);
+    expect(wrapper.findAll('.milestone-award-inline.unpaid')).to.have.lengthOf(0);
+  });
+
   it('shows a Coordination icon next to the price when Conglomerates is on', () => {
     const wrapper = mount(Milestones, {
       ...globalConfig,
