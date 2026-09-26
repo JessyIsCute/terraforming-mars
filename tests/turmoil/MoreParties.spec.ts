@@ -6,6 +6,7 @@ import {CardName} from '../../src/common/cards/CardName';
 import {DEFAULT_GAME_OPTIONS, GameOptions} from '../../src/server/game/GameOptions';
 import {toName} from '../../src/common/utils/utils';
 import {testGame} from '../TestGame';
+import {forcePartiesInPlay} from '../TestingUtils';
 
 // Populists, Spome, Empower, Bureaucrats, Centrists and Transhumanists are placeholder Turmoil
 // parties added for idesOfMars/robAntilles cards that reference them. They're gated behind
@@ -13,6 +14,21 @@ import {testGame} from '../TestGame';
 // card that requires one of them is registered as needing moreParties too, so a game can't end
 // up with a card whose required party doesn't exist.
 describe('More Parties expansion', () => {
+  for (const moonExpansion of [false, true]) {
+    it(`selects Spome only with the Moon enabled (moon=${moonExpansion})`, () => {
+      const restore = forcePartiesInPlay(PartyName.SPOME);
+      try {
+        const [game] = testGame(2, {turmoilExtension: true, morePartiesExpansion: true, moonExpansion});
+        const names = Turmoil.getTurmoil(game).parties.map(toName);
+        expect(names).has.length(6);
+        expect(new Set(names).size).to.eq(6);
+        expect(names.includes(PartyName.SPOME)).to.eq(moonExpansion);
+      } finally {
+        restore();
+      }
+    });
+  }
+
   it('without morePartiesExpansion, only the 6 official parties exist', () => {
     const [game] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true, robAntillesExpansion: true});
     const names = Turmoil.getTurmoil(game).parties.map((p) => p.name);
