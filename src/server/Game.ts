@@ -269,6 +269,13 @@ export class Game implements IGame, Logger {
     this.spectatorId = spectatorId;
     this.rng = rng;
     this.projectDeck = projectDeck;
+    if (gameOptions.morePartiesExpansion) {
+      this.projectDeck.isCardAvailable = (card) => {
+        const parties = this.turmoil?.parties;
+        return parties === undefined || card.requirements.every((requirement) =>
+          requirement.party === undefined || parties.some((party) => party.name === requirement.party));
+      };
+    }
     this.corporationDeck = corporationDeck;
     this.preludeDeck = preludeDeck;
     this.ceoDeck = ceoDeck;
