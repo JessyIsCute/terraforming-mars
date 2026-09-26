@@ -75,6 +75,9 @@ export interface SerializedPlayer extends DeprecatedFields{
   removedFromPlayCards: Array<CardName>;
   removingPlayers: Array<PlayerId>;
   scienceTagCount: number;
+  spaceTagCount?: number;
+  energyTagCount?: number;
+  wildTagCount?: number;
   standardProjectsThisGeneration: Array<CardName>;
   steel: number;
   steelProduction: number;

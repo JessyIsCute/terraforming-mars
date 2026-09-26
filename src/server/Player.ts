@@ -2138,6 +2138,9 @@ export class Player implements IPlayer {
       scienceTagCount: this.tags.extraScienceTags,
       plantTagCount: this.tags.extraPlantTags,
       jovianTagCount: this.tags.extraJovianTags,
+      spaceTagCount: this.tags.extraSpaceTags,
+      energyTagCount: this.tags.extraEnergyTags,
+      wildTagCount: this.tags.extraWildTags,
       // Ecoline
       plantsNeededForGreenery: this.plantsNeededForGreenery,
       // Lawsuit
@@ -2228,6 +2231,9 @@ export class Player implements IPlayer {
     player.tags.extraScienceTags = d.scienceTagCount;
     player.tags.extraPlantTags = d.plantTagCount;
     player.tags.extraJovianTags = d.jovianTagCount ?? 0;
+    player.tags.extraSpaceTags = d.spaceTagCount ?? 0;
+    player.tags.extraEnergyTags = d.energyTagCount ?? 0;
+    player.tags.extraWildTags = d.wildTagCount ?? 0;
     player.steel = d.steel;
     player.steelValue = d.steelValue;
     player.floaterValue = d.floaterValue ?? constants.FLOATERS_VALUE;
