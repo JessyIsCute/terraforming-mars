@@ -110,19 +110,22 @@ export class PoliticalAgendas {
   // More Parties: fired whenever a party's leader changes (including a first assignment).
   // A real player who becomes leader chooses that party's new bonus, and its policy too
   // unless the party is currently ruling (policy stays locked until the next Chairman
-  // election). A neutral delegate becoming leader re-randomizes both instead.
+  // election). A neutral leader randomizes the same unlocked parts of the agenda.
   public static onPartyLeaderChange(turmoil: Turmoil, party: IParty, newLeader: Delegate, game: IGame): void {
     if (turmoil.politicalAgendasData.agendaStyle !== 'PartyLeaders') {
       return;
     }
     const agenda = this.getAgenda(turmoil, party.name);
+    const isRuling = turmoil.rulingParty.name === party.name;
     if (newLeader === 'NEUTRAL') {
       const random = this.getRandomAgenda(party);
       agenda.bonusId = random.bonusId;
-      agenda.policyId = random.policyId;
+      if (!isRuling) {
+        agenda.policyId = random.policyId;
+      }
       return;
     }
-    const choice = turmoil.rulingParty.name === party.name ? 'bonus' : 'both';
+    const choice = isRuling ? 'bonus' : 'both';
     game.defer(new ChooseNewPartyAgenda(newLeader, party, choice, (bonusId, policyId) => {
       if (bonusId !== undefined) {
         agenda.bonusId = bonusId;
