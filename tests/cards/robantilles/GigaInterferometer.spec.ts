@@ -3,7 +3,11 @@ import {GigaInterferometer} from '../../../src/server/cards/robantilles/GigaInte
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {SelectCard} from '../../../src/server/inputs/SelectCard';
-import {doWait, runAllActions} from '../../TestingUtils';
+import {Phase} from '../../../src/common/Phase';
+import {OrOptions} from '../../../src/server/inputs/OrOptions';
+import {SelectPayment} from '../../../src/server/inputs/SelectPayment';
+import {cast} from '../../../src/common/utils/utils';
+import {Payment} from '../../../src/common/inputs/Payment';
 
 describe('GigaInterferometer', () => {
   let card: GigaInterferometer;
@@ -26,29 +30,66 @@ describe('GigaInterferometer', () => {
     expect(card.canPlay(player)).is.true;
   });
 
-  it('immediately gives every player a drafted-card selection, and resumes the acting player\'s turn once everyone answers', () => {
+  it('waits for every player before handing the turn to the next player', () => {
+    const [game, passedPlayer, actingPlayer, nextPlayer] = testGame(3, {draftVariant: true});
+    game.generation = 6;
+    game.phase = Phase.ACTION;
+    game.activePlayer = actingPlayer;
+    game.playerHasPassed(passedPlayer);
+    for (const p of game.players) {
+      p.megaCredits = 6;
+    }
+    actingPlayer.actionsTakenThisRound = 2;
+
+    card.play(actingPlayer);
+    actingPlayer.takeAction();
+    actingPlayer.process({type: 'card', cards: []});
+
+    expect(game.activePlayer).to.eq(actingPlayer);
+    expect(actingPlayer.getWaitingFor()).is.undefined;
+    expect(nextPlayer.getWaitingFor()).is.instanceOf(SelectCard);
+
+    passedPlayer.process({type: 'card', cards: []});
+    expect(game.activePlayer).to.eq(actingPlayer);
+    nextPlayer.process({type: 'card', cards: []});
+
+    expect(game.activePlayer).to.eq(nextPlayer);
+    expect(nextPlayer.getWaitingFor()).is.instanceOf(OrOptions);
+    expect(game.generation).to.eq(6);
+    expect(game.phase).to.eq(Phase.ACTION);
+    expect(game.hasPassedThisActionPhase(passedPlayer)).is.true;
+    expect(game.players.every((p) => !p.awaitingAdHocResearch)).is.true;
+  });
+
+  it('resumes the current turn only after the last purchase is paid', () => {
+    const game = player.game;
+    game.generation = 6;
+    game.phase = Phase.ACTION;
+    player.actionsTakenThisRound = 1;
+    player2.canUseHeatAsMegaCredits = true;
+    player2.heat = 3;
     card.play(player);
-    runAllActions(player.game);
+    player.takeAction();
 
-    expect(player.awaitingAdHocResearch).is.true;
-    expect(player2.awaitingAdHocResearch).is.true;
+    const choice = cast(player2.getWaitingFor(), SelectCard);
+    expect(choice.cards).has.length(4);
+    const boughtCard = choice.cards[0];
+    player2.process({type: 'card', cards: [boughtCard.name]});
+    expect(player2.getWaitingFor()).is.instanceOf(SelectPayment);
 
-    const player1CardsBefore = player.cardsInHand.length;
-    const player2CardsBefore = player2.cardsInHand.length;
+    player.process({type: 'card', cards: []});
+    expect(player.getWaitingFor()).is.undefined;
+    expect(player.actionsTakenThisRound).to.eq(1);
+    expect(player2.cardsInHand).does.not.include(boughtCard);
 
-    // Both players buy nothing, just to close out the ad hoc research quickly.
-    doWait(player2, SelectCard, (sc) => sc.cb([]));
-    runAllActions(player.game);
-    expect(player2.awaitingAdHocResearch).is.false;
-
-    doWait(player, SelectCard, (sc) => sc.cb([]));
-    runAllActions(player.game);
-    expect(player.awaitingAdHocResearch).is.false;
-
-    expect(player.cardsInHand.length).to.eq(player1CardsBefore);
-    expect(player2.cardsInHand.length).to.eq(player2CardsBefore);
-
-    // The acting player's turn resumed: they have a normal action prompt again.
-    expect(player.getWaitingFor()).is.not.undefined;
+    player2.process({type: 'payment', payment: Payment.of({heat: 3})});
+    expect(player2.cardsInHand).includes(boughtCard);
+    expect(player2.heat).to.eq(0);
+    expect(player2.megaCredits).to.eq(6);
+    expect(player2.getWaitingFor()).is.undefined;
+    expect(game.activePlayer).to.eq(player);
+    expect(player.actionsTakenThisRound).to.eq(1);
+    expect(player.getWaitingFor()).is.instanceOf(OrOptions);
+    expect(game.players.every((p) => !p.awaitingAdHocResearch)).is.true;
   });
 });
