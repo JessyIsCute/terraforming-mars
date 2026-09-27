@@ -434,12 +434,14 @@ each(@players, {
     // Outline each team's score in that team's own shared Turmoil delegate color (see
     // PlayerResources.vue's own team-colored outline for the same color), so which bracket
     // goes with which team is obvious without cross-referencing the player scores below it.
-    each(@players, {
-    @c: ~"player_@{value}";
-    .ma-team-score--@{value} {
-      box-shadow: 0 0 0 2px @@c;
+    .ma-team-score {
+      each(@players, {
+        @c: ~"player_@{value}";
+        &--@{value} {
+          box-shadow: 0 0 0 2px @@c;
+        }
+      });
     }
-    })
 
     .ma-player {
       margin: 25px 0 0 70px;
@@ -521,14 +523,14 @@ each(@players, {
       builder7, legend4, pioneer4, metallurgist, spacefarer4, tactician4,
       terraformer29, terran5, trader, tycoon10, suburbian, briber, merchant,
     ;
+    // Images are expected to be 140px x 83px
+    // background-size: 200px;
+    // background-position: -30px -5px;
     each(@ma-name, {
-    .ma-name--@{value} {
-      background-image: url("assets/ma/@{value}.png");
-      // Images are expected to be 140px x 83px
-      // background-size: 200px;
-      // background-position: -30px -5px;
+      .ma-name--@{value} {
+        background-image: url("assets/ma/@{value}.png");
       }
-    })
+    });
 
     // Conglomerates milestone variants have no dedicated art -- reuse the base milestone's
     // image (Milestone.vue then draws a small patch over the corner number, see
@@ -561,19 +563,21 @@ each(@players, {
       producer24 producer 16 22, purifier5 purifier 16 22, risktaker5 risktaker 16 22,
       sponsor5 sponsor 16 22, thawer8 thawer 16 22, trader5 trader 16 22,
       tunneler11 tunneler 16 22;
-    each(@ma-name-conglomerates, {
-      @variant: extract(@value, 1);
-      @base: extract(@value, 2);
-      @left: extract(@value, 3);
-      @top: extract(@value, 4);
-      .ma-name--@{variant} {
-        background-image: url("assets/ma/@{base}.png");
-        .ma-number-patch {
-          left: unit(@left, px);
-          top: unit(@top, px);
+    .ma-name {
+      each(@ma-name-conglomerates, {
+        @variant: extract(@value, 1);
+        @base: extract(@value, 2);
+        @left: extract(@value, 3);
+        @top: extract(@value, 4);
+        &--@{variant} {
+          background-image: url("assets/ma/@{base}.png");
+          .ma-number-patch {
+            left: unit(@left, px);
+            top: unit(@top, px);
+          }
         }
-      }
-    })
+      });
+    }
 
     // A small patch drawn over the reused image's corner number, showing the real
     // Conglomerates-scaled value. Deliberately one consistent style (gold hex, black bold
