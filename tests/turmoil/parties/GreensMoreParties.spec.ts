@@ -2,7 +2,6 @@ import {expect} from 'chai';
 import {GreensMoreParties} from '../../../src/server/turmoil/parties/GreensMoreParties';
 import {GREENS_POLICY_1} from '../../../src/server/turmoil/parties/Greens';
 import {
-  GREENS_MORE_PARTIES_POLICY_2,
   GREENS_MORE_PARTIES_POLICY_3,
   GREENS_MORE_PARTIES_POLICY_4,
 } from '../../../src/server/turmoil/parties/GreensMoreParties';

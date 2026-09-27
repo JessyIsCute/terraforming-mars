@@ -4,7 +4,6 @@ import {REDS_BONUS_1, REDS_POLICY_1} from '../../../src/server/turmoil/parties/R
 import {
   REDS_MORE_PARTIES_BONUS_2,
   REDS_MORE_PARTIES_POLICY_3,
-  REDS_MORE_PARTIES_POLICY_4,
 } from '../../../src/server/turmoil/parties/RedsMoreParties';
 import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';

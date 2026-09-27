@@ -7,6 +7,7 @@ import {GlobalEventName} from '../../src/common/turmoil/globalEvents/GlobalEvent
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
 import {PoliticalAgendas} from '../../src/server/turmoil/PoliticalAgendas';
+import {CardRenderer} from '../../src/server/cards/render/CardRenderer';
 
 // More Parties (fan): when a Global Event references a party that isn't among the game's 6
 // currently-active parties, Turmoil.swapInParty (private, exercised here via the public
@@ -27,7 +28,7 @@ describe('More Parties: party swap', () => {
       description: 'test event',
       revealedDelegate: currentDelegate,
       currentDelegate,
-      renderData: {rows: []},
+      renderData: CardRenderer.builder((b) => b.empty()),
       resolve: () => {},
     };
   }
