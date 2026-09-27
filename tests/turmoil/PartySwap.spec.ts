@@ -27,7 +27,7 @@ describe('More Parties: party swap', () => {
       description: 'test event',
       revealedDelegate: currentDelegate,
       currentDelegate,
-      renderData: {rows: []},
+      renderData: {is: 'root', rows: []},
       resolve: () => {},
     };
   }

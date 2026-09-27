@@ -1,17 +1,15 @@
 import {expect} from 'chai';
 import {testGame} from '../../TestGame';
 import {TestPlayer} from '../../TestPlayer';
-import {IGame} from '../../../src/server/IGame';
 import {StellarEngine} from '../../../src/server/cards/solaris/StellarEngine';
 
 describe('StellarEngine', () => {
   let card: StellarEngine;
   let player: TestPlayer;
-  let game: IGame;
 
   beforeEach(() => {
     card = new StellarEngine();
-    [game, player] = testGame(2);
+    [, player] = testGame(2);
     player.megaCredits = card.cost;
   });
 

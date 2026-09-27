@@ -6,7 +6,6 @@ import {
   UNITY_MORE_PARTIES_POLICY_2,
   UNITY_MORE_PARTIES_POLICY_3,
 } from '../../../src/server/turmoil/parties/UnityMoreParties';
-import {IGame} from '../../../src/server/IGame';
 import {TestPlayer} from '../../TestPlayer';
 import {testGame} from '../../TestGame';
 import {forcePartiesInPlay} from '../../TestingUtils';
@@ -15,13 +14,12 @@ import {Resource} from '../../../src/common/Resource';
 import {Tag} from '../../../src/common/cards/Tag';
 
 describe('UnityMoreParties', () => {
-  let game: IGame;
   let player: TestPlayer;
   let restoreShuffle: () => void;
 
   beforeEach(() => {
     restoreShuffle = forcePartiesInPlay(PartyName.UNITY);
-    [game, player] = testGame(1, {turmoilExtension: true, coloniesExtension: true, morePartiesExpansion: true});
+    [, player] = testGame(1, {turmoilExtension: true, coloniesExtension: true, morePartiesExpansion: true});
   });
 
   afterEach(() => {

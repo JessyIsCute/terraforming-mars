@@ -2,7 +2,6 @@ import {expect} from 'chai';
 import {KelvinistsMoreParties} from '../../../src/server/turmoil/parties/KelvinistsMoreParties';
 import {KELVINISTS_BONUS_1, KELVINISTS_POLICY_4} from '../../../src/server/turmoil/parties/Kelvinists';
 import {
-  KELVINISTS_MORE_PARTIES_POLICY_1,
   KELVINISTS_MORE_PARTIES_POLICY_2,
   KELVINISTS_MORE_PARTIES_POLICY_3,
 } from '../../../src/server/turmoil/parties/KelvinistsMoreParties';
@@ -75,12 +74,12 @@ describe('KelvinistsMoreParties', () => {
   });
 
   it('bonus B: gains 2 M€ per temperature-track step (adapted from the missing "individual" track)', () => {
-    game.increaseTemperature(player, 0); // no-op to ensure game state is set up
+    game.increaseTemperature(player, 2);
     const party = new KelvinistsMoreParties();
     const bonusB = party.bonuses[1];
     const before = player.megaCredits;
-    const score = bonusB.getScore(player);
+    expect(bonusB.getScore(player)).to.eq(2);
     bonusB.grantForPlayer(player);
-    expect(player.megaCredits).to.eq(before + score * 2);
+    expect(player.megaCredits).to.eq(before + 4);
   });
 });

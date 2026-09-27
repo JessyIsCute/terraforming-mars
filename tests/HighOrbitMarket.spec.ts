@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import {IGame} from '../src/server/IGame';
 import {Game} from '../src/server/Game';
-import {TestPlayer} from './TestPlayer';
 import {testGame} from './TestGame';
 import {CardName} from '../src/common/cards/CardName';
 
@@ -11,10 +10,9 @@ import {CardName} from '../src/common/cards/CardName';
 // lifecycle: initial deal, generation-start unlock/refill, and serialization.
 describe('High Orbit Infrastructure market', () => {
   let game: IGame;
-  let player: TestPlayer;
 
   beforeEach(() => {
-    [game, player] = testGame(2, {highOrbitExpansion: true});
+    [game] = testGame(2, {highOrbitExpansion: true});
   });
 
   it('deals exactly 3 rows of 5 filled slots at game start', () => {

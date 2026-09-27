@@ -8,7 +8,6 @@ import {runAllActions} from '../../TestingUtils';
 import {cast} from '../../../src/common/utils/utils';
 import {SelectAmount} from '../../../src/server/inputs/SelectAmount';
 import {SpaceTradingStation} from '../../../src/server/cards/highOrbit/SpaceTradingStation';
-import {PlanetaryOutpost} from '../../../src/server/cards/highOrbit/PlanetaryOutpost';
 import {HighOrbitMarketRow} from '../../../src/common/highOrbit/HighOrbitMarket';
 
 function oneRowMarket(...cardNames: Array<CardName | undefined>): Array<HighOrbitMarketRow> {
