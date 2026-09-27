@@ -17,7 +17,7 @@ import {PlayerId, GameId, SpectatorId, SpaceId, isGameId} from '../common/Types'
 import {AndThen, DeferredAction} from './deferredActions/DeferredAction';
 import {Priority} from './deferredActions/Priority';
 import {DeferredActionsQueue} from './deferredActions/DeferredActionsQueue';
-import {SerializedGame} from './SerializedGame';
+import {AdditionalResearch, SerializedGame} from './SerializedGame';
 import {SpaceBonus} from '../common/boards/SpaceBonus';
 import {TileType} from '../common/TileType';
 import {ICard} from './cards/ICard';
@@ -179,6 +179,9 @@ export interface IGame extends Logger {
   /** Initiates the first research phase, which is when a player chooses their starting hand, corps and preludes. */
   gotoInitialResearchPhase(): void;
   gotoResearchPhase(): void;
+  additionalResearch: AdditionalResearch | undefined;
+  requestAdditionalResearch(): void;
+  startAdditionalResearch(): void;
   save(): void;
   serialize(): SerializedGame;
   isSoloMode() :boolean;

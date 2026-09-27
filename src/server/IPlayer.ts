@@ -98,9 +98,6 @@ export interface IPlayer {
   // Sistemas Seebeck (fan): set right before an action resolves to mark it as free -
   // takeAction() checks and clears this instead of incrementing actionsTakenThisRound.
   skipNextActionIncrement: boolean;
-  // robAntilles (fan, Giga Interferometer): set while this player has an unanswered mid-generation
-  // ad hoc research/draft selection pending - takeAction() leaves their waitingFor alone until it clears.
-  awaitingAdHocResearch: boolean;
   // Luna Trade Federation
   canUseTitaniumAsMegacredits: boolean;
   // Martian Lumber Corp
@@ -348,7 +345,7 @@ export interface IPlayer {
   runProductionPhase(): void;
   finishProductionPhase(): void;
 
-  runResearchPhase(onFinished?: () => void): void;
+  runResearchPhase(restoring?: boolean): void;
   getCardCost(card: IProjectCard): number;
 
   /** The number of resources on this card for this player, or 0 if the player does not have this card. */

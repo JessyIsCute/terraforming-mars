@@ -34,7 +34,7 @@ import {SelectInitialCards} from './inputs/SelectInitialCards';
 import {PlaceOceanTile} from './deferredActions/PlaceOceanTile';
 import {RemoveColonyFromGame} from './deferredActions/RemoveColonyFromGame';
 import {GainResourcesDeferred} from './deferredActions/GainResourcesDeferred';
-import {SerializedGame} from './SerializedGame';
+import {AdditionalResearch, SerializedGame} from './SerializedGame';
 import {SpaceBonus} from '../common/boards/SpaceBonus';
 import {TileType, GREENERY_TILES} from '../common/TileType';
 import {Turmoil} from './turmoil/Turmoil';
@@ -161,6 +161,7 @@ export class Game implements IGame, Logger {
   private donePlayers = new Set<PlayerId>();
   private passedPlayers = new Set<PlayerId>();
   private researchedPlayers = new Set<PlayerId>();
+  public additionalResearch: AdditionalResearch | undefined;
   /** The first player of this generation. */
   public first: IPlayer;
 
@@ -603,6 +604,9 @@ export class Game implements IGame, Logger {
       venusScaleLevel: this.venusScaleLevel,
       verminInEffect: this.verminInEffect,
     };
+    if (this.additionalResearch !== undefined) {
+      result.additionalResearch = this.additionalResearch;
+    }
     if (this.aresData !== undefined) {
       result.aresData = this.aresData;
     }
@@ -861,10 +865,32 @@ export class Game implements IGame, Logger {
   public gotoResearchPhase(): void {
     this.phase = Phase.RESEARCH;
     this.researchedPlayers.clear();
-    this.save();
+    if (this.additionalResearch === undefined) {
+      this.save();
+    }
     this.players.forEach((player) => {
       player.runResearchPhase();
     });
+    if (this.additionalResearch !== undefined) {
+      this.save();
+    }
+  }
+
+  public requestAdditionalResearch(): void {
+    this.additionalResearch = {phase: this.phase, draftRound: this.draftRound, pending: true, exchangedPlayers: []};
+  }
+
+  /** Starts the extra phase after the triggering action and its effects finish. */
+  public startAdditionalResearch(): void {
+    if (this.additionalResearch?.pending !== true) {
+      return;
+    }
+    this.additionalResearch.pending = false;
+    if (this.gameOptions.draftVariant && !this.isSoloMode()) {
+      this.gotoDraftPhase();
+    } else {
+      this.gotoResearchPhase();
+    }
   }
 
   private gotoDraftPhase(): void {
@@ -1184,6 +1210,20 @@ export class Game implements IGame, Logger {
   public playerIsFinishedWithResearchPhase(player: IPlayer): void {
     this.deferredActions.runAllFor(player, () => {
       this.researchedPlayers.add(player.id);
+      if (this.additionalResearch !== undefined) {
+        player.draftedCards = [];
+        player.nextResearchKeepMax = undefined;
+        if (this.researchedPlayers.size === this.players.length) {
+          this.researchedPlayers.clear();
+          this.phase = this.additionalResearch.phase;
+          this.draftRound = this.additionalResearch.draftRound;
+          this.additionalResearch = undefined;
+          this.activePlayer.takeAction();
+        } else {
+          this.save();
+        }
+        return;
+      }
       if (this.researchedPlayers.size === this.players.length) {
         this.researchedPlayers.clear();
         this.phase = Phase.ACTION;
@@ -2057,8 +2097,21 @@ export class Game implements IGame, Logger {
     }
     game.verminInEffect = d.verminInEffect;
     game.exploitationOfVenusInEffect = d.exploitationOfVenusInEffect;
+    game.additionalResearch = d.additionalResearch;
     // Still in Draft or Research of generation 1
-    if (game.generation === 1 && players.some((p) => p.playedCards.filter(isICorporationCard).length === 0)) {
+    if (game.additionalResearch !== undefined) {
+      if (game.additionalResearch.pending) {
+        game.activePlayer.takeAction(false);
+      } else if (game.phase === Phase.DRAFTING) {
+        newStandardDraft(game).restoreDraft();
+      } else {
+        for (const player of players) {
+          if (!game.hasResearched(player)) {
+            player.runResearchPhase(true);
+          }
+        }
+      }
+    } else if (game.generation === 1 && players.some((p) => p.playedCards.filter(isICorporationCard).length === 0)) {
       if (game.phase === Phase.INITIALDRAFTING) {
         switch (game.initialDraftIteration) {
         case 1:
