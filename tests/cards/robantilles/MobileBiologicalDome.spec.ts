@@ -18,7 +18,7 @@ describe('MobileBiologicalDome', () => {
   beforeEach(() => {
     restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
     card = new MobileBiologicalDome();
-    [game, player] = testGame(1, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, robAntillesExpansion: true, morePartiesExpansion: true, moonExpansion: true});
   });
 
   afterEach(() => {

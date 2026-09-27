@@ -16,7 +16,7 @@ describe('WanderingStationHermes', () => {
   beforeEach(() => {
     restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
     card = new WanderingStationHermes();
-    [game, player] = testGame(1, {turmoilExtension: true, morePartiesExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, morePartiesExpansion: true, moonExpansion: true});
   });
 
   afterEach(() => {

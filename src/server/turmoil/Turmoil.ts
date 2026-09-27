@@ -82,6 +82,10 @@ export const MORE_PARTIES_ALL = {
 
 const PARTIES_IN_PLAY = 6;
 
+function isPartyCompatible(name: PartyName, options: GameOptions): boolean {
+  return name !== PartyName.SPOME || options.moonExpansion;
+}
+
 function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
   if (!gameOptions.morePartiesExpansion) {
     return [
@@ -92,7 +96,8 @@ function createParties(gameOptions: GameOptions): ReadonlyArray<IParty> {
   // (the 6 official ones plus Populists, Spome, Empower, Bureaucrats, Centrists and
   // Transhumanists) are chosen at random each game, rather than always using all 12.
   const names = Turmoil.shufflePartyNames(Object.keys(MORE_PARTIES_ALL) as Array<PartyName>);
-  return names.slice(0, PARTIES_IN_PLAY).map((name) => new MORE_PARTIES_ALL[name]());
+  return names.filter((name) => isPartyCompatible(name, gameOptions))
+    .slice(0, PARTIES_IN_PLAY).map((name) => new MORE_PARTIES_ALL[name]());
 }
 
 const UNINITIALIZED_POLITICAL_AGENDAS_DATA: PoliticalAgendasData = {
@@ -391,7 +396,7 @@ export class Turmoil {
       // swapInParty(). Outside moreParties (or during the initial setup reveal, see
       // initGlobalEvent) there's no swap to perform, so fall back to the old silent-skip
       // behavior.
-      if (!allowSwap || !game.gameOptions.morePartiesExpansion) {
+      if (!allowSwap || !game.gameOptions.morePartiesExpansion || !isPartyCompatible(partyName, game.gameOptions)) {
         return;
       }
       this.swapInParty(partyName, game);

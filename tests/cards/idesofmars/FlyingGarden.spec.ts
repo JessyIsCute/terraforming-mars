@@ -21,7 +21,7 @@ describe('FlyingGarden', () => {
   beforeEach(() => {
     restoreShuffle = forcePartiesInPlay(PartyName.SPOME);
     card = new FlyingGarden();
-    [game, player] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true});
+    [game, player] = testGame(1, {turmoilExtension: true, idesOfMarsExpansion: true, morePartiesExpansion: true, moonExpansion: true});
   });
 
   afterEach(() => {
