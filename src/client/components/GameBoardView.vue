@@ -20,7 +20,7 @@
 
   <template v-if="game.turmoil">
     <a class="hotkey-target"></a>
-    <Turmoil :turmoil="game.turmoil" :morePartiesExpansion="game.gameOptions.expansions.moreParties"/>
+    <Turmoil :turmoil="game.turmoil" :morePartiesExpansion="game.gameOptions.expansions.moreParties" :agendaStyle="game.gameOptions.politicalAgendasExtension"/>
   </template>
 
   <template v-if="game.moon">

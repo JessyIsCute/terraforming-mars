@@ -78,6 +78,8 @@
         </div>
       </div>
     </div>
+    <TurmoilAgendaReference v-if="agendaStyle === 'Chairman' || agendaStyle === 'PartyLeaders' || morePartiesExpansion"
+      :parties="referenceParties" :rulingParty="turmoil.ruling" :agendaStyle="agendaStyle" :morePartiesExpansion="morePartiesExpansion" />
 </template>
 
 <script lang="ts">
@@ -87,8 +89,9 @@ import {vueRoot} from '@/client/components/vueRoot';
 import {PartyName} from '@/common/turmoil/PartyName';
 import {TurmoilModel} from '@/common/models/TurmoilModel';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
+import TurmoilAgendaReference from '@/client/components/turmoil/TurmoilAgendaReference.vue';
 import GlobalEvent from '@/client/components/turmoil/GlobalEvent.vue';
-import {Agenda, BonusId, PolicyId} from '@/common/turmoil/Types';
+import {Agenda, AgendaStyle, BonusId, PolicyId} from '@/common/turmoil/Types';
 
 export default defineComponent({
   name: 'Turmoil',
@@ -100,6 +103,15 @@ export default defineComponent({
     morePartiesExpansion: {
       type: Boolean,
       default: false,
+    },
+    agendaStyle: {
+      type: String as () => AgendaStyle,
+      default: 'Standard',
+    },
+  },
+  computed: {
+    referenceParties(): Array<{name: PartyName; agenda: Agenda}> {
+      return this.turmoil.parties.map((party) => ({name: party.name, agenda: this.agendaFor(party.name)}));
     },
   },
   methods: {
@@ -159,6 +171,7 @@ export default defineComponent({
   components: {
     GlobalEvent,
     TurmoilAgenda,
+    TurmoilAgendaReference,
   },
 });
 

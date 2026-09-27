@@ -1,4 +1,4 @@
-import {BonusId, PolicyId} from '@/common/turmoil/Types';
+import {BonusId, PolicyId, BONUS_IDS, POLICY_IDS} from '@/common/turmoil/Types';
 import {PartyName} from '@/common/turmoil/PartyName';
 import {ClientAgenda} from '@/common/turmoil/ClientAgenda';
 // @ts-ignore agendas.json doesn't exist during npm run build
@@ -22,20 +22,10 @@ export function getAgendaOrThrow(id: BonusId | PolicyId, morePartiesExpansion: b
   return agenda;
 }
 
-// Always the standard (non-moreParties) ids for a party -- used by the Political Parties help
-// page, which shows every party's normal content regardless of which game options are active.
-export function getPartyAgendaIds(partyName: PartyName): {bonuses: Array<BonusId>; policies: Array<PolicyId>} {
-  const bonuses: Array<BonusId> = [];
-  const policies: Array<PolicyId> = [];
-  for (const id of Object.keys(agendas) as Array<BonusId | PolicyId>) {
-    if (agendas[id]?.partyName !== partyName) {
-      continue;
-    }
-    if (id[1] === 'b') {
-      bonuses.push(id as BonusId);
-    } else {
-      policies.push(id as PolicyId);
-    }
-  }
-  return {bonuses, policies};
+export function getPartyAgendaIds(partyName: PartyName, morePartiesExpansion: boolean = false): {bonuses: Array<BonusId>; policies: Array<PolicyId>} {
+  const source = morePartiesExpansion ? moreAgendas : agendas;
+  return {
+    bonuses: BONUS_IDS.filter((id) => source[id]?.partyName === partyName),
+    policies: POLICY_IDS.filter((id) => source[id]?.partyName === partyName),
+  };
 }
