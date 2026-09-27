@@ -28,7 +28,7 @@ describe('FloatingRig', () => {
   it('increases energy production on play', () => {
     setVenusScaleLevel(game, 16);
     card.play(player);
-    expect(player.production.energy).to.eq(3);
+    expect(player.production.energy).to.eq(1);
   });
 
   it('cannot act without steel', () => {

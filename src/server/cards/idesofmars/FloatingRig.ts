@@ -21,7 +21,7 @@ export class FloatingRig extends ActionCard implements IProjectCard, IActionCard
       requirements: {venus: 16, max},
 
       behavior: {
-        production: {energy: 3},
+        production: {energy: 1},
       },
 
       action: {
@@ -35,10 +35,10 @@ export class FloatingRig extends ActionCard implements IProjectCard, IActionCard
           b.action('Spend 1 steel to add a floater to this card.', (eb) => {
             eb.steel(1).startAction.resource(CardResource.FLOATER);
           }).br;
-          b.production((pb) => pb.energy(3)).br;
+          b.production((pb) => pb.energy(1)).br;
           b.vpText('1 VP for every 2 floaters on this card.');
         }),
-        description: 'Requires max 16% Venus. Increase your energy production 3 steps.',
+        description: 'Requires max 16% Venus. Increase your energy production 1 step.',
       },
     });
   }
