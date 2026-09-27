@@ -79,12 +79,12 @@
 }
 
 each(@players, {
-@c: ~"player_@{value}";
-.conglomerates-team-total--@{value} {
-  border-color: @@c;
-  box-shadow: 0 0 6px @@c;
-}
-})
+  @c: ~"player_@{value}";
+  .conglomerates-team-total--@{value} {
+    border-color: @@c;
+    box-shadow: 0 0 6px @@c;
+  }
+});
 
 // The per-member score row (e.g. "(6) (3)"), shown right under the team total -- one entry
 // per member, in the same order as the header's color swatches.
