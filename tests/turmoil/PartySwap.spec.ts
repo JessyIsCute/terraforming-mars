@@ -6,8 +6,8 @@ import {IGlobalEvent} from '../../src/server/turmoil/globalEvents/IGlobalEvent';
 import {GlobalEventName} from '../../src/common/turmoil/globalEvents/GlobalEventName';
 import {TestPlayer} from '../TestPlayer';
 import {testGame} from '../TestGame';
-import {PoliticalAgendas} from '../../src/server/turmoil/PoliticalAgendas';
 import {forcePartiesInPlay} from '../TestingUtils';
+import {PoliticalAgendas} from '../../src/server/turmoil/PoliticalAgendas';
 import {CardRenderer} from '../../src/server/cards/render/CardRenderer';
 
 // More Parties (fan): when a Global Event references a party that isn't among the game's 6
