@@ -128,8 +128,6 @@ export class Player implements IPlayer {
   public canUseEnergyAsMegaCredits: boolean = false;
   // Sistemas Seebeck (fan): see IPlayer.skipNextActionIncrement.
   public skipNextActionIncrement: boolean = false;
-  // robAntilles (fan, Giga Interferometer): see IPlayer.awaitingAdHocResearch.
-  public awaitingAdHocResearch: boolean = false;
   // Martian Lumber Corp
   public canUsePlantsAsMegacredits: boolean = false;
   // Luna Trade Federation
@@ -743,8 +741,9 @@ export class Player implements IPlayer {
     return total;
   }
 
-  public runResearchPhase(onFinished: () => void = () => this.game.playerIsFinishedWithResearchPhase(this)): void {
-    if (!this.game.gameOptions.draftVariant || this.game.isSoloMode()) {
+  public runResearchPhase(restoring: boolean = false): void {
+    const additionalResearch = this.game.additionalResearch;
+    if (!restoring && (!this.game.gameOptions.draftVariant || this.game.isSoloMode())) {
       this.draftedCards = newStandardDraft(this.game).draw(this);
     }
 
@@ -759,10 +758,13 @@ export class Player implements IPlayer {
     }
     if (this.nextResearchKeepMax !== undefined) {
       selectable = Math.min(selectable, this.nextResearchKeepMax);
-      this.nextResearchKeepMax = undefined;
+      if (additionalResearch === undefined) {
+        this.nextResearchKeepMax = undefined;
+      }
     }
 
-    const cards = copyAndClear(this.draftedCards);
+    // Extra research retains its offers until purchase completes, including across reloads.
+    const cards = additionalResearch === undefined ? copyAndClear(this.draftedCards) : this.draftedCards;
 
     const chooseCardsToBuy = () => {
       // TODO(kberg): Using .execute to rely on directly calling setWaitingFor is not great.
@@ -777,13 +779,14 @@ export class Player implements IPlayer {
       const saved = action.cb;
       action.cb = ((response) => {
         saved(response);
-        onFinished();
+        this.game.playerIsFinishedWithResearchPhase(this);
         return undefined;
       });
       return action;
     };
 
     if (this.game.underworldDraftEnabled &&
+      additionalResearch?.exchangedPlayers.includes(this.id) !== true &&
       this.underworldData.corruption > 0 &&
       cards.length >= 2 &&
       this.game.projectDeck.size() >= 2) {
@@ -793,6 +796,7 @@ export class Player implements IPlayer {
       options.options.push(new SelectCard('Spend 1 corruption to replace 2 cards', 'Spend Corruption', cards, {min: 2, max: 2}).andThen((discards) => {
         this.game.projectDeck.discard(...discards);
         UnderworldExpansion.loseCorruption(this, 1, {log: true});
+        additionalResearch?.exchangedPlayers.push(this.id);
         for (const discard of discards) {
           inplaceRemove(cards, discard);
         }
@@ -1723,11 +1727,8 @@ export class Player implements IPlayer {
       return;
     }
 
-    // robAntilles (fan, Giga Interferometer): a mid-generation ad hoc research phase set this
-    // player's waitingFor to their drafted-card selection. Leave it alone here instead of
-    // clobbering it with the normal next-action prompt below; runResearchPhase's onFinished
-    // callback clears the flag and resumes this method once they've answered it.
-    if (this.awaitingAdHocResearch) {
+    if (game.additionalResearch !== undefined) {
+      game.startAdditionalResearch();
       return;
     }
 

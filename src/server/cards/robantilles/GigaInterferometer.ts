@@ -32,23 +32,7 @@ export class GigaInterferometer extends Card implements IProjectCard {
   public override bespokePlay(player: IPlayer) {
     const game = player.game;
     game.log('${0} triggers an immediate research phase for every player', (b) => b.card(this));
-    // Draft games still require a separate mid-generation drafting flow.
-    const researchingPlayers = new Set(game.players);
-    for (const p of game.players) {
-      p.awaitingAdHocResearch = true;
-      p.runResearchPhase(() => {
-        game.deferredActions.runAllFor(p, () => {
-          researchingPlayers.delete(p);
-          if (researchingPlayers.size === 0) {
-            // Keep turns paused until all purchases and their effects finish.
-            for (const participant of game.players) {
-              participant.awaitingAdHocResearch = false;
-            }
-            player.takeAction();
-          }
-        });
-      });
-    }
+    game.requestAdditionalResearch();
     return undefined;
   }
 }

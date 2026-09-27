@@ -23,7 +23,16 @@ import {MilestoneName} from '../common/ma/MilestoneName';
 import {Tag} from '../common/cards/Tag';
 import {CardName} from '../common/cards/CardName';
 
+/** Return state for a research phase that interrupts an action turn. */
+export type AdditionalResearch = {
+    phase: Phase;
+    draftRound: number;
+    pending: boolean;
+    exchangedPlayers: Array<PlayerId>;
+};
+
 export type SerializedGame = {
+    additionalResearch?: AdditionalResearch;
     activePlayer: PlayerId;
     aresData?: AresData;
     awards: Array<AwardName>;
