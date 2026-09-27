@@ -80,10 +80,10 @@ describe('BetterMars replacement cards', () => {
     }
   });
 
-  it('cost bumps: Lunar Exports +1, Mars University +2, Meat Industry +1', () => {
+  it('adjusted costs: Lunar Exports 20, Mars University 10, Meat Industry 2', () => {
     expect(new LunarExportsBetterMars().cost).to.eq(20);
     expect(new MarsUniversityBetterMars().cost).to.eq(10);
-    expect(new MeatIndustryBetterMars().cost).to.eq(6);
+    expect(new MeatIndustryBetterMars().cost).to.eq(2);
   });
 
   it('each replacement has a unique BetterMars card number', () => {

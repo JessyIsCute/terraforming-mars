@@ -7,7 +7,7 @@ import {ICard} from '../ICard';
 import {CardResource} from '../../../common/CardResource';
 import {Resource} from '../../../common/Resource';
 
-/** Meat Industry, with an added Animal tag, 1 M€ more expensive, and only 1 M€ per animal (was 2). */
+/** Meat Industry, with an added Animal tag, 3 M€ cheaper, and only 1 M€ per animal (was 2). */
 export class MeatIndustryBetterMars extends MeatIndustry {
   public override get name() {
     return CardName.MEAT_INDUSTRY_BETTER_MARS;
