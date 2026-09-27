@@ -16,7 +16,6 @@ describe('TurmoilAgendaReference', () => {
       ...globalConfig,
       props: {parties, rulingParty: PartyName.SCIENTISTS, agendaStyle: 'Chairman', morePartiesExpansion: false},
     });
-    expect(wrapper.find('details').element.open).is.false;
     expect(wrapper.findAll('button').map((button) => button.text())).to.deep.eq(['Scientists', 'Greens']);
     expect(wrapper.findAll('[data-agenda-id]').map((option) => option.attributes('data-agenda-id')))
       .to.deep.eq(['sb01', 'sb02', 'sp01', 'sp02', 'sp03', 'sp04']);
@@ -36,7 +35,7 @@ describe('TurmoilAgendaReference', () => {
   it('uses More Parties descriptions and updates when a selected party leaves play', async () => {
     const wrapper = mount(TurmoilAgendaReference, {
       ...globalConfig,
-      props: {parties, agendaStyle: 'PartyLeaders', morePartiesExpansion: true},
+      props: {parties, agendaStyle: 'Chairman', morePartiesExpansion: true},
     });
     expect(wrapper.text()).to.contain('All players are considered having 2 more science tags');
     expect(wrapper.text()).not.to.contain('Pay 10 M€ to draw 3 cards');
@@ -54,11 +53,29 @@ describe('TurmoilAgendaReference', () => {
       .to.deep.eq(['spob01', 'spop02']);
   });
 
+  it('shows only the current policy of each party without Chairman', async () => {
+    const wrapper = mount(TurmoilAgendaReference, {
+      ...globalConfig,
+      props: {parties, agendaStyle: 'Random', morePartiesExpansion: false},
+    });
+    expect(wrapper.findAll('[data-agenda-id]').map((option) => option.attributes('data-agenda-id')))
+      .to.deep.eq(['sp01', 'gp04']);
+    expect(wrapper.findAll('.party-name').map((party) => party.text())).to.deep.eq(['Scientists', 'Greens']);
+    expect(wrapper.findAll('button')).to.have.length(0);
+    expect(wrapper.text()).not.to.contain('Available bonuses');
+    expect(wrapper.text()).not.to.contain('Available policies');
+    await wrapper.setProps({agendaStyle: 'PartyLeaders', morePartiesExpansion: true,
+      parties: [{name: PartyName.SPOME, agenda: {bonusId: 'spob01', policyId: 'spop02'}}]});
+    expect(wrapper.findAll('[data-agenda-id]').map((option) => option.attributes('data-agenda-id')))
+      .to.deep.eq(['spop02']);
+    expect(wrapper.text()).to.contain('Every time you place a lunar habitat tile, gain 4 M€');
+  });
+
   it('renders nothing without parties', () => {
     const wrapper = mount(TurmoilAgendaReference, {
       ...globalConfig,
       props: {parties: [], agendaStyle: 'Chairman', morePartiesExpansion: false},
     });
-    expect(wrapper.find('details').exists()).is.false;
+    expect(wrapper.find('.agenda-reference').exists()).is.false;
   });
 });

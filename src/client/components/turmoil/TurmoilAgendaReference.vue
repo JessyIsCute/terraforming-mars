@@ -1,7 +1,6 @@
 <template>
-  <details v-if="activeParty" class="agenda-reference">
-    <summary v-i18n>Party reference</summary>
-    <div class="agenda-reference-body">
+  <div v-if="activeParty" class="agenda-reference">
+    <div v-if="agendaStyle === 'Chairman'" class="agenda-reference-body">
       <div class="agenda-reference-parties">
         <button v-for="party in parties" :key="party.name" type="button"
           :aria-pressed="party.name === activeParty.name"
@@ -28,7 +27,14 @@
         </section>
       </div>
     </div>
-  </details>
+    <div v-else class="agenda-reference-body agenda-reference-current-policies">
+      <article v-for="party in parties" :key="party.name" :data-agenda-id="party.agenda.policyId" class="agenda-reference-option">
+        <div :class="'party-name party-name--' + party.name.toLowerCase().replaceAll(' ', '_')" v-i18n>{{ party.name }}</div>
+        <div class="agenda-reference-icon"><TurmoilAgenda :id="party.agenda.policyId" :morePartiesExpansion="morePartiesExpansion" /></div>
+        <p v-i18n>{{ getAgendaOrThrow(party.agenda.policyId, morePartiesExpansion).description }}</p>
+      </article>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,7 +42,7 @@ import {computed, ref} from 'vue';
 import {PartyName} from '@/common/turmoil/PartyName';
 import {Agenda, AgendaStyle, agendaInfoById} from '@/common/turmoil/Types';
 import {getAgendaOrThrow, getPartyAgendaIds} from '@/client/turmoil/ClientAgendaManifest';
-import TurmoilAgenda from './TurmoilAgenda.vue';
+import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
 
 const props = defineProps<{
   parties: ReadonlyArray<{name: PartyName; agenda: Agenda}>;
@@ -64,9 +70,7 @@ const sections = computed(() => {
 <style scoped>
 .agenda-reference {
   box-sizing: border-box;
-  width: min(890px, calc(100vw - 48px));
-  max-width: 100%;
-  margin: 12px 0 24px;
+  width: 100%;
   color: #e7ebee;
   background: #242a30;
   border: 1px solid #64717b;
@@ -74,15 +78,14 @@ const sections = computed(() => {
   text-align: left;
 }
 
-summary {
-  padding: 14px 18px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
+.agenda-reference-body {
+  padding: 18px;
 }
 
-.agenda-reference-body {
-  padding: 0 18px 18px;
+.agenda-reference-current-policies {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .agenda-reference-parties {
@@ -104,7 +107,7 @@ button[aria-pressed="true"] {
   border-color: #efc765;
 }
 
-button:focus-visible, summary:focus-visible {
+button:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
@@ -189,13 +192,13 @@ h3 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .agenda-reference-options {
+  .agenda-reference-options, .agenda-reference-current-policies {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 450px) {
-  .agenda-reference-options {
+  .agenda-reference-options, .agenda-reference-current-policies {
     grid-template-columns: minmax(0, 1fr);
   }
 }

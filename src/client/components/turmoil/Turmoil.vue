@@ -33,9 +33,9 @@
           </div>
           <div class="policies">
             <div class="policies-title">
-                <a class="policies-clickable" href="#" @click.prevent="toggleMe()" v-i18n>Policies</a>
+                <a ref="policiesLink" class="policies-clickable" href="#" @click.prevent="toggleMe()" v-i18n>Policies</a>
             </div>
-            <div v-show="isVisible()" class='policies-global'>
+            <div v-if="!hasAgendas" v-show="isVisible()" class='policies-global'>
               <div v-for="party in turmoil.parties" :key="party.name" class='policy-block'>
                 <div :class="'party-name party-name--'+partyNameToCss(party.name)" v-i18n>{{party.name}}</div>
 
@@ -78,8 +78,14 @@
         </div>
       </div>
     </div>
-    <TurmoilAgendaReference v-if="agendaStyle === 'Chairman' || agendaStyle === 'PartyLeaders' || morePartiesExpansion"
-      :parties="referenceParties" :rulingParty="turmoil.ruling" :agendaStyle="agendaStyle" :morePartiesExpansion="morePartiesExpansion" />
+    <Teleport to="body">
+      <PopupPanel v-if="showReference" class="agenda-reference-popup" role="dialog" aria-labelledby="agenda-reference-title" @close="closeReference">
+        <template #header>
+          <h2 ref="referenceTitle" id="agenda-reference-title" tabindex="-1" v-i18n>{{ agendaStyle === 'Chairman' ? 'Party reference' : 'Policies' }}</h2>
+        </template>
+        <TurmoilAgendaReference :parties="referenceParties" :rulingParty="turmoil.ruling" :agendaStyle="agendaStyle" :morePartiesExpansion="morePartiesExpansion" />
+      </PopupPanel>
+    </Teleport>
 </template>
 
 <script lang="ts">
@@ -90,6 +96,7 @@ import {PartyName} from '@/common/turmoil/PartyName';
 import {TurmoilModel} from '@/common/models/TurmoilModel';
 import TurmoilAgenda from '@/client/components/turmoil/TurmoilAgenda.vue';
 import TurmoilAgendaReference from '@/client/components/turmoil/TurmoilAgendaReference.vue';
+import PopupPanel from '@/client/components/common/PopupPanel.vue';
 import GlobalEvent from '@/client/components/turmoil/GlobalEvent.vue';
 import {Agenda, AgendaStyle, BonusId, PolicyId} from '@/common/turmoil/Types';
 
@@ -109,7 +116,13 @@ export default defineComponent({
       default: 'Standard',
     },
   },
+  data() {
+    return {showReference: false};
+  },
   computed: {
+    hasAgendas(): boolean {
+      return this.agendaStyle !== 'Standard' || this.morePartiesExpansion;
+    },
     referenceParties(): Array<{name: PartyName; agenda: Agenda}> {
       return this.turmoil.parties.map((party) => ({name: party.name, agenda: this.agendaFor(party.name)}));
     },
@@ -160,20 +173,61 @@ export default defineComponent({
     getPolicy(partyName: PartyName): PolicyId {
       return this.agendaFor(partyName).policyId;
     },
-    toggleMe() {
+    async toggleMe() {
+      if (this.hasAgendas) {
+        this.showReference = true;
+        await this.$nextTick();
+        const title = this.$refs.referenceTitle;
+        if (title instanceof HTMLElement) {
+          title.focus();
+        }
+        return;
+      }
       const currentState: boolean = this.isVisible();
       vueRoot(this).setVisibilityState('turmoil_parties', ! currentState);
     },
     isVisible() {
       return vueRoot(this).getVisibilityState('turmoil_parties');
     },
+    closeReference() {
+      this.showReference = false;
+      const link = this.$refs.policiesLink;
+      if (link instanceof HTMLElement) {
+        link.focus();
+      }
+    },
   },
   components: {
     GlobalEvent,
     TurmoilAgenda,
     TurmoilAgendaReference,
+    PopupPanel,
   },
 });
 
 </script>
+
+<style scoped>
+.agenda-reference-popup :deep(.popup-inner) {
+  box-sizing: border-box;
+  width: min(960px, calc(100vw - 32px));
+  height: auto;
+  max-height: 90vh;
+  padding: 16px;
+}
+
+.agenda-reference-popup :deep(.popup-header) {
+  margin: 0 0 16px;
+  gap: 12px;
+}
+
+.agenda-reference-popup :deep(.close-button) {
+  position: static;
+}
+
+#agenda-reference-title {
+  margin: 0;
+  font-size: 20px;
+}
+</style>
 
