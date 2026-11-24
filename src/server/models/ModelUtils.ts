@@ -13,6 +13,7 @@ import {Tag} from '../../common/cards/Tag';
 import {asArray} from '../../common/utils/utils';
 import {isIStandardProjectCard} from '../cards/IStandardProjectCard';
 import {isCustomCardName, getCustomCardDefinition} from '../cards/CustomCardRegistry';
+import {getAssembledCardDefinition} from '../assembler/AssembledCardRegistry';
 import {NEUTRAL_COLONY_OWNER} from '../../common/Types';
 
 export function cardsToModel(
@@ -98,6 +99,22 @@ export function cardsToModel(
         module: 'customCards',
         compatibility: getCustomCardDefinition(card.name)?.compatibility ?? [],
       };
+    }
+    // Assembler: generated during the game, so not in the static manifest either.
+    const assembled = getAssembledCardDefinition(card.name);
+    if (assembled !== undefined) {
+      model.customCard = {
+        type: card.type,
+        cost: card.cost,
+        tags: card.tags,
+        requirements: card.requirements,
+        metadata: card.metadata,
+        resourceType: card.resourceType,
+        module: 'customCards',
+        compatibility: [],
+        hasAction: assembled.action !== undefined,
+      };
+      model.combinedDisplayName = assembled.title;
     }
     // Same reasoning as Custom Card Maker cards above: DeimosDoubleDownCopy's face varies
     // per instance (whichever Space event it copies), so it's not in the static manifest

@@ -9,6 +9,8 @@ import {ALL_MODULE_MANIFESTS} from './cards/AllManifests';
 import {resolveCardName} from '../common/cards/CardRenames';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getCustomCardDefinition} from './cards/CustomCardRegistry';
+import {getAssembledCardDefinition} from './assembler/AssembledCardRegistry';
+import {newAssembledCard} from './assembler/AssembledCard';
 
 function _createCard<T extends ICard>(cardName: CardName, cardManifestNames: Array<keyof ModuleManifest>): T | undefined {
   const standardizedCardName = resolveCardName(cardName);
@@ -32,6 +34,11 @@ function _createCard<T extends ICard>(cardName: CardName, cardManifestNames: Arr
     const def = getCustomCardDefinition(standardizedCardName);
     if (def !== undefined) {
       return <T> <unknown> new DataDrivenCard(def);
+    }
+    // Assembler: cards generated during a game, registered by that game (see AssembledCardRegistry).
+    const assembled = getAssembledCardDefinition(standardizedCardName);
+    if (assembled !== undefined) {
+      return <T> <unknown> newAssembledCard(assembled);
     }
   }
   return undefined;

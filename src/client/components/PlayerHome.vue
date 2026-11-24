@@ -174,7 +174,7 @@ import {CardType} from '@/common/cards/CardType';
 import {getCardsByType, isCardActivated} from '@/client/utils/CardUtils';
 import {sortActiveCards} from '@/client/utils/ActiveCardsSortingOrder';
 import {CardModel} from '@/common/models/CardModel';
-import {getCardOrThrow} from '../cards/ClientCardManifest';
+import {getClientCard} from '../cards/CustomCardAdapter';
 import {HomeMixin} from '@/client/mixins/HomeMixin';
 
 type PlayerHomeModel = {
@@ -328,11 +328,11 @@ export default defineComponent({
       }
     },
     isActive(cardModel: CardModel): boolean {
-      const card = getCardOrThrow(cardModel.name);
-      return card.type === CardType.ACTIVE || card.hasAction;
+      const card = getClientCard(cardModel);
+      return card !== undefined && (card.type === CardType.ACTIVE || card.hasAction);
     },
     isNotActive(cardModel: CardModel): boolean {
-      return !getCardOrThrow(cardModel.name).hasAction;
+      return getClientCard(cardModel)?.hasAction !== true;
     },
   },
 });

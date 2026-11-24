@@ -1,3 +1,5 @@
+import {AssembledCardDefinition} from './assembler/AssembledCardDefinition';
+import {registerAssembledCard} from './assembler/AssembledCardRegistry';
 import * as constants from '../common/constants';
 import {BeginnerCorporation} from './cards/corporation/BeginnerCorporation';
 import {Board} from './boards/Board';
@@ -140,6 +142,8 @@ export class Game implements IGame, Logger {
   // High Orbit (fan): see IGame.highOrbitMarket / IGame.highOrbitDeck.
   public highOrbitMarket: Array<HighOrbitMarketRow> = [];
   public highOrbitDeck: Array<CardName> = [];
+  // Assembler (fan): see IGame.assembledCards.
+  public assembledCards: Array<AssembledCardDefinition> = [];
   // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration.
   public resourceRemovalBlockedThisGeneration: boolean = false;
   public phase: Phase = Phase.RESEARCH;
@@ -555,6 +559,7 @@ export class Game implements IGame, Logger {
       cardsPlayedThisGeneration: Array.from(this.cardsPlayedThisGeneration),
       highOrbitMarket: this.highOrbitMarket,
       highOrbitDeck: this.highOrbitDeck,
+      assembledCards: this.assembledCards.length > 0 ? this.assembledCards : undefined,
       resourceRemovalBlockedThisGeneration: this.resourceRemovalBlockedThisGeneration,
       ceoDeck: this.ceoDeck.serialize(),
       colonies: this.colonies.map((colony) => colony.serialize()),
@@ -1934,6 +1939,8 @@ export class Game implements IGame, Logger {
   }
 
   public static deserialize(d: SerializedGame): Game {
+    // Assembled cards must be findable by name before anything rebuilds hands, tableaus or decks.
+    d.assembledCards?.forEach(registerAssembledCard);
     const gameOptions = d.gameOptions;
     gameOptions.boardName = normalizeBoardName(gameOptions.boardName);
     const players = d.players.map((element) => Player.deserialize(element));
@@ -2021,6 +2028,7 @@ export class Game implements IGame, Logger {
     game.cardsPlayedThisGeneration = new Set<CardName>(d.cardsPlayedThisGeneration ?? []);
     game.highOrbitMarket = d.highOrbitMarket ?? [];
     game.highOrbitDeck = d.highOrbitDeck ?? [];
+    game.assembledCards = d.assembledCards ?? [];
     game.resourceRemovalBlockedThisGeneration = d.resourceRemovalBlockedThisGeneration ?? false;
     game.researchedPlayers = new Set<PlayerId>(d.researchedPlayers);
 

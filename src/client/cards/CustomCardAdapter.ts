@@ -1,6 +1,7 @@
 import {CardName} from '@/common/cards/CardName';
 import {ClientCard} from '@/common/cards/ClientCard';
-import {CustomCardModel} from '@/common/models/CardModel';
+import {CardModel, CustomCardModel} from '@/common/models/CardModel';
+import {getCard} from '@/client/cards/ClientCardManifest';
 
 /**
  * Builds a `ClientCard`-shaped object from the wire-provided `CustomCardModel` fallback data
@@ -21,6 +22,14 @@ export function buildClientCardFromCustom(name: CardName, customCard: CustomCard
     metadata: customCard.metadata,
     resourceType: customCard.resourceType,
     compatibility: customCard.compatibility,
-    hasAction: false,
+    hasAction: customCard.hasAction ?? false,
   };
+}
+
+/**
+ * The client-side card for a card model: from the static manifest, or, for a card generated or
+ * authored at runtime (Custom Card Maker, Assembler), from the face data the server sent along.
+ */
+export function getClientCard(model: CardModel): ClientCard | undefined {
+  return getCard(model.name) ?? (model.customCard !== undefined ? buildClientCardFromCustom(model.name, model.customCard) : undefined);
 }

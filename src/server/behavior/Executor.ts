@@ -43,6 +43,7 @@ import {ProxyCard} from '../cards/ProxyCard';
 import {From} from '../logs/From';
 import {BaseStock} from '../player/StockBase';
 import {AddResourcesToAnyCardExecutor} from './AddResourcesToAnyCardExecutor';
+import {AssemblerExpansion} from '../assembler/AssemblerExpansion';
 
 /**
  * Caps each count at what `lose` is allowed to take: never below zero, so a countable that
@@ -556,6 +557,9 @@ export class Executor implements BehaviorExecutor {
 
     if (behavior.decreaseAnyProduction !== undefined) {
       player.game.defer(new DecreaseAnyProduction(player, behavior.decreaseAnyProduction.type, {count: behavior.decreaseAnyProduction.count}));
+    }
+    if (behavior.assemble !== undefined) {
+      AssemblerExpansion.assemble(player.game, behavior.assemble, player);
     }
     if (behavior.removeAnyPlants !== undefined) {
       player.game.defer(new RemoveAnyPlants(player, behavior.removeAnyPlants));

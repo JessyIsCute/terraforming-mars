@@ -138,6 +138,9 @@ export type Behavior = {
   /** Draw this many cards from the deck. */
   drawCard?: number | DrawCard,
 
+  /** Assembler (fan): generate this many new cards and shuffle them into the project deck. */
+  assemble?: number,
+
   /** Greeneries cost one plant less. */
   greeneryDiscount?: 1,
 

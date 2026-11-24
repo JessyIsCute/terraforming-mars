@@ -31,6 +31,8 @@ export interface CustomCardModel {
     resourceType?: CardResource;
     module: GameModule;
     compatibility: Array<Expansion>;
+    /** Whether the card has a repeatable action (blue cards). Absent means no. */
+    hasAction?: boolean;
 }
 
 export interface CardModel {

@@ -25,6 +25,15 @@ export class CardRenderer {
     if (isLiveServer()) {
       return EMPTY_ROOT;
     }
+    return CardRenderer.runtimeBuilder(f);
+  }
+
+  /**
+   * Like `builder`, but always builds the tree, even on the live server. For cards created at
+   * runtime (e.g. Assembler), whose face the client can't get from cards.json, so the server
+   * sends renderData over the wire.
+   */
+  public static runtimeBuilder(f: (builder: Builder<CardRenderRoot>) => void): ICardRenderRoot {
     const builder = new RootBuilder();
     f(builder);
     return builder.build();

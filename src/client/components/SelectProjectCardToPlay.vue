@@ -45,7 +45,7 @@
 import {defineComponent} from 'vue';
 import {SpendableResource} from '@/common/inputs/Spendable';
 import Card from '@/client/components/card/Card.vue';
-import {getCardOrThrow} from '@/client/cards/ClientCardManifest';
+import {getClientCard} from '@/client/cards/CustomCardAdapter';
 import {CardModel} from '@/common/models/CardModel';
 import {CardOrderStorage} from '@/client/utils/CardOrderStorage';
 import {PaymentWidgetMixin} from '@/client/mixins/PaymentWidgetMixin';
@@ -144,7 +144,7 @@ export default defineComponent({
       reserveUnits: card?.reserveUnits ?? Units.EMPTY,
       cards: cards,
       cost: card?.calculatedCost ?? 0,
-      tags: card !== undefined ? getCardOrThrow(card.name).tags : [],
+      tags: card !== undefined ? (getClientCard(card)?.tags ?? []) : [],
       available: Units.of({}),
     };
   },
@@ -173,7 +173,7 @@ export default defineComponent({
       if (this.cardName === undefined) {
         return [];
       }
-      return getCardOrThrow(this.cardName).tags;
+      return getClientCard(this.getCard())?.tags ?? [];
     },
     updateAvailableUnits() {
       const thisPlayer = this.playerView.thisPlayer;

@@ -1,3 +1,4 @@
+import {AssembledCardDefinition} from './assembler/AssembledCardDefinition';
 import {Phase} from '../common/Phase';
 import {SerializedClaimedMilestone} from './milestones/ClaimedMilestone';
 import {SerializedFundedAward} from './awards/FundedAward';
@@ -37,6 +38,8 @@ export type SerializedGame = {
     // compatibility with saves from before this field existed (or from the old flat-map shape).
     highOrbitMarket?: Array<HighOrbitMarketRow>;
     highOrbitDeck?: Array<CardName>;
+    // Assembler (fan): see IGame.assembledCards. Optional: absent in games that never assembled.
+    assembledCards?: Array<AssembledCardDefinition>;
     // Solaris (fan): see IGame.resourceRemovalBlockedThisGeneration. Optional for backward
     // compatibility with saves from before this field existed.
     resourceRemovalBlockedThisGeneration?: boolean;

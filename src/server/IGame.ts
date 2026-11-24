@@ -1,3 +1,4 @@
+import {AssembledCardDefinition} from './assembler/AssembledCardDefinition';
 import {MarsBoard} from './boards/MarsBoard';
 import {GlobalParametersConfig} from '../common/GlobalParameterConfig';
 import {CardName} from '../common/cards/CardName';
@@ -82,6 +83,11 @@ export interface IGame extends Logger {
    * in `Game.newInstance`, drawn from to refill market slots at the start of each generation.
    */
   highOrbitDeck: Array<CardName>;
+  /**
+   * Assembler (fan): every card this game has assembled. They exist nowhere else, and hands and
+   * decks only store names, so their definitions are saved with the game.
+   */
+  assembledCards: Array<AssembledCardDefinition>;
   /**
    * Solaris (fan): Anti Fraud Investigation. When true, no player may remove resources from
    * any card for the rest of the generation. Set true by Anti Fraud Investigation's play

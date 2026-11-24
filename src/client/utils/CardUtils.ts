@@ -1,11 +1,11 @@
 import {CardModel} from '@/common/models/CardModel';
 import {CardType} from '@/common/cards/CardType';
 import {PublicPlayerModel} from '@/common/models/PlayerModel';
-import {getCard} from '@/client/cards/ClientCardManifest';
+import {getClientCard} from '@/client/cards/CustomCardAdapter';
 
 export function getCardsByType(inCards: ReadonlyArray<CardModel>, cardTypes: ReadonlyArray<CardType>): ReadonlyArray<CardModel> {
   const outCards = inCards.filter((inCard) => {
-    const outCard = getCard(inCard.name);
+    const outCard = getClientCard(inCard);
     if (outCard === undefined) {
       return false;
     }
