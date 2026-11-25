@@ -14,6 +14,8 @@ export const EFFECT_CATEGORIES = [
   'knowledge', 'city',
   'prestige', 'infamy',
   'efficiency', 'synergy',
+  'rust', 'theft',
+  'espionage', 'forgetting',
 ] as const;
 
 export type EffectCategory = typeof EFFECT_CATEGORIES[number];
@@ -43,6 +45,10 @@ export const EFFECT_CATEGORY_INFO: Record<EffectCategory, EffectCategoryInfo> = 
   infamy: {label: 'Infamy', description: 'Lose victory points.', bane: true},
   efficiency: {label: 'Efficiency', description: 'Cards cost less to play.', bane: false},
   synergy: {label: 'Synergy', description: 'Gain resources when you play a tag.', bane: false},
+  rust: {label: 'Rust', description: 'Remove steel, titanium or their production, from you or another player.', bane: true},
+  theft: {label: 'Theft', description: 'Steal resources from another player.', bane: false},
+  espionage: {label: 'Espionage', description: 'Make your opponents discard cards.', bane: false},
+  forgetting: {label: 'Forgetting', description: 'Discard cards from your hand.', bane: true},
 };
 
 export function isEffectCategory(s: string): s is EffectCategory {

@@ -206,7 +206,18 @@ Most negatives are the same formulas with a minus sign, so costs stay consistent
 | Your cards with tag T cost +X M€ | −8 × share(T) × X | no ×2: you won't build around a penalty |
 | Your standard projects cost +X M€ | −2.3 × X | mirror of Standard Technology |
 | Remove up to X plants from any player | +0.3 per plant | good for you, but barely |
-| Lower any player's production 1 step | +2.5 | good for you |
+| Lower any player's production 1 step | +40% of that step's value | good for you; 1-3 steps of any resource (steel/titanium is **Rust**) |
+| Steal X resources from another player | +1 × stock value × X | **Theft** |
+| Every opponent discards a card | +1.5 | **Espionage** |
+| Discard X cards from your hand | −2 × X | **Forgetting** |
+
+### Complexity score and bold cards
+
+A card shows its **complexity score**: 1 per benefit, effect or action, drawback and requirement,
+plus 1 per tag after the first. Low is 1, mid 2-4, high 5 or more. 30% of mid and high cards are
+**bold**: one benefit 2-3 times the usual size (4 steel production, 4 VP, 3 TR, draw 4…) paired
+with an equally big drawback. Benefits also pull matching tags: money leans Earth, plants lean
+Plant/Microbe, metal leans Building/Space/Jovian, and so on (3× likelier per matching benefit).
 
 ## Where your anchors and the data disagree
 

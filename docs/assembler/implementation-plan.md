@@ -132,6 +132,15 @@ reload, which happens after every move. So:
 - Icon widths in `AssemblerRender.ts` were measured in the browser; 480 generated cards were
   checked with no icons past the card edge.
 
+### More categories, bold cards and PvP (done)
+- New categories: Rust (lose steel/titanium), Theft (steal), Espionage (opponents discard),
+  Forgetting (discard from your hand).
+- Bold cards: a big benefit and a big drawback; multi-VP; decrease any production of any resource.
+- Tag theming by benefit category; the complexity score (1 per part, +1 per extra tag) is shown
+  instead of Low/Mid/High.
+- Next: resources on cards (animals, microbes, floaters), production per X tags, more trigger
+  rewards.
+
 ### Phase 4 — v2 effects and tuning
 - Trigger effects ("when you play a X tag, gain Y") as a generic trigger card class.
 - Recount tag synergy from the game's actual card pool at setup (see value-table.md, "Make it

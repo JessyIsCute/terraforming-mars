@@ -1,5 +1,5 @@
 import {CardRenderer} from '../cards/render/CardRenderer';
-import {all, digit} from '../cards/Options';
+import {all, digit, uppercase} from '../cards/Options';
 import {Units} from '../../common/Units';
 import {Behavior} from '../behavior/Behavior';
 import {AssembledCardDefinition} from './AssembledCardDefinition';
@@ -117,18 +117,14 @@ export function renderAssembled(def: AssembledCardDefinition) {
       }).br;
     }
 
-    const behavior = def.behavior;
-    if (behavior === undefined) {
-      return;
-    }
-
+    const behavior = def.behavior ?? {};
     const production = numbers(behavior.production);
     const decreaseAny = behavior.decreaseAnyProduction;
     const losses = Object.fromEntries(Object.entries(production).filter(([, n]) => n < 0));
     const gains = Object.fromEntries(Object.entries(production).filter(([, n]) => n > 0));
     const hasLoss = Object.keys(losses).length > 0 || decreaseAny !== undefined;
     const hasGain = Object.keys(gains).length > 0;
-    const instant = instantGroups(behavior);
+    const instant = instantGroups(def);
     if (hasLoss || hasGain) {
       b.production((pb) => {
         const p = pb as unknown as ItemBuilder;
@@ -176,13 +172,15 @@ type RowBuilder = ItemBuilder & {
   oceans(n: number): RowBuilder;
   greenery(): RowBuilder;
   city(): RowBuilder;
-  cards(n: number): RowBuilder;
+  cards(n: number, options?: {all?: boolean, digit?: boolean}): RowBuilder;
+  text(text: string, options?: {uppercase?: boolean}): RowBuilder;
 };
 
 /** A one-off play effect: how to draw it, and how many icons wide it is. */
 type Group = {width: number, draw: (b: RowBuilder) => void};
 
-function instantGroups(behavior: Behavior): Array<Group> {
+function instantGroups(def: AssembledCardDefinition): Array<Group> {
+  const behavior = def.behavior ?? {};
   const groups: Array<Group> = [];
   const lose = behavior.lose?.stock as Partial<Units> | undefined;
   if (lose !== undefined) {
@@ -198,19 +196,19 @@ function instantGroups(behavior: Behavior): Array<Group> {
   const g = behavior.global;
   if (g?.temperature) {
     const n = g.temperature;
-    groups.push({width: 0.6, draw: (b) => b.temperature(n)});
+    groups.push({width: 0.6 * n, draw: (b) => b.temperature(n)});
   }
   if (g?.oxygen) {
     const n = g.oxygen;
-    groups.push({width: 1.4, draw: (b) => b.oxygen(n)});
+    groups.push({width: 1.4 * n, draw: (b) => b.oxygen(n)});
   }
   if (g?.venus) {
     const n = g.venus;
-    groups.push({width: 1.8, draw: (b) => b.venus(n)});
+    groups.push({width: 1.8 * n, draw: (b) => b.venus(n)});
   }
   if (typeof behavior.tr === 'number') {
     const n = behavior.tr;
-    groups.push({width: 1.6, draw: (b) => b.tr(n)});
+    groups.push({width: 1.6 * n, draw: (b) => b.tr(n)});
   }
   if (behavior.ocean !== undefined) {
     const n = behavior.ocean.count ?? 1;
@@ -224,7 +222,29 @@ function instantGroups(behavior: Behavior): Array<Group> {
   }
   if (typeof behavior.drawCard === 'number') {
     const n = behavior.drawCard;
-    groups.push({width: n, draw: (b) => b.cards(n)});
+    groups.push({width: n >= DIGIT_FROM ? 1.5 : n, draw: (b) => b.cards(n, n >= DIGIT_FROM ? {digit} : undefined)});
+  }
+  const steal = def.steal;
+  if (steal !== undefined) {
+    const r = steal.resource as Resource;
+    groups.push({width: 1.6 + iconCount(r, steal.count), draw: (b) => {
+      b.text('steal', {uppercase});
+      b[r](steal.count, steal.count >= DIGIT_FROM && r !== 'megacredits' ? {all, digit} : {all});
+    }});
+  }
+  if (def.discard !== undefined) {
+    const n = def.discard;
+    groups.push({width: n + 0.5, draw: (b) => {
+      b.minus();
+      b.cards(n);
+    }});
+  }
+  if (def.opponentsDiscard !== undefined) {
+    const n = def.opponentsDiscard;
+    groups.push({width: n + 0.5, draw: (b) => {
+      b.minus();
+      b.cards(n, {all});
+    }});
   }
   if (behavior.removeAnyPlants !== undefined) {
     const n = Math.abs(behavior.removeAnyPlants);
@@ -279,12 +299,12 @@ export function estimateContentHeight(def: AssembledCardDefinition): number {
   for (const t of def.effectTexts) {
     h += EFFECT_HEIGHT + textHeight(stripLabel(t));
   }
-  const behavior = def.behavior;
-  if (behavior !== undefined) {
+  const behavior = def.behavior ?? {};
+  {
     const production = Object.values(numbers(behavior.production));
     const hasLoss = production.some((n) => n < 0) || behavior.decreaseAnyProduction !== undefined;
     const hasGain = production.some((n) => n > 0);
-    const instant = instantGroups(behavior);
+    const instant = instantGroups(def);
     let width = instantWidth(instant);
     if (hasLoss || hasGain) {
       h += ROW_HEIGHT + (hasLoss && hasGain ? PRODUCTION_ROW_HEIGHT : 0);

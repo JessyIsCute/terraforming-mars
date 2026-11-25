@@ -36,6 +36,7 @@ export function addAssembledCardModel(model: CardModel, card: ICard, assembled: 
   model.combinedDisplayName = assembled.title;
   model.assembled = {
     complexity: assembled.complexity,
+    ...(assembled.complexityScore !== undefined ? {score: assembled.complexityScore} : {}),
     value: assembled.value,
     breakdown: assembled.breakdown,
     costAdjust: assembled.costAdjust,

@@ -7,6 +7,8 @@ import {CardName} from '../../common/cards/CardName';
 import {Units} from '../../common/Units';
 import {AssembledCardDefinition} from './AssembledCardDefinition';
 import {renderAssembled} from './AssemblerRender';
+import {StealResources} from '../deferredActions/StealResources';
+import {DiscardCards} from '../deferredActions/DiscardCards';
 
 function properties(def: AssembledCardDefinition): StaticCardProperties {
   return {
@@ -40,10 +42,29 @@ function onTrigger(def: AssembledCardDefinition, player: IPlayer, card: ICard) {
   return undefined;
 }
 
+/** The on-play parts the Behavior DSL doesn't cover: stealing and discarding. */
+function onPlay(def: AssembledCardDefinition, player: IPlayer) {
+  if (def.steal !== undefined) {
+    player.game.defer(new StealResources(player, def.steal.resource, def.steal.count));
+  }
+  if (def.discard !== undefined) {
+    player.game.defer(new DiscardCards(player, def.discard, def.discard));
+  }
+  if (def.opponentsDiscard !== undefined) {
+    for (const opponent of player.opponents) {
+      player.game.defer(new DiscardCards(opponent, def.opponentsDiscard, def.opponentsDiscard));
+    }
+  }
+  return undefined;
+}
+
 /** A generated card with no action. See AssemblerGenerator. */
 export class AssembledCard extends Card implements IProjectCard {
   constructor(public readonly definition: AssembledCardDefinition) {
     super(properties(definition));
+  }
+  public override bespokePlay(player: IPlayer) {
+    return onPlay(this.definition, player);
   }
   public onCardPlayed(player: IPlayer, card: ICard) {
     return onTrigger(this.definition, player, card);
@@ -61,6 +82,9 @@ function requireAction(def: AssembledCardDefinition) {
 export class AssembledActionCard extends ActionCard implements IProjectCard {
   constructor(public readonly definition: AssembledCardDefinition) {
     super({...properties(definition), action: requireAction(definition)});
+  }
+  public override bespokePlay(player: IPlayer) {
+    return onPlay(this.definition, player);
   }
   public onCardPlayed(player: IPlayer, card: ICard) {
     return onTrigger(this.definition, player, card);

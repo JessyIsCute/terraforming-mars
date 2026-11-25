@@ -6,7 +6,7 @@ import {CardName} from '../../common/cards/CardName';
 import {IProjectCard} from '../cards/IProjectCard';
 import {OPEN_SOURCE_BLUEPRINTS_DISCOUNT, OPEN_SOURCE_BLUEPRINTS_PRESET} from '../cards/assembler/OpenSourceBlueprints';
 import * as V from './AssemblerValues';
-import {PROFILE} from './AssemblerGenerator';
+import {COMPLEXITY_SCORE, PROFILE} from './AssemblerGenerator';
 import {CATEGORY_WORDS, MAJOR_VALUE} from './AssemblerNames';
 import {AssembleSpec} from './AssembleSpec';
 
@@ -120,7 +120,10 @@ export function buildValueTable(): AssemblerValueTableModel {
     ['Place a greenery tile (and raise oxygen)', num(V.GREENERY_VALUE), 'Plants'],
     ['Place a city tile', num(V.CITY_VALUE), 'City'],
     ['Remove 1 plant from any player', num(V.REMOVE_PLANT_VALUE), 'Blight'],
-    ['Decrease any production 1 step', num(V.DECREASE_ANY_PRODUCTION_VALUE), 'Cooling / Blight / Debt'],
+    ['Decrease any production 1 step', `${pct(V.DECREASE_ANY_FACTOR)} of the step's value (M€ ${num(V.DECREASE_ANY_FACTOR * V.PRODUCTION_VALUE.megacredits)}, titanium ${num(V.DECREASE_ANY_FACTOR * V.PRODUCTION_VALUE.titanium)})`, 'Cooling / Blight / Debt / Drain / Rust'],
+    ['Steal 1 resource from another player', `${num(V.STEAL_FACTOR)} × its stock value`, 'Theft'],
+    ['Discard a card from your hand', num(-V.DISCARD_VALUE), 'Forgetting'],
+    ['Every opponent discards a card', num(V.OPPONENT_DISCARD_VALUE), 'Espionage'],
   ]));
 
   sections.push(section('Effects and actions', ['What', 'How it\'s valued', 'Example'], [false, false, false], [
@@ -159,7 +162,7 @@ export function buildValueTable(): AssemblerValueTableModel {
       const p = PROFILE[c];
       return [c.charAt(0).toUpperCase() + c.slice(1), range(p.slots), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance)];
     }),
-    'Every benefit, effect or action, drawback and requirement takes a slot. Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest. A card that ends up busier than asked for (a guaranteed effect, a minimum cost) shows the higher complexity.'));
+    `Every benefit, effect or action, drawback and requirement takes a slot. A card's complexity score is 1 per slot plus 1 per tag after the first; the card shows that score. Low cards score ${COMPLEXITY_SCORE.low}, mid up to ${COMPLEXITY_SCORE.mid}, high more. Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest. ${pct(V.BOLD_CHANCE)} of mid and high cards are bold: one big benefit (up to 2-3 times the usual amount) paid for by one big drawback. A card that ends up busier than asked for shows the higher complexity.`));
 
   sections.push(section('Effect categories and names', ['Category', 'Kind', 'What counts', 'Nouns', 'Adjectives (small / big)', 'Endings'], [false, false, false, false, false, false],
     EFFECT_CATEGORIES.map((c) => {

@@ -99,7 +99,17 @@ export const TAG_REQUIREMENT_EXPONENT = 1.5;
 
 /** Attacks are worth a little to the attacker. */
 export const REMOVE_PLANT_VALUE = 0.3;
-export const DECREASE_ANY_PRODUCTION_VALUE = 2.5;
+/** Lowering another player's production: this share of what one step is worth (to them). */
+export const DECREASE_ANY_FACTOR = 0.4;
+/** Stealing: you gain it if someone has it, and they lose it. Times the resource's stock value. */
+export const STEAL_FACTOR = 1;
+/** Discarding a card from your hand (you pick your worst). */
+export const DISCARD_VALUE = 2;
+/** Every opponent discards a card. */
+export const OPPONENT_DISCARD_VALUE = 1.5;
+
+/** Mid and high cards: the chance of one big benefit paired with one big drawback. */
+export const BOLD_CHANCE = 0.3;
 
 export const MIN_COST = 1;
 export const MAX_COST = 40;

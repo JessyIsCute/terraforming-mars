@@ -106,6 +106,26 @@ export const CATEGORY_WORDS: Record<EffectCategory, Words> = {
     adjectives: [['Linked', 'Tuned'], ['Resonant', 'Harmonic']],
     endings: ['of Echoes', 'of Harmony'],
   },
+  rust: {
+    nouns: [['Scrap Yard', 'Rust Pit'], ['Corrosion Plant', 'Ore Wrecker']],
+    adjectives: [['Rusty', 'Corroded'], ['Crumbling', 'Ruined']],
+    endings: ['of Rust', 'of Decay'],
+  },
+  theft: {
+    nouns: [['Raider', 'Smuggler Den'], ['Pirate Base', 'Black Market']],
+    adjectives: [['Sly', 'Pilfering'], ['Plundering', 'Ruthless']],
+    endings: ['of Thieves', 'of the Raid'],
+  },
+  espionage: {
+    nouns: [['Spy Post', 'Listening Post'], ['Spy Network', 'Shadow Bureau']],
+    adjectives: [['Covert', 'Snooping'], ['Shadowy', 'Subversive']],
+    endings: ['of Whispers', 'of Shadows'],
+  },
+  forgetting: {
+    nouns: [['Shredder', 'Recycle Bin'], ['Memory Wipe', 'Purge Center']],
+    adjectives: [['Forgetful', 'Hasty'], ['Amnesiac', 'Reckless']],
+    endings: ['of Oblivion', 'of Lost Plans'],
+  },
 };
 
 /** What the namer needs to know about each part of the card. */

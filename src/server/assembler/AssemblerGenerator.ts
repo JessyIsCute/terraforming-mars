@@ -19,6 +19,9 @@ type Draft = {
   cardDiscount: Array<CardDiscount>;
   trigger?: AssembledTrigger;
   victoryPoints: number;
+  steal?: {resource: Resource, count: number};
+  discard?: number;
+  opponentsDiscard?: number;
 };
 
 type PartKind = 'good' | 'effect' | 'bad';
@@ -60,7 +63,9 @@ const LOSS_CATEGORY = {
   energy: 'drain',
   heat: 'cooling',
   plants: 'blight',
-} as const satisfies Partial<Record<V.StandardResource, EffectCategory>>;
+  steel: 'rust',
+  titanium: 'rust',
+} as const satisfies Record<V.StandardResource, EffectCategory>;
 
 const GLOBAL_CATEGORY = {temperature: 'heat', oxygen: 'air', venus: 'air'} as const satisfies Record<string, EffectCategory>;
 
@@ -118,10 +123,37 @@ export const PROFILE: Record<AssemblerComplexity, {slots: [number, number], effe
   high: {slots: [4, 6], effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5},
 };
 
-/** The complexity a card's slot count reads as. */
-export function complexityOfSlots(slots: number): AssemblerComplexity {
-  return slots <= PROFILE.low.slots[1] ? 'low' : slots <= PROFILE.mid.slots[1] ? 'mid' : 'high';
+/**
+ * A card's complexity score: 1 per benefit, effect or action, drawback and requirement, plus 1 per
+ * tag after the first. Low cards score 1, mid 2-4, high 5 or more.
+ */
+export const COMPLEXITY_SCORE = {low: 1, mid: 4} as const;
+
+/** The complexity a score reads as. */
+export function complexityOfScore(score: number): AssemblerComplexity {
+  return score <= COMPLEXITY_SCORE.low ? 'low' : score <= COMPLEXITY_SCORE.mid ? 'mid' : 'high';
 }
+
+/**
+ * Tags that fit each kind of benefit: money cards lean Earth, plant cards Plant, and so on. A card
+ * is this many times likelier to draw a tag that fits one of its benefits.
+ */
+const THEME: Partial<Record<EffectCategory, ReadonlyArray<Tag>>> = {
+  money: [Tag.EARTH],
+  metal: [Tag.BUILDING, Tag.SPACE, Tag.JOVIAN],
+  plants: [Tag.PLANT, Tag.MICROBE],
+  heat: [Tag.SPACE, Tag.POWER],
+  energy: [Tag.POWER, Tag.BUILDING],
+  water: [Tag.SPACE],
+  air: [Tag.VENUS, Tag.MICROBE],
+  knowledge: [Tag.SCIENCE],
+  city: [Tag.CITY, Tag.BUILDING],
+  prestige: [Tag.JOVIAN, Tag.SPACE],
+  efficiency: [Tag.BUILDING, Tag.SCIENCE],
+  theft: [Tag.EARTH, Tag.SPACE],
+  espionage: [Tag.EARTH, Tag.SCIENCE],
+};
+const THEME_BOOST = 3;
 
 const COMPLEXITY_ORDER: ReadonlyArray<AssemblerComplexity> = ['low', 'mid', 'high'];
 
@@ -180,56 +212,85 @@ export class AssemblerGenerator {
 
   // ---- parts -------------------------------------------------------------------------------------
 
-  private goodPart(): Part {
+  /**
+   * A benefit. `big`: a bold card's headline benefit, 2-3 times the usual amount (it comes with a
+   * big drawback). Only parts that scale take part then.
+   */
+  private goodPart(big = false): Part {
+    const scaling: Array<readonly [() => Part, number]> = [
+      [() => this.gainStock(big), 10],
+      [() => this.gainProduction(big), 10],
+      [() => {
+        const n = big ? this.int(2, 3) : 1;
+        return {kind: 'good', key: 'tr', text: `Raise your TR ${n} ${n === 1 ? 'step' : 'steps'}.`, value: V.TR_VALUE * n, category: 'prestige', apply: (d) => d.behavior.tr = n};
+      }, 3],
+      [() => this.raiseGlobal(big), 4],
+      [() => {
+        const n = big ? this.int(3, 4) : this.int(1, 2);
+        return {kind: 'good', key: 'draw', text: `Draw ${plural(n, 'card')}.`, value: V.DRAW_CARD_VALUE * n, category: 'knowledge', apply: (d) => d.behavior.drawCard = n};
+      }, 4],
+      [() => {
+        const n = big ? this.int(3, 4) : this.weighted<number>([[1, 3], [2, 3], [3, 1]]);
+        return {kind: 'good', key: 'vp', text: '', value: V.VP_VALUE * n, lasting: true, category: 'prestige', apply: (d) => d.victoryPoints = n};
+      }, 4],
+      [() => this.decreaseAny(big), 1.5],
+      [() => this.steal(big), 1.2],
+    ];
+    if (big) {
+      return this.weighted(scaling)();
+    }
     return this.weighted<() => Part>([
-      [() => this.gainStock(), 10],
-      [() => this.gainProduction(), 10],
-      [() => ({kind: 'good', key: 'tr', text: 'Raise your TR 1 step.', value: V.TR_VALUE, category: 'prestige', apply: (d) => d.behavior.tr = 1}), 3],
-      [() => this.raiseGlobal(), 4],
+      ...scaling,
       [() => ({kind: 'good', key: 'ocean', text: 'Place an ocean tile.', value: V.OCEAN_VALUE, category: 'water', apply: (d) => d.behavior.ocean = {}}), 2],
       [() => ({kind: 'good', key: 'greenery', text: 'Place a greenery tile and raise oxygen 1 step.', value: V.GREENERY_VALUE, hintTag: Tag.PLANT, category: 'plants', apply: (d) => d.behavior.greenery = {}}), 1.5],
       [() => ({kind: 'good', key: 'city', text: 'Place a city tile.', value: V.CITY_VALUE, lasting: true, hintTag: Tag.CITY, category: 'city', apply: (d) => d.behavior.city = {}}), 1.5],
       [() => {
-        const n = this.int(1, 2);
-        return {kind: 'good', key: 'draw', text: `Draw ${plural(n, 'card')}.`, value: V.DRAW_CARD_VALUE * n, category: 'knowledge', apply: (d) => d.behavior.drawCard = n};
-      }, 4],
-      [() => {
-        const n = this.int(1, 2);
-        return {kind: 'good', key: 'vp', text: '', value: V.VP_VALUE * n, lasting: true, category: 'prestige', apply: (d) => d.victoryPoints = n};
-      }, 4],
-      [() => {
         const n = this.int(2, 4);
         return {kind: 'good', key: 'removePlants', text: `Remove up to ${n} plants from any player.`, value: V.REMOVE_PLANT_VALUE * n, category: 'blight', apply: (d) => d.behavior.removeAnyPlants = n};
       }, 0.6],
-      [() => {
-        const r = this.pick([Resource.MEGACREDITS, Resource.HEAT, Resource.PLANTS] as const);
-        return {kind: 'good', key: 'decreaseAny', text: `Decrease any ${NAME[r]} production 1 step.`, value: V.DECREASE_ANY_PRODUCTION_VALUE, category: LOSS_CATEGORY[r],
-          apply: (d) => d.behavior.decreaseAnyProduction = {type: r, count: 1}};
-      }, 0.6],
+      [() => ({kind: 'good', key: 'opponentsDiscard', text: 'Each opponent discards 1 card.', value: V.OPPONENT_DISCARD_VALUE, category: 'espionage', apply: (d) => d.opponentsDiscard = 1}), 0.8],
     ])();
   }
 
-  private gainStock(): Part {
+  /** PvP: lower another player's production. Losing steel or titanium production is Rust. */
+  private decreaseAny(big: boolean): Part {
+    const r = this.weighted<V.StandardResource>([['megacredits', 3], ['steel', 1.5], ['titanium', 1], ['plants', 2], ['energy', 1.5], ['heat', 2]]);
+    const n = big ? this.int(2, 3) : this.int(1, 2);
+    return {kind: 'good', key: 'decreaseAny', text: `Decrease any ${NAME[r]} production ${n} ${n === 1 ? 'step' : 'steps'}.`,
+      value: V.DECREASE_ANY_FACTOR * V.PRODUCTION_VALUE[r] * n, category: LOSS_CATEGORY[r],
+      apply: (d) => d.behavior.decreaseAnyProduction = {type: r as Resource, count: n}};
+  }
+
+  /** PvP: steal resources from another player. */
+  private steal(big: boolean): Part {
+    const [r, lo, hi] = this.pick([['megacredits', 3, 6], ['steel', 2, 3], ['titanium', 1, 2], ['plants', 2, 4], ['heat', 3, 5], ['energy', 2, 3]] as const);
+    const n = big ? hi * 2 : this.int(lo, hi);
+    return {kind: 'good', key: 'steal', text: `Steal up to ${amount(n, r)} from any player.`, value: V.STEAL_FACTOR * V.STOCK_VALUE[r] * n, category: 'theft',
+      apply: (d) => d.steal = {resource: r as Resource, count: n}};
+  }
+
+  private gainStock(big = false): Part {
     const r = this.pick(Object.keys(V.STOCK_VALUE) as Array<V.StandardResource>);
-    const n = r === 'megacredits' ? this.int(2, 8) : this.int(1, 5);
+    const n = r === 'megacredits' ? (big ? this.int(10, 16) : this.int(2, 8)) : (big ? this.int(6, 10) : this.int(1, 5));
     return {kind: 'good', key: `stock.${r}`, text: `Gain ${amount(n, r)}.`, value: V.STOCK_VALUE[r] * n, category: GAIN_CATEGORY[r],
       apply: (d) => d.behavior.stock = {...d.behavior.stock, [r]: n}};
   }
 
-  private gainProduction(): Part {
+  private gainProduction(big = false): Part {
     const r = this.weighted<V.StandardResource>([['megacredits', 4], ['steel', 2], ['titanium', 1], ['plants', 2], ['energy', 2], ['heat', 2]]);
-    const n = r === 'megacredits' ? this.int(1, 3) : this.int(1, 2);
+    const n = r === 'megacredits' ? (big ? this.int(4, 6) : this.int(1, 3)) : (big ? this.int(3, 4) : this.int(1, 2));
     const hint = r === 'energy' ? Tag.POWER : r === 'plants' ? Tag.PLANT : r === 'steel' ? Tag.BUILDING : r === 'titanium' ? Tag.SPACE : undefined;
     return {kind: 'good', key: `production.${r}`, text: `Increase your ${NAME[r]} production ${n} ${n === 1 ? 'step' : 'steps'}.`,
       value: V.PRODUCTION_VALUE[r] * n, lasting: true, hintTag: hint, category: GAIN_CATEGORY[r],
       apply: (d) => d.behavior.production = {...d.behavior.production, [r]: n}};
   }
 
-  private raiseGlobal(): Part {
+  private raiseGlobal(big = false): Part {
     const g = this.pick(['temperature', 'oxygen', 'venus'] as const);
-    return {kind: 'good', key: `global.${g}`, text: `Raise ${g === 'venus' ? 'Venus' : g} 1 step.`, value: V.GLOBAL_STEP_VALUE[g], category: GLOBAL_CATEGORY[g],
+    const n = big ? 2 : 1;
+    return {kind: 'good', key: `global.${g}`, text: `Raise ${g === 'venus' ? 'Venus' : g} ${n} ${n === 1 ? 'step' : 'steps'}.`, value: V.GLOBAL_STEP_VALUE[g] * n, category: GLOBAL_CATEGORY[g],
       hintTag: g === 'venus' ? Tag.VENUS : undefined,
-      apply: (d) => d.behavior.global = {...d.behavior.global, [g]: 1}};
+      apply: (d) => d.behavior.global = {...d.behavior.global, [g]: n}};
   }
 
   private effectPart(): Part {
@@ -282,26 +343,35 @@ export class AssemblerGenerator {
     ])();
   }
 
-  private badPart(): Part {
+  /** A drawback. `big`: a bold card's big drawback, paying for its big benefit. */
+  private badPart(big = false): Part {
     return this.weighted<() => Part>([
       [() => {
-        const r = this.weighted<keyof typeof LOSS_CATEGORY>([['megacredits', 4], ['energy', 3], ['heat', 1], ['plants', 1]]);
-        const n = r === 'megacredits' ? this.int(1, 2) : 1;
+        const r = this.weighted<V.StandardResource>([['megacredits', 4], ['energy', 3], ['heat', 1], ['plants', 1], ['steel', 0.7], ['titanium', 0.4]]);
+        const n = r === 'megacredits' ? (big ? this.int(3, 4) : this.int(1, 2)) : (big ? 2 : 1);
         return {kind: 'bad', key: `production.${r}`, text: `Decrease your ${NAME[r]} production ${n} ${n === 1 ? 'step' : 'steps'}.`,
           value: -V.PRODUCTION_VALUE[r] * n, category: LOSS_CATEGORY[r], apply: (d) => d.behavior.production = {...d.behavior.production, [r]: -n}};
       }, 5],
       [() => {
-        const r = this.pick(['plants', 'heat', 'energy'] as const);
-        const n = this.int(2, 4);
+        const r = this.pick(['plants', 'heat', 'energy', 'steel', 'titanium'] as const);
+        const n = big ? this.int(5, 8) : this.int(2, 4);
         return {kind: 'bad', key: 'lose', text: `Lose ${amount(n, r)}.`, value: -V.STOCK_VALUE[r] * n, category: LOSS_CATEGORY[r],
           apply: (d) => d.behavior.lose = {stock: {[r]: n}}};
       }, 3],
-      [() => ({kind: 'bad', key: 'vp', text: '', value: -V.VP_VALUE, category: 'infamy', apply: (d) => d.victoryPoints = -1}), 2],
+      [() => {
+        const n = big ? this.int(2, 3) : 1;
+        return {kind: 'bad', key: 'vp', text: '', value: -V.VP_VALUE * n, category: 'infamy', apply: (d) => d.victoryPoints = -n};
+      }, 2],
+      [() => {
+        const n = big ? this.int(2, 3) : 1;
+        return {kind: 'bad', key: 'discard', text: `Discard ${plural(n, 'card')} from your hand.`, value: -V.DISCARD_VALUE * n, category: 'forgetting', apply: (d) => d.discard = n};
+      }, 1.5],
       [() => {
         const tag = this.pick([Tag.SPACE, Tag.BUILDING, Tag.EARTH, Tag.SCIENCE]);
-        const text = `Effect: When you play ${an(tag)} tag, you pay 1 M€ more for it.`;
+        const x = big ? 2 : 1;
+        const text = `Effect: When you play ${an(tag)} tag, you pay ${x} M€ more for it.`;
         return {kind: 'bad', key: 'blue', blue: true, text: '', effectText: text,
-          value: -V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0), category: 'debt', apply: (d) => d.cardDiscount.push({tag, amount: -1})};
+          value: -x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0), category: 'debt', apply: (d) => d.cardDiscount.push({tag, amount: -x})};
       }, 1.5],
       [() => ({kind: 'bad', key: 'blue', blue: true, text: '', effectText: 'Effect: When you play a card, you pay 1 M€ more for it.',
         value: -V.CARDS_PLAYED_AFTER, category: 'debt', apply: (d) => d.cardDiscount.push({amount: -1})}), 0.7],
@@ -369,6 +439,10 @@ export class AssemblerGenerator {
     const parts: Array<Part> = [...new Set(spec.categories ?? [])].map((c) => this.partOf(c));
     const has = (kind: PartKind) => parts.filter((p) => p.kind === kind).length;
     const slots = this.int(...profile.slots);
+    // A bold card: one big benefit, paid for by one big drawback (mid and high only).
+    if (complexity !== 'low' && this.chance(V.BOLD_CHANCE)) {
+      parts.push(this.goodPart(true), this.badPart(true));
+    }
     if (has('effect') === 0 && this.chance(profile.effectChance)) {
       parts.push(this.effectPart());
     }
@@ -437,7 +511,11 @@ export class AssemblerGenerator {
       tags.push(hint);
     }
     // A wild tag on an event is gone once the event resolves: it never helps, so events don't get one.
-    const tagWeights = type === CardType.EVENT ? TAG_WEIGHTS.filter(([t]) => t !== Tag.WILD) : TAG_WEIGHTS;
+    // Tags that fit the card's benefits are likelier.
+    const themes = parts.filter((p) => p.kind !== 'bad').flatMap((p) => THEME[p.category] ?? []);
+    const tagWeights = TAG_WEIGHTS
+      .filter(([t]) => type !== CardType.EVENT || t !== Tag.WILD)
+      .map(([t, w]) => [t, w * (1 + THEME_BOOST * themes.filter((x) => x === t).length)] as const);
     while (tags.length < nTags) {
       const t = this.weighted(tagWeights);
       if (!tags.includes(t)) {
@@ -499,7 +577,8 @@ export class AssemblerGenerator {
     const effectTexts = parts.filter((p) => p.effectText !== undefined).map((p) => p.effectText as string);
     // Forced extras (a guaranteed drawback, a requirement, a minimum cost) can make a card busier
     // than asked for; it then says so.
-    const actual = complexityOfSlots(parts.length + (requirement !== undefined ? 1 : 0));
+    const score = parts.length + (requirement !== undefined ? 1 : 0) + Math.max(0, tags.length - 1);
+    const actual = complexityOfScore(score);
     const shown = COMPLEXITY_ORDER.indexOf(actual) > COMPLEXITY_ORDER.indexOf(complexity) ? actual : complexity;
     const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), shown, (items) => this.pick(items));
 
@@ -516,6 +595,10 @@ export class AssemblerGenerator {
       action: draft.action,
       cardDiscount: draft.cardDiscount.length > 0 ? draft.cardDiscount : undefined,
       trigger: draft.trigger,
+      ...(draft.steal !== undefined ? {steal: draft.steal} : {}),
+      ...(draft.discard !== undefined ? {discard: draft.discard} : {}),
+      ...(draft.opponentsDiscard !== undefined ? {opponentsDiscard: draft.opponentsDiscard} : {}),
+      complexityScore: score,
       description,
       effectTexts,
       value,

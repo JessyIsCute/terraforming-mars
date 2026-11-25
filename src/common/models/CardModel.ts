@@ -39,6 +39,8 @@ export interface CustomCardModel {
 /** Assembler (fan): how a card generated during the game was priced. Shown in its info popup. */
 export interface AssembledCardInfo {
     complexity: 'low' | 'mid' | 'high';
+    /** Complexity score: 1 per effect, drawback and requirement, plus 1 per tag after the first. */
+    score?: number;
     /** What the card is worth, in M€. Its cost is round(value - 3), plus costAdjust. */
     value: number;
     /** category: set when the line is one of the card's parts. */

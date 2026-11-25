@@ -1,3 +1,4 @@
+import {Resource} from '../../common/Resource';
 import {CardType} from '../../common/cards/CardType';
 import {Tag} from '../../common/cards/Tag';
 import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescriptor';
@@ -43,6 +44,17 @@ export interface AssembledCardDefinition {
   action?: Behavior;
   cardDiscount?: Array<CardDiscount>;
   trigger?: AssembledTrigger;
+  /** On play: steal up to `count` of a standard resource from another player. */
+  steal?: {resource: Resource, count: number};
+  /** On play: discard this many cards from your hand. */
+  discard?: number;
+  /** On play: every opponent discards this many cards from their hand. */
+  opponentsDiscard?: number;
+  /**
+   * 1 per benefit, effect or action, drawback and requirement, plus 1 per tag after the first.
+   * Not set on cards saved before it existed.
+   */
+  complexityScore?: number;
   /** Text for the card's on-play part. */
   description: string;
   /** Effect / action texts, in the order they're drawn. */

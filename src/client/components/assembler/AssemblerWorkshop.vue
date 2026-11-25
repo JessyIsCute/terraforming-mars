@@ -127,7 +127,7 @@
             <Card :card="card" auto-tall/>
             <div v-if="card.assembled !== undefined" class="assembler-score">
               <div class="assembler-score-head">
-                <span class="assembler-complexity" :class="'assembler-complexity--' + card.assembled.complexity">{{ $t(complexityLabel(card.assembled.complexity)) }}</span>
+                <span class="assembler-complexity" :class="'assembler-complexity--' + card.assembled.complexity" :title="$t('1 per effect, drawback and requirement, plus 1 per tag after the first')">{{ complexityText(card) }}</span>
                 <span><span v-i18n>value</span> {{ card.assembled.value }}</span>
               </div>
               <div class="assembler-score-effects">
@@ -257,6 +257,13 @@ export default defineComponent({
     },
     tagLabel(tag: string): string {
       return tag.charAt(0).toUpperCase() + tag.slice(1);
+    },
+    complexityText(card: CardModel): string {
+      const info = card.assembled;
+      if (info === undefined) {
+        return '';
+      }
+      return info.score !== undefined ? `${this.$t('Complexity')} ${info.score}` : this.$t(this.complexityLabel(info.complexity));
     },
     complexityLabel(c: string): string {
       return c === 'low' ? 'Low complexity' : c === 'mid' ? 'Mid complexity' : 'High complexity';
