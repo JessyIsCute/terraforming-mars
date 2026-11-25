@@ -14,9 +14,11 @@
     <div class="assembler-tabs">
       <a href="#" class="assembler-tab" :class="{'assembler-tab--on': view === 'generator'}" @click.prevent="show('generator')" v-i18n>Generator</a>
       <a href="#values" class="assembler-tab" :class="{'assembler-tab--on': view === 'values'}" @click.prevent="show('values')" v-i18n>Value table</a>
+      <a href="#rate" class="assembler-tab" :class="{'assembler-tab--on': view === 'rate'}" @click.prevent="show('rate')" v-i18n>Rate cards</a>
     </div>
 
     <AssemblerValueTable v-if="view === 'values'"/>
+    <AssemblerRater v-else-if="view === 'rate'"/>
     <div v-else class="assembler-layout">
       <form class="assembler-controls" @submit.prevent="generate">
         <fieldset class="assembler-fieldset">
@@ -144,6 +146,7 @@
 import {defineComponent} from 'vue';
 import Card from '@/client/components/card/Card.vue';
 import AssemblerValueTable from '@/client/components/assembler/AssemblerValueTable.vue';
+import AssemblerRater from '@/client/components/assembler/AssemblerRater.vue';
 import {CardModel} from '@/common/models/CardModel';
 import {paths} from '@/common/app/paths';
 import {EFFECT_CATEGORIES, EFFECT_CATEGORY_INFO, EffectCategory} from '@/common/assembler/EffectCategory';
@@ -152,8 +155,15 @@ import {ASSEMBLER_PREVIEW_LIMITS, ASSEMBLER_PREVIEW_TAGS, AssemblerPreviewRespon
 /** The page's options, as query parameters (see src/common/assembler/AssemblerPreview.ts). */
 const KEYS = ['count', 'complexity', 'type', 'seed', 'categories', 'tags', 'tagCount', 'minCost', 'maxCost', 'costAdjust', 'requirement'] as const;
 
+type View = 'generator' | 'values' | 'rate';
+
+function viewFromHash(hash: string): View {
+  // #values (or a section link inside it) opens the value table.
+  return hash.startsWith('#values') ? 'values' : hash === '#rate' ? 'rate' : 'generator';
+}
+
 type DataModel = {
-  view: 'generator' | 'values',
+  view: View,
   count: number,
   complexity: string,
   type: string,
@@ -194,12 +204,12 @@ export default defineComponent({
   components: {
     Card,
     AssemblerValueTable,
+    AssemblerRater,
   },
   data(): DataModel {
     return {
       ...defaults(),
-      // #values (or a section link inside it) opens the value table.
-      view: window.location.hash.startsWith('#values') ? 'values' : 'generator',
+      view: viewFromHash(window.location.hash),
       cards: [],
       seed: undefined,
       failed: 0,
@@ -233,12 +243,17 @@ export default defineComponent({
     if (KEYS.some((k) => params.has(k))) {
       this.fromQuery(params);
     }
-    this.generate();
+    if (this.view === 'generator') {
+      this.generate();
+    }
   },
   methods: {
-    show(view: 'generator' | 'values') {
+    show(view: View) {
       this.view = view;
-      history.replaceState(null, '', view === 'values' ? '#values' : window.location.pathname + window.location.search);
+      if (view === 'generator' && this.cards.length === 0 && !this.loading) {
+        this.generate();
+      }
+      history.replaceState(null, '', view === 'generator' ? window.location.pathname + window.location.search : '#' + view);
     },
     tagLabel(tag: string): string {
       return tag.charAt(0).toUpperCase() + tag.slice(1);

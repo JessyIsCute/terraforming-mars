@@ -143,3 +143,17 @@ reload, which happens after every move. So:
 
 Push to `main` → the VPS's `tm-deploy.timer` builds and restarts within ~5 minutes. A restart
 reloads games from the database, so the Phase 1 save/load tests are what keep live games safe.
+
+## Rating mode ("Rate cards" tab)
+
+`/assembler#rate` shows one generated card at a time with five verdicts, from "Way too cheap" to "Way too expensive" (keys 1–5; S skips).
+Votes are kept in the browser's localStorage (`assemblerVotes`) and downloaded as JSON.
+The side panel shows, for each kind of effect, the average verdict on cards that have it.
+
+To turn downloaded votes into suggested changes:
+
+    npx tsx src/server/tools/assembler_votes.ts votes.json [more.json ...] [--markdown out.md]
+
+Each vote says what the card is worth: its cost + 3, moved by 15% (at least 2 M€) for each verdict step.
+`AssemblerVoteFit` solves one factor per kind of effect, plus a flat offset, so that the cards' scaled parts match those values.
+Each factor is pulled toward 1 as if 3 extra votes said the card was fair.
