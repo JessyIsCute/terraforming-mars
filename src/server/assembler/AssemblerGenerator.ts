@@ -436,8 +436,10 @@ export class AssemblerGenerator {
     if (hint !== undefined && tags.length < nTags && !tags.includes(hint) && this.chance(0.7)) {
       tags.push(hint);
     }
+    // A wild tag on an event is gone once the event resolves: it never helps, so events don't get one.
+    const tagWeights = type === CardType.EVENT ? TAG_WEIGHTS.filter(([t]) => t !== Tag.WILD) : TAG_WEIGHTS;
     while (tags.length < nTags) {
-      const t = this.weighted(TAG_WEIGHTS);
+      const t = this.weighted(tagWeights);
       if (!tags.includes(t)) {
         tags.push(t);
       }
@@ -472,23 +474,8 @@ export class AssemblerGenerator {
       breakdown.push({text: requirement.text, value: requirement.value});
     }
 
-    const baseValue = breakdown.reduce((s, l) => s + l.value, 0);
-    // Steel/titanium payment grows with the cost, so solve cost = base + flat + share * cost - BUY_COST.
-    let flat = 0;
-    let share = 0;
-    for (const t of tags) {
-      const pay = V.PAYMENT_VALUE[t];
-      if (pay !== undefined) {
-        flat += pay.flat;
-        share += pay.ofCost;
-      }
-    }
-    const exactCost = (baseValue + flat - V.BUY_COST) / (1 - share);
-    if (flat > 0) {
-      breakdown.push({text: 'Pay with steel/titanium', value: flat + share * exactCost});
-    }
     // Round the value first and derive the cost from it, so cost = round(value - 3) holds exactly for the shown value.
-    const value = Math.round((exactCost + V.BUY_COST) * 10) / 10;
+    const value = Math.round(breakdown.reduce((s, l) => s + l.value, 0) * 10) / 10;
     const pricedCost = Math.round(value - V.BUY_COST);
     if (pricedCost < Math.max(V.MIN_COST, spec.minCost ?? 0) || pricedCost > Math.min(V.MAX_COST, spec.maxCost ?? Infinity)) {
       return undefined;

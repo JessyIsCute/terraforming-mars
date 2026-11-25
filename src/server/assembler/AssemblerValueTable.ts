@@ -137,17 +137,14 @@ export function buildValueTable(): AssemblerValueTableModel {
     ['Cards cost 1 M€ more (drawback)', `−${V.CARDS_PLAYED_AFTER} (× tag share for one tag)`, `Science tags: ${num(-V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0))}`],
   ]));
 
-  sections.push(section('Tags', ['Tag', 'Value', 'Share of cards', 'Pay with'], [false, true, true, false],
-    TAG_ORDER.map((t) => {
-      const pay = V.PAYMENT_VALUE[t];
-      return [
-        t.charAt(0).toUpperCase() + t.slice(1),
-        num(V.TAG_VALUE[t] ?? 0),
-        V.TAG_SHARE[t] !== undefined ? pct(V.TAG_SHARE[t]) : '–',
-        pay !== undefined ? `${t === Tag.SPACE ? 'Titanium' : 'Steel'}: +${num(pay.flat)} and ${pct(pay.ofCost)} of the cost` : '',
-      ];
-    }),
-    `The most valuable tag counts fully, every other tag ${pct(V.EXTRA_TAG_FACTOR)}. An event's tags count ${pct(V.EVENT_TAG_FACTOR)}, plus ${num(V.EVENT_TAG_VALUE)} for the event tag.`));
+  sections.push(section('Tags', ['Tag', 'Value', 'Share of cards'], [false, true, true],
+    TAG_ORDER.map((t) => [
+      t.charAt(0).toUpperCase() + t.slice(1),
+      num(V.TAG_VALUE[t] ?? 0),
+      V.TAG_SHARE[t] !== undefined ? pct(V.TAG_SHARE[t]) : '–',
+    ]),
+    `The most valuable tag counts fully, every other tag ${pct(V.EXTRA_TAG_FACTOR)}. An event's tags count ${pct(V.EVENT_TAG_FACTOR)}, plus ${num(V.EVENT_TAG_VALUE)} for the event tag. ` +
+    'Paying with steel or titanium is not priced on top: that is already why steel and titanium are worth 2 and 3 M€.'));
 
   const tagRequirementRows = [1, 2, 3, 4, 5].map((n) => [`${n} tag${n === 1 ? '' : 's'}`, num(-Math.pow(n, V.TAG_REQUIREMENT_EXPONENT))]);
   sections.push(section('Requirements', ['Requirement', 'Value'], [false, true], [
@@ -230,9 +227,7 @@ export function rateableValues(): Array<RateableValue> {
   add('action.steel', 'Action: gain 1 steel (on a blue card)', V.STOCK_VALUE.steel * V.ACTION_USES, 'Effects and actions');
   add('discount.all', 'Effect: you pay 1 M€ less for every card', V.CARDS_PLAYED_AFTER, 'Effects and actions');
   for (const t of [Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, Tag.VENUS, Tag.PLANT, Tag.POWER, Tag.MICROBE, Tag.JOVIAN, Tag.CITY, Tag.ANIMAL]) {
-    const pay = V.PAYMENT_VALUE[t];
-    const extra = pay !== undefined ? ` (incl. paying with ${t === Tag.SPACE ? 'titanium' : 'steel'} on a 10 M€ card)` : '';
-    add(`tag.${t}`, `A ${t} tag on a card${extra}`, (V.TAG_VALUE[t] ?? 0) + (pay !== undefined ? pay.flat + pay.ofCost * 10 : 0), 'Tags');
+    add(`tag.${t}`, `A ${t} tag on a card`, V.TAG_VALUE[t] ?? 0, 'Tags');
   }
   add('event', 'Being an event (the event tag)', V.EVENT_TAG_VALUE, 'Tags');
   for (const n of [1, 2, 3, 4]) {

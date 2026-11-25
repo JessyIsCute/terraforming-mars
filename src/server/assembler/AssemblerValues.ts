@@ -42,7 +42,11 @@ export const GREENERY_VALUE = 14;
 /** Fitted to official cards (11 cards). */
 export const CITY_VALUE = 8.8;
 
-/** Value of having the tag: base 0.5 + synergy with the official card pool (+ payment for building/space). */
+/**
+ * Value of having the tag: base 0.5 + synergy with the official card pool. Paying with steel or
+ * titanium is not priced on top: steel and titanium are worth 2 and 3 M€ only because building and
+ * space cards accept them, so charging the card again would count that twice (official cards don't).
+ */
 export const TAG_VALUE: Partial<Record<Tag, number>> = {
   [Tag.SCIENCE]: 3.7,
   [Tag.JOVIAN]: 4.2,
@@ -56,12 +60,6 @@ export const TAG_VALUE: Partial<Record<Tag, number>> = {
   [Tag.POWER]: 1.2,
   [Tag.CITY]: 0.9,
   [Tag.WILD]: 6,
-};
-
-/** Building and space tags let you pay with steel and titanium: a flat part plus a share of the card's cost. */
-export const PAYMENT_VALUE: Partial<Record<Tag, {flat: number, ofCost: number}>> = {
-  [Tag.BUILDING]: {flat: 1, ofCost: 0.05},
-  [Tag.SPACE]: {flat: 1, ofCost: 0.10},
 };
 
 /** Every tag after the most valuable one counts this much. */

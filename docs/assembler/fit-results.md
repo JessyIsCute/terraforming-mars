@@ -6,9 +6,9 @@
 
 | | Current table | Fitted |
 |---|---:|---:|
-| Average error on the cards it was fitted to | 2.8 M€ | 1.6 M€ |
-| Average error on cards it didn't see (5-fold) | 2.8 M€ | 2.0 M€ |
-| Production on a prelude, compared with a project card | 1.0x | 1.4x |
+| Average error on the cards it was fitted to | 2.7 M€ | 1.7 M€ |
+| Average error on cards it didn't see (5-fold) | 2.7 M€ | 2.2 M€ |
+| Production on a prelude, compared with a project card | 1.0x | 1.3x |
 
 ## Values
 
@@ -16,43 +16,43 @@ Cards: how many plain cards have it. Few cards = weak evidence; those values bar
 
 | Value | Now | Fitted | Change | Cards |
 |---|---:|---:|---:|---:|
-| megacredits production | 3.3 | 3.3 | 0.0 | 38 |
-| steel production | 5.1 | 4.9 | -0.2 | 12 |
-| titanium production | 8.5 | 8.3 | -0.2 | 15 |
-| plants production | 6.0 | 6.2 | +0.2 | 26 |
-| energy production | 6.0 |  **4.1** | -1.9 | 44 |
-| heat production | 4.5 | 4.2 | -0.3 | 20 |
-| 1 steel | 2.0 | 1.3 | -0.7 | 6 |
+| megacredits production | 3.3 | 3.5 | +0.2 | 38 |
+| steel production | 5.1 | 5.3 | +0.2 | 12 |
+| titanium production | 8.5 | 8.9 | +0.4 | 15 |
+| plants production | 6.0 | 6.5 | +0.5 | 26 |
+| energy production | 6.0 |  **4.4** | -1.6 | 44 |
+| heat production | 4.5 | 4.5 | +0.0 | 20 |
+| 1 steel | 2.0 | 1.2 | -0.8 | 6 |
 | 1 titanium | 3.0 | 2.2 | -0.8 | 8 |
-| 1 plants | 2.3 | 1.6 | -0.7 | 15 |
+| 1 plants | 2.3 | 1.7 | -0.6 | 15 |
 | 1 energy | 1.2 | 1.2 | +0.0 | 0 |
 | 1 heat | 1.2 | 0.6 | -0.6 | 3 |
-| TR | 7.0 | 6.9 | -0.1 | 10 |
-| temperature step | 8.5 | 8.5 | 0.0 | 3 |
-| oxygen step | 8.5 | 6.9 | -1.6 | 3 |
-| Venus step | 9.0 |  **7.7** | -1.3 | 8 |
-| ocean tile | 11.0 | 10.7 | -0.3 | 11 |
-| greenery tile | 14.0 | 14.4 | +0.4 | 4 |
-| city tile | 8.8 |  **9.9** | +1.1 | 11 |
-| draw a card | 3.0 | 3.0 | 0.0 | 15 |
-| 1 VP | 3.3 | 3.3 | +0.0 | 42 |
-| building tag | 2.5 | 2.7 | +0.2 | 49 |
-| space tag | 3.0 |  **0.9** | -2.1 | 33 |
-| earth tag | 3.4 |  **1.9** | -1.5 | 15 |
-| science tag | 3.7 | 3.4 | -0.3 | 11 |
-| venus tag | 3.6 |  **2.1** | -1.5 | 9 |
-| plant tag | 2.1 | 2.9 | +0.8 | 19 |
+| TR | 7.0 | 7.3 | +0.3 | 10 |
+| temperature step | 8.5 | 8.6 | +0.1 | 3 |
+| oxygen step | 8.5 | 7.2 | -1.3 | 3 |
+| Venus step | 9.0 | 8.4 | -0.6 | 8 |
+| ocean tile | 11.0 | 11.0 | +0.0 | 11 |
+| greenery tile | 14.0 | 14.9 | +0.9 | 4 |
+| city tile | 8.8 | 9.4 | +0.6 | 11 |
+| draw a card | 3.0 | 3.1 | +0.1 | 15 |
+| 1 VP | 3.3 | 3.6 | +0.3 | 42 |
+| building tag | 1.5 |  **2.7** | +1.2 | 49 |
+| space tag | 2.0 | 1.4 | -0.6 | 33 |
+| earth tag | 3.4 |  **1.8** | -1.6 | 15 |
+| science tag | 3.7 | 3.3 | -0.4 | 11 |
+| venus tag | 3.6 |  **2.0** | -1.6 | 9 |
+| plant tag | 2.1 | 2.8 | +0.7 | 19 |
 | power tag | 1.2 |  **3.0** | +1.8 | 24 |
-| microbe tag | 1.9 |  **3.0** | +1.1 | 5 |
-| jovian tag | 4.2 | 4.1 | -0.1 | 8 |
-| city tag | 0.9 | 0.0 | -0.9 | 11 |
+| microbe tag | 1.9 |  **3.1** | +1.2 | 5 |
+| jovian tag | 4.2 | 4.4 | +0.2 | 8 |
+| city tag | 0.9 | 1.3 | +0.4 | 11 |
 | animal tag | 1.3 | 1.3 | +0.0 | 0 |
-| wild tag | 6.0 | 7.0 | +1.0 | 1 |
-| being an event (event tag) | 2.0 | 2.2 | +0.2 | 18 |
-| global requirement "at least" (x how late) | -6.0 | -6.9 | -0.9 | 24 |
-| global requirement "at most" (x how early) | -2.5 |  **-1.0** | +1.5 | 6 |
-| tag requirement (x count^1.5) | -1.0 | -0.8 | +0.2 | 19 |
-| value of a prelude | 21.0 | 21.5 | +0.5 | 36 |
+| wild tag | 6.0 | 7.1 | +1.1 | 1 |
+| being an event (event tag) | 2.0 | 2.5 | +0.5 | 18 |
+| global requirement "at least" (x how late) | -6.0 |  **-7.7** | -1.7 | 24 |
+| global requirement "at most" (x how early) | -2.5 |  **-1.4** | +1.1 | 6 |
+| tag requirement (x count^1.5) | -1.0 | -0.9 | +0.1 | 19 |
+| value of a prelude | 21.0 | 21.8 | +0.8 | 36 |
 
 ## Cards that disagree most with the fit
 
@@ -60,18 +60,18 @@ Positive: the card gives more than its cost says (strong). Negative: it gives le
 
 | Card | Module | Cost | Fitted value − (cost + 3) |
 |---|---|---:|---:|
-| Kelp Farming | base | 17 | +10.0 |
-| Farming | base | 16 | +6.5 |
-| Society Support | prelude | prelude | -6.1 |
-| Biosphere Support | prelude | prelude | -6.0 |
-| Underground City | base | 18 | -5.8 |
-| Trees | base | 13 | +5.8 |
+| Kelp Farming | base | 17 | +11.3 |
+| Farming | base | 16 | +7.6 |
+| Biosphere Support | prelude | prelude | -6.8 |
+| Society Support | prelude | prelude | -6.5 |
+| Trees | base | 13 | +6.4 |
+| Underground City | base | 18 | -6.2 |
+| Soletta | base | 35 | -5.0 |
+| UNMI Contractor | prelude | prelude | +4.9 |
+| Venus L1 Shade | prelude2 | prelude | +4.7 |
 | Tropical Resort | corpera | 13 | -4.6 |
-| Soletta | base | 35 | -4.1 |
-| UNMI Contractor | prelude | prelude | +4.1 |
-| Ishtar Expedition | prelude2 | 6 | +3.9 |
-| Stanford Torus | promo | 12 | +3.6 |
-| Phobos Space Haven | base | 25 | +3.5 |
-| Callisto Penal Mines | corpera | 24 | -3.4 |
-| Polar Industries | prelude | prelude | +3.4 |
-| Investment Loan | corpera | 3 | +3.4 |
+| Ishtar Expedition | prelude2 | 6 | +4.2 |
+| Stanford Torus | promo | 12 | +4.0 |
+| Callisto Penal Mines | corpera | 24 | -3.8 |
+| Soil Factory | base | 9 | -3.6 |
+| Polar Industries | prelude | prelude | +3.5 |

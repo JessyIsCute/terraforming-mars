@@ -16,7 +16,7 @@
  *   agreed with it. A value seen on many cards moves freely; one seen on 1-2 cards barely moves.
  * - Tags: the most valuable tag counts fully and each other one 75%, which depends on the tag
  *   values themselves -- so the fit repeats (tags re-ranked each round) until nothing changes.
- * - Fixed by definition: 1 M€ = 1, cost = value - 3, the steel/titanium share of the cost.
+ * - Fixed by definition: 1 M€ = 1, cost = value - 3.
  *
  * Only plain cards are used: no actions, effects, stored resources or custom code, and only
  * global-parameter or tag requirements. Everything else would need its own unknowns.
@@ -68,8 +68,7 @@ const UNKNOWNS: Array<Unknown> = [
   {key: 'city', label: 'city tile', now: V.CITY_VALUE},
   {key: 'draw', label: 'draw a card', now: V.DRAW_CARD_VALUE},
   {key: 'vp', label: '1 VP', now: V.VP_VALUE},
-  // A tag's value here includes the flat part of paying with steel/titanium.
-  ...TAGS.map((t) => ({key: `tag.${t}`, label: `${t} tag`, now: (V.TAG_VALUE[t] ?? 0) + (V.PAYMENT_VALUE[t]?.flat ?? 0)})),
+  ...TAGS.map((t) => ({key: `tag.${t}`, label: `${t} tag`, now: V.TAG_VALUE[t] ?? 0})),
   {key: 'event', label: 'being an event (event tag)', now: V.EVENT_TAG_VALUE},
   {key: 'req.min', label: 'global requirement "at least" (x how late)', now: V.GLOBAL_MIN_REQUIREMENT},
   {key: 'req.max', label: 'global requirement "at most" (x how early)', now: V.GLOBAL_MAX_REQUIREMENT},
@@ -92,7 +91,7 @@ type CardData = {
   prelude: boolean,
   /** Project cards: cost + 3. Preludes: 0 (the 'prelude' unknown is on the other side). */
   target: number,
-  /** Known M€ on the card: M€ gained or paid, the steel/titanium share of the cost. */
+  /** Known M€ on the card: M€ gained or paid. */
   fixed: number,
   /** Unknowns times how many: {'prod.steel': 2, 'ocean': 1, ...}. Not tags. */
   terms: Map<string, number>,
@@ -207,14 +206,10 @@ function toData(card: ICard, module: string, prelude: boolean): CardData | null 
   if (tags.some((t) => !TAGS.includes(t))) {
     return null;
   }
-  const cost = card.cost ?? 0;
-  for (const t of tags) {
-    fixed += (V.PAYMENT_VALUE[t]?.ofCost ?? 0) * cost;
-  }
   if (event) {
     add(terms, 'event', 1);
   }
-  return {name: card.name, module, prelude, target: prelude ? 0 : cost + V.BUY_COST, fixed, terms, tags, event};
+  return {name: card.name, module, prelude, target: prelude ? 0 : (card.cost ?? 0) + V.BUY_COST, fixed, terms, tags, event};
 }
 
 function loadCards(): Array<CardData> {

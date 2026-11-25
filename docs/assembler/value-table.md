@@ -57,7 +57,7 @@ within 2 M€.
 
 ## Tags
 
-A tag is worth three things:
+A tag is worth two things:
 
 1. **Base 0.5.** Every tag counts for milestones, awards and "per tag you have" effects in general.
 2. **Synergy.** What the rest of the deck does with that tag. It's counted from the official card
@@ -67,24 +67,28 @@ A tag is worth three things:
      Mining Industries: 1 VP per Jovian tag)
    - **cards that discount it or trigger on it:** 0.12 M€ each (Space Station, Olympus
      Conference, Decomposers…)
-3. **Payment** (building and space only). The tag lets you pay with steel or titanium, which are
-   otherwise hard to spend.
 
-| Tag | Require it | Count it | Discount/trigger | Synergy | Payment | **Total** |
-|---|---:|---:|---:|---:|---:|---:|
-| Science | 24 cards (avg 3.2 needed) | 3 | 7 | 3.2 | – | **3.7** |
-| Jovian | 8 | 9 (mostly VP) | 3 | 3.7 | – | **4.2** |
-| Venus | 8 | 10 | 8 | 3.1 | – | **3.6** |
-| Earth | 11 | 6 | 9 | 2.9 | – | **3.4** |
-| Space | 0 | 3 | 9 | 1.5 | 1 + 10% of cost | **3 + 10% of cost** |
-| Building | 0 | 4 | 3 | 1.0 | 1 + 5% of cost | **2.5 + 5% of cost** |
-| Plant | 1 | 3 | 9 | 1.6 | – | **2.1** |
-| Microbe | 1 | 2 | 8 | 1.35 | – | **1.9** |
-| Animal | 1 | 0 | 6 | 0.8 | – | **1.3** |
-| Power | 3 | 2 | 1 | 0.7 | – | **1.2** |
-| City | 0 | 0 | 3 | 0.4 | – | **0.9** |
-| **Wild** | counts as every tag | | | ~11 | – | **6** |
-| Event | | | | | | **2** (fitted to 18 events; was 0.5), and the card's other tags are gone once played |
+**Paying with steel or titanium is not priced.** It used to add 1 M€ plus 5% (building) or 10%
+(space) of the cost. That counted the same thing twice: steel and titanium are worth 2 and 3 M€
+*because* building and space cards accept them. Official cards don't charge for it either: without
+it the table matches them slightly better (average error 2.8 → 2.7 M€), and the fit prices a building
+tag at about 2.7 and a space tag at about 1.4 in total.
+
+| Tag | Require it | Count it | Discount/trigger | Synergy | **Total** |
+|---|---:|---:|---:|---:|---:|
+| Science | 24 cards (avg 3.2 needed) | 3 | 7 | 3.2 | **3.7** |
+| Jovian | 8 | 9 (mostly VP) | 3 | 3.7 | **4.2** |
+| Venus | 8 | 10 | 8 | 3.1 | **3.6** |
+| Earth | 11 | 6 | 9 | 2.9 | **3.4** |
+| Space | 0 | 3 | 9 | 1.5 | **2.0** |
+| Building | 0 | 4 | 3 | 1.0 | **1.5** |
+| Plant | 1 | 3 | 9 | 1.6 | **2.1** |
+| Microbe | 1 | 2 | 8 | 1.35 | **1.9** |
+| Animal | 1 | 0 | 6 | 0.8 | **1.3** |
+| Power | 3 | 2 | 1 | 0.7 | **1.2** |
+| City | 0 | 0 | 3 | 0.4 | **0.9** |
+| **Wild** | counts as every tag | | | ~11 | **6** |
+| Event | | | | | **2** (fitted to 18 events; was 0.5), and the card's other tags are gone once played |
 
 **Wild:** in the code (`player/Tags.ts`) one wild tag adds +1 to *every* tag count at once, for
 requirements and "per tag" counts. It does not fire "when you play a science tag" triggers, unless
@@ -92,10 +96,6 @@ you have Cyborgs or Strong Artificial Intelligence. Its synergy summed over all 
 only build around 2–3 tags, so it's priced at about half: **6**, nearly two science tags.
 
 **Multiple tags:** the most valuable tag counts in full, every extra tag counts **75%**.
-
-**Building and space payment:** the "% of cost" part grows with the card's price. A 25 M€ space card
-can take 8 titanium, so the tag matters more on expensive cards. Titanium is worth more than steel,
-so space gets a bigger share.
 
 **Make it live:** these counts depend on which expansions are on. With Venus off, the Venus tag's
 synergy is near zero. The generator should **recount the synergy at game start from that game's

@@ -243,5 +243,21 @@ describe('AssemblerGenerator', () => {
       }
     });
   });
+  it('never puts a wild tag on an event', () => {
+    let events = 0;
+    let wild = 0;
+    for (const complexity of COMPLEXITIES) {
+      for (const def of generateMany(0.81, 600, complexity)) {
+        if (def.type === CardType.EVENT) {
+          events++;
+          expect(def.tags, def.name).not.include(Tag.WILD);
+        } else if (def.tags.includes(Tag.WILD)) {
+          wild++;
+        }
+      }
+    }
+    expect(events).gt(200);
+    expect(wild, 'other cards still get wild tags').gt(0);
+  });
 });
 
