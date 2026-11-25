@@ -19,7 +19,24 @@ export type AssemblerPreviewRequest = {
   count: number,
   seed: number,
   spec: AssembleSpec,
+  /** Rating mode: shift some cards' printed cost on purpose (recorded in costAdjust). */
+  spread?: boolean,
 };
+
+/**
+ * Rating mode's deliberate mispricing. Votes on cards printed too cheap or too expensive show
+ * whether raters can tell (they should lean "too expensive" on cards shifted up): a check on the
+ * votes themselves. Most cards are shifted, by 15-40% of their value and at least 2 M€.
+ */
+export const SPREAD = {unchanged: 0.4, min: 0.15, max: 0.4, minMC: 2} as const;
+
+export function spreadShift(rng: SeededRandom, value: number): number {
+  if (rng.next() < SPREAD.unchanged) {
+    return 0;
+  }
+  const size = Math.max(SPREAD.minMC, value * (SPREAD.min + rng.next() * (SPREAD.max - SPREAD.min)));
+  return Math.round(size) * (rng.next() < 0.5 ? -1 : 1);
+}
 
 /** Categories that only come as an effect or action. A card has at most one of those. */
 const EFFECT_ONLY: ReadonlyArray<EffectCategory> = ['efficiency', 'synergy'];
@@ -115,6 +132,7 @@ export function parsePreviewRequest(params: URLSearchParams, randomSeed: () => n
     count: integer(params, 'count', 1, LIMITS.MAX_COUNT) ?? LIMITS.DEFAULT_COUNT,
     seed: integer(params, 'seed', 1, LIMITS.MAX_SEED) ?? randomSeed(),
     spec: cleaned,
+    ...(params.get('spread') === '1' ? {spread: true} : {}),
   };
 }
 
@@ -125,6 +143,8 @@ export function parsePreviewRequest(params: URLSearchParams, randomSeed: () => n
 export function previewCards(request: AssemblerPreviewRequest): AssemblerPreviewResponse {
   const rng = new SeededRandom(request.seed / (LIMITS.MAX_SEED + 1));
   const generator = new AssemblerGenerator(rng);
+  // Its own stream, so the same seed makes the same cards with or without the spread.
+  const spreadRng = new SeededRandom(((request.seed * 7919) % (LIMITS.MAX_SEED + 1)) / (LIMITS.MAX_SEED + 1) + 1e-7);
   const cards: Array<CardModel> = [];
   let failed = 0;
   for (let i = 1; i <= request.count; i++) {
@@ -142,6 +162,13 @@ export function previewCards(request: AssemblerPreviewRequest): AssemblerPreview
       // Some combinations rarely fit on a card, e.g. high complexity at the top of the cost range.
       failed++;
       continue;
+    }
+    if (request.spread === true) {
+      const shift = Math.max(-definition.cost, spreadShift(spreadRng, definition.value));
+      if (shift !== 0) {
+        const costAdjust = (definition.costAdjust ?? 0) + shift;
+        definition = {...definition, cost: definition.cost + shift, costAdjust: costAdjust !== 0 ? costAdjust : undefined};
+      }
     }
     const card = newAssembledCard(definition);
     // Card caches properties by name; this card is gone after the response.

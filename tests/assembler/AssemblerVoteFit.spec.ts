@@ -1,6 +1,7 @@
 import {expect} from 'chai';
-import {fitVotes} from '../../src/server/assembler/AssemblerVoteFit';
-import {AssemblerVote, Verdict, votedValue} from '../../src/common/assembler/AssemblerVotes';
+import {calibrate, fitVotes, summarizeValueVotes} from '../../src/server/assembler/AssemblerVoteFit';
+import {SeededRandom} from '../../src/common/utils/Random';
+import {AssemblerValueVote, AssemblerVote, Verdict, shiftTableValue, votedTableValue, votedValue} from '../../src/common/assembler/AssemblerVotes';
 import {EffectCategory} from '../../src/common/assembler/EffectCategory';
 
 let n = 0;
@@ -44,5 +45,53 @@ describe('AssemblerVoteFit', () => {
   it('cards that all feel too cheap move the offset', () => {
     const votes = Array.from({length: 20}, (_, i) => vote('too-cheap', [[(['money', 'heat', 'water', 'plants'] as const)[i % 4], 8 + (i % 5)]]));
     expect(fitVotes(votes).offset).gt(0.5);
+  });
+});
+
+describe('AssemblerVoteFit: table values and the check', () => {
+  function valueVote(key: string, shown: number, real: number, verdict: Verdict, at = 1): AssemblerValueVote {
+    return {key, label: key, shown, real, verdict, at};
+  }
+
+  it('a value vote moves the number by 15% of what was shown', () => {
+    expect(votedTableValue({shown: 2, verdict: 'fair'})).eq(2);
+    expect(votedTableValue({shown: 2, verdict: 'too-expensive'})).closeTo(1.7, 1e-9);
+    expect(votedTableValue({shown: 10, verdict: 'much-too-cheap'})).eq(13);
+    // at least 0.2 per step for small numbers
+    expect(votedTableValue({shown: 0.3, verdict: 'too-cheap'})).closeTo(0.5, 1e-9);
+  });
+
+  it('suggests a number per value from all its votes', () => {
+    const rows = summarizeValueVotes([
+      valueVote('stock.steel', 2, 2, 'too-expensive'),
+      valueVote('stock.steel', 2.5, 2, 'much-too-expensive'),
+      valueVote('tr', 7, 7, 'fair'),
+    ]);
+    expect(rows[0].key).eq('stock.steel');
+    expect(rows[0].votes).eq(2);
+    expect(rows[0].suggested).closeTo((1.7 + 1.75) / 2, 1e-9);
+    expect(rows[1]).to.include({key: 'tr', suggested: 7, lean: 0});
+  });
+
+  it('splits verdicts by how the price was moved', () => {
+    const c = calibrate([
+      {shift: -2, verdict: 'too-cheap'}, {shift: -3, verdict: 'much-too-cheap'},
+      {shift: 0, verdict: 'fair'},
+      {shift: 4, verdict: 'too-expensive'},
+    ]);
+    expect(c.down).deep.eq({count: 2, lean: 1.5});
+    expect(c.none).deep.eq({count: 1, lean: 0});
+    expect(c.up).deep.eq({count: 1, lean: -1});
+  });
+
+  it('moves about 60% of table values, by 15-40%', () => {
+    const rng = new SeededRandom(0.5);
+    const shown = Array.from({length: 1000}, () => shiftTableValue(10, () => rng.next()));
+    const moved = shown.filter((v) => v !== 10);
+    expect(moved.length).within(520, 680);
+    for (const v of moved) {
+      expect(Math.abs(v - 10)).within(1.5, 4);
+    }
+    expect(moved.some((v) => v < 10) && moved.some((v) => v > 10)).is.true;
   });
 });

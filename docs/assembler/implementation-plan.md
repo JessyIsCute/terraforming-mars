@@ -146,7 +146,7 @@ reloads games from the database, so the Phase 1 save/load tests are what keep li
 
 ## Rating mode ("Rate cards" tab)
 
-`/assembler#rate` shows one generated card at a time with five verdicts, from "Way too cheap" to "Way too expensive" (keys 1–5; S skips).
+`/assembler#rate` ("Rate prices") rates single values from the table ("Rate values") or one generated card at a time ("Rate cards"), with five verdicts, from "Way too cheap" to "Way too expensive" (keys 1–5; S skips).
 Votes are kept in the browser's localStorage (`assemblerVotes`) and downloaded as JSON.
 The side panel shows, for each kind of effect, the average verdict on cards that have it.
 

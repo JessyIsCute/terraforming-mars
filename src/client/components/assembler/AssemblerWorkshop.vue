@@ -14,7 +14,7 @@
     <div class="assembler-tabs">
       <a href="#" class="assembler-tab" :class="{'assembler-tab--on': view === 'generator'}" @click.prevent="show('generator')" v-i18n>Generator</a>
       <a href="#values" class="assembler-tab" :class="{'assembler-tab--on': view === 'values'}" @click.prevent="show('values')" v-i18n>Value table</a>
-      <a href="#rate" class="assembler-tab" :class="{'assembler-tab--on': view === 'rate'}" @click.prevent="show('rate')" v-i18n>Rate cards</a>
+      <a href="#rate" class="assembler-tab" :class="{'assembler-tab--on': view === 'rate'}" @click.prevent="show('rate')" v-i18n>Rate prices</a>
     </div>
 
     <AssemblerValueTable v-if="view === 'values'"/>

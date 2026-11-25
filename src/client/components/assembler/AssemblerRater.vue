@@ -1,13 +1,17 @@
 <template>
   <div class="assembler-rater">
     <p class="assembler-intro" v-i18n>
-      Rate generated cards one at a time: is the cost right for what the card does? Use the buttons
-      or the keys 1 to 5 (S skips). Your votes stay in this browser. Download them to help tune the
-      value table.
+      Say whether things are priced right. Rate single numbers from the value table, or whole
+      generated cards. Use the buttons or the keys 1 to 5 (S skips). Your votes stay in this
+      browser; download them to help tune the value table.
     </p>
 
     <div class="rater-options">
-      <label class="rater-option">
+      <div class="rater-modes">
+        <a href="#" class="rater-mode" :class="{'rater-mode--on': mode === 'values'}" @click.prevent="mode = 'values'" v-i18n>Rate values</a>
+        <a href="#" class="rater-mode" :class="{'rater-mode--on': mode === 'cards'}" @click.prevent="mode = 'cards'" v-i18n>Rate cards</a>
+      </div>
+      <label v-if="mode === 'cards'" class="rater-option">
         <span v-i18n>Complexity</span>
         <select v-model="complexity" @change="restart">
           <option value="">{{ $t('Random') }}</option>
@@ -16,53 +20,98 @@
           <option value="high">{{ $t('High') }}</option>
         </select>
       </label>
-      <label class="rater-option rater-option--inline">
-        <input type="checkbox" v-model="showValue">
-        <span v-i18n>Show the value before I vote</span>
+      <label class="rater-option" :title="$t('Some prices are moved on purpose. If you call those wrong too, the votes can be trusted.')">
+        <input type="checkbox" v-model="spread" @change="restart">
+        <span v-i18n>Mix in deliberately wrong prices</span>
       </label>
     </div>
 
     <div class="rater-layout">
       <div class="rater-stage">
         <div v-if="error !== ''" class="assembler-error">{{ error }}</div>
-        <template v-if="current !== undefined">
-          <Card :card="current" auto-tall :key="current.name"/>
-          <div v-if="showValue && current.assembled !== undefined" class="rater-value">
-            <span v-i18n>value</span> {{ current.assembled.value }} · <span v-i18n>cost</span> {{ current.calculatedCost }}
+
+        <template v-if="mode === 'values'">
+          <div v-if="currentValue !== undefined" class="rater-value-card">
+            <div class="rater-value-group">{{ $t(currentValue.item.group) }}</div>
+            <div class="rater-value-label">{{ $t(currentValue.item.label) }}</div>
+            <div class="rater-value-number">= {{ currentValue.shown }} M€</div>
           </div>
-          <div class="rater-buttons">
-            <button v-for="v in VERDICTS" :key="v" type="button" class="rater-verdict" :class="'rater-verdict--' + v" @click="rate(v)">
-              <span class="rater-key">{{ INFO[v].key }}</span> {{ $t(INFO[v].label) }}
-            </button>
-            <button type="button" class="rater-skip" @click="skip"><span class="rater-key">S</span> {{ $t('Skip') }}</button>
-          </div>
+          <div v-else-if="error === ''" class="rater-loading" v-i18n>Loading the value table…</div>
         </template>
-        <div v-else-if="error === ''" class="rater-loading" v-i18n>Assembling cards…</div>
-        <div v-if="last !== undefined" class="rater-last">
-          <span v-i18n>Last card</span>: {{ last.title }} ({{ last.cost }} M€) — {{ $t(INFO[last.verdict].label) }}
+        <template v-else>
+          <Card v-if="currentCard !== undefined" :card="blind(currentCard)" auto-tall :key="currentCard.name"/>
+          <div v-else-if="error === ''" class="rater-loading" v-i18n>Assembling cards…</div>
+        </template>
+
+        <div v-if="ready" class="rater-buttons">
+          <button v-for="v in VERDICTS" :key="v" type="button" class="rater-verdict" :class="'rater-verdict--' + v" @click="rate(v)">
+            <span class="rater-key">{{ INFO[v].key }}</span> {{ $t(mode === 'values' ? INFO[v].valueLabel : INFO[v].label) }}
+          </button>
+          <button type="button" class="rater-skip" @click="skip"><span class="rater-key">S</span> {{ $t('Skip') }}</button>
+        </div>
+
+        <div v-if="mode === 'values' && lastValue !== undefined" class="rater-last">
+          <span v-i18n>Last</span>: {{ lastValue.label }} = {{ lastValue.shown }} M€ — {{ $t(INFO[lastValue.verdict].valueLabel) }}<template v-if="lastValue.shown !== lastValue.real"> ({{ $t('the table says') }} {{ lastValue.real }})</template>
+          <a href="#" @click.prevent="undo" v-i18n>undo</a>
+        </div>
+        <div v-if="mode === 'cards' && lastCard !== undefined" class="rater-last">
+          <span v-i18n>Last card</span>: {{ lastCard.title }} ({{ lastCard.cost }} M€) — {{ $t(INFO[lastCard.verdict].label) }}<template v-if="(lastCard.shift ?? 0) !== 0"> ({{ $t('real price') }} {{ lastCard.cost - (lastCard.shift ?? 0) }} M€)</template>
           <a href="#" @click.prevent="undo" v-i18n>undo</a>
         </div>
       </div>
 
       <div class="rater-stats">
-        <h3><span v-i18n>Your votes</span>: {{ votes.length }}</h3>
+        <h3><span v-i18n>Your votes</span>: {{ valueVotes.length + votes.length }}</h3>
         <div class="rater-bar">
           <div v-for="v in VERDICTS" :key="v" class="rater-bar-part" :class="'rater-verdict--' + v" :style="{flexGrow: tally[v]}" :title="$t(INFO[v].label) + ': ' + tally[v]"></div>
         </div>
-        <table v-if="leans.length > 0" class="rater-leans">
-          <thead><tr><th v-i18n>Cards with</th><th v-i18n>Votes</th><th v-i18n>Your verdict</th></tr></thead>
-          <tbody>
-            <tr v-for="l in leans" :key="l.group">
-              <td>{{ $t(l.label) }}</td>
-              <td>{{ l.count }}</td>
-              <td :class="leanClass(l.lean)">{{ $t(leanText(l.lean)) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-else class="assembler-hint" v-i18n>Rate a few cards to see which kinds of effect you think are priced too high or too low.</p>
+
+        <template v-if="mode === 'values'">
+          <table v-if="valueSummary.length > 0" class="rater-leans rater-values">
+            <thead><tr><th v-i18n>Value</th><th v-i18n>Votes</th><th v-i18n>Table</th><th v-i18n>You say</th></tr></thead>
+            <tbody>
+              <tr v-for="r in valueSummary" :key="r.key">
+                <td>{{ $t(r.label) }}</td>
+                <td>{{ r.count }}</td>
+                <td>{{ r.real }}</td>
+                <td :class="leanClass(r.suggested - r.real, 0.05 * Math.abs(r.real) + 0.1)">{{ r.suggested }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-else class="assembler-hint" v-i18n>Rate a few values to see what you'd change.</p>
+        </template>
+        <template v-else>
+          <table v-if="leans.length > 0" class="rater-leans">
+            <thead><tr><th v-i18n>Cards with</th><th v-i18n>Votes</th><th v-i18n>Your verdict</th></tr></thead>
+            <tbody>
+              <tr v-for="l in leans" :key="l.group">
+                <td>{{ $t(l.label) }}</td>
+                <td>{{ l.count }}</td>
+                <td :class="leanClass(l.lean, 0.25)">{{ $t(leanText(l.lean)) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-else class="assembler-hint" v-i18n>Rate a few cards at their real price to see which kinds of effect you think are priced too high or too low.</p>
+        </template>
+
+        <template v-if="check.some((c) => c.count > 0)">
+          <h4 v-i18n>Check: did you notice the wrong prices?</h4>
+          <table class="rater-leans rater-check">
+            <thead><tr><th v-i18n>Shown price</th><th v-i18n>Votes</th><th v-i18n>Your verdict</th></tr></thead>
+            <tbody>
+              <tr v-for="c in check" :key="c.label">
+                <td>{{ $t(c.label) }}</td>
+                <td>{{ c.count }}</td>
+                <td :class="c.count > 0 ? leanClass(c.lean, 0.25) : ''">{{ c.count > 0 ? $t(leanText(c.lean)) : '–' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="assembler-hint" v-i18n>Prices moved down should read as cheap and prices moved up as expensive. If they don't, the votes are mostly noise.</p>
+        </template>
+
         <div class="rater-actions">
-          <button type="button" class="btn btn-primary" :disabled="votes.length === 0" @click="download" v-i18n>Download votes</button>
-          <button type="button" class="btn" :disabled="votes.length === 0" @click="clear" v-i18n>Clear votes</button>
+          <button type="button" class="btn btn-primary" :disabled="votes.length + valueVotes.length === 0" @click="download" v-i18n>Download votes</button>
+          <button type="button" class="btn" :disabled="votes.length + valueVotes.length === 0" @click="clear" v-i18n>Clear votes</button>
         </div>
       </div>
     </div>
@@ -76,8 +125,12 @@ import Card from '@/client/components/card/Card.vue';
 import {CardModel} from '@/common/models/CardModel';
 import {paths} from '@/common/app/paths';
 import {AssemblerPreviewResponse} from '@/common/assembler/AssemblerPreview';
+import {AssemblerValueTableModel, RateableValue} from '@/common/assembler/AssemblerValueTable';
 import {EFFECT_CATEGORY_INFO} from '@/common/assembler/EffectCategory';
-import {ASSEMBLER_VOTES_STORAGE_KEY, AssemblerVote, AssemblerVoteFile, PriceGroup, VERDICTS, VERDICT_INFO, Verdict, isVerdict, priceGroup} from '@/common/assembler/AssemblerVotes';
+import {
+  ASSEMBLER_VALUE_VOTES_STORAGE_KEY, ASSEMBLER_VOTES_STORAGE_KEY, AssemblerValueVote, AssemblerVote, AssemblerVoteFile, PriceGroup,
+  VERDICTS, VERDICT_INFO, Verdict, isVerdict, priceGroup, shiftTableValue, votedTableValue,
+} from '@/common/assembler/AssemblerVotes';
 
 /** Fetch more cards when fewer than this are waiting. */
 const REFILL_AT = 4;
@@ -85,13 +138,21 @@ const BATCH = 6;
 /** A kind of effect needs this many votes before it shows in the table. */
 const MIN_VOTES = 3;
 
+type Mode = 'values' | 'cards';
 type Lean = {group: PriceGroup, label: string, count: number, lean: number};
+type ValueRow = {key: string, label: string, count: number, real: number, suggested: number};
+type CheckRow = {label: string, count: number, lean: number};
+type ShownValue = {item: RateableValue, shown: number};
 
 type DataModel = {
+  mode: Mode,
   complexity: string,
-  showValue: boolean,
+  spread: boolean,
   queue: Array<CardModel>,
+  table: ReadonlyArray<RateableValue>,
+  valueQueue: Array<ShownValue>,
   votes: Array<AssemblerVote>,
+  valueVotes: Array<AssemblerValueVote>,
   error: string,
   loading: boolean,
 };
@@ -104,9 +165,9 @@ function storage(): Storage | undefined {
   }
 }
 
-function loadVotes(): Array<AssemblerVote> {
+function load<T>(key: string): Array<T> {
   try {
-    const raw = storage()?.getItem(ASSEMBLER_VOTES_STORAGE_KEY);
+    const raw = storage()?.getItem(key);
     const parsed: unknown = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed.filter((v) => isVerdict(v?.verdict)) : [];
   } catch (e) {
@@ -123,7 +184,20 @@ function groupLabel(group: PriceGroup): string {
   }
 }
 
-/** Assembler (fan): rate generated cards one by one to see whether their prices feel right. */
+function average(ns: ReadonlyArray<number>): number {
+  return ns.reduce((s, n) => s + n, 0) / Math.max(1, ns.length);
+}
+
+function shuffled<T>(items: ReadonlyArray<T>): Array<T> {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** Assembler (fan): rate table values or generated cards one by one to see whether prices feel right. */
 export default defineComponent({
   name: 'AssemblerRater',
   components: {
@@ -131,10 +205,14 @@ export default defineComponent({
   },
   data(): DataModel {
     return {
+      mode: 'values',
       complexity: '',
-      showValue: false,
+      spread: true,
       queue: [],
-      votes: loadVotes(),
+      table: [],
+      valueQueue: [],
+      votes: load<AssemblerVote>(ASSEMBLER_VOTES_STORAGE_KEY),
+      valueVotes: load<AssemblerValueVote>(ASSEMBLER_VALUE_VOTES_STORAGE_KEY),
       error: '',
       loading: false,
     };
@@ -146,35 +224,74 @@ export default defineComponent({
     INFO(): typeof VERDICT_INFO {
       return VERDICT_INFO;
     },
-    current(): CardModel | undefined {
+    currentCard(): CardModel | undefined {
       return this.queue[0];
     },
-    last(): AssemblerVote | undefined {
+    currentValue(): ShownValue | undefined {
+      return this.valueQueue[0];
+    },
+    ready(): boolean {
+      return this.mode === 'values' ? this.currentValue !== undefined : this.currentCard !== undefined;
+    },
+    lastCard(): AssemblerVote | undefined {
       return this.votes[this.votes.length - 1];
+    },
+    lastValue(): AssemblerValueVote | undefined {
+      return this.valueVotes[this.valueVotes.length - 1];
     },
     tally(): Record<Verdict, number> {
       const tally = Object.fromEntries(VERDICTS.map((v) => [v, 0])) as Record<Verdict, number>;
-      for (const vote of this.votes) {
+      for (const vote of this.mode === 'values' ? this.valueVotes : this.votes) {
         tally[vote.verdict]++;
       }
       return tally;
     },
-    /** Per kind of effect: the average verdict on cards that have it (+2 way too cheap … −2 way too expensive). */
+    /** Per kind of effect, on cards shown at their real price: the average verdict (+2 way too cheap … −2 way too expensive). */
     leans(): Array<Lean> {
-      const sums = new Map<PriceGroup, {count: number, steps: number}>();
-      for (const vote of this.votes) {
-        const groups = new Set(vote.assembled.breakdown.map(priceGroup));
-        for (const g of groups) {
-          const s = sums.get(g) ?? {count: 0, steps: 0};
-          s.count++;
-          s.steps += VERDICT_INFO[vote.verdict].steps;
-          sums.set(g, s);
+      const sums = new Map<PriceGroup, Array<number>>();
+      for (const vote of this.votes.filter((v) => (v.shift ?? 0) === 0)) {
+        for (const g of new Set(vote.assembled.breakdown.map(priceGroup))) {
+          sums.set(g, [...(sums.get(g) ?? []), VERDICT_INFO[vote.verdict].steps]);
         }
       }
       return [...sums]
-        .filter(([, s]) => s.count >= MIN_VOTES)
-        .map(([group, s]) => ({group, label: groupLabel(group), count: s.count, lean: s.steps / s.count}))
+        .filter(([, s]) => s.length >= MIN_VOTES)
+        .map(([group, s]) => ({group, label: groupLabel(group), count: s.length, lean: average(s)}))
         .sort((a, b) => Math.abs(b.lean) - Math.abs(a.lean));
+    },
+    /** Per table value: what your votes say it should be. */
+    valueSummary(): Array<ValueRow> {
+      const byKey = new Map<string, Array<AssemblerValueVote>>();
+      for (const v of this.valueVotes) {
+        byKey.set(v.key, [...(byKey.get(v.key) ?? []), v]);
+      }
+      const off = (r: ValueRow) => Math.abs(r.suggested - r.real) / Math.max(0.5, r.real);
+      return [...byKey.values()].map((vs) => {
+        const latest = vs[vs.length - 1];
+        const suggested = Math.round(average(vs.map(votedTableValue)) * 10) / 10;
+        return {key: latest.key, label: latest.label, count: vs.length, real: latest.real, suggested};
+      }).sort((a, b) => off(b) - off(a));
+    },
+    /** Verdicts split by how the shown price was moved: the check on the votes themselves. */
+    check(): Array<CheckRow> {
+      const items: Array<{shift: number, steps: number}> = this.mode === 'values' ?
+        this.valueVotes.map((v) => ({shift: v.shown - v.real, steps: VERDICT_INFO[v.verdict].steps})) :
+        this.votes.filter((v) => v.shift !== undefined).map((v) => ({shift: v.shift ?? 0, steps: VERDICT_INFO[v.verdict].steps}));
+      const row = (label: string, keep: (shift: number) => boolean): CheckRow => {
+        const steps = items.filter((i) => keep(i.shift)).map((i) => i.steps);
+        return {label, count: steps.length, lean: average(steps)};
+      };
+      return [
+        row('Moved down (cheaper than real)', (s) => s < 0),
+        row('Real price', (s) => s === 0),
+        row('Moved up (pricier than real)', (s) => s > 0),
+      ];
+    },
+  },
+  watch: {
+    mode() {
+      this.error = '';
+      this.refill();
     },
   },
   mounted() {
@@ -185,6 +302,10 @@ export default defineComponent({
     window.removeEventListener('keydown', this.onKey);
   },
   methods: {
+    /** The card without its price breakdown, so the vote isn't anchored on it (or on a moved price). */
+    blind(card: CardModel): CardModel {
+      return {...card, assembled: undefined};
+    },
     leanText(lean: number): string {
       if (lean >= 0.75) {
         return 'too cheap';
@@ -200,8 +321,8 @@ export default defineComponent({
       }
       return 'too expensive';
     },
-    leanClass(lean: number): string {
-      return lean >= 0.25 ? 'rater-lean--cheap' : lean <= -0.25 ? 'rater-lean--expensive' : '';
+    leanClass(lean: number, threshold: number): string {
+      return lean >= threshold ? 'rater-lean--cheap' : lean <= -threshold ? 'rater-lean--expensive' : '';
     },
     onKey(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.ctrlKey || e.metaKey || e.altKey) {
@@ -215,41 +336,61 @@ export default defineComponent({
       }
     },
     rate(verdict: Verdict) {
-      const card = this.current;
-      if (card === undefined || card.assembled === undefined) {
-        return;
+      if (this.mode === 'values') {
+        const v = this.currentValue;
+        if (v === undefined) {
+          return;
+        }
+        this.valueVotes.push({key: v.item.key, label: v.item.label, shown: v.shown, real: v.item.value, verdict, at: Date.now()});
+      } else {
+        const card = this.currentCard;
+        if (card === undefined || card.assembled === undefined) {
+          return;
+        }
+        this.votes.push({
+          card: card.name,
+          title: card.combinedDisplayName ?? card.name,
+          cost: card.calculatedCost ?? 0,
+          verdict,
+          assembled: card.assembled,
+          // Only cards asked for with the spread can have a deliberate shift.
+          ...(this.spread ? {shift: card.assembled.costAdjust ?? 0} : {}),
+          at: Date.now(),
+        });
       }
-      this.votes.push({
-        card: card.name,
-        title: card.combinedDisplayName ?? card.name,
-        cost: card.calculatedCost ?? 0,
-        verdict,
-        assembled: card.assembled,
-        at: Date.now(),
-      });
       this.save();
       this.next();
     },
     skip() {
-      if (this.current !== undefined) {
+      if (this.ready) {
         this.next();
       }
     },
     undo() {
-      this.votes.pop();
+      if (this.mode === 'values') {
+        this.valueVotes.pop();
+      } else {
+        this.votes.pop();
+      }
       this.save();
     },
     next() {
-      this.queue.shift();
+      if (this.mode === 'values') {
+        this.valueQueue.shift();
+      } else {
+        this.queue.shift();
+      }
       this.refill();
     },
     restart() {
       this.queue = [];
+      this.valueQueue = [];
       this.refill();
     },
     save() {
       try {
         storage()?.setItem(ASSEMBLER_VOTES_STORAGE_KEY, JSON.stringify(this.votes));
+        storage()?.setItem(ASSEMBLER_VALUE_VOTES_STORAGE_KEY, JSON.stringify(this.valueVotes));
       } catch (e) {
         this.error = 'Could not save your votes in this browser. Download them before you leave.';
       }
@@ -257,11 +398,12 @@ export default defineComponent({
     clear() {
       if (window.confirm(this.$t('Delete all your votes from this browser? Download them first if you want to keep them.'))) {
         this.votes = [];
+        this.valueVotes = [];
         this.save();
       }
     },
     download() {
-      const file: AssemblerVoteFile = {version: 1, votes: this.votes};
+      const file: AssemblerVoteFile = {version: 1, votes: this.votes, valueVotes: this.valueVotes};
       const blob = new Blob([JSON.stringify(file, null, 1)], {type: 'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -269,16 +411,49 @@ export default defineComponent({
       a.click();
       URL.revokeObjectURL(a.href);
     },
-    async refill() {
+    refill(): Promise<void> {
+      return this.mode === 'values' ? this.refillValues() : this.refillCards();
+    },
+    async refillValues(): Promise<void> {
+      if (this.valueQueue.length > 0) {
+        return;
+      }
+      if (this.table.length === 0) {
+        if (this.loading) {
+          return;
+        }
+        this.loading = true;
+        try {
+          const response = await fetch(paths.API_ASSEMBLER_VALUES);
+          if (!response.ok) {
+            this.error = 'Could not load the value table.';
+            return;
+          }
+          const model: AssemblerValueTableModel = await response.json();
+          this.table = model.rateable;
+        } catch (e) {
+          this.error = 'Could not reach the server.';
+          return;
+        } finally {
+          this.loading = false;
+        }
+      }
+      // Every value once, in a random order, then again.
+      this.valueQueue = shuffled(this.table).map((item) => ({item, shown: this.spread ? shiftTableValue(item.value, Math.random) : item.value}));
+    },
+    async refillCards(): Promise<void> {
       if (this.loading || this.queue.length >= REFILL_AT) {
         return;
       }
       this.loading = true;
-      const complexity = this.complexity;
+      const options = `${this.complexity}|${this.spread}`;
       try {
         const params = new URLSearchParams({count: String(BATCH)});
-        if (complexity !== '') {
-          params.set('complexity', complexity);
+        if (this.complexity !== '') {
+          params.set('complexity', this.complexity);
+        }
+        if (this.spread) {
+          params.set('spread', '1');
         }
         const response = await fetch(`${paths.API_ASSEMBLER}?${params}`);
         if (!response.ok) {
@@ -287,7 +462,7 @@ export default defineComponent({
         }
         const result: AssemblerPreviewResponse = await response.json();
         // Options changed while this batch was on its way: it's for the old options.
-        if (complexity === this.complexity) {
+        if (options === `${this.complexity}|${this.spread}`) {
           this.error = '';
           this.queue.push(...result.cards.filter((c) => c.assembled !== undefined));
         }
@@ -296,8 +471,8 @@ export default defineComponent({
       } finally {
         this.loading = false;
       }
-      if (complexity !== this.complexity) {
-        this.refill();
+      if (options !== `${this.complexity}|${this.spread}` && this.mode === 'cards') {
+        await this.refillCards();
       }
     },
   },
@@ -327,6 +502,7 @@ export default defineComponent({
 
 .rater-options {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   align-items: center;
   margin-bottom: 12px;
@@ -337,6 +513,27 @@ export default defineComponent({
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.rater-modes {
+  display: flex;
+  gap: 4px;
+}
+
+.rater-mode {
+  padding: 3px 10px;
+  border: 1px solid #555;
+  border-radius: 12px;
+  color: #aaa;
+  text-decoration: none;
+
+  &:hover { color: #fff; }
+}
+
+.rater-mode--on {
+  color: #fff;
+  background-color: rgba(224, 160, 96, 0.25);
+  border-color: #e0a060;
 }
 
 .rater-layout {
@@ -354,9 +551,33 @@ export default defineComponent({
   min-width: 260px;
 }
 
-.rater-value {
-  font-size: 13px;
-  color: #ccc;
+.rater-value-card {
+  width: 340px;
+  max-width: 100%;
+  padding: 20px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background-color: #262626;
+  text-align: center;
+}
+
+.rater-value-group {
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rater-value-label {
+  margin: 10px 0;
+  font-size: 17px;
+  color: #fff;
+}
+
+.rater-value-number {
+  font-size: 28px;
+  font-weight: bold;
+  color: #e0a060;
 }
 
 .rater-buttons {
@@ -411,11 +632,12 @@ export default defineComponent({
 }
 
 .rater-stats {
-  width: 340px;
+  width: 380px;
   max-width: 100%;
   font-size: 13px;
 
   h3 { margin: 0 0 8px; color: #fff; }
+  h4 { margin: 12px 0 6px; color: #ddd; font-size: 13px; }
 }
 
 .rater-bar {

@@ -1,5 +1,5 @@
 import {Tag} from '../../common/cards/Tag';
-import {AssemblerValueTableModel, ValueTableSection} from '../../common/assembler/AssemblerValueTable';
+import {AssemblerValueTableModel, RateableValue, ValueTableSection} from '../../common/assembler/AssemblerValueTable';
 import {EFFECT_CATEGORIES, EFFECT_CATEGORY_INFO} from '../../common/assembler/EffectCategory';
 import {ASSEMBLER_CARD_MANIFEST} from '../cards/assembler/AssemblerCardManifest';
 import {CardName} from '../../common/cards/CardName';
@@ -157,12 +157,12 @@ export function buildValueTable(): AssemblerValueTableModel {
     ...tagRequirementRows,
   ], 'A requirement makes a card harder to play, so it lowers the value. Tag requirements grow faster than the count.'));
 
-  sections.push(section('Complexity', ['Complexity', 'Benefits', 'Effect chance', 'Drawbacks', 'Tags', 'Requirement chance'], [false, true, true, true, true, true],
+  sections.push(section('Complexity', ['Complexity', 'Slots', 'Effect chance', 'Drawbacks', 'Tags', 'Requirement chance'], [false, true, true, true, true, true],
     (['low', 'mid', 'high'] as const).map((c) => {
       const p = PROFILE[c];
-      return [c.charAt(0).toUpperCase() + c.slice(1), range(p.good), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance)];
+      return [c.charAt(0).toUpperCase() + c.slice(1), range(p.slots), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance)];
     }),
-    'Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest.'));
+    'Every benefit, effect or action, drawback and requirement takes a slot. Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest. A card that ends up busier than asked for (a guaranteed effect, a minimum cost) shows the higher complexity.'));
 
   sections.push(section('Effect categories and names', ['Category', 'Kind', 'What counts', 'Nouns', 'Adjectives (small / big)', 'Endings'], [false, false, false, false, false, false],
     EFFECT_CATEGORIES.map((c) => {
@@ -200,5 +200,44 @@ export function buildValueTable(): AssemblerValueTableModel {
     [`Printed cost (value − ${V.BUY_COST})`, String(Math.round(example - V.BUY_COST))],
   ]));
 
-  return {sections};
+  return {sections, rateable: rateableValues()};
+}
+
+const RESOURCE_WORD: Record<V.StandardResource, string> = {megacredits: 'M€', steel: 'steel', titanium: 'titanium', plants: 'plant', heat: 'heat', energy: 'energy'};
+
+/** The table's single numbers, for the rating mode's "Rate values". */
+export function rateableValues(): Array<RateableValue> {
+  const round = (n: number) => Math.round(n * 10) / 10;
+  const values: Array<RateableValue> = [];
+  const add = (key: string, label: string, value: number, group: string) => values.push({key, label, value: round(value), group});
+  for (const r of Object.keys(V.STOCK_VALUE) as Array<V.StandardResource>) {
+    if (r !== 'megacredits') {
+      add(`stock.${r}`, `Gain 1 ${RESOURCE_WORD[r]}`, V.STOCK_VALUE[r], 'Resources');
+    }
+  }
+  for (const r of Object.keys(V.PRODUCTION_VALUE) as Array<V.StandardResource>) {
+    add(`production.${r}`, `Increase your ${RESOURCE_WORD[r]} production 1 step`, V.PRODUCTION_VALUE[r], 'Production');
+  }
+  add('tr', 'Raise your TR 1 step', V.TR_VALUE, 'One-off effects');
+  add('vp', '1 victory point', V.VP_VALUE, 'One-off effects');
+  add('draw', 'Draw a card', V.DRAW_CARD_VALUE, 'One-off effects');
+  add('global.temperature', 'Raise the temperature 1 step', V.GLOBAL_STEP_VALUE.temperature, 'One-off effects');
+  add('global.oxygen', 'Raise oxygen 1 step', V.GLOBAL_STEP_VALUE.oxygen, 'One-off effects');
+  add('global.venus', 'Raise Venus 1 step', V.GLOBAL_STEP_VALUE.venus, 'One-off effects');
+  add('ocean', 'Place an ocean tile', V.OCEAN_VALUE, 'One-off effects');
+  add('greenery', 'Place a greenery tile (and raise oxygen)', V.GREENERY_VALUE, 'One-off effects');
+  add('city', 'Place a city tile', V.CITY_VALUE, 'One-off effects');
+  add('action.steel', 'Action: gain 1 steel (on a blue card)', V.STOCK_VALUE.steel * V.ACTION_USES, 'Effects and actions');
+  add('discount.all', 'Effect: you pay 1 M€ less for every card', V.CARDS_PLAYED_AFTER, 'Effects and actions');
+  for (const t of [Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, Tag.VENUS, Tag.PLANT, Tag.POWER, Tag.MICROBE, Tag.JOVIAN, Tag.CITY, Tag.ANIMAL]) {
+    const pay = V.PAYMENT_VALUE[t];
+    const extra = pay !== undefined ? ` (incl. paying with ${t === Tag.SPACE ? 'titanium' : 'steel'} on a 10 M€ card)` : '';
+    add(`tag.${t}`, `A ${t} tag on a card${extra}`, (V.TAG_VALUE[t] ?? 0) + (pay !== undefined ? pay.flat + pay.ofCost * 10 : 0), 'Tags');
+  }
+  add('event', 'Being an event (the event tag)', V.EVENT_TAG_VALUE, 'Tags');
+  for (const n of [1, 2, 3, 4]) {
+    add(`req.tags.${n}`, `Requires ${n} science ${n === 1 ? 'tag' : 'tags'} (how much it takes off)`, Math.pow(n, V.TAG_REQUIREMENT_EXPONENT), 'Requirements');
+  }
+  add('req.oxygen.7', 'Requires 7% oxygen or more (how much it takes off)', -V.GLOBAL_MIN_REQUIREMENT * 7 / 14, 'Requirements');
+  return values;
 }

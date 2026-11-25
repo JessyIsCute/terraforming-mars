@@ -9,7 +9,7 @@ import {AssemblerExpansion} from '../../assembler/AssemblerExpansion';
 import {AssembleSpec} from '../../assembler/AssembleSpec';
 import {all} from '../Options';
 
-/** Low complexity, but worth about 30 M€: a simple, big card. */
+/** Asked for as low complexity (benefits only, no effects or drawbacks), but worth about 30 M€; it takes several benefits, so it shows as mid or high. */
 export const OPEN_SOURCE_BLUEPRINTS_PRESET: AssembleSpec = {complexity: 'low', minCost: 28, maxCost: 32};
 export const OPEN_SOURCE_BLUEPRINTS_DISCOUNT = 10;
 

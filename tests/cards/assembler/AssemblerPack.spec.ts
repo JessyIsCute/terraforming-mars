@@ -63,11 +63,13 @@ describe('Assembler card pack', () => {
     const myDef = definitionOf(mine);
     const theirDef = definitionOf(theirs);
 
-    expect(theirDef.complexity).eq('low');
+    // Several benefits, no effects or drawbacks: too busy to read as low complexity.
+    expect(theirDef.complexity).not.eq('low');
+    expect(theirDef.effectTexts).is.empty;
     expect(theirDef.cost).is.within(28, 32);
     expect(theirDef.costAdjust).is.undefined;
 
-    expect(myDef.complexity).eq('low');
+    expect(myDef.effectTexts).is.empty;
     expect(myDef.costAdjust).eq(-10);
     expect(myDef.cost).is.within(18, 22);
     expect(mine.cost).eq(myDef.cost);

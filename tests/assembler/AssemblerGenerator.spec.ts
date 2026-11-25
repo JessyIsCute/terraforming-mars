@@ -2,13 +2,15 @@ import {expect} from 'chai';
 import {SeededRandom} from '../../src/common/utils/Random';
 import {CardType} from '../../src/common/cards/CardType';
 import {Tag} from '../../src/common/cards/Tag';
-import {AssemblerGenerator, compactTexts} from '../../src/server/assembler/AssemblerGenerator';
+import {AssemblerGenerator, compactTexts, complexityOfSlots} from '../../src/server/assembler/AssemblerGenerator';
 import {AssembledCardDefinition, AssemblerComplexity} from '../../src/server/assembler/AssembledCardDefinition';
 import {AssembleSpec} from '../../src/server/assembler/AssembleSpec';
 import {fitsOnCard} from '../../src/server/assembler/AssemblerRender';
 import {newAssembledCard} from '../../src/server/assembler/AssembledCard';
 import {validateBehavior} from '../../src/server/cards/Card';
 import {CardName} from '../../src/common/cards/CardName';
+import {testGame} from '../TestGame';
+import {Units} from '../../src/common/Units';
 import {BUY_COST, MAX_COST, MIN_COST} from '../../src/server/assembler/AssemblerValues';
 
 const COMPLEXITIES: Array<AssemblerComplexity> = ['low', 'mid', 'high'];
@@ -127,8 +129,9 @@ describe('AssemblerGenerator', () => {
     it('a cost range holds, even for low complexity with a high minimum', () => {
       for (const def of many({minCost: 28, maxCost: 32}, 'low')) {
         expect(def.cost, def.name).is.within(28, 32);
-        expect(def.complexity).eq('low');
-        // low complexity: no effects, actions or drawbacks
+        // No single benefit is worth 28 M€: it takes several, so the card says it isn't low.
+        expect(def.complexity).not.eq('low');
+        // Asked for low: still no effects, actions or drawbacks
         expect(def.effectTexts, def.name).is.empty;
         expect(def.cost).eq(Math.round(def.value - BUY_COST));
       }
@@ -153,6 +156,90 @@ describe('AssemblerGenerator', () => {
           expect(fitsOnCard(def), def.name).is.true;
           expect(() => validateBehavior(def.behavior, def.name as CardName)).not.to.throw();
         }
+      }
+    });
+  });
+  describe('complexity', () => {
+    // Every benefit, effect or action, drawback and requirement is a slot.
+    function slots(def: AssembledCardDefinition) {
+      return def.breakdown.filter((l) => !l.text.startsWith('Tags:') && l.text !== 'Pay with steel/titanium').length;
+    }
+
+    it('cards stay within their slots when nothing is forced', () => {
+      const limits = {low: [1, 1], mid: [2, 3], high: [4, 6]};
+      for (const complexity of COMPLEXITIES) {
+        for (const def of generateMany(0.55, 200, complexity)) {
+          expect(def.complexity, def.name).eq(complexity);
+          expect(slots(def), def.name).within(limits[complexity][0], limits[complexity][1]);
+        }
+      }
+    });
+
+    it('a low active card is just its effect or action', () => {
+      const generator = new AssemblerGenerator(new SeededRandom(0.61));
+      for (let i = 0; i < 100; i++) {
+        const def = generator.generate(`Assembled blue-${i}`, 'low', {type: CardType.ACTIVE});
+        expect(def.effectTexts, def.name).has.length(1);
+        expect(slots(def), def.name).eq(1);
+        expect(def.complexity).eq('low');
+      }
+    });
+
+    it('low cards have no requirement unless asked, and then read as mid', () => {
+      for (const def of generateMany(0.62, 200, 'low')) {
+        expect(def.requirements, def.name).is.empty;
+      }
+      for (const def of generateMany(0.63, 50, 'low', true)) {
+        expect(def.complexity, def.name).eq('mid');
+      }
+    });
+
+    it('a guaranteed drawback on a low card makes it mid; sabotage alone stays low', () => {
+      const generator = new AssemblerGenerator(new SeededRandom(0.64));
+      const seen = new Set<string>();
+      for (let i = 0; i < 80; i++) {
+        const def = generator.generate(`Assembled bane-${i}`, 'low', {categories: ['cooling']});
+        // "Decrease any heat production" is one slot; "Decrease your heat production" needs a benefit too.
+        const drawback = def.breakdown.some((l) => l.category === 'cooling' && l.value < 0);
+        expect(def.complexity, def.name).eq(drawback ? 'mid' : 'low');
+        expect(def.complexity).eq(complexityOfSlots(slots(def)));
+        seen.add(def.complexity);
+      }
+      expect([...seen].sort()).deep.eq(['low', 'mid']);
+    });
+  });
+
+  describe("triggers on the card's own tag", () => {
+    function triggerCards(): Array<AssembledCardDefinition> {
+      const generator = new AssemblerGenerator(new SeededRandom(0.71));
+      return Array.from({length: 300}, (_, i) => generator.generate(`Assembled trig-${i}`, 'mid', {categories: ['synergy']}))
+        .filter((d) => d.trigger !== undefined);
+    }
+
+    it('say "including this" exactly when the card has the tag', () => {
+      const cards = triggerCards();
+      const self = cards.filter((d) => d.tags.includes(d.trigger!.tag));
+      const other = cards.filter((d) => !d.tags.includes(d.trigger!.tag));
+      expect(self.length).gt(5);
+      expect(other.length).gt(5);
+      for (const d of self) {
+        expect(d.effectTexts.join(' '), d.name).contains(`${d.trigger!.tag} tag, including this, gain`);
+      }
+      for (const d of other) {
+        expect(d.effectTexts.join(' '), d.name).not.contains('including this');
+      }
+    });
+
+    it('do fire for the card itself when played', () => {
+      const def = triggerCards().find((d) => d.tags.includes(d.trigger!.tag) && d.requirements.length === 0 && d.behavior?.stock === undefined && d.behavior?.production === undefined)!;
+      expect(def, 'a plain self-triggering card').is.not.undefined;
+      const [/* game */, player] = testGame(1);
+      const before = player.stock.asUnits();
+      player.playCard(newAssembledCard(def));
+      const after = player.stock.asUnits();
+      const gained = Units.of(def.trigger!.gain);
+      for (const r of Object.keys(def.trigger!.gain) as Array<keyof Units>) {
+        expect(after[r] - before[r], r).gte(gained[r]);
       }
     });
   });

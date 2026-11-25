@@ -1,4 +1,4 @@
-import {AssemblerVote, PriceGroup, VERDICT_INFO, priceGroup, votedValue} from '../../common/assembler/AssemblerVotes';
+import {AssemblerValueVote, AssemblerVote, PriceGroup, VERDICT_INFO, priceGroup, votedTableValue, votedValue} from '../../common/assembler/AssemblerVotes';
 
 /**
  * Assembler (fan): what rating-mode votes say about the value table.
@@ -43,8 +43,9 @@ function rowOf(vote: AssemblerVote): Row {
     const g = priceGroup(line);
     parts.set(g, (parts.get(g) ?? 0) + line.value);
   }
-  // The card's printed price is the sum of its lines; cost adjustments are on top.
-  return {parts, target: votedValue(vote) - (vote.assembled.costAdjust ?? 0)};
+  // The lines are what the card does; the vote says what that's worth, judged against the shown
+  // cost (which may have been shifted on purpose).
+  return {parts, target: votedValue(vote)};
 }
 
 /** Solve A x = b by Gaussian elimination with partial pivoting. */
@@ -121,4 +122,51 @@ export function fitVotes(votes: ReadonlyArray<AssemblerVote>): VoteFit {
     errorBefore: err(() => 1, 0),
     errorAfter: err((g) => factor.get(g) ?? 1, offset),
   };
+}
+
+export type ValueResult = {
+  key: string,
+  label: string,
+  votes: number,
+  /** The table's number when the votes were cast (latest). */
+  real: number,
+  /** What the votes say it should be: the average voted value. */
+  suggested: number,
+  /** Average verdict, judged against the shown numbers. */
+  lean: number,
+};
+
+/** Votes on single table values (Rate values): what each number should be. */
+export function summarizeValueVotes(votes: ReadonlyArray<AssemblerValueVote>): Array<ValueResult> {
+  const byKey = new Map<string, Array<AssemblerValueVote>>();
+  for (const v of votes) {
+    byKey.set(v.key, [...(byKey.get(v.key) ?? []), v]);
+  }
+  const avg = (ns: ReadonlyArray<number>) => ns.reduce((s, n) => s + n, 0) / Math.max(1, ns.length);
+  return [...byKey.values()].map((vs) => {
+    const latest = vs.reduce((a, b) => (b.at > a.at ? b : a));
+    return {
+      key: latest.key,
+      label: latest.label,
+      votes: vs.length,
+      real: latest.real,
+      suggested: avg(vs.map(votedTableValue)),
+      lean: avg(vs.map((v) => VERDICT_INFO[v.verdict].steps)),
+    };
+  }).sort((a, b) => Math.abs(b.suggested - b.real) / Math.max(0.5, b.real) - Math.abs(a.suggested - a.real) / Math.max(0.5, a.real));
+}
+
+export type CalibrationRow = {count: number, lean: number};
+export type Calibration = {down: CalibrationRow, none: CalibrationRow, up: CalibrationRow};
+
+/**
+ * The check on the votes: verdicts split by how the shown price was moved on purpose. Good votes
+ * lean "too cheap" on prices moved down and "too expensive" on prices moved up.
+ */
+export function calibrate(items: ReadonlyArray<{shift: number, verdict: AssemblerVote['verdict']}>): Calibration {
+  const row = (keep: (s: number) => boolean): CalibrationRow => {
+    const steps = items.filter((i) => keep(i.shift)).map((i) => VERDICT_INFO[i.verdict].steps);
+    return {count: steps.length, lean: steps.reduce((s, n) => s + n, 0) / Math.max(1, steps.length)};
+  };
+  return {down: row((s) => s < 0), none: row((s) => s === 0), up: row((s) => s > 0)};
 }

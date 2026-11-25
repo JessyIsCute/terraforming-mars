@@ -39,6 +39,8 @@ type Part = {
   effectText?: string;
   /** What kind of effect this is; names the card and lets presets guarantee it. */
   category: EffectCategory;
+  /** A "when you play a X tag" trigger: if the card has that tag itself, it fires once more on play. */
+  selfTrigger?: {tag: Tag, value: number};
   apply: (d: Draft) => void;
 };
 
@@ -106,11 +108,22 @@ export function compactTexts(texts: Array<string>): Array<string> {
   return [sentence.charAt(0).toUpperCase() + sentence.slice(1), ...rest];
 }
 
-export const PROFILE: Record<AssemblerComplexity, {good: [number, number], effectChance: number, bad: [number, number], tags: [number, number], requirementChance: number}> = {
-  low: {good: [1, 1], effectChance: 0, bad: [0, 0], tags: [1, 1], requirementChance: 0.15},
-  mid: {good: [2, 3], effectChance: 0.3, bad: [0, 1], tags: [1, 2], requirementChance: 0.35},
-  high: {good: [2, 3], effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5},
+/**
+ * How busy a card is, in slots: every benefit, effect or action, drawback and requirement takes
+ * one. Effects, drawbacks and requirements are rolled first; benefits fill the slots that are left.
+ */
+export const PROFILE: Record<AssemblerComplexity, {slots: [number, number], effectChance: number, bad: [number, number], tags: [number, number], requirementChance: number}> = {
+  low: {slots: [1, 1], effectChance: 0, bad: [0, 0], tags: [1, 1], requirementChance: 0},
+  mid: {slots: [2, 3], effectChance: 0.3, bad: [0, 1], tags: [1, 2], requirementChance: 0.35},
+  high: {slots: [4, 6], effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5},
 };
+
+/** The complexity a card's slot count reads as. */
+export function complexityOfSlots(slots: number): AssemblerComplexity {
+  return slots <= PROFILE.low.slots[1] ? 'low' : slots <= PROFILE.mid.slots[1] ? 'mid' : 'high';
+}
+
+const COMPLEXITY_ORDER: ReadonlyArray<AssemblerComplexity> = ['low', 'mid', 'high'];
 
 const TAG_WEIGHTS: Array<[Tag, number]> = [
   [Tag.BUILDING, 31], [Tag.SPACE, 26], [Tag.EARTH, 16], [Tag.SCIENCE, 15], [Tag.VENUS, 11], [Tag.PLANT, 11],
@@ -263,6 +276,7 @@ export class AssemblerGenerator {
         const triggers = V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR;
         const text = `Effect: When you play ${an(tag)} tag, gain ${amount(n, r)}.`;
         return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'synergy', value: V.STOCK_VALUE[r] * n * triggers,
+          selfTrigger: {tag, value: V.STOCK_VALUE[r] * n},
           apply: (d) => d.trigger = {tag, gain: {[r]: n}}};
       }, 3],
     ])();
@@ -350,13 +364,11 @@ export class AssemblerGenerator {
     const profile = PROFILE[complexity];
     // Chosen first, so a minimum cost (below) can make up for what the requirement takes off.
     const requirement = (forceRequirement || this.chance(profile.requirementChance)) ? this.requirement() : undefined;
-    // Guaranteed effects first; they count toward the card's usual number of parts.
+    // Guaranteed effects first. Everything takes a slot: guaranteed parts, the requirement, an
+    // effect or action, drawbacks. Benefits fill what's left (at least one thing must be good).
     const parts: Array<Part> = [...new Set(spec.categories ?? [])].map((c) => this.partOf(c));
     const has = (kind: PartKind) => parts.filter((p) => p.kind === kind).length;
-    const nGood = this.int(...profile.good) - has('good');
-    for (let i = 0; i < nGood; i++) {
-      parts.push(this.goodPart());
-    }
+    const slots = this.int(...profile.slots);
     if (has('effect') === 0 && this.chance(profile.effectChance)) {
       parts.push(this.effectPart());
     }
@@ -367,6 +379,11 @@ export class AssemblerGenerator {
     const nBad = this.int(...profile.bad) - has('bad');
     for (let i = 0; i < nBad; i++) {
       parts.push(this.badPart());
+    }
+    const used = parts.length + (requirement !== undefined ? 1 : 0);
+    const nGood = Math.max(has('good') + has('effect') === 0 ? 1 : 0, slots - used);
+    for (let i = 0; i < nGood; i++) {
+      parts.push(this.goodPart());
     }
     // A minimum cost: add good parts until the card is worth about enough. Pricing below decides.
     // Each time, take the candidate that lands closest to the target: a big part while far below
@@ -431,6 +448,14 @@ export class AssemblerGenerator {
       tags[tags.length - 1] = requirement.tag;
     }
 
+    // A trigger on a tag the card has fires for the card itself too (like Olympus Conference): say
+    // so, and count that one extra payout.
+    for (const [i, p] of parts.entries()) {
+      if (p.selfTrigger !== undefined && tags.includes(p.selfTrigger.tag)) {
+        parts[i] = {...p, value: p.value + p.selfTrigger.value, effectText: p.effectText?.replace(' tag, gain ', ' tag, including this, gain ')};
+      }
+    }
+
     // ---- price ----
     const breakdown: Array<AssembledValueLine> = [];
     for (const p of parts) {
@@ -485,12 +510,16 @@ export class AssemblerGenerator {
     const playTexts = parts.filter((p) => p.text !== '' && p.effectText === undefined).map((p) => p.text);
     const description = [requirement?.text, ...compactTexts(playTexts)].filter((t) => t !== undefined).join(' ');
     const effectTexts = parts.filter((p) => p.effectText !== undefined).map((p) => p.effectText as string);
-    const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), complexity, (items) => this.pick(items));
+    // Forced extras (a guaranteed drawback, a requirement, a minimum cost) can make a card busier
+    // than asked for; it then says so.
+    const actual = complexityOfSlots(parts.length + (requirement !== undefined ? 1 : 0));
+    const shown = COMPLEXITY_ORDER.indexOf(actual) > COMPLEXITY_ORDER.indexOf(complexity) ? actual : complexity;
+    const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), shown, (items) => this.pick(items));
 
     return {
       name,
       title,
-      complexity,
+      complexity: shown,
       type,
       cost,
       tags,

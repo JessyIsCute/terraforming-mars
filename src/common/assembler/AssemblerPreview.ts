@@ -14,6 +14,8 @@ import {CardModel} from '../models/CardModel';
  *   minCost, maxCost   printed cost range, 0..MAX_COST
  *   costAdjust   added to the cost after pricing, -MAX_COST_ADJUST..MAX_COST_ADJUST
  *   requirement  1: the card always has a requirement
+ *   spread       1: rating mode. Most cards get a hidden shift of their printed cost (in
+ *                assembled.costAdjust), to check whether votes notice
  */
 export const ASSEMBLER_PREVIEW_LIMITS = {
   DEFAULT_COUNT: 6,

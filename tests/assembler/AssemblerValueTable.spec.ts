@@ -36,4 +36,14 @@ describe('AssemblerValueTable', () => {
     expect(describeSpec({tags: [Tag.SCIENCE], minCost: 10, maxCost: 20, costAdjust: -5, categories: ['cooling']}))
       .eq('At least 1 science tag, cost 10–20 M€, then −5 M€, with Cooling');
   });
+  it('lists single values to rate, with unique keys', () => {
+    const {rateable} = buildValueTable();
+    expect(rateable.length).gt(30);
+    expect(new Set(rateable.map((r) => r.key)).size).eq(rateable.length);
+    expect(rateable.find((r) => r.key === 'stock.steel')?.value).eq(2);
+    expect(rateable.find((r) => r.key === 'req.tags.3')?.value).eq(5.2);
+    for (const r of rateable) {
+      expect(r.value, r.key).gt(0);
+    }
+  });
 });

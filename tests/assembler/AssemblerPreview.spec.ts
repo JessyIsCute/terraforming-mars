@@ -86,4 +86,24 @@ describe('AssemblerPreview', () => {
     expect(() => previewCards(parse('complexity=low&categories=efficiency&maxCost=0')))
       .to.throw(AssemblerPreviewError, /No card fits/);
   });
+  it('spread: the same cards, most with a hidden shift of the printed cost', () => {
+    const plain = previewCards(parse('count=12&seed=55&complexity=low'));
+    const spread = previewCards(parse('count=12&seed=55&complexity=low&spread=1'));
+    expect(spread.cards.map((c) => c.name)).deep.eq(plain.cards.map((c) => c.name));
+    let moved = 0;
+    spread.cards.forEach((card, i) => {
+      const real = plain.cards[i].calculatedCost ?? 0;
+      const shift = card.assembled?.costAdjust ?? 0;
+      expect(card.calculatedCost, card.name).eq(real + shift);
+      expect(card.assembled?.breakdown).deep.eq(plain.cards[i].assembled?.breakdown);
+      if (shift !== 0) {
+        moved++;
+        // at least 2 M€, unless that would go below a cost of 0
+        expect(Math.abs(shift) >= 2 || card.calculatedCost === 0, card.name).is.true;
+      }
+    });
+    expect(moved).gte(3);
+    // the same request moves the same cards the same way
+    expect(previewCards(parse('count=12&seed=55&complexity=low&spread=1'))).deep.eq(spread);
+  });
 });
