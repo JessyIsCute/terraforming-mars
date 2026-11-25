@@ -279,7 +279,7 @@ export class AssemblerGenerator {
       ...scaling,
       [() => ({kind: 'good', key: 'ocean', text: 'Place an ocean tile.', value: V.OCEAN_VALUE, category: 'water', apply: (d) => d.behavior.ocean = {}}), 2],
       [() => ({kind: 'good', key: 'greenery', text: 'Place a greenery tile and raise oxygen 1 step.', value: V.GREENERY_VALUE, hintTag: Tag.PLANT, category: 'plants', apply: (d) => d.behavior.greenery = {}}), 1.5],
-      [() => ({kind: 'good', key: 'city', text: 'Place a city tile.', value: V.CITY_VALUE, lasting: true, hintTag: Tag.CITY, category: 'city', apply: (d) => d.behavior.city = {}}), 1.5],
+      [() => this.cityPart(), 1.5],
       [() => {
         const n = this.int(2, 4);
         return {kind: 'good', key: 'removePlants', text: `Remove up to ${n} plants from any player.`, value: V.REMOVE_PLANT_VALUE * n, category: 'blight', apply: (d) => d.behavior.removeAnyPlants = n};
@@ -289,6 +289,11 @@ export class AssemblerGenerator {
       [() => this.addToAnotherCard(), 1.5],
       [() => this.perTagProduction(), 2],
     ])();
+  }
+
+  /** Placing a city. Only these cards carry the city tag, and they always do. */
+  private cityPart(): Part {
+    return {kind: 'good', key: 'city', text: 'Place a city tile.', value: V.CITY_VALUE, lasting: true, hintTag: Tag.CITY, category: 'city', apply: (d) => d.behavior.city = {}};
   }
 
   /** "Add 2 microbes to another card." */
@@ -417,7 +422,7 @@ export class AssemblerGenerator {
         const x = this.int(2, 3);
         const text = `Effect: When you play ${an(tag)} tag, you pay ${x} M€ less for it.`;
         return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'efficiency',
-          value: x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR,
+          value: x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.DISCOUNT_FOCUS_FACTOR,
           apply: (d) => d.cardDiscount.push({tag, amount: x})};
       }, 3],
       [() => {
@@ -560,6 +565,10 @@ export class AssemblerGenerator {
     // and drawbacks if they fit, then benefits fill the rest (at least one thing must be good).
     let budget = Math.max(1, target - (nTags - 1) - (requirement !== undefined ? 1 : 0));
     const parts: Array<Part> = [...new Set(spec.categories ?? [])].map((c) => this.partOf(c));
+    // A city tag means the card places a city.
+    if (required.includes(Tag.CITY) && !parts.some((p) => p.key === 'city')) {
+      parts.push(this.cityPart());
+    }
     const has = (kind: PartKind) => parts.filter((p) => p.kind === kind).length;
     const left = () => budget - parts.length;
     // An active card needs an effect or action.
@@ -625,6 +634,11 @@ export class AssemblerGenerator {
 
     // Tags: lean toward one that fits the parts.
     const tags: Array<Tag> = [...required];
+    // A card that places a city has the city tag, and only those cards do.
+    if (parts.some((p) => p.key === 'city') && !tags.includes(Tag.CITY)) {
+      tags.push(Tag.CITY);
+      nTags = Math.max(nTags, tags.length);
+    }
     const hint = parts.find((p) => p.hintTag !== undefined)?.hintTag;
     if (hint !== undefined && tags.length < nTags && !tags.includes(hint) && this.chance(0.7)) {
       tags.push(hint);
@@ -633,7 +647,7 @@ export class AssemblerGenerator {
     // Tags that fit the card's benefits are likelier.
     const themes = parts.filter((p) => p.kind !== 'bad').flatMap((p) => THEME[p.category] ?? []);
     const tagWeights = TAG_WEIGHTS
-      .filter(([t]) => type !== CardType.EVENT || t !== Tag.WILD)
+      .filter(([t]) => t !== Tag.CITY && (type !== CardType.EVENT || t !== Tag.WILD))
       .map(([t, w]) => [t, w * (1 + THEME_BOOST * themes.filter((x) => x === t).length)] as const);
     while (tags.length < nTags) {
       const t = this.weighted(tagWeights);
@@ -643,7 +657,7 @@ export class AssemblerGenerator {
     }
 
     // Science-requirement cards tend to be science cards -- unless that would drop a required tag.
-    if (requirement?.tag !== undefined && !tags.includes(requirement.tag) && tags.length > required.length && this.chance(0.5)) {
+    if (requirement?.tag !== undefined && !tags.includes(requirement.tag) && tags.length > required.length && tags[tags.length - 1] !== Tag.CITY && this.chance(0.5)) {
       tags[tags.length - 1] = requirement.tag;
     }
 

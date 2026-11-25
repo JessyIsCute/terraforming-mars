@@ -35,7 +35,7 @@ within 2 M€.
 
 | Part | Value | Notes |
 |---|---:|---|
-| M€ production | 3.3 | fitted to official cards, see fit-results.md (was 4) |
+| M€ production | 4 | fitted to official cards at 3.3 (see fit-results.md), set back to 4 by hand: it felt underpriced |
 | Steel production | 5.1 | fitted to official cards, see fit-results.md (was 7). Project cards alone say ~4.6; preludes say more because they produce from generation 1 |
 | Titanium production | 8.5 | fitted to official cards, see fit-results.md (was 10) |
 | Plant production | 6 | lowered from 8; see "Lichen" below |
@@ -159,8 +159,11 @@ Example: "Action: spend 1 energy to gain 2 steel" = (2×2 − 1.2) × 4 = 11.2.
 
 ```
 −X M€ on every card     = X × 8           (you play ~8 more cards after it)
-−X M€ on cards with tag T = X × 8 × share(T) × 2   (×2 because you build around it)
+−X M€ on cards with tag T = X × 8 × share(T) × 3   (×3 because you build around it)
 ```
+
+The factor was 2 (it matches the space cards below); raised to 3 by hand so 2 M€ off science is
+worth about 7. Space and building discounts now come out above the printed cards.
 
 | Card | Discount | Predicted | Measured |
 |---|---|---:|---:|

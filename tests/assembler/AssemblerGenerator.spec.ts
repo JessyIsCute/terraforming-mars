@@ -421,6 +421,23 @@ describe('AssemblerGenerator', () => {
     });
   });
 
+  it('a card has the city tag exactly when it places a city', () => {
+    let cities = 0;
+    for (const complexity of COMPLEXITIES) {
+      for (const def of generateMany(0.83, 400, complexity)) {
+        const places = def.behavior?.city !== undefined;
+        cities += places ? 1 : 0;
+        expect(def.tags.includes(Tag.CITY), def.name).eq(places);
+      }
+    }
+    expect(cities).gt(10);
+    const generator = new AssemblerGenerator(new SeededRandom(0.84));
+    for (let i = 0; i < 20; i++) {
+      const def = generator.generate(`Assembled city-${i}`, {tags: [Tag.CITY]});
+      expect(def.behavior?.city, def.name).is.not.undefined;
+    }
+  });
+
   it('never puts a wild tag on an event', () => {
     let events = 0;
     let wild = 0;

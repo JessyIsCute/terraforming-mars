@@ -22,7 +22,8 @@ export const STOCK_VALUE = {
  * splits energy production + power tag differently (4.2 + 3.0), but their total is the same.
  */
 export const PRODUCTION_VALUE = {
-  megacredits: 3.3,
+  // The fit says 3.3; raised to 4 by hand: a step of M€ production felt underpriced.
+  megacredits: 4,
   steel: 5.1,
   titanium: 8.5,
   plants: 6,
@@ -90,6 +91,11 @@ export const CONVERSION_ACTION_USES = 2;
 export const CARDS_PLAYED_AFTER = 8;
 /** You build around a tag you get a bonus for. */
 export const FOCUS_FACTOR = 2;
+/**
+ * A discount on a tag pulls harder: you buy and play more of those cards. Set so 2 M€ off
+ * science tags is worth about 7 (2 × 8 cards × 15% × 3).
+ */
+export const DISCOUNT_FOCUS_FACTOR = 3;
 export const STANDARD_PROJECTS_AFTER = 2.3;
 
 /** Requirements. */

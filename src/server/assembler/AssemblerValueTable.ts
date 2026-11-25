@@ -143,8 +143,8 @@ export function buildValueTable(): AssemblerValueTableModel {
     ['Action: spend 4 energy to raise a parameter', `(Step − 4 energy) × ${V.CONVERSION_ACTION_USES} uses`,
       `Temperature: (${num(V.GLOBAL_STEP_VALUE.temperature)} − ${num(4 * V.STOCK_VALUE.energy)}) × ${V.CONVERSION_ACTION_USES} = ${num((V.GLOBAL_STEP_VALUE.temperature - 4 * V.STOCK_VALUE.energy) * V.CONVERSION_ACTION_USES)}`],
     ['Discount on every card', `Discount × ${V.CARDS_PLAYED_AFTER} cards played after`, `1 M€: ${num(V.CARDS_PLAYED_AFTER)}`],
-    ['Discount on a tag', `Discount × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR} (focus)`,
-      `2 M€ on science: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SCIENCE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['Discount on a tag', `Discount × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.DISCOUNT_FOCUS_FACTOR} (focus)`,
+      `2 M€ on science: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SCIENCE] ?? 0)} × ${V.DISCOUNT_FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.DISCOUNT_FOCUS_FACTOR)}`],
     ['When you play a tag, gain', `Gain × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
       `2 M€ per space tag: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SPACE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SPACE] ?? 0) * V.FOCUS_FACTOR)}`],
     ['When you play a tag, draw a card', `${num(V.DRAW_CARD_VALUE)} × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
@@ -165,7 +165,8 @@ export function buildValueTable(): AssemblerValueTableModel {
       V.TAG_SHARE[t] !== undefined ? pct(V.TAG_SHARE[t]) : '–',
     ]),
     `The most valuable tag counts fully, every other tag ${pct(V.EXTRA_TAG_FACTOR)}. An event's tags count ${pct(V.EVENT_TAG_FACTOR)}, plus ${num(V.EVENT_TAG_VALUE)} for the event tag. ` +
-    'Paying with steel or titanium is not priced on top: that is already why steel and titanium are worth 2 and 3 M€.'));
+    'Paying with steel or titanium is not priced on top: that is already why steel and titanium are worth 2 and 3 M€. ' +
+    'A card has the city tag exactly when it places a city.'));
 
   const tagRequirementRows = [1, 2, 3, 4, 5].map((n) => [`${n} tag${n === 1 ? '' : 's'}`, num(-Math.pow(n, V.TAG_REQUIREMENT_EXPONENT))]);
   sections.push(section('Requirements', ['Requirement', 'Value'], [false, true], [
