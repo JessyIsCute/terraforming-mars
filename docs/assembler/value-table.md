@@ -29,15 +29,15 @@ within 2 M€.
 | 1 heat | 1.2 | |
 | 1 energy | 1.2 | |
 | Draw 1 card | 3 | the price of buying a card |
-| 1 resource on a card (microbe, floater…) | 1.5 | a resource on a card that scores VP per resource is worth that VP share instead: 1 VP per animal = 5, 1 VP per 4 microbes = 1.25 |
+| 1 resource on a card (microbe, floater…) | 1.5 | a resource on a card that scores VP per resource is worth that VP share instead: 1 VP per animal = 3.3, 1 VP per 4 microbes = 0.8 |
 
 ## Production (per step)
 
 | Part | Value | Notes |
 |---|---:|---|
-| M€ production | 4 | fitted 3.2–3.9 |
-| Steel production | 7 | |
-| Titanium production | 10 | |
+| M€ production | 3.3 | fitted to official cards, see fit-results.md (was 4) |
+| Steel production | 5.1 | fitted to official cards, see fit-results.md (was 7). Project cards alone say ~4.6; preludes say more because they produce from generation 1 |
+| Titanium production | 8.5 | fitted to official cards, see fit-results.md (was 10) |
 | Plant production | 6 | lowered from 8; see "Lichen" below |
 | Energy production | 6 | lowered from 7; see "Energy" below |
 | Heat production | 4.5 | fitted 4.3–4.9 |
@@ -46,13 +46,13 @@ within 2 M€.
 
 | Part | Value | Notes |
 |---|---:|---|
-| 1 TR | 9 | 1 VP (5) + 1 M€ production (4), as you defined it. The fit gives 9.0 |
-| VP | 5 | fitted 4.1 |
+| 1 TR | 7 | fitted to official cards, see fit-results.md (10 cards; was 9). Still about 1 VP (3.3) + 1 M€ production (3.3) |
+| VP | 3.3 | fitted to official cards, see fit-results.md (42 cards; was 5) |
 | Temperature or oxygen step | 8.5 | includes its TR. Printed cards price a step slightly below a full TR |
 | Venus step | 9 | |
 | Ocean tile | 11 | TR plus about 2 M€ of placement bonus |
 | Greenery tile | 14 | raises oxygen and gives 1 VP at the end |
-| City tile | 8 | the city tag is priced separately |
+| City tile | 8.8 | fitted to official cards (11 cards; was 8). The city tag is priced separately |
 | Special tile (Nuclear Zone, Mohole Area…) | 2.5 | the real value is usually the effect or VP printed with it |
 
 ## Tags
@@ -84,7 +84,7 @@ A tag is worth three things:
 | Power | 3 | 2 | 1 | 0.7 | – | **1.2** |
 | City | 0 | 0 | 3 | 0.4 | – | **0.9** |
 | **Wild** | counts as every tag | | | ~11 | – | **6** |
-| Event | | | | | | **0.5**, and the card's other tags are gone once played |
+| Event | | | | | | **2** (fitted to 18 events; was 0.5), and the card's other tags are gone once played |
 
 **Wild:** in the code (`player/Tags.ts`) one wild tag adds +1 to *every* tag count at once, for
 requirements and "per tag" counts. It does not fire "when you play a science tag" triggers, unless
@@ -200,7 +200,7 @@ Most negatives are the same formulas with a minus sign, so costs stay consistent
 | Part | Value | Notes |
 |---|---:|---|
 | Lose your own resources / production | −(table value) | the card must be unplayable if you can't pay. Normal TM behavior; the behavior system already checks it |
-| −1 VP | −5 | |
+| −1 VP | −3.3 | |
 | Lower a global parameter | −8.5 | very rare in the real game |
 | Your project cards cost +X M€ (ongoing) | −8 × X | mirror of the all-card discount |
 | Your cards with tag T cost +X M€ | −8 × share(T) × X | no ×2: you won't build around a penalty |

@@ -16,10 +16,15 @@ export const STOCK_VALUE = {
   energy: 1.2,
 } as const;
 
+/**
+ * M€, steel and titanium production come from the fit to official cards
+ * (src/server/tools/assembler_fit.ts, docs/assembler/fit-results.md). Energy stays at 6: the fit
+ * splits energy production + power tag differently (4.2 + 3.0), but their total is the same.
+ */
 export const PRODUCTION_VALUE = {
-  megacredits: 4,
-  steel: 7,
-  titanium: 10,
+  megacredits: 3.3,
+  steel: 5.1,
+  titanium: 8.5,
   plants: 6,
   energy: 6,
   heat: 4.5,
@@ -27,13 +32,15 @@ export const PRODUCTION_VALUE = {
 
 export type StandardResource = keyof typeof STOCK_VALUE;
 
-export const TR_VALUE = 9;
-export const VP_VALUE = 5;
+/** Fitted to official cards: TR 7.0 (10 cards), VP 3.3 (42 cards). TR is about 1 VP + 1 M€ production. */
+export const TR_VALUE = 7;
+export const VP_VALUE = 3.3;
 export const DRAW_CARD_VALUE = 3;
 export const GLOBAL_STEP_VALUE = {temperature: 8.5, oxygen: 8.5, venus: 9} as const;
 export const OCEAN_VALUE = 11;
 export const GREENERY_VALUE = 14;
-export const CITY_VALUE = 8;
+/** Fitted to official cards (11 cards). */
+export const CITY_VALUE = 8.8;
 
 /** Value of having the tag: base 0.5 + synergy with the official card pool (+ payment for building/space). */
 export const TAG_VALUE: Partial<Record<Tag, number>> = {
@@ -61,7 +68,8 @@ export const PAYMENT_VALUE: Partial<Record<Tag, {flat: number, ofCost: number}>>
 export const EXTRA_TAG_FACTOR = 0.75;
 /** An event's tags leave play once it resolves: they're worth this fraction, plus the event tag. */
 export const EVENT_TAG_FACTOR = 0.25;
-export const EVENT_TAG_VALUE = 0.5;
+/** Fitted to official cards (18 events): being an event is worth more than the tag alone. */
+export const EVENT_TAG_VALUE = 2;
 
 /** Share of project cards with each tag (official pool). Used for tag discounts and triggers. */
 export const TAG_SHARE: Partial<Record<Tag, number>> = {

@@ -434,7 +434,7 @@ export class AssemblerGenerator {
     // ---- price ----
     const breakdown: Array<AssembledValueLine> = [];
     for (const p of parts) {
-      const text = p.key === 'vp' ? `${p.value > 0 ? '' : '−'}${Math.abs(p.value / V.VP_VALUE)} VP` : (p.effectText ?? p.text);
+      const text = p.key === 'vp' ? `${p.value > 0 ? '' : '−'}${Math.round(Math.abs(p.value / V.VP_VALUE))} VP` : (p.effectText ?? p.text);
       breakdown.push({text, value: p.value, category: p.category});
     }
     const tagValues = tags.map((t) => V.TAG_VALUE[t] ?? 0).sort((a, b) => b - a);
