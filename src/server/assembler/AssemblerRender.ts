@@ -3,6 +3,8 @@ import {all, digit, uppercase} from '../cards/Options';
 import {Units} from '../../common/Units';
 import {Behavior} from '../behavior/Behavior';
 import {AssembledCardDefinition} from './AssembledCardDefinition';
+import {Tag} from '../../common/cards/Tag';
+import {CardResource} from '../../common/CardResource';
 
 const RESOURCES = ['megacredits', 'steel', 'titanium', 'plants', 'energy', 'heat'] as const;
 type Resource = typeof RESOURCES[number];
@@ -13,8 +15,38 @@ type ItemBuilder = {
 } & {
   minus(): ItemBuilder;
   plus(): ItemBuilder;
+  slash(): ItemBuilder;
+  tag(tag: Tag, amount?: number): ItemBuilder;
+  resource(type: CardResource, amount?: number): ItemBuilder;
+  asterix(): ItemBuilder;
   readonly nbsp: ItemBuilder;
 };
+
+/** "1 VP per 2 animals on this card." */
+function vpText(def: AssembledCardDefinition): string | undefined {
+  const r = def.cardResource;
+  if (r?.vpPer === undefined) {
+    return undefined;
+  }
+  const word = r.type.toLowerCase();
+  return `1 VP per ${r.vpPer === 1 ? word : `${r.vpPer} ${word}s`} on this card.`;
+}
+
+/** Production that grows with a tag count (Insects, Medical Lab): {resource, tag, per}. */
+function perTag(behavior: Behavior): {r: Resource, tag: Tag, per: number} | undefined {
+  for (const r of RESOURCES) {
+    const n = behavior.production?.[r];
+    if (typeof n === 'object' && n !== null) {
+      const c = n as {tag?: Tag | ReadonlyArray<Tag>, per?: number};
+      if (typeof c.tag === 'string') {
+        return {r, tag: c.tag as Tag, per: c.per ?? 1};
+      }
+    }
+  }
+  return undefined;
+}
+/** Icon widths of "1 M€ / 2 building tags". */
+const PER_TAG_WIDTH = 3;
 
 /** From this many of one resource, draw one icon with a number, like printed cards do. */
 const DIGIT_FROM = 4;
@@ -75,13 +107,17 @@ export function renderAssembled(def: AssembledCardDefinition) {
   const texts = def.effectTexts;
   const actionText = stripLabel(texts.find((t) => t.startsWith('Action')));
   const discountTexts = texts.filter((t) => t.startsWith('Effect') && t.includes(' pay ')).map(stripLabel);
-  const triggerText = stripLabel(texts.find((t) => t.startsWith('Effect') && t.includes(', gain ')));
+  const triggerText = stripLabel(texts.find((t) => t.startsWith('Effect') && / tag, (including this, )?(gain|draw|add) /.test(t)));
 
   return CardRenderer.runtimeBuilder((b) => {
     const action = def.action;
     if (action !== undefined) {
       b.action(actionText, (eb) => {
         const spentEnergy = action.spend?.energy;
+        if (action.addResources !== undefined && def.cardResource !== undefined) {
+          eb.empty().startAction.resource(def.cardResource.type);
+          return;
+        }
         if (typeof spentEnergy === 'number') {
           eb.energy(spentEnergy, {digit});
         } else {
@@ -114,6 +150,12 @@ export function renderAssembled(def: AssembledCardDefinition) {
       b.effect(triggerText, (eb) => {
         eb.tag(trigger.tag).startEffect;
         units(eb as unknown as ItemBuilder, trigger.gain);
+        if (trigger.drawCard !== undefined) {
+          eb.cards(trigger.drawCard);
+        }
+        if (trigger.addResource !== undefined && def.cardResource !== undefined) {
+          eb.resource(def.cardResource.type, trigger.addResource);
+        }
       }).br;
     }
 
@@ -123,7 +165,8 @@ export function renderAssembled(def: AssembledCardDefinition) {
     const losses = Object.fromEntries(Object.entries(production).filter(([, n]) => n < 0));
     const gains = Object.fromEntries(Object.entries(production).filter(([, n]) => n > 0));
     const hasLoss = Object.keys(losses).length > 0 || decreaseAny !== undefined;
-    const hasGain = Object.keys(gains).length > 0;
+    const growth = perTag(behavior);
+    const hasGain = Object.keys(gains).length > 0 || growth !== undefined;
     const instant = instantGroups(def);
     if (hasLoss || hasGain) {
       b.production((pb) => {
@@ -140,6 +183,12 @@ export function renderAssembled(def: AssembledCardDefinition) {
           }
         }
         units(p, gains);
+        if (growth !== undefined) {
+          if (Object.keys(gains).length > 0) {
+            p.nbsp;
+          }
+          p[growth.r](1).slash().tag(growth.tag, growth.per > 1 ? growth.per : undefined);
+        }
       });
       // Like printed cards, small one-off effects share the production box's row.
       if (instant.length > 0 && productionWidth(behavior) + GAP + instantWidth(instant) <= ROW_WIDTH) {
@@ -160,6 +209,11 @@ export function renderAssembled(def: AssembledCardDefinition) {
       }
       group.draw(b as unknown as RowBuilder);
       width += group.width;
+    }
+    const vp = vpText(def);
+    if (vp !== undefined) {
+      b.br;
+      b.vpText(vp);
     }
   });
 }
@@ -240,10 +294,27 @@ function instantGroups(def: AssembledCardDefinition): Array<Group> {
     }});
   }
   if (def.opponentsDiscard !== undefined) {
+    // Every opponent: "EACH -card" in red, so it reads apart from the one-opponent version.
     const n = def.opponentsDiscard;
+    groups.push({width: n + 1.9, draw: (b) => {
+      b.text('each', {uppercase});
+      b.minus();
+      b.cards(n, {all});
+    }});
+  }
+  if (def.targetDiscard !== undefined) {
+    const n = def.targetDiscard;
     groups.push({width: n + 0.5, draw: (b) => {
       b.minus();
       b.cards(n, {all});
+    }});
+  }
+  const addAny = behavior.addResourcesToAnyCard;
+  if (addAny !== undefined && !Array.isArray(addAny) && addAny.type !== undefined) {
+    const n = typeof addAny.count === 'number' ? addAny.count : 1;
+    const type = addAny.type;
+    groups.push({width: n + 0.4, draw: (b) => {
+      b.resource(type, n).asterix();
     }});
   }
   if (behavior.removeAnyPlants !== undefined) {
@@ -266,7 +337,8 @@ function productionWidth(behavior: Behavior): number {
   const production = numbers(behavior.production);
   const lossWidth = unitsWidth(Object.fromEntries(Object.entries(production).filter(([, n]) => n < 0))) +
     (behavior.decreaseAnyProduction?.count ?? 0);
-  const gainWidth = unitsWidth(Object.fromEntries(Object.entries(production).filter(([, n]) => n > 0)));
+  const gainWidth = unitsWidth(Object.fromEntries(Object.entries(production).filter(([, n]) => n > 0))) +
+    (perTag(behavior) !== undefined ? PER_TAG_WIDTH : 0);
   return Math.max(lossWidth, gainWidth) + (lossWidth > 0 ? 0.5 : 0) + 1;
 }
 
@@ -303,7 +375,7 @@ export function estimateContentHeight(def: AssembledCardDefinition): number {
   {
     const production = Object.values(numbers(behavior.production));
     const hasLoss = production.some((n) => n < 0) || behavior.decreaseAnyProduction !== undefined;
-    const hasGain = production.some((n) => n > 0);
+    const hasGain = production.some((n) => n > 0) || perTag(behavior) !== undefined;
     const instant = instantGroups(def);
     let width = instantWidth(instant);
     if (hasLoss || hasGain) {
@@ -314,10 +386,12 @@ export function estimateContentHeight(def: AssembledCardDefinition): number {
     }
     h += Math.ceil(width / ROW_WIDTH) * ROW_HEIGHT;
   }
+  // The VP text sits beside the VP box, in the space CONTENT_HEIGHT_WITH_VP already leaves out.
   return h + textHeight(def.description);
 }
 
 /** Whether the card's face fits on a card without text running off it or under the VP box. */
 export function fitsOnCard(def: AssembledCardDefinition): boolean {
-  return estimateContentHeight(def) <= (def.victoryPoints !== undefined ? CONTENT_HEIGHT_WITH_VP : CONTENT_HEIGHT);
+  const vp = def.victoryPoints !== undefined || def.cardResource?.vpPer !== undefined;
+  return estimateContentHeight(def) <= (vp ? CONTENT_HEIGHT_WITH_VP : CONTENT_HEIGHT);
 }

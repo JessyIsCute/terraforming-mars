@@ -12,6 +12,7 @@ const table: AssemblerValueTableModel = {
     numeric: [false, true],
     rows: [['Steel', '2'], ['Debt', '−4']],
   }],
+  rateable: [],
 };
 
 describe('AssemblerValueTable', () => {

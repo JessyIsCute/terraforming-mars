@@ -6,7 +6,8 @@ import {CardModel} from '../models/CardModel';
  * Query parameters, all optional:
  *   count        how many cards, 1..MAX_COUNT (default DEFAULT_COUNT)
  *   seed         1..MAX_SEED; the same seed and options give the same cards (default: random)
- *   complexity   low | mid | high (default: random per card)
+ *   minComplexity, maxComplexity   complexity range, 1..8 (default: random per card, mostly simple)
+ *   complexity   short for minComplexity = maxComplexity
  *   type         automated | active | event
  *   categories   comma-separated EffectCategory list: guaranteed effects
  *   tags         comma-separated Tag list: tags the card must have
@@ -24,6 +25,8 @@ export const ASSEMBLER_PREVIEW_LIMITS = {
   MAX_COST: 60,
   MAX_COST_ADJUST: 30,
   MAX_TAG_COUNT: 4,
+  /** Complexity runs 1..MAX_COMPLEXITY. */
+  MAX_COMPLEXITY: 7,
 } as const;
 
 export type AssemblerPreviewResponse = {

@@ -12,6 +12,19 @@ import {forgetCardProperties} from '../cards/Card';
  */
 const registry = new Map<string, AssembledCardDefinition>();
 
+/** Old saves: complexity was 'low' | 'mid' | 'high', with the number (if any) in complexityScore. */
+const LEGACY_COMPLEXITY: Record<string, number> = {low: 1, mid: 3, high: 5};
+
+/** Brings a definition from an older save up to date. */
+export function upgradeAssembledCard(def: AssembledCardDefinition): AssembledCardDefinition {
+  const old = def as unknown as {complexity: unknown, complexityScore?: number};
+  if (typeof old.complexity === 'number') {
+    return def;
+  }
+  const {complexityScore, ...rest} = old;
+  return {...rest, complexity: complexityScore ?? LEGACY_COMPLEXITY[String(old.complexity)] ?? 1} as AssembledCardDefinition;
+}
+
 export function registerAssembledCard(def: AssembledCardDefinition): void {
   registry.set(def.name, def);
   // Card caches properties by name; a re-registered name must not keep an older card's face.

@@ -2,27 +2,40 @@ import {expect} from 'chai';
 import {SeededRandom} from '../../src/common/utils/Random';
 import {CardType} from '../../src/common/cards/CardType';
 import {Tag} from '../../src/common/cards/Tag';
-import {AssemblerGenerator, compactTexts, complexityOfScore} from '../../src/server/assembler/AssemblerGenerator';
-import {AssembledCardDefinition, AssemblerComplexity} from '../../src/server/assembler/AssembledCardDefinition';
+import {AssemblerGenerator, compactTexts} from '../../src/server/assembler/AssemblerGenerator';
+import {AssembledCardDefinition} from '../../src/server/assembler/AssembledCardDefinition';
 import {AssembleSpec} from '../../src/server/assembler/AssembleSpec';
 import {fitsOnCard} from '../../src/server/assembler/AssemblerRender';
 import {newAssembledCard} from '../../src/server/assembler/AssembledCard';
 import {validateBehavior} from '../../src/server/cards/Card';
+import {IActionCard} from '../../src/server/cards/ICard';
 import {CardName} from '../../src/common/cards/CardName';
 import {testGame} from '../TestGame';
 import {runAllActions} from '../TestingUtils';
 import {cast} from '../../src/common/utils/utils';
 import {OrOptions} from '../../src/server/inputs/OrOptions';
+import {SelectPlayer} from '../../src/server/inputs/SelectPlayer';
 import {Units} from '../../src/common/Units';
 import {BUY_COST, MAX_COST, MIN_COST} from '../../src/server/assembler/AssemblerValues';
 
-const COMPLEXITIES: Array<AssemblerComplexity> = ['low', 'mid', 'high'];
+/** Simple, some and busy cards: the complexity ranges these tests ask for. */
+type Band = 'low' | 'mid' | 'high';
+const COMPLEXITIES: Array<Band> = ['low', 'mid', 'high'];
+const RANGE: Record<Band, AssembleSpec> = {
+  low: {minComplexity: 1, maxComplexity: 1},
+  mid: {minComplexity: 2, maxComplexity: 4},
+  high: {minComplexity: 5, maxComplexity: 7},
+};
 
-function generateMany(seed: number, count: number, complexity: AssemblerComplexity, forceRequirement = false): Array<AssembledCardDefinition> {
+function gen(generator: AssemblerGenerator, name: string, band: Band, spec: AssembleSpec = {}): AssembledCardDefinition {
+  return generator.generate(name, {...RANGE[band], ...spec});
+}
+
+function generateMany(seed: number, count: number, complexity: Band, forceRequirement = false): Array<AssembledCardDefinition> {
   const generator = new AssemblerGenerator(new SeededRandom(seed));
   const cards: Array<AssembledCardDefinition> = [];
   for (let i = 0; i < count; i++) {
-    cards.push(generator.generate(`Assembled test-${seed}-${complexity}-${forceRequirement}-${i}`, complexity, {forceRequirement}));
+    cards.push(gen(generator, `Assembled test-${seed}-${complexity}-${forceRequirement}-${i}`, complexity, {forceRequirement}));
   }
   return cards;
 }
@@ -102,9 +115,9 @@ describe('AssemblerGenerator', () => {
   });
 
   describe('presets', () => {
-    function many(spec: AssembleSpec, complexity: AssemblerComplexity = 'mid', count = 200) {
+    function many(spec: AssembleSpec, complexity: Band = 'mid', count = 200) {
       const generator = new AssemblerGenerator(new SeededRandom(0.77));
-      return Array.from({length: count}, (_, i) => generator.generate(`Assembled preset-${i}`, complexity, spec));
+      return Array.from({length: count}, (_, i) => gen(generator, `Assembled preset-${i}`, complexity, spec));
     }
 
     it('required tags are always on the card', () => {
@@ -132,8 +145,8 @@ describe('AssemblerGenerator', () => {
     it('a cost range holds, even for low complexity with a high minimum', () => {
       for (const def of many({minCost: 28, maxCost: 32}, 'low')) {
         expect(def.cost, def.name).is.within(28, 32);
-        // No single benefit is worth 28 M€: it takes several, so the card says it isn't low.
-        expect(def.complexity).not.eq('low');
+        // No single benefit is worth 28 M€: it takes several, so the card's complexity is higher.
+        expect(def.complexity).gt(1);
         // Asked for low: still no effects, actions or drawbacks
         expect(def.effectTexts, def.name).is.empty;
         expect(def.cost).eq(Math.round(def.value - BUY_COST));
@@ -154,7 +167,7 @@ describe('AssemblerGenerator', () => {
     it('preset cards still fit on a card and validate', () => {
       // High complexity at 28+ M€ often can't fit on a card (the generator page reports those); the
       // cost preset is tested at low complexity, as Open Source Blueprints uses it.
-      for (const [spec, complexity] of [[{tagCount: 4}, 'high'], [{tags: [Tag.SCIENCE]}, 'high'], [{minCost: 28, maxCost: 32}, 'low']] as Array<[AssembleSpec, AssemblerComplexity]>) {
+      for (const [spec, complexity] of [[{tagCount: 4}, 'high'], [{tags: [Tag.SCIENCE]}, 'high'], [{minCost: 28, maxCost: 32}, 'low']] as Array<[AssembleSpec, Band]>) {
         for (const def of many(spec, complexity, 60)) {
           expect(fitsOnCard(def), def.name).is.true;
           expect(() => validateBehavior(def.behavior, def.name as CardName)).not.to.throw();
@@ -165,88 +178,85 @@ describe('AssemblerGenerator', () => {
   describe('complexity', () => {
     // Every benefit, effect or action, drawback and requirement is a slot.
     function slots(def: AssembledCardDefinition) {
-      return def.breakdown.filter((l) => !l.text.startsWith('Tags:') && l.text !== 'Pay with steel/titanium').length;
+      return def.breakdown.filter((l) => !l.text.startsWith('Tags:')).length;
     }
-
-    // The score: 1 per slot, plus 1 per tag after the first.
+    // 1 per slot, plus 1 per tag after the first.
     function score(def: AssembledCardDefinition) {
       return slots(def) + Math.max(0, def.tags.length - 1);
     }
-    const ORDER: Array<AssemblerComplexity> = ['low', 'mid', 'high'];
 
-    it('the score is 1 per part and requirement plus 1 per extra tag, and sets the label', () => {
-      for (const complexity of COMPLEXITIES) {
-        for (const def of generateMany(0.55, 200, complexity)) {
-          expect(def.complexityScore, def.name).eq(score(def));
-          // The label is what was asked for, or higher when the score says so.
-          const actual = complexityOfScore(score(def));
-          expect(def.complexity, def.name).eq(ORDER.indexOf(actual) > ORDER.indexOf(complexity) ? actual : complexity);
+    it('is 1 per part and requirement, plus 1 per tag after the first', () => {
+      for (const band of COMPLEXITIES) {
+        for (const def of generateMany(0.55, 200, band)) {
+          expect(def.complexity, def.name).eq(score(def));
+          expect(def.complexity, def.name).within(RANGE[band].minComplexity!, RANGE[band].maxComplexity!);
         }
       }
     });
 
-    it('cards stay within their band when nothing is forced, bold cards aside', () => {
+    it('stays in the asked range when nothing is forced', () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.56));
-      for (const complexity of COMPLEXITIES) {
-        for (let i = 0; i < 200; i++) {
-          const def = generator.generate(`Assembled band-${complexity}-${i}`, complexity);
-          const bold = def.breakdown.length > 0 && def.complexityScore! > 4 && complexity === 'mid';
-          if (!bold) {
-            expect(def.complexity, def.name).eq(complexity);
-          }
+      for (const [min, max] of [[1, 1], [2, 2], [3, 3], [4, 6], [5, 7], [7, 7]]) {
+        for (let i = 0; i < 60; i++) {
+          const def = generator.generate(`Assembled range-${min}-${max}-${i}`, {minComplexity: min, maxComplexity: max});
+          expect(def.complexity, def.name).within(min, max);
         }
       }
+    });
+
+    it('without a range, makes mostly simple cards and some busy ones', () => {
+      const generator = new AssemblerGenerator(new SeededRandom(0.58));
+      const cards = Array.from({length: 300}, (_, i) => generator.generate(`Assembled any-${i}`));
+      expect(cards.filter((d) => d.complexity === 1).length).gt(60);
+      expect(cards.filter((d) => d.complexity >= 5).length).gt(20);
+      expect(Math.max(...cards.map((d) => d.complexity))).lte(7);
     });
 
     it('more tags is more complexity', () => {
-      expect(complexityOfScore(1)).eq('low');
-      expect(complexityOfScore(2)).eq('mid');
-      expect(complexityOfScore(4)).eq('mid');
-      expect(complexityOfScore(5)).eq('high');
       const generator = new AssemblerGenerator(new SeededRandom(0.57));
-      const def = generator.generate('Assembled tags-4', 'low', {tagCount: 4});
-      expect(def.complexityScore).eq(slots(def) + 3);
-      expect(def.complexity).not.eq('low');
+      const def = gen(generator, 'Assembled tags-4', 'low', {tagCount: 4});
+      expect(def.complexity).eq(slots(def) + 3);
+      expect(def.complexity).gt(1);
     });
 
-    it('a low active card is just its effect or action', () => {
+    it('a complexity 1 active card is just its effect or action', () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.61));
       for (let i = 0; i < 100; i++) {
-        const def = generator.generate(`Assembled blue-${i}`, 'low', {type: CardType.ACTIVE});
+        const def = gen(generator, `Assembled blue-${i}`, 'low', {type: CardType.ACTIVE});
         expect(def.effectTexts, def.name).has.length(1);
         expect(slots(def), def.name).eq(1);
-        expect(def.complexity).eq('low');
+        expect(def.complexity).eq(1);
       }
     });
 
-    it('low cards have no requirement unless asked, and then read as mid', () => {
+    it('complexity 1 cards have no requirement unless asked, which makes them 2 or more', () => {
       for (const def of generateMany(0.62, 200, 'low')) {
         expect(def.requirements, def.name).is.empty;
       }
       for (const def of generateMany(0.63, 50, 'low', true)) {
-        expect(def.complexity, def.name).eq('mid');
+        expect(def.complexity, def.name).gte(2);
       }
     });
 
-    it('a guaranteed drawback on a low card makes it mid; sabotage alone stays low', () => {
+    it('a guaranteed drawback adds to complexity 1; sabotage alone stays 1', () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.64));
-      const seen = new Set<string>();
+      const seen = new Set<number>();
       for (let i = 0; i < 80; i++) {
-        const def = generator.generate(`Assembled bane-${i}`, 'low', {categories: ['cooling']});
-        // "Decrease any heat production" is one slot; "Decrease your heat production" needs a benefit too.
+        const def = gen(generator, `Assembled bane-${i}`, 'low', {categories: ['cooling']});
+        // "Decrease any heat production" is one part; "Decrease your heat production" needs a benefit too.
         const drawback = def.breakdown.some((l) => l.category === 'cooling' && l.value < 0);
-        expect(def.complexity, def.name).eq(drawback ? 'mid' : 'low');
-        expect(def.complexity).eq(complexityOfScore(score(def)));
+        expect(def.complexity, def.name).eq(drawback ? 2 : 1);
+        expect(def.complexity).eq(score(def));
         seen.add(def.complexity);
       }
-      expect([...seen].sort()).deep.eq(['low', 'mid']);
+      expect([...seen].sort()).deep.eq([1, 2]);
     });
   });
 
   describe("triggers on the card's own tag", () => {
     function triggerCards(): Array<AssembledCardDefinition> {
       const generator = new AssemblerGenerator(new SeededRandom(0.71));
-      return Array.from({length: 300}, (_, i) => generator.generate(`Assembled trig-${i}`, 'mid', {categories: ['synergy']}))
+      return Array.from({length: 300}, (_, i) => gen(generator, `Assembled trig-${i}`, 'mid', {categories: ['synergy']}))
         .filter((d) => d.trigger !== undefined);
     }
 
@@ -281,7 +291,7 @@ describe('AssemblerGenerator', () => {
     const all = () => COMPLEXITIES.flatMap((c) => generateMany(0.91, 400, c));
 
     it('bold cards pair a big benefit with a big drawback', () => {
-      const big = all().filter((d) => (d.behavior?.production?.steel ?? 0) >= 3 || (d.behavior?.production?.megacredits ?? 0) >= 4 || (d.victoryPoints ?? 0) >= 4);
+      const big = all().filter((d) => Number(d.behavior?.production?.steel ?? 0) >= 3 || Number(d.behavior?.production?.megacredits ?? 0) >= 4 || (d.victoryPoints ?? 0) >= 4);
       expect(big.length).gt(5);
       for (const d of big) {
         expect(d.breakdown.some((l) => l.value < 0), d.name).is.true;
@@ -317,12 +327,24 @@ describe('AssemblerGenerator', () => {
       expect(select, forgetful.name).is.not.undefined;
     });
 
+    it('an opponent of your choice discards', () => {
+      const def = all().find((d) => d.targetDiscard !== undefined && d.requirements.length === 0 && d.steal === undefined && d.discard === undefined && d.behavior?.lose === undefined && d.behavior?.decreaseAnyProduction === undefined)!;
+      expect(def, 'a target-discard card').is.not.undefined;
+      const [game, player, other] = testGame(2);
+      other.cardsInHand.push(...game.projectDeck.drawN(game, 3));
+      player.playCard(newAssembledCard(def));
+      runAllActions(game);
+      cast(player.popWaitingFor(), SelectPlayer).cb(other);
+      runAllActions(game);
+      expect(other.popWaitingFor(), 'the opponent picks the card').is.not.undefined;
+    });
+
     it('tags lean toward the theme of their benefits', () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.92));
       let earth = 0;
       let total = 0;
       for (let i = 0; i < 400; i++) {
-        const def = generator.generate(`Assembled theme-${i}`, 'low', {categories: ['money']});
+        const def = gen(generator, `Assembled theme-${i}`, 'low', {categories: ['money']});
         if (def.type !== CardType.EVENT || def.tags.length > 0) {
           total++;
           earth += def.tags.includes(Tag.EARTH) ? 1 : 0;
@@ -330,6 +352,72 @@ describe('AssemblerGenerator', () => {
       }
       // Earth is one of many tags; money cards draw it far more than their share.
       expect(earth / total).gt(0.2);
+    });
+  });
+
+  describe('card resources, growth and new triggers', () => {
+    const all = () => COMPLEXITIES.flatMap((c) => generateMany(0.93, 500, c));
+
+    it('makes every new kind of part', () => {
+      const cards = all();
+      expect(cards.some((d) => d.cardResource !== undefined && d.action?.addResources !== undefined), 'collector action').is.true;
+      expect(cards.some((d) => d.trigger?.addResource !== undefined), 'collector trigger').is.true;
+      expect(cards.some((d) => d.trigger?.drawCard !== undefined), 'draw trigger').is.true;
+      expect(cards.some((d) => d.behavior?.addResourcesToAnyCard !== undefined), 'add to another card').is.true;
+      expect(cards.some((d) => Object.values(d.behavior?.production ?? {}).some((v) => typeof v === 'object')), 'per tag production').is.true;
+      for (const d of cards.filter((c) => c.cardResource !== undefined)) {
+        expect(d.type, d.name).eq(CardType.ACTIVE);
+        expect(d.victoryPoints, 'VP comes from the resources only').is.undefined;
+      }
+    });
+
+    it('a collector action adds to the card and scores VP', () => {
+      const def = all().find((d) => d.action?.addResources !== undefined && d.requirements.length === 0)!;
+      const [game, player] = testGame(1);
+      const card = newAssembledCard(def);
+      expect(card.resourceType).eq(def.cardResource!.type);
+      player.playedCards.push(card);
+      for (let i = 0; i < 4; i++) {
+        (card as unknown as IActionCard).action(player);
+        runAllActions(game);
+      }
+      expect(card.resourceCount).eq(4);
+      expect(card.getVictoryPoints(player)).eq(Math.floor(4 / def.cardResource!.vpPer!));
+    });
+
+    it('a collector trigger adds to the card when its tag is played', () => {
+      const def = all().find((d) => d.trigger?.addResource !== undefined)!;
+      const [, player] = testGame(1);
+      const card = newAssembledCard(def);
+      player.playedCards.push(card);
+      const other = all().find((d) => d.tags.includes(def.trigger!.tag) && d.type !== CardType.EVENT)!;
+      card.onCardPlayed!(player, newAssembledCard(other));
+      expect(card.resourceCount).eq(1);
+    });
+
+    it('a draw trigger draws a card', () => {
+      const def = all().find((d) => d.trigger?.drawCard !== undefined)!;
+      const [, player] = testGame(1);
+      const card = newAssembledCard(def);
+      const other = all().find((d) => d.tags.includes(def.trigger!.tag))!;
+      const before = player.cardsInHand.length;
+      card.onCardPlayed!(player, newAssembledCard(other));
+      expect(player.cardsInHand.length).eq(before + 1);
+    });
+
+    it('per tag production counts tags, and says "including this" when the card has the tag', () => {
+      const cards = all().filter((d) => Object.values(d.behavior?.production ?? {}).some((v) => typeof v === 'object'));
+      for (const d of cards) {
+        const [, counted] = Object.entries(d.behavior!.production!).find(([, v]) => typeof v === 'object')! as [string, {tag: Tag}];
+        expect(d.description.includes('including this'), d.name).eq(d.tags.includes(counted.tag));
+      }
+      const def = cards.find((d) => d.requirements.length === 0 && d.behavior?.lose === undefined && Object.keys(d.behavior!.production!).length === 1 && d.discard === undefined && d.steal === undefined && d.cardResource === undefined)!;
+      expect(def, 'a plain growth card').is.not.undefined;
+      const [r, c] = Object.entries(def.behavior!.production!)[0] as [keyof Units, {tag: Tag, per?: number}];
+      const [, player] = testGame(1);
+      player.tagsForTest = {[c.tag]: 4};
+      player.playCard(newAssembledCard(def));
+      expect(player.production[r]).gte(Math.floor(4 / (c.per ?? 1)));
     });
   });
 

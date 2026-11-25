@@ -14,7 +14,7 @@ function card(i: number, costAdjust?: number): CardModel {
     combinedDisplayName: `Card ${i}`,
     calculatedCost: 10 + i + (costAdjust ?? 0),
     assembled: {
-      complexity: 'low',
+      complexity: 1,
       value: 13 + i,
       breakdown: [{text: 'Increase your steel production 2 steps.', value: 11 + i, category: 'metal'}, {text: 'Tags: building', value: 2}],
       costAdjust,

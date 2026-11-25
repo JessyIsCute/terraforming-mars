@@ -1,5 +1,5 @@
 import {AssembledCardDefinition} from './assembler/AssembledCardDefinition';
-import {registerAssembledCard} from './assembler/AssembledCardRegistry';
+import {registerAssembledCard, upgradeAssembledCard} from './assembler/AssembledCardRegistry';
 import {AssemblerExpansion} from './assembler/AssemblerExpansion';
 import * as constants from '../common/constants';
 import {BeginnerCorporation} from './cards/corporation/BeginnerCorporation';
@@ -1946,6 +1946,7 @@ export class Game implements IGame, Logger {
 
   public static deserialize(d: SerializedGame): Game {
     // Assembled cards must be findable by name before anything rebuilds hands, tableaus or decks.
+    d.assembledCards = d.assembledCards?.map(upgradeAssembledCard);
     d.assembledCards?.forEach(registerAssembledCard);
     const gameOptions = d.gameOptions;
     gameOptions.boardName = normalizeBoardName(gameOptions.boardName);

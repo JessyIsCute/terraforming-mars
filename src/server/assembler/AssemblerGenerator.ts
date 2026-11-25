@@ -1,16 +1,18 @@
 import {CardType} from '../../common/cards/CardType';
 import {Tag} from '../../common/cards/Tag';
 import {Resource} from '../../common/Resource';
+import {CardResource} from '../../common/CardResource';
 import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescriptor';
 import {CardDiscount} from '../../common/cards/Types';
 import {Random} from '../../common/utils/Random';
 import {Behavior} from '../behavior/Behavior';
-import {AssembledCardDefinition, AssembledTrigger, AssembledValueLine, AssemblerComplexity} from './AssembledCardDefinition';
+import {AssembledCardDefinition, AssembledTrigger, AssembledValueLine} from './AssembledCardDefinition';
 import * as V from './AssemblerValues';
 import {fitsOnCard} from './AssemblerRender';
 import {AssembleSpec} from './AssembleSpec';
 import {EffectCategory} from '../../common/assembler/EffectCategory';
 import {nameCard} from './AssemblerNames';
+import {ASSEMBLER_PREVIEW_LIMITS} from '../../common/assembler/AssemblerPreview';
 
 /** A card under construction. Parts write into it. */
 type Draft = {
@@ -22,6 +24,8 @@ type Draft = {
   steal?: {resource: Resource, count: number};
   discard?: number;
   opponentsDiscard?: number;
+  targetDiscard?: number;
+  cardResource?: {type: CardResource, vpPer?: number};
 };
 
 type PartKind = 'good' | 'effect' | 'bad';
@@ -42,8 +46,13 @@ type Part = {
   effectText?: string;
   /** What kind of effect this is; names the card and lets presets guarantee it. */
   category: EffectCategory;
-  /** A "when you play a X tag" trigger: if the card has that tag itself, it fires once more on play. */
+  /**
+   * A part that counts a tag ("when you play a X tag", "for each X tag you have"): if the card has
+   * that tag itself, it counts once more, and the text says "including this".
+   */
   selfTrigger?: {tag: Tag, value: number};
+  /** The price line, when it says more than the card text (e.g. a collector's VP). */
+  priceText?: string;
   apply: (d: Draft) => void;
 };
 
@@ -114,24 +123,38 @@ export function compactTexts(texts: Array<string>): Array<string> {
 }
 
 /**
- * How busy a card is, in slots: every benefit, effect or action, drawback and requirement takes
- * one. Effects, drawbacks and requirements are rolled first; benefits fill the slots that are left.
+ * A card's complexity is a number: 1 per benefit, effect or action, drawback and requirement, plus
+ * 1 per tag after the first. The generator picks a target in the asked range and builds to it.
  */
-export const PROFILE: Record<AssemblerComplexity, {slots: [number, number], effectChance: number, bad: [number, number], tags: [number, number], requirementChance: number}> = {
-  low: {slots: [1, 1], effectChance: 0, bad: [0, 0], tags: [1, 1], requirementChance: 0},
-  mid: {slots: [2, 3], effectChance: 0.3, bad: [0, 1], tags: [1, 2], requirementChance: 0.35},
-  high: {slots: [4, 6], effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5},
+export const MIN_COMPLEXITY = 1;
+export const MAX_COMPLEXITY = ASSEMBLER_PREVIEW_LIMITS.MAX_COMPLEXITY;
+
+/** How often each complexity comes up when nothing is asked for: mostly simple cards. */
+export const COMPLEXITY_WEIGHTS: ReadonlyArray<readonly [number, number]> = [
+  [1, 4], [2, 1.5], [3, 1.5], [4, 1.2], [5, 1], [6, 0.6], [7, 0.4],
+];
+
+export type ComplexityProfile = {
+  /** Chance of an effect or action. */
+  effectChance: number,
+  /** How many drawbacks. */
+  bad: [number, number],
+  /** How many tags. */
+  tags: [number, number],
+  requirementChance: number,
+  /** Chance of a bold card: one big benefit and one big drawback. */
+  boldChance: number,
 };
 
-/**
- * A card's complexity score: 1 per benefit, effect or action, drawback and requirement, plus 1 per
- * tag after the first. Low cards score 1, mid 2-4, high 5 or more.
- */
-export const COMPLEXITY_SCORE = {low: 1, mid: 4} as const;
-
-/** The complexity a score reads as. */
-export function complexityOfScore(score: number): AssemblerComplexity {
-  return score <= COMPLEXITY_SCORE.low ? 'low' : score <= COMPLEXITY_SCORE.mid ? 'mid' : 'high';
+/** What a card of this complexity is made of. Busier cards get effects, drawbacks and more tags. */
+export function profileOf(complexity: number): ComplexityProfile {
+  if (complexity <= 1) {
+    return {effectChance: 0, bad: [0, 0], tags: [1, 1], requirementChance: 0, boldChance: 0};
+  }
+  if (complexity <= 4) {
+    return {effectChance: 0.15 + 0.1 * complexity, bad: [0, 1], tags: [1, 2], requirementChance: 0.1 * complexity, boldChance: complexity >= 3 ? V.BOLD_CHANCE : 0};
+  }
+  return {effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5, boldChance: V.BOLD_CHANCE};
 }
 
 /**
@@ -152,10 +175,23 @@ const THEME: Partial<Record<EffectCategory, ReadonlyArray<Tag>>> = {
   efficiency: [Tag.BUILDING, Tag.SCIENCE],
   theft: [Tag.EARTH, Tag.SPACE],
   espionage: [Tag.EARTH, Tag.SCIENCE],
+  fauna: [Tag.ANIMAL, Tag.PLANT],
+  microbes: [Tag.MICROBE, Tag.VENUS],
+  floaters: [Tag.VENUS, Tag.JOVIAN],
 };
-const THEME_BOOST = 3;
 
-const COMPLEXITY_ORDER: ReadonlyArray<AssemblerComplexity> = ['low', 'mid', 'high'];
+/** The resources a card can collect: its word, how many make 1 VP, the tag it likes, its category. */
+const COLLECTIBLES = [
+  {type: CardResource.ANIMAL, word: 'animal', vpPer: [1, 2], tag: Tag.ANIMAL, category: 'fauna'},
+  {type: CardResource.MICROBE, word: 'microbe', vpPer: [3, 4], tag: Tag.MICROBE, category: 'microbes'},
+  {type: CardResource.FLOATER, word: 'floater', vpPer: [2, 3], tag: Tag.VENUS, category: 'floaters'},
+] as const;
+
+/** "1 VP per 2 animals on this card." */
+export function collectorVpText(word: string, per: number): string {
+  return `1 VP per ${per === 1 ? word : `${per} ${word}s`} on this card.`;
+}
+const THEME_BOOST = 3;
 
 const TAG_WEIGHTS: Array<[Tag, number]> = [
   [Tag.BUILDING, 31], [Tag.SPACE, 26], [Tag.EARTH, 16], [Tag.SCIENCE, 15], [Tag.VENUS, 11], [Tag.PLANT, 11],
@@ -248,8 +284,61 @@ export class AssemblerGenerator {
         const n = this.int(2, 4);
         return {kind: 'good', key: 'removePlants', text: `Remove up to ${n} plants from any player.`, value: V.REMOVE_PLANT_VALUE * n, category: 'blight', apply: (d) => d.behavior.removeAnyPlants = n};
       }, 0.6],
-      [() => ({kind: 'good', key: 'opponentsDiscard', text: 'Each opponent discards 1 card.', value: V.OPPONENT_DISCARD_VALUE, category: 'espionage', apply: (d) => d.opponentsDiscard = 1}), 0.8],
+      [() => ({kind: 'good', key: 'opponentsDiscard', text: 'Each opponent chooses 1 card to discard.', value: V.OPPONENT_DISCARD_VALUE, category: 'espionage', apply: (d) => d.opponentsDiscard = 1}), 0.5],
+      [() => ({kind: 'good', key: 'opponentsDiscard', text: 'An opponent of your choice chooses 1 card to discard.', value: V.TARGET_DISCARD_VALUE, category: 'espionage', apply: (d) => d.targetDiscard = 1}), 0.5],
+      [() => this.addToAnotherCard(), 1.5],
+      [() => this.perTagProduction(), 2],
     ])();
+  }
+
+  /** "Add 2 microbes to another card." */
+  private addToAnotherCard(): Part {
+    const c = this.pick(COLLECTIBLES);
+    const n = c.type === CardResource.ANIMAL ? this.int(1, 2) : this.int(2, 3);
+    return {kind: 'good', key: 'addAny', text: `Add ${plural(n, c.word)} to another card.`, value: V.CARD_RESOURCE_VALUE[c.word] * n,
+      hintTag: c.tag, category: c.category, apply: (d) => d.behavior.addResourcesToAnyCard = {type: c.type, count: n}};
+  }
+
+  /** Like Insects or Medical Lab: production that grows with a tag count. */
+  private perTagProduction(): Part {
+    const r = this.weighted<V.StandardResource>([['megacredits', 3], ['plants', 2], ['energy', 1.5], ['heat', 1.5], ['steel', 1], ['titanium', 0.5]]);
+    const tag = this.pick([Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, Tag.PLANT, Tag.MICROBE, Tag.POWER, Tag.JOVIAN, Tag.VENUS]);
+    const owned = V.TAGS_IN_PLAY * (V.TAG_SHARE[tag] ?? 0);
+    // Common tags count per 2, so one card doesn't pay off too much.
+    const per = owned >= 2.5 ? 2 : 1;
+    const step = V.PRODUCTION_VALUE[r] / per;
+    const text = per === 1 ?
+      `Increase your ${NAME[r]} production 1 step for each ${tag} tag you have.` :
+      `Increase your ${NAME[r]} production 1 step for every ${per} ${tag} tags you have.`;
+    return {kind: 'good', key: `production.${r}`, text, value: step * owned, lasting: true, hintTag: tag, category: 'growth',
+      selfTrigger: {tag, value: step},
+      apply: (d) => d.behavior.production = {...d.behavior.production, [r]: {tag, per}}};
+  }
+
+  /** A card that collects animals, microbes or floaters for VP: by an action, or when you play a tag. */
+  private collector(): Part {
+    const c = this.pick(COLLECTIBLES);
+    const per = this.pick(c.vpPer);
+    const vp = collectorVpText(c.word, per);
+    const one = V.VP_VALUE / per;
+    if (this.chance(0.6)) {
+      const text = `Action: Add 1 ${c.word} to this card.`;
+      return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, priceText: `${text} ${vp}`, value: one * V.COLLECTOR_USES,
+        lasting: true, hintTag: c.tag, category: c.category,
+        apply: (d) => {
+          d.action = {addResources: 1};
+          d.cardResource = {type: c.type, vpPer: per};
+        }};
+    }
+    const tag = this.pick([c.tag, Tag.PLANT, Tag.SCIENCE, Tag.EARTH, Tag.SPACE, Tag.VENUS].filter((t, i, a) => a.indexOf(t) === i));
+    const triggers = V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR;
+    const text = `Effect: When you play ${an(tag)} tag, add 1 ${c.word} to this card.`;
+    return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, priceText: `${text} ${vp}`, value: one * triggers,
+      lasting: true, hintTag: tag, category: c.category, selfTrigger: {tag, value: one},
+      apply: (d) => {
+        d.trigger = {tag, gain: {}, addResource: 1};
+        d.cardResource = {type: c.type, vpPer: per};
+      }};
   }
 
   /** PvP: lower another player's production. Losing steel or titanium production is Rust. */
@@ -333,13 +422,22 @@ export class AssemblerGenerator {
       }, 3],
       [() => {
         const tag = this.pick([Tag.SPACE, Tag.BUILDING, Tag.EARTH, Tag.SCIENCE, Tag.PLANT, Tag.MICROBE]);
-        const [r, n] = this.pick([['megacredits', 2], ['plants', 1], ['steel', 1], ['heat', 2]] as const);
+        const [r, n] = this.pick([['megacredits', 2], ['plants', 1], ['steel', 1], ['heat', 2], ['titanium', 1], ['energy', 1]] as const);
         const triggers = V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR;
         const text = `Effect: When you play ${an(tag)} tag, gain ${amount(n, r)}.`;
         return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'synergy', value: V.STOCK_VALUE[r] * n * triggers,
           selfTrigger: {tag, value: V.STOCK_VALUE[r] * n},
           apply: (d) => d.trigger = {tag, gain: {[r]: n}}};
       }, 3],
+      [() => {
+        const tag = this.pick([Tag.SCIENCE, Tag.EARTH, Tag.JOVIAN, Tag.VENUS]);
+        const triggers = V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR;
+        const text = `Effect: When you play ${an(tag)} tag, draw a card.`;
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'knowledge', value: V.DRAW_CARD_VALUE * triggers,
+          selfTrigger: {tag, value: V.DRAW_CARD_VALUE},
+          apply: (d) => d.trigger = {tag, gain: {}, drawCard: 1}};
+      }, 1.2],
+      [() => this.collector(), 3],
     ])();
   }
 
@@ -416,47 +514,70 @@ export class AssemblerGenerator {
   /**
    * @param name the card's unique name (see AssembledCardDefinition.name).
    * Tries random cards until one is sensibly priced and fits on a card. Throws only if 2000 tries all fail.
-   * @param spec optional constraints (a preset): required tags, tag count, cost range, cost adjustment.
+   * @param spec optional constraints (a preset): complexity range, required tags, tag count, cost range, cost adjustment.
    */
-  public generate(name: string, complexity: AssemblerComplexity, spec: AssembleSpec = {}): AssembledCardDefinition {
+  public generate(name: string, spec: AssembleSpec = {}): AssembledCardDefinition {
+    const min = spec.minComplexity ?? MIN_COMPLEXITY;
+    const max = spec.maxComplexity ?? MAX_COMPLEXITY;
+    const weights = COMPLEXITY_WEIGHTS.filter(([c]) => c >= min && c <= max);
+    if (weights.length === 0) {
+      throw new Error(`Assembler has no complexity between ${min} and ${max}`);
+    }
+    // Keep the picked complexity for a while: busy cards fail more often (they must fit on a card),
+    // and re-picking every attempt would quietly favour simple ones.
+    let target = this.weighted(weights);
     for (let attempt = 0; attempt < 2000; attempt++) {
-      const card = this.tryGenerate(name, complexity, spec);
+      if (attempt > 0 && attempt % 400 === 0) {
+        target = this.weighted(weights);
+      }
+      const card = this.tryGenerate(name, target, spec);
       // Reroll cards too busy to print legibly, rather than letting text run off the card.
       if (card !== undefined && fitsOnCard(card)) {
         return card;
       }
     }
-    throw new Error(`Assembler could not build a ${complexity} card`);
+    throw new Error(`Assembler could not build a card with complexity ${min}-${max}`);
   }
 
-  private tryGenerate(name: string, complexity: AssemblerComplexity, spec: AssembleSpec): AssembledCardDefinition | undefined {
+  /** Builds a card aiming at complexity `target`. Undefined when the roll doesn't work out. */
+  private tryGenerate(name: string, target: number, spec: AssembleSpec): AssembledCardDefinition | undefined {
     const forceRequirement = spec.forceRequirement === true;
-    const profile = PROFILE[complexity];
+    const profile = profileOf(target);
+    // Tags and the requirement count toward the complexity too: settle them first, leaving at
+    // least one point for what the card does.
+    const required = [...new Set(spec.tags ?? [])];
+    let nTags = Math.max(spec.tagCount ?? this.int(...profile.tags), required.length);
+    let withRequirement = forceRequirement || this.chance(profile.requirementChance);
+    if (spec.tagCount === undefined) {
+      nTags = Math.max(required.length, Math.min(nTags, target - (withRequirement ? 1 : 0)));
+    }
+    if (!forceRequirement && withRequirement && target - (nTags - 1) - 1 < 1) {
+      withRequirement = false;
+    }
     // Chosen first, so a minimum cost (below) can make up for what the requirement takes off.
-    const requirement = (forceRequirement || this.chance(profile.requirementChance)) ? this.requirement() : undefined;
-    // Guaranteed effects first. Everything takes a slot: guaranteed parts, the requirement, an
-    // effect or action, drawbacks. Benefits fill what's left (at least one thing must be good).
+    const requirement = withRequirement ? this.requirement() : undefined;
+    // What's left is for parts: guaranteed effects first, then a bold pair, an effect or action
+    // and drawbacks if they fit, then benefits fill the rest (at least one thing must be good).
+    let budget = Math.max(1, target - (nTags - 1) - (requirement !== undefined ? 1 : 0));
     const parts: Array<Part> = [...new Set(spec.categories ?? [])].map((c) => this.partOf(c));
     const has = (kind: PartKind) => parts.filter((p) => p.kind === kind).length;
-    const slots = this.int(...profile.slots);
-    // A bold card: one big benefit, paid for by one big drawback (mid and high only).
-    if (complexity !== 'low' && this.chance(V.BOLD_CHANCE)) {
-      parts.push(this.goodPart(true), this.badPart(true));
-    }
-    if (has('effect') === 0 && this.chance(profile.effectChance)) {
-      parts.push(this.effectPart());
-    }
+    const left = () => budget - parts.length;
     // An active card needs an effect or action.
     if (spec.type === CardType.ACTIVE && !parts.some((p) => p.blue === true)) {
       parts.push(this.effectPart());
+    } else if (has('effect') === 0 && left() >= 1 && this.chance(profile.effectChance)) {
+      parts.push(this.effectPart());
     }
-    const nBad = this.int(...profile.bad) - has('bad');
+    if (left() >= 2 && this.chance(profile.boldChance)) {
+      parts.push(this.goodPart(true), this.badPart(true));
+    }
+    // A drawback needs something to pay for, so it never takes the last point.
+    const nBad = Math.min(this.int(...profile.bad) - has('bad'), left() - (has('good') + has('effect') === 0 ? 1 : 0));
     for (let i = 0; i < nBad; i++) {
       parts.push(this.badPart());
     }
-    const used = parts.length + (requirement !== undefined ? 1 : 0);
-    const nGood = Math.max(has('good') + has('effect') === 0 ? 1 : 0, slots - used);
-    for (let i = 0; i < nGood; i++) {
+    budget = Math.max(budget, parts.length + (has('good') + has('effect') === 0 ? 1 : 0));
+    while (parts.length < budget) {
       parts.push(this.goodPart());
     }
     // A minimum cost: add good parts until the card is worth about enough. Pricing below decides.
@@ -503,9 +624,7 @@ export class AssemblerGenerator {
     }
 
     // Tags: lean toward one that fits the parts.
-    const required = [...new Set(spec.tags ?? [])];
     const tags: Array<Tag> = [...required];
-    const nTags = Math.max(spec.tagCount ?? this.int(...profile.tags), required.length);
     const hint = parts.find((p) => p.hintTag !== undefined)?.hintTag;
     if (hint !== undefined && tags.length < nTags && !tags.includes(hint) && this.chance(0.7)) {
       tags.push(hint);
@@ -532,14 +651,17 @@ export class AssemblerGenerator {
     // so, and count that one extra payout.
     for (const [i, p] of parts.entries()) {
       if (p.selfTrigger !== undefined && tags.includes(p.selfTrigger.tag)) {
-        parts[i] = {...p, value: p.value + p.selfTrigger.value, effectText: p.effectText?.replace(' tag, gain ', ' tag, including this, gain ')};
+        parts[i] = {...p, value: p.value + p.selfTrigger.value,
+          text: p.text.replace(' tags you have.', ' tags you have, including this.').replace(' tag you have.', ' tag you have, including this.'),
+          effectText: p.effectText?.replace(' tag, ', ' tag, including this, '),
+          priceText: p.priceText?.replace(' tag, ', ' tag, including this, ')};
       }
     }
 
     // ---- price ----
     const breakdown: Array<AssembledValueLine> = [];
     for (const p of parts) {
-      const text = p.key === 'vp' ? `${p.value > 0 ? '' : '−'}${Math.round(Math.abs(p.value / V.VP_VALUE))} VP` : (p.effectText ?? p.text);
+      const text = p.key === 'vp' ? `${p.value > 0 ? '' : '−'}${Math.round(Math.abs(p.value / V.VP_VALUE))} VP` : (p.priceText ?? p.effectText ?? p.text);
       breakdown.push({text, value: p.value, category: p.category});
     }
     const tagValues = tags.map((t) => V.TAG_VALUE[t] ?? 0).sort((a, b) => b - a);
@@ -571,21 +693,28 @@ export class AssemblerGenerator {
     if (lost.some((r) => Object.keys(draft.behavior.stock ?? {}).includes(r))) {
       return undefined;
     }
+    // A card scores VP one way: per resource on it, or a fixed number.
+    if (draft.cardResource?.vpPer !== undefined && draft.victoryPoints !== 0) {
+      return undefined;
+    }
 
     const playTexts = parts.filter((p) => p.text !== '' && p.effectText === undefined).map((p) => p.text);
     const description = [requirement?.text, ...compactTexts(playTexts)].filter((t) => t !== undefined).join(' ');
     const effectTexts = parts.filter((p) => p.effectText !== undefined).map((p) => p.effectText as string);
-    // Forced extras (a guaranteed drawback, a requirement, a minimum cost) can make a card busier
-    // than asked for; it then says so.
-    const score = parts.length + (requirement !== undefined ? 1 : 0) + Math.max(0, tags.length - 1);
-    const actual = complexityOfScore(score);
-    const shown = COMPLEXITY_ORDER.indexOf(actual) > COMPLEXITY_ORDER.indexOf(complexity) ? actual : complexity;
-    const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), shown, (items) => this.pick(items));
+    // What the preset forces (guaranteed effects, tags, a requirement, a minimum cost) can make a
+    // card busier than asked for; it then says so. Otherwise the card stays in the asked range.
+    const complexity = parts.length + (requirement !== undefined ? 1 : 0) + Math.max(0, tags.length - 1);
+    const forced = (spec.categories ?? []).length > 0 || (spec.tags ?? []).length > 0 || spec.tagCount !== undefined ||
+      spec.minCost !== undefined || forceRequirement || spec.type === CardType.ACTIVE;
+    if (!forced && (complexity < (spec.minComplexity ?? MIN_COMPLEXITY) || complexity > (spec.maxComplexity ?? MAX_COMPLEXITY))) {
+      return undefined;
+    }
+    const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), complexity, (items) => this.pick(items));
 
     return {
       name,
       title,
-      complexity: shown,
+      complexity,
       type,
       cost,
       tags,
@@ -598,7 +727,8 @@ export class AssemblerGenerator {
       ...(draft.steal !== undefined ? {steal: draft.steal} : {}),
       ...(draft.discard !== undefined ? {discard: draft.discard} : {}),
       ...(draft.opponentsDiscard !== undefined ? {opponentsDiscard: draft.opponentsDiscard} : {}),
-      complexityScore: score,
+      ...(draft.targetDiscard !== undefined ? {targetDiscard: draft.targetDiscard} : {}),
+      ...(draft.cardResource !== undefined ? {cardResource: draft.cardResource} : {}),
       description,
       effectTexts,
       value,

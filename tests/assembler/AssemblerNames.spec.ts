@@ -13,26 +13,26 @@ describe('AssemblerNames', () => {
       {category: 'energy', value: 6, bad: false},
       {category: 'money', value: 4, bad: false},
       {category: 'cooling', value: -2, bad: true},
-    ], 'mid', first);
+    ], 3, first);
     expect(title).eq('Cooled Power Cell');
   });
 
   it('a big effect uses the major words', () => {
-    expect(nameCard([{category: 'heat', value: 12, bad: false}, {category: 'cooling', value: -12, bad: true}], 'mid', first))
+    expect(nameCard([{category: 'heat', value: 12, bad: false}, {category: 'cooling', value: -12, bad: true}], 3, first))
       .eq('Frozen Solar Lens');
   });
 
   it('one category describes itself, without repeating the noun', () => {
     // 'Heated Heater' would be silly: the adjective skips words that start like the noun.
-    expect(nameCard([{category: 'heat', value: 4, bad: false}], 'low', first)).eq('Warm Heater');
+    expect(nameCard([{category: 'heat', value: 4, bad: false}], 1, first)).eq('Warm Heater');
   });
 
-  it('high complexity adds an ending from a third category', () => {
+  it('complexity 5 or more adds an ending from a third category', () => {
     expect(nameCard([
       {category: 'plants', value: 9, bad: false},
       {category: 'knowledge', value: 6, bad: false},
       {category: 'drain', value: -3, bad: true},
-    ], 'high', first)).eq('Drained Greenhouse of Insight');
+    ], 5, first)).eq('Drained Greenhouse of Insight');
   });
 
   it('drops an ending that would make the title too long', () => {
@@ -41,7 +41,7 @@ describe('AssemblerNames', () => {
       {category: 'money', value: 15, bad: false},
       {category: 'drain', value: -12, bad: true},
       {category: 'cooling', value: -3, bad: true},
-    ], 'high', last);
+    ], 5, last);
     // "Power-starved Investment Bank of the Long Night" is too long for a card.
     expect(title).eq('Power-starved Investment Bank');
     expect(title.length).is.at.most(MAX_TITLE_LENGTH);
@@ -59,7 +59,7 @@ describe('Assembler effect categories', () => {
   it('every part of a card has a category, and the title uses its words', () => {
     const generator = new AssemblerGenerator(new SeededRandom(0.31));
     for (let i = 0; i < 40; i++) {
-      const def = generator.generate('x', i % 2 === 0 ? 'mid' : 'high');
+      const def = generator.generate('x', i % 2 === 0 ? {minComplexity: 2, maxComplexity: 4} : {minComplexity: 5});
       const parts = def.breakdown.filter((l) => !l.text.startsWith('Tags:') && !l.text.startsWith('Requires') && !l.text.startsWith('It must') && l.text !== 'Pay with steel/titanium');
       for (const line of parts) {
         expect(line.category, line.text).is.not.undefined;
@@ -76,7 +76,7 @@ describe('Assembler effect categories', () => {
     it(`can guarantee ${category}`, () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.5));
       for (let i = 0; i < 5; i++) {
-        const def = generator.generate('x', 'mid', {categories: [category]});
+        const def = generator.generate('x', {minComplexity: 2, maxComplexity: 4, categories: [category]});
         expect(def.breakdown.map((l) => l.category), def.title).includes(category);
       }
     });
@@ -84,7 +84,7 @@ describe('Assembler effect categories', () => {
 
   it('can guarantee several categories at once', () => {
     const generator = new AssemblerGenerator(new SeededRandom(0.2));
-    const def = generator.generate('x', 'high', {categories: ['water', 'cooling', 'knowledge']});
+    const def = generator.generate('x', {minComplexity: 5, categories: ['water', 'cooling', 'knowledge']});
     const categories = def.breakdown.map((l) => l.category);
     expect(categories).includes.members(['water', 'cooling', 'knowledge']);
   });
@@ -93,7 +93,7 @@ describe('Assembler effect categories', () => {
     it(`can require a ${type} card`, () => {
       const generator = new AssemblerGenerator(new SeededRandom(0.8));
       for (let i = 0; i < 5; i++) {
-        expect(generator.generate('x', 'mid', {type}).type).eq(type);
+        expect(generator.generate('x', {minComplexity: 2, maxComplexity: 4, type}).type).eq(type);
       }
     });
   }

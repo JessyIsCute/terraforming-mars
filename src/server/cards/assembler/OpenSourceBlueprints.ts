@@ -9,8 +9,8 @@ import {AssemblerExpansion} from '../../assembler/AssemblerExpansion';
 import {AssembleSpec} from '../../assembler/AssembleSpec';
 import {all} from '../Options';
 
-/** Asked for as low complexity (benefits only, no effects or drawbacks), but worth about 30 M€; it takes several benefits, so it shows as mid or high. */
-export const OPEN_SOURCE_BLUEPRINTS_PRESET: AssembleSpec = {complexity: 'low', minCost: 28, maxCost: 32};
+/** Asked for as complexity 1 (benefits only, no effects or drawbacks), but worth about 30 M€; it takes several benefits, so its complexity ends up higher. */
+export const OPEN_SOURCE_BLUEPRINTS_PRESET: AssembleSpec = {maxComplexity: 1, minCost: 28, maxCost: 32};
 export const OPEN_SOURCE_BLUEPRINTS_DISCOUNT = 10;
 
 export class OpenSourceBlueprints extends Card implements IProjectCard {

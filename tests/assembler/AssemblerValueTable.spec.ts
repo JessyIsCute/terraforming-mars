@@ -25,7 +25,7 @@ describe('AssemblerValueTable', () => {
   it('lists every printed card with its preset', () => {
     const printed = table.sections.find((s) => s.title.startsWith('Printed'))!;
     expect(printed.rows).has.length(14);
-    expect(printed.rows.find((r) => r[0] === 'Bargain Bin')?.[3]).eq('Low complexity, cost at most 8 M€');
+    expect(printed.rows.find((r) => r[0] === 'Bargain Bin')?.[3]).eq('Complexity 1, cost at most 8 M€');
     for (const row of printed.rows) {
       expect(row[2], row[0]).is.not.empty;
     }

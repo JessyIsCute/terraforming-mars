@@ -2,22 +2,24 @@ import {Tag} from '../../common/cards/Tag';
 import {CardType} from '../../common/cards/CardType';
 import {EffectCategory} from '../../common/assembler/EffectCategory';
 
-export type AssemblerComplexity = 'low' | 'mid' | 'high';
-
 /**
  * Constraints for one Assemble -- a "preset". Every field is optional; an empty spec is a fully
  * random card. Used by printed cards like "Assemble a card with at least 1 science tag".
  */
 export type AssembleSpec = {
-  /** Default: picked at random (more low and mid than high). */
-  complexity?: AssemblerComplexity,
+  /**
+   * The card's complexity (1 per benefit, effect or action, drawback and requirement, plus 1 per
+   * tag after the first) is in this range. Default: 1-8, mostly simple cards.
+   */
+  minComplexity?: number,
+  maxComplexity?: number,
   /** The card has all of these tags (and maybe others). */
   tags?: ReadonlyArray<Tag>,
   /** The card has exactly this many tags. */
   tagCount?: number,
   /**
    * The card's printed cost is in this range. A card that would cost less gets extra good parts
-   * until it's worth enough, so even a low-complexity card can hit a high cost.
+   * until it's worth enough, so even a simple card can hit a high cost (it then has more parts than maxComplexity allows).
    */
   minCost?: number,
   maxCost?: number,

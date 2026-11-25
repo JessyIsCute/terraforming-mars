@@ -138,8 +138,12 @@ reload, which happens after every move. So:
 - Bold cards: a big benefit and a big drawback; multi-VP; decrease any production of any resource.
 - Tag theming by benefit category; the complexity score (1 per part, +1 per extra tag) is shown
   instead of Low/Mid/High.
-- Next: resources on cards (animals, microbes, floaters), production per X tags, more trigger
-  rewards.
+
+### Card resources, growth and more triggers (done)
+- Fauna / Microbes / Floaters: cards that collect resources for VP (by action or tag trigger), and
+  "add N to another card".
+- Growth: production per X tags (Insects, Medical Lab), "including this" when the card has the tag.
+- Triggers can also give titanium or energy, or draw a card.
 
 ### Phase 4 — v2 effects and tuning
 - Trigger effects ("when you play a X tag, gain Y") as a generic trigger card class.

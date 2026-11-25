@@ -7,9 +7,8 @@ import {ASSEMBLER_PREVIEW_LIMITS as LIMITS, ASSEMBLER_PREVIEW_TAGS, AssemblerPre
 import {CardName} from '../../common/cards/CardName';
 import {forgetCardProperties} from '../cards/Card';
 import {addAssembledCardModel} from '../models/ModelUtils';
-import {AssembleSpec, AssemblerComplexity} from './AssembleSpec';
-import {AssemblerGenerator} from './AssemblerGenerator';
-import {AssemblerExpansion} from './AssemblerExpansion';
+import {AssembleSpec} from './AssembleSpec';
+import {AssemblerGenerator, MAX_COMPLEXITY, MIN_COMPLEXITY} from './AssemblerGenerator';
 import {newAssembledCard} from './AssembledCard';
 
 /** A request the player can fix: the message is shown on the generator page. */
@@ -61,12 +60,12 @@ function list(params: URLSearchParams, key: string): Array<string> {
 export function parsePreviewRequest(params: URLSearchParams, randomSeed: () => number): AssemblerPreviewRequest {
   const spec: {-readonly [K in keyof AssembleSpec]: AssembleSpec[K]} = {};
 
-  const complexity = params.get('complexity');
-  if (complexity !== null && complexity !== '') {
-    if (complexity !== 'low' && complexity !== 'mid' && complexity !== 'high') {
-      throw new AssemblerPreviewError('complexity must be low, mid or high.');
-    }
-    spec.complexity = complexity as AssemblerComplexity;
+  // complexity=N is short for minComplexity=N&maxComplexity=N.
+  const exact = integer(params, 'complexity', MIN_COMPLEXITY, MAX_COMPLEXITY);
+  spec.minComplexity = integer(params, 'minComplexity', MIN_COMPLEXITY, MAX_COMPLEXITY) ?? exact;
+  spec.maxComplexity = integer(params, 'maxComplexity', MIN_COMPLEXITY, MAX_COMPLEXITY) ?? exact;
+  if (spec.minComplexity !== undefined && spec.maxComplexity !== undefined && spec.minComplexity > spec.maxComplexity) {
+    throw new AssemblerPreviewError('The lowest complexity is above the highest complexity.');
   }
 
   const type = params.get('type');
@@ -153,13 +152,12 @@ export function previewCards(request: AssemblerPreviewRequest): AssemblerPreview
       failed = request.count - cards.length;
       break;
     }
-    const complexity = request.spec.complexity ?? AssemblerExpansion.pickComplexity(rng);
     const name = `Assembled preview-${request.seed}-${i}`;
     let definition;
     try {
-      definition = generator.generate(name, complexity, request.spec);
+      definition = generator.generate(name, request.spec);
     } catch (e) {
-      // Some combinations rarely fit on a card, e.g. high complexity at the top of the cost range.
+      // Some combinations rarely fit on a card, e.g. a busy card at the top of the cost range.
       failed++;
       continue;
     }

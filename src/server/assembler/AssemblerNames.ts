@@ -1,5 +1,4 @@
 import {EffectCategory} from '../../common/assembler/EffectCategory';
-import {AssemblerComplexity} from './AssembleSpec';
 
 /**
  * Assembler (fan): card names built from what the card does.
@@ -9,12 +8,12 @@ import {AssemblerComplexity} from './AssembleSpec';
  * Array"; a small heat loss is "Cooled", a big one "Frozen".
  *
  * The strongest benefit gives the noun. The next category gives an adjective in front ("Cooled
- * Reactor"). High-complexity cards add a third category as an ending ("Cooled Reactor of Bloom").
+ * Reactor"). Cards of complexity ENDING_FROM or more add a third category as an ending ("Cooled Reactor of Bloom").
  */
 type Words = {
   nouns: [ReadonlyArray<string>, ReadonlyArray<string>],
   adjectives: [ReadonlyArray<string>, ReadonlyArray<string>],
-  /** "of ..." endings for high-complexity cards. */
+  /** "of ..." endings for busy cards (complexity ENDING_FROM or more). */
   endings: ReadonlyArray<string>,
 };
 
@@ -126,6 +125,26 @@ export const CATEGORY_WORDS: Record<EffectCategory, Words> = {
     adjectives: [['Forgetful', 'Hasty'], ['Amnesiac', 'Reckless']],
     endings: ['of Oblivion', 'of Lost Plans'],
   },
+  fauna: {
+    nouns: [['Burrow', 'Paddock'], ['Wildlife Reserve', 'Grazing Range']],
+    adjectives: [['Furry', 'Grazing'], ['Wild', 'Roaming']],
+    endings: ['of Beasts', 'of the Herd'],
+  },
+  microbes: {
+    nouns: [['Culture Dish', 'Bioreactor'], ['Microbe Vat', 'Spore Bank']],
+    adjectives: [['Fermenting', 'Teeming'], ['Symbiotic', 'Swarming']],
+    endings: ['of Spores', 'of the Swarm'],
+  },
+  floaters: {
+    nouns: [['Balloon', 'Blimp'], ['Cloud Station', 'Aerostat']],
+    adjectives: [['Floating', 'Buoyant'], ['Airborne', 'Drifting']],
+    endings: ['of the Clouds', 'of the Skies'],
+  },
+  growth: {
+    nouns: [['Nursery', 'Incubator'], ['Growth Hub', 'Expansion Office']],
+    adjectives: [['Growing', 'Budding'], ['Thriving', 'Expanding']],
+    endings: ['of Growth', 'of Plenty'],
+  },
 };
 
 /** What the namer needs to know about each part of the card. */
@@ -147,7 +166,10 @@ function tier(value: number): 0 | 1 {
  * The card's title from its parts.
  * @param pick chooses one word from a list (the generator's seeded random pick).
  */
-export function nameCard(parts: ReadonlyArray<NamedPart>, complexity: AssemblerComplexity, pick: <T>(items: ReadonlyArray<T>) => T): string {
+/** From this complexity on, a card's name gets an "of ..." ending. */
+export const ENDING_FROM = 5;
+
+export function nameCard(parts: ReadonlyArray<NamedPart>, complexity: number, pick: <T>(items: ReadonlyArray<T>) => T): string {
   const benefits = parts.filter((p) => !p.bad && p.value > 0).sort((a, b) => b.value - a.value);
   const main = benefits[0] ?? parts[0];
   const noun = pick(CATEGORY_WORDS[main.category].nouns[tier(main.value)]);
@@ -171,7 +193,7 @@ export function nameCard(parts: ReadonlyArray<NamedPart>, complexity: AssemblerC
   const fitting = adjectives.filter((a) => a.slice(0, 4) !== noun.slice(0, 4));
   const adjective = pick(fitting.length > 0 ? fitting : adjectives);
   let title = `${adjective} ${noun}`;
-  if (complexity === 'high') {
+  if (complexity >= ENDING_FROM) {
     const second = others[1];
     const ending = second !== undefined ? pick(CATEGORY_WORDS[second.category].endings) : 'Mk II';
     const longer = `${title} ${ending}`;

@@ -3,8 +3,9 @@
     <h1 v-i18n>Assembler card generator</h1>
     <p class="assembler-intro" v-i18n>
       Generate random Assembler cards, the way the Assembler expansion makes them during a game.
-      Every card is priced from what it does. Pick a complexity, guarantee effects, tags or a
-      cost range, or leave everything on random.
+      Every card is priced from what it does. Pick a complexity range, guarantee effects, tags or a
+      cost range, or leave everything on random. Complexity counts 1 per effect, drawback and
+      requirement, plus 1 per tag after the first.
     </p>
     <p class="assembler-intro" v-i18n>
       A card's name comes from its effects: the strongest benefit names the thing, the next effect
@@ -30,12 +31,17 @@
             </select>
           </label>
           <label class="assembler-field">
-            <span v-i18n>Complexity</span>
-            <select v-model="complexity">
-              <option value="">{{ $t('Random') }}</option>
-              <option value="low">{{ $t('Low: one effect') }}</option>
-              <option value="mid">{{ $t('Mid: a few effects') }}</option>
-              <option value="high">{{ $t('High: many effects and a drawback') }}</option>
+            <span v-i18n>Complexity from</span>
+            <select v-model="minComplexity">
+              <option value="">{{ $t('Any') }}</option>
+              <option v-for="n in COMPLEXITIES" :key="n" :value="String(n)">{{ n }}</option>
+            </select>
+          </label>
+          <label class="assembler-field">
+            <span v-i18n>Complexity to</span>
+            <select v-model="maxComplexity">
+              <option value="">{{ $t('Any') }}</option>
+              <option v-for="n in COMPLEXITIES" :key="n" :value="String(n)">{{ n }}</option>
             </select>
           </label>
           <label class="assembler-field">
@@ -127,7 +133,7 @@
             <Card :card="card" auto-tall/>
             <div v-if="card.assembled !== undefined" class="assembler-score">
               <div class="assembler-score-head">
-                <span class="assembler-complexity" :class="'assembler-complexity--' + card.assembled.complexity" :title="$t('1 per effect, drawback and requirement, plus 1 per tag after the first')">{{ complexityText(card) }}</span>
+                <span class="assembler-complexity" :class="'assembler-complexity--' + band(card.assembled.complexity)" :title="$t('1 per effect, drawback and requirement, plus 1 per tag after the first')">{{ $t('Complexity') }} {{ card.assembled.complexity }}</span>
                 <span><span v-i18n>value</span> {{ card.assembled.value }}</span>
               </div>
               <div class="assembler-score-effects">
@@ -153,7 +159,7 @@ import {EFFECT_CATEGORIES, EFFECT_CATEGORY_INFO, EffectCategory} from '@/common/
 import {ASSEMBLER_PREVIEW_LIMITS, ASSEMBLER_PREVIEW_TAGS, AssemblerPreviewResponse} from '@/common/assembler/AssemblerPreview';
 
 /** The page's options, as query parameters (see src/common/assembler/AssemblerPreview.ts). */
-const KEYS = ['count', 'complexity', 'type', 'seed', 'categories', 'tags', 'tagCount', 'minCost', 'maxCost', 'costAdjust', 'requirement'] as const;
+const KEYS = ['count', 'minComplexity', 'maxComplexity', 'type', 'seed', 'categories', 'tags', 'tagCount', 'minCost', 'maxCost', 'costAdjust', 'requirement'] as const;
 
 type View = 'generator' | 'values' | 'rate';
 
@@ -165,7 +171,8 @@ function viewFromHash(hash: string): View {
 type DataModel = {
   view: View,
   count: number,
-  complexity: string,
+  minComplexity: string,
+  maxComplexity: string,
   type: string,
   seedInput: string,
   categories: Array<EffectCategory>,
@@ -185,7 +192,8 @@ type DataModel = {
 function defaults() {
   return {
     count: ASSEMBLER_PREVIEW_LIMITS.DEFAULT_COUNT,
-    complexity: '',
+    minComplexity: '',
+    maxComplexity: '',
     type: '',
     seedInput: '',
     categories: [] as Array<EffectCategory>,
@@ -224,6 +232,9 @@ export default defineComponent({
     TAGS(): ReadonlyArray<string> {
       return ASSEMBLER_PREVIEW_TAGS;
     },
+    COMPLEXITIES(): ReadonlyArray<number> {
+      return Array.from({length: ASSEMBLER_PREVIEW_LIMITS.MAX_COMPLEXITY}, (_, i) => i + 1);
+    },
     INFO(): typeof EFFECT_CATEGORY_INFO {
       return EFFECT_CATEGORY_INFO;
     },
@@ -258,15 +269,9 @@ export default defineComponent({
     tagLabel(tag: string): string {
       return tag.charAt(0).toUpperCase() + tag.slice(1);
     },
-    complexityText(card: CardModel): string {
-      const info = card.assembled;
-      if (info === undefined) {
-        return '';
-      }
-      return info.score !== undefined ? `${this.$t('Complexity')} ${info.score}` : this.$t(this.complexityLabel(info.complexity));
-    },
-    complexityLabel(c: string): string {
-      return c === 'low' ? 'Low complexity' : c === 'mid' ? 'Mid complexity' : 'High complexity';
+    /** The chip's colour: green for simple cards, amber for a few parts, red for busy ones. */
+    band(complexity: number): string {
+      return complexity <= 1 ? 'simple' : complexity <= 4 ? 'some' : 'busy';
     },
     effectsOf(card: CardModel): Array<EffectCategory> {
       const all = (card.assembled?.breakdown ?? []).map((l) => l.category).filter((c): c is EffectCategory => c !== undefined);
@@ -280,7 +285,8 @@ export default defineComponent({
         }
       };
       set('count', String(this.count));
-      set('complexity', this.complexity);
+      set('minComplexity', this.minComplexity);
+      set('maxComplexity', this.maxComplexity);
       set('type', this.type);
       set('seed', seed !== undefined ? String(seed) : String(this.seedInput));
       set('categories', this.categories.join(','));
@@ -298,7 +304,9 @@ export default defineComponent({
       if (Number.isInteger(count) && count >= 1 && count <= ASSEMBLER_PREVIEW_LIMITS.MAX_COUNT) {
         this.count = count;
       }
-      this.complexity = get('complexity');
+      // complexity=N (older links) is an exact complexity.
+      this.minComplexity = get('minComplexity') || get('complexity');
+      this.maxComplexity = get('maxComplexity') || get('complexity');
       this.type = get('type');
       this.seedInput = get('seed');
       this.categories = get('categories').split(',').filter((c): c is EffectCategory => (EFFECT_CATEGORIES as ReadonlyArray<string>).includes(c));
@@ -532,7 +540,7 @@ fieldset.assembler-fieldset {
   color: #fff;
 }
 
-.assembler-complexity--low { background-color: #4a7a4a; }
-.assembler-complexity--mid { background-color: #9a7a24; }
-.assembler-complexity--high { background-color: #9a3a3a; }
+.assembler-complexity--simple { background-color: #4a7a4a; }
+.assembler-complexity--some { background-color: #9a7a24; }
+.assembler-complexity--busy { background-color: #9a3a3a; }
 </style>

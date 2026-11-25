@@ -1,19 +1,20 @@
 import {Resource} from '../../common/Resource';
+import {CardResource} from '../../common/CardResource';
 import {CardType} from '../../common/cards/CardType';
 import {Tag} from '../../common/cards/Tag';
 import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescriptor';
 import {CardDiscount} from '../../common/cards/Types';
 import {Units} from '../../common/Units';
 import {Behavior} from '../behavior/Behavior';
-import {AssemblerComplexity} from './AssembleSpec';
 import {EffectCategory} from '../../common/assembler/EffectCategory';
 
-export type {AssemblerComplexity} from './AssembleSpec';
-
-/** "When you play a card with `tag`, gain `gain`." */
+/** "When you play a card with `tag`, gain `gain`" (or draw cards, or add a resource to this card). */
 export type AssembledTrigger = {
   tag: Tag,
   gain: Partial<Units>,
+  drawCard?: number,
+  /** Add this many of the card's own resource (see `cardResource`) to it. */
+  addResource?: number,
 };
 
 /** One line of the card's price, for the tooltip and for tests. */
@@ -34,7 +35,11 @@ export interface AssembledCardDefinition {
   name: string;
   /** What players see on the card, e.g. "Modular Greenhouse". */
   title: string;
-  complexity: AssemblerComplexity;
+  /**
+   * 1 per benefit, effect or action, drawback and requirement, plus 1 per tag after the first.
+   * Games saved before this was a number say low / mid / high: see upgradeAssembledCard.
+   */
+  complexity: number;
   type: CardType.AUTOMATED | CardType.ACTIVE | CardType.EVENT;
   cost: number;
   tags: Array<Tag>;
@@ -44,17 +49,16 @@ export interface AssembledCardDefinition {
   action?: Behavior;
   cardDiscount?: Array<CardDiscount>;
   trigger?: AssembledTrigger;
+  /** The card collects this resource (animals, microbes, floaters), worth 1 VP per `vpPer`. */
+  cardResource?: {type: CardResource, vpPer?: number};
   /** On play: steal up to `count` of a standard resource from another player. */
   steal?: {resource: Resource, count: number};
   /** On play: discard this many cards from your hand. */
   discard?: number;
   /** On play: every opponent discards this many cards from their hand. */
   opponentsDiscard?: number;
-  /**
-   * 1 per benefit, effect or action, drawback and requirement, plus 1 per tag after the first.
-   * Not set on cards saved before it existed.
-   */
-  complexityScore?: number;
+  /** On play: one opponent you choose discards this many cards (they pick which). */
+  targetDiscard?: number;
   /** Text for the card's on-play part. */
   description: string;
   /** Effect / action texts, in the order they're drawn. */

@@ -9,6 +9,7 @@ import {AssembledCardDefinition} from './AssembledCardDefinition';
 import {renderAssembled} from './AssemblerRender';
 import {StealResources} from '../deferredActions/StealResources';
 import {DiscardCards} from '../deferredActions/DiscardCards';
+import {SelectPlayer} from '../inputs/SelectPlayer';
 
 function properties(def: AssembledCardDefinition): StaticCardProperties {
   return {
@@ -19,7 +20,8 @@ function properties(def: AssembledCardDefinition): StaticCardProperties {
     cost: def.cost,
     tags: def.tags,
     requirements: def.requirements,
-    victoryPoints: def.victoryPoints,
+    resourceType: def.cardResource?.type,
+    victoryPoints: def.cardResource?.vpPer !== undefined ? {resourcesHere: {}, per: def.cardResource.vpPer} : def.victoryPoints,
     behavior: def.behavior,
     action: def.action,
     cardDiscount: def.cardDiscount,
@@ -31,13 +33,21 @@ function properties(def: AssembledCardDefinition): StaticCardProperties {
   };
 }
 
-function onTrigger(def: AssembledCardDefinition, player: IPlayer, card: ICard) {
+function onTrigger(def: AssembledCardDefinition, self: ICard, player: IPlayer, card: ICard) {
   const trigger = def.trigger;
   if (trigger === undefined) {
     return undefined;
   }
   if (player.tags.cardTagCount(card, trigger.tag) > 0) {
-    player.stock.adjust(Units.of(trigger.gain), {log: true});
+    if (Object.keys(trigger.gain).length > 0) {
+      player.stock.adjust(Units.of(trigger.gain), {log: true});
+    }
+    if (trigger.drawCard !== undefined) {
+      player.drawCard(trigger.drawCard);
+    }
+    if (trigger.addResource !== undefined) {
+      player.addResourceTo(self, {qty: trigger.addResource, log: true});
+    }
   }
   return undefined;
 }
@@ -55,6 +65,16 @@ function onPlay(def: AssembledCardDefinition, player: IPlayer) {
       player.game.defer(new DiscardCards(opponent, def.opponentsDiscard, def.opponentsDiscard));
     }
   }
+  const n = def.targetDiscard;
+  if (n !== undefined) {
+    const targets = player.opponents.filter((p) => p.cardsInHand.length > 0);
+    if (targets.length > 0) {
+      player.defer(new SelectPlayer(targets, 'Select an opponent to discard a card', 'Discard').andThen((target) => {
+        player.game.defer(new DiscardCards(target, n, n));
+        return undefined;
+      }));
+    }
+  }
   return undefined;
 }
 
@@ -67,7 +87,7 @@ export class AssembledCard extends Card implements IProjectCard {
     return onPlay(this.definition, player);
   }
   public onCardPlayed(player: IPlayer, card: ICard) {
-    return onTrigger(this.definition, player, card);
+    return onTrigger(this.definition, this, player, card);
   }
 }
 
@@ -87,7 +107,7 @@ export class AssembledActionCard extends ActionCard implements IProjectCard {
     return onPlay(this.definition, player);
   }
   public onCardPlayed(player: IPlayer, card: ICard) {
-    return onTrigger(this.definition, player, card);
+    return onTrigger(this.definition, this, player, card);
   }
 }
 

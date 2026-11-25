@@ -10,7 +10,7 @@ const card: CardModel = {
   name: 'Assembled preview-7-1' as CardName,
   combinedDisplayName: 'Cooled Reactor',
   assembled: {
-    complexity: 'mid',
+    complexity: 3,
     value: 20,
     breakdown: [
       {text: 'Increase your energy production 2 steps.', value: 15, category: 'energy'},
@@ -54,7 +54,7 @@ describe('AssemblerWorkshop', () => {
     const wrapper = await mountReady();
     expect(requested).deep.eq(['api/assembler?count=6']);
     expect(wrapper.text()).contains('Seed 7');
-    expect(wrapper.find('.assembler-complexity--mid').exists()).is.true;
+    expect(wrapper.find('.assembler-complexity--some').text()).contains('3');
     expect(wrapper.find('.assembler-score').text()).contains('20');
     const effects = wrapper.findAll('.assembler-score-effects .assembler-chip').map((c) => c.text());
     expect(effects).deep.eq(['Energy', 'Cooling']);
@@ -70,9 +70,9 @@ describe('AssemblerWorkshop', () => {
   });
 
   it('opens a shared link with its options', async () => {
-    history.pushState({}, '', '/assembler?count=2&complexity=high&seed=99&categories=water');
+    history.pushState({}, '', '/assembler?count=2&minComplexity=5&seed=99&categories=water');
     await mountReady();
-    expect(requested).deep.eq(['api/assembler?count=2&complexity=high&seed=99&categories=water']);
+    expect(requested).deep.eq(['api/assembler?count=2&minComplexity=5&seed=99&categories=water']);
   });
 
   it('shows why no card could be made', async () => {

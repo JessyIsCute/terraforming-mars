@@ -1,6 +1,6 @@
 /**
  * Assembler demo: creates a solo game whose player holds 12 freshly assembled cards
- * (3 low, 3 mid, 3 high complexity, 3 with a guaranteed requirement) and saves it to the
+ * (complexity 1 to 8, plus 3 with a guaranteed requirement) and saves it to the
  * local database, so the real client can show them.
  *
  *   LOCAL_FS_DB=1 npx tsx src/server/tools/assembler_demo.ts [seed]
@@ -16,7 +16,6 @@ import {Game} from '../Game';
 import {Player} from '../Player';
 import {GameId, PlayerId, SpectatorId} from '../../common/Types';
 import {AssemblerExpansion} from '../assembler/AssemblerExpansion';
-import {AssemblerComplexity} from '../assembler/AssembledCardDefinition';
 import {estimateContentHeight} from '../assembler/AssemblerRender';
 import {AssembleSpec} from '../assembler/AssembleSpec';
 import {ASSEMBLER_CARD_MANIFEST} from '../cards/assembler/AssemblerCardManifest';
@@ -24,11 +23,10 @@ import {OPEN_SOURCE_BLUEPRINTS_DISCOUNT, OPEN_SOURCE_BLUEPRINTS_PRESET} from '..
 import {Tag} from '../../common/cards/Tag';
 import {IProjectCard} from '../cards/IProjectCard';
 
-const PLAN: Array<[AssemblerComplexity, boolean]> = [
-  ['low', false], ['low', false], ['low', false],
-  ['mid', false], ['mid', false], ['mid', false],
-  ['high', false], ['high', false], ['high', false],
-  ['mid', true], ['low', true], ['high', true],
+/** [complexity, guaranteed requirement] */
+const PLAN: Array<[number, boolean]> = [
+  [1, false], [1, false], [2, false], [3, false], [4, false], [5, false], [6, false], [8, false],
+  [3, true], [2, true], [5, true], [7, true],
 ];
 
 /** One card from each preset the printed cards use, labelled for the console. */
@@ -38,8 +36,8 @@ const PACK_PRESETS: Array<[string, AssembleSpec]> = [
   ['Open Source Blueprints: theirs', OPEN_SOURCE_BLUEPRINTS_PRESET],
   ['Quad-Core Chassis: 4 tags', {tagCount: 4}],
   ['Specialized Fabricator: jovian', {tags: [Tag.JOVIAN]}],
-  ['Venture Prototype: high', {complexity: 'high'}],
-  ['Bargain Bin: simple, <= 8', {complexity: 'low', maxCost: 8}],
+  ['Venture Prototype: high', {minComplexity: 5}],
+  ['Bargain Bin: simple, <= 8', {maxComplexity: 1, maxCost: 8}],
 ];
 
 async function main() {
@@ -77,7 +75,7 @@ async function main() {
     }
   } else {
     for (const [complexity, forceRequirement] of PLAN) {
-      const {card} = AssemblerExpansion.create(game, {complexity, forceRequirement});
+      const {card} = AssemblerExpansion.create(game, {minComplexity: complexity, maxComplexity: complexity, forceRequirement});
       player.cardsInHand.push(card);
     }
   }
@@ -97,7 +95,7 @@ async function main() {
       continue; // seeded into the deck at setup, not in hand
     }
     const label = labels.get(def.name) ?? '';
-    console.log(`  ${def.complexity.padEnd(4)} ${String(def.cost).padStart(2)} M€  ${def.title} [${def.tags.join(', ')}]  ${label}  (${def.name}, est. height ${estimateContentHeight(def)}px)`);
+    console.log(`  ${String(def.complexity).padStart(2)} ${String(def.cost).padStart(2)} M€  ${def.title} [${def.tags.join(', ')}]  ${label}  (${def.name}, est. height ${estimateContentHeight(def)}px)`);
   }
   console.log(`Open: http://localhost:8080/player?id=${player.id}`);
 }

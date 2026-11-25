@@ -12,7 +12,7 @@ export class BargainBin extends Card implements IProjectCard {
       cost: 2,
 
       behavior: {
-        assemble: {count: 1, into: 'hand', preset: {complexity: 'low', maxCost: 8}},
+        assemble: {count: 1, into: 'hand', preset: {maxComplexity: 1, maxCost: 8}},
         stock: {megacredits: 2},
       },
 

@@ -63,8 +63,8 @@ describe('Assembler card pack', () => {
     const myDef = definitionOf(mine);
     const theirDef = definitionOf(theirs);
 
-    // Several benefits, no effects or drawbacks: too busy to read as low complexity.
-    expect(theirDef.complexity).not.eq('low');
+    // Several benefits, no effects or drawbacks: more than complexity 1.
+    expect(theirDef.complexity).gt(1);
     expect(theirDef.effectTexts).is.empty;
     expect(theirDef.cost).is.within(28, 32);
     expect(theirDef.costAdjust).is.undefined;
@@ -124,11 +124,11 @@ describe('Assembler card pack', () => {
     expect(assembledInHand(player)).has.length(1);
   });
 
-  it('Venture Prototype: a high-complexity card and 1 titanium', () => {
+  it('Venture Prototype: a card of complexity 5 or more and 1 titanium', () => {
     player.playCard(new VenturePrototype());
     runAllActions(game);
     const [assembled] = assembledInHand(player);
-    expect(definitionOf(assembled).complexity).eq('high');
+    expect(definitionOf(assembled).complexity).gte(5);
     expect(player.titanium).eq(1);
   });
 
@@ -161,7 +161,7 @@ describe('Assembler card pack', () => {
     runAllActions(game);
     const [assembled] = assembledInHand(player);
     const def = definitionOf(assembled);
-    expect(def.complexity).eq('low');
+    expect(def.complexity).eq(1);
     expect(def.cost).is.at.most(8);
     expect(player.megaCredits).eq(2);
   });

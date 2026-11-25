@@ -9,7 +9,7 @@ function vote(verdict: Verdict, parts: Array<[EffectCategory | 'tags', number]>)
   const breakdown = parts.map(([g, value]) => g === 'tags' ? {text: 'Tags: space', value} : {text: g, value, category: g});
   const value = breakdown.reduce((s, l) => s + l.value, 0);
   n++;
-  return {card: `Assembled preview-1-${n}`, title: 'Card', cost: Math.round(value - 3), verdict, assembled: {complexity: 'low', value, breakdown}, at: n};
+  return {card: `Assembled preview-1-${n}`, title: 'Card', cost: Math.round(value - 3), verdict, assembled: {complexity: 1, value, breakdown}, at: n};
 }
 
 describe('AssemblerVoteFit', () => {

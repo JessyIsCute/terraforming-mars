@@ -14,7 +14,7 @@ export class VenturePrototype extends Card implements IProjectCard {
       cost: 6,
 
       behavior: {
-        assemble: {count: 1, into: 'hand', preset: {complexity: 'high'}},
+        assemble: {count: 1, into: 'hand', preset: {minComplexity: 5}},
         stock: {titanium: 1},
       },
 
@@ -23,7 +23,7 @@ export class VenturePrototype extends Card implements IProjectCard {
         renderData: CardRenderer.builder((b) => {
           b.assemble(1).text('high').asterix().nbsp.titanium(1);
         }),
-        description: 'Assemble a new high-complexity card into your hand. Gain 1 titanium.',
+        description: 'Assemble a new card of complexity 5 or more into your hand. Gain 1 titanium.',
       },
     });
   }

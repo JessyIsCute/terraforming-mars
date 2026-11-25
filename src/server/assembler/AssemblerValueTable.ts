@@ -6,8 +6,8 @@ import {CardName} from '../../common/cards/CardName';
 import {IProjectCard} from '../cards/IProjectCard';
 import {OPEN_SOURCE_BLUEPRINTS_DISCOUNT, OPEN_SOURCE_BLUEPRINTS_PRESET} from '../cards/assembler/OpenSourceBlueprints';
 import * as V from './AssemblerValues';
-import {COMPLEXITY_SCORE, PROFILE} from './AssemblerGenerator';
-import {CATEGORY_WORDS, MAJOR_VALUE} from './AssemblerNames';
+import {COMPLEXITY_WEIGHTS, profileOf} from './AssemblerGenerator';
+import {CATEGORY_WORDS, MAJOR_VALUE, ENDING_FROM} from './AssemblerNames';
 import {AssembleSpec} from './AssembleSpec';
 
 /** "8.5", "11", "−2.5": one decimal at most, a real minus sign. */
@@ -42,8 +42,14 @@ const TAG_ORDER: Array<Tag> = [Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, 
 /** The preset each printed Assembler card uses, in words. */
 export function describeSpec(spec: AssembleSpec): string {
   const parts: Array<string> = [];
-  if (spec.complexity !== undefined) {
-    parts.push(`${spec.complexity} complexity`);
+  const lo = spec.minComplexity;
+  const hi = spec.maxComplexity;
+  if (lo !== undefined && hi !== undefined) {
+    parts.push(lo === hi ? `complexity ${lo}` : `complexity ${lo}–${hi}`);
+  } else if (lo !== undefined) {
+    parts.push(`complexity ${lo} or more`);
+  } else if (hi !== undefined) {
+    parts.push(hi === 1 ? 'complexity 1' : `complexity ${hi} or less`);
   }
   if (spec.tags !== undefined && spec.tags.length > 0) {
     parts.push(`at least 1 ${spec.tags.join(' and ')} tag`);
@@ -76,8 +82,8 @@ const PRESETS: Partial<Record<CardName, string>> = {
   [CardName.OPEN_SOURCE_BLUEPRINTS]: `${describeSpec(OPEN_SOURCE_BLUEPRINTS_PRESET)}; yours ${num(-OPEN_SOURCE_BLUEPRINTS_DISCOUNT)} M€`,
   [CardName.QUAD_CORE_CHASSIS]: describeSpec({tagCount: 4}),
   [CardName.SPECIALIZED_FABRICATOR]: 'Has your most common tag',
-  [CardName.VENTURE_PROTOTYPE]: describeSpec({complexity: 'high'}),
-  [CardName.BARGAIN_BIN]: describeSpec({complexity: 'low', maxCost: 8}),
+  [CardName.VENTURE_PROTOTYPE]: describeSpec({minComplexity: 5}),
+  [CardName.BARGAIN_BIN]: describeSpec({maxComplexity: 1, maxCost: 8}),
 };
 
 /** Effect and action texts live in the card's picture, not its description; spelled out here. */
@@ -123,7 +129,11 @@ export function buildValueTable(): AssemblerValueTableModel {
     ['Decrease any production 1 step', `${pct(V.DECREASE_ANY_FACTOR)} of the step's value (M€ ${num(V.DECREASE_ANY_FACTOR * V.PRODUCTION_VALUE.megacredits)}, titanium ${num(V.DECREASE_ANY_FACTOR * V.PRODUCTION_VALUE.titanium)})`, 'Cooling / Blight / Debt / Drain / Rust'],
     ['Steal 1 resource from another player', `${num(V.STEAL_FACTOR)} × its stock value`, 'Theft'],
     ['Discard a card from your hand', num(-V.DISCARD_VALUE), 'Forgetting'],
-    ['Every opponent discards a card', num(V.OPPONENT_DISCARD_VALUE), 'Espionage'],
+    ['Each opponent chooses a card to discard', num(V.OPPONENT_DISCARD_VALUE), 'Espionage'],
+    ['An opponent of your choice chooses a card to discard', num(V.TARGET_DISCARD_VALUE), 'Espionage'],
+    ['Add 1 animal to another card', num(V.CARD_RESOURCE_VALUE.animal), 'Fauna'],
+    ['Add 1 microbe to another card', num(V.CARD_RESOURCE_VALUE.microbe), 'Microbes'],
+    ['Add 1 floater to another card', num(V.CARD_RESOURCE_VALUE.floater), 'Floaters'],
   ]));
 
   sections.push(section('Effects and actions', ['What', 'How it\'s valued', 'Example'], [false, false, false], [
@@ -137,6 +147,14 @@ export function buildValueTable(): AssemblerValueTableModel {
       `2 M€ on science: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SCIENCE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.FOCUS_FACTOR)}`],
     ['When you play a tag, gain', `Gain × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
       `2 M€ per space tag: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SPACE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SPACE] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['When you play a tag, draw a card', `${num(V.DRAW_CARD_VALUE)} × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
+      `Science: ${num(V.DRAW_CARD_VALUE * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['Action: add 1 animal / microbe / floater here', `${num(V.VP_VALUE)} ÷ resources per VP × ${V.COLLECTOR_USES} uses`,
+      `1 VP per 2 animals: ${num(V.VP_VALUE / 2 * V.COLLECTOR_USES)}`],
+    ['When you play a tag, add 1 resource here', `${num(V.VP_VALUE)} ÷ resources per VP × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
+      `Microbe per plant tag, 1 VP per 3: ${num(V.VP_VALUE / 3 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.PLANT] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['Production per X tags (Growth)', `Step value ÷ X × ${V.TAGS_IN_PLAY} cards in play × tag share (+1 tag if the card has it)`,
+      `1 M€ per 2 building tags: ${num(V.PRODUCTION_VALUE.megacredits / 2 * V.TAGS_IN_PLAY * (V.TAG_SHARE[Tag.BUILDING] ?? 0))}`],
     ['Cards cost 1 M€ more (drawback)', `−${V.CARDS_PLAYED_AFTER} (× tag share for one tag)`, `Science tags: ${num(-V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0))}`],
   ]));
 
@@ -157,12 +175,13 @@ export function buildValueTable(): AssemblerValueTableModel {
     ...tagRequirementRows,
   ], 'A requirement makes a card harder to play, so it lowers the value. Tag requirements grow faster than the count.'));
 
-  sections.push(section('Complexity', ['Complexity', 'Slots', 'Effect chance', 'Drawbacks', 'Tags', 'Requirement chance'], [false, true, true, true, true, true],
-    (['low', 'mid', 'high'] as const).map((c) => {
-      const p = PROFILE[c];
-      return [c.charAt(0).toUpperCase() + c.slice(1), range(p.slots), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance)];
+  const weightTotal = COMPLEXITY_WEIGHTS.reduce((s, [, w]) => s + w, 0);
+  sections.push(section('Complexity', ['Complexity', 'How often', 'Effect chance', 'Drawbacks', 'Tags', 'Requirement chance', 'Bold chance'], [true, true, true, true, true, true, true],
+    COMPLEXITY_WEIGHTS.map(([c, w]) => {
+      const p = profileOf(c);
+      return [String(c), pct(w / weightTotal), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance), pct(p.boldChance)];
     }),
-    `Every benefit, effect or action, drawback and requirement takes a slot. A card's complexity score is 1 per slot plus 1 per tag after the first; the card shows that score. Low cards score ${COMPLEXITY_SCORE.low}, mid up to ${COMPLEXITY_SCORE.mid}, high more. Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest. ${pct(V.BOLD_CHANCE)} of mid and high cards are bold: one big benefit (up to 2-3 times the usual amount) paid for by one big drawback. A card that ends up busier than asked for shows the higher complexity.`));
+    'A card\'s complexity is 1 per benefit, effect or action, drawback and requirement, plus 1 per tag after the first. The generator picks a complexity (from the asked range, or by "How often") and builds the card to match: tags and the requirement first, then a bold pair (one big benefit, up to 2-3 times the usual amount, paid for by one big drawback), an effect and drawbacks if they fit, and benefits for the rest. A preset that forces something (guaranteed effects, tags, a minimum cost) can make a card busier than asked for.'));
 
   sections.push(section('Effect categories and names', ['Category', 'Kind', 'What counts', 'Nouns', 'Adjectives (small / big)', 'Endings'], [false, false, false, false, false, false],
     EFFECT_CATEGORIES.map((c) => {
@@ -177,7 +196,7 @@ export function buildValueTable(): AssemblerValueTableModel {
         w.endings.join(', '),
       ];
     }),
-    'The strongest benefit names the thing, the next effect (a drawback first) describes it, and high-complexity cards add an ending: "Cooled Reactor of Insight".'));
+    `The strongest benefit names the thing, the next effect (a drawback first) describes it, and cards of complexity ${ENDING_FROM} or more add an ending: "Cooled Reactor of Insight".`));
 
   const printed: Array<IProjectCard> = Object.values(ASSEMBLER_CARD_MANIFEST.projectCards).map((spec) => new spec.Factory());
   sections.push(section('Printed Assembler cards and their presets', ['Card', 'Cost', 'What it does', 'Preset'], [false, true, false, false],

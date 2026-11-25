@@ -69,10 +69,7 @@ export default defineComponent({
   },
   computed: {
     complexityLabel(): string {
-      if (this.info.score !== undefined) {
-        return `${this.$t('Complexity')} ${this.info.score}`;
-      }
-      return {low: 'Low complexity', mid: 'Mid complexity', high: 'High complexity'}[this.info.complexity];
+      return `${this.$t('Complexity')} ${this.info.complexity}`;
     },
     pricedCost(): number {
       return Math.round(this.info.value - 3);

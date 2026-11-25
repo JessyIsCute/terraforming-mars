@@ -2,13 +2,10 @@ import {IGame} from '../IGame';
 import {IPlayer} from '../IPlayer';
 import {IProjectCard} from '../cards/IProjectCard';
 import {AssembledCardDefinition} from './AssembledCardDefinition';
-import {AssembleSpec, AssemblerComplexity} from './AssembleSpec';
+import {AssembleSpec} from './AssembleSpec';
 import {AssemblerGenerator} from './AssemblerGenerator';
 import {assembledCardName, registerAssembledCard} from './AssembledCardRegistry';
 import {newAssembledCard} from './AssembledCard';
-import {Random} from '../../common/utils/Random';
-
-const COMPLEXITY_WEIGHTS: Array<[AssemblerComplexity, number]> = [['low', 4], ['mid', 4], ['high', 2]];
 
 export class AssemblerExpansion {
   private constructor() {}
@@ -20,9 +17,8 @@ export class AssemblerExpansion {
    */
   public static create(game: IGame, spec: AssembleSpec = {}): {definition: AssembledCardDefinition, card: IProjectCard} {
     const generator = new AssemblerGenerator(game.rng);
-    const chosen = spec.complexity ?? AssemblerExpansion.pickComplexity(game.rng);
     const name = assembledCardName(game.id, game.assembledCards.length + 1);
-    const definition = generator.generate(name, chosen, spec);
+    const definition = generator.generate(name, spec);
     game.assembledCards.push(definition);
     registerAssembledCard(definition);
     return {definition, card: newAssembledCard(definition)};
@@ -61,18 +57,5 @@ export class AssemblerExpansion {
   /** Game setup with the expansion on: shuffle SETUP_CARDS new cards into the project deck. */
   public static setup(game: IGame): void {
     AssemblerExpansion.assemble(game, AssemblerExpansion.SETUP_CARDS);
-  }
-
-  /** A random complexity: more low and mid than high. */
-  public static pickComplexity(rng: Random): AssemblerComplexity {
-    const total = COMPLEXITY_WEIGHTS.reduce((s, [, w]) => s + w, 0);
-    let r = rng.next() * total;
-    for (const [c, w] of COMPLEXITY_WEIGHTS) {
-      r -= w;
-      if (r < 0) {
-        return c;
-      }
-    }
-    return 'mid';
   }
 }

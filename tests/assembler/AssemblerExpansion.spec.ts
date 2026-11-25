@@ -7,7 +7,7 @@ import {IGame} from '../../src/server/IGame';
 import {AssembledCardDefinition} from '../../src/server/assembler/AssembledCardDefinition';
 import {AssemblerExpansion} from '../../src/server/assembler/AssemblerExpansion';
 import {newAssembledCard} from '../../src/server/assembler/AssembledCard';
-import {getAssembledCardDefinition, registerAssembledCard, unregisterAssembledCards} from '../../src/server/assembler/AssembledCardRegistry';
+import {getAssembledCardDefinition, registerAssembledCard, unregisterAssembledCards, upgradeAssembledCard} from '../../src/server/assembler/AssembledCardRegistry';
 import {getBehaviorExecutor} from '../../src/server/behavior/BehaviorExecutor';
 import {newProjectCard} from '../../src/server/createCard';
 import {cardsToModel} from '../../src/server/models/ModelUtils';
@@ -25,7 +25,7 @@ function definition(overrides: Partial<AssembledCardDefinition>): AssembledCardD
   const def: AssembledCardDefinition = {
     name: `Assembled unit-test-${serial}`,
     title: 'Test Contraption',
-    complexity: 'low',
+    complexity: 1,
     type: CardType.AUTOMATED,
     cost: 5,
     tags: [Tag.BUILDING],
@@ -175,5 +175,19 @@ describe('AssemblerExpansion', () => {
   it('createCard finds registered assembled cards by name', () => {
     const def = definition({});
     expect(newProjectCard(def.name as CardName)?.name).eq(def.name);
+  });
+});
+
+describe('AssembledCardRegistry: old saves', () => {
+  it('turns low / mid / high complexity into a number', () => {
+    const old = (complexity: string, complexityScore?: number) =>
+      ({...definition({}), complexity, ...(complexityScore !== undefined ? {complexityScore} : {})}) as unknown as AssembledCardDefinition;
+    expect(upgradeAssembledCard(old('high')).complexity).eq(5);
+    expect(upgradeAssembledCard(old('low')).complexity).eq(1);
+    const scored = upgradeAssembledCard(old('mid', 4));
+    expect(scored.complexity).eq(4);
+    expect(scored).not.have.property('complexityScore');
+    const current = definition({complexity: 3});
+    expect(upgradeAssembledCard(current)).eq(current);
   });
 });

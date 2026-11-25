@@ -39,8 +39,8 @@ export const DRAW_CARD_VALUE = 3;
 export const GLOBAL_STEP_VALUE = {temperature: 8.5, oxygen: 8.5, venus: 9} as const;
 export const OCEAN_VALUE = 11;
 export const GREENERY_VALUE = 14;
-/** Fitted to official cards (11 cards). */
-export const CITY_VALUE = 8.8;
+/** Fitted to official cards (11 cards): 8.8, raised 1.5 because placing a city felt underpriced. */
+export const CITY_VALUE = 10.3;
 
 /**
  * Value of having the tag: base 0.5 + synergy with the official card pool. Paying with steel or
@@ -105,8 +105,23 @@ export const DECREASE_ANY_FACTOR = 0.4;
 export const STEAL_FACTOR = 1;
 /** Discarding a card from your hand (you pick your worst). */
 export const DISCARD_VALUE = 2;
-/** Every opponent discards a card. */
+/** Every opponent chooses a card to discard. */
 export const OPPONENT_DISCARD_VALUE = 1.5;
+/** One opponent of your choice chooses a card to discard. */
+export const TARGET_DISCARD_VALUE = 1;
+
+/**
+ * Cards that collect animals, microbes or floaters: how many they gather over the game from a
+ * "add 1 to this card" action (they're played early and used every generation).
+ */
+export const COLLECTOR_USES = 5;
+/**
+ * One resource added to another card. Worth less than its VP share alone: you need a card that
+ * holds it. Animals are mostly 1 VP each; microbes and floaters are often 1 VP per 2-3 or spent.
+ */
+export const CARD_RESOURCE_VALUE = {animal: 2, microbe: 1, floater: 1.3} as const;
+/** How many cards you have in play, on average, when you play a "per tag" card. */
+export const TAGS_IN_PLAY = 10;
 
 /** Mid and high cards: the chance of one big benefit paired with one big drawback. */
 export const BOLD_CHANCE = 0.3;

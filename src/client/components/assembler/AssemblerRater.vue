@@ -15,9 +15,7 @@
         <span v-i18n>Complexity</span>
         <select v-model="complexity" @change="restart">
           <option value="">{{ $t('Random') }}</option>
-          <option value="low">{{ $t('Low') }}</option>
-          <option value="mid">{{ $t('Mid') }}</option>
-          <option value="high">{{ $t('High') }}</option>
+          <option v-for="n in 8" :key="n" :value="String(n)">{{ n }}</option>
         </select>
       </label>
       <label class="rater-option" :title="$t('Some prices are moved on purpose. If you call those wrong too, the votes can be trusted.')">

@@ -52,7 +52,7 @@ within 2 M€.
 | Venus step | 9 | |
 | Ocean tile | 11 | TR plus about 2 M€ of placement bonus |
 | Greenery tile | 14 | raises oxygen and gives 1 VP at the end |
-| City tile | 8.8 | fitted to official cards (11 cards; was 8). The city tag is priced separately |
+| City tile | 10.3 | fitted to official cards at 8.8 (11 cards), raised 1.5 because it felt underpriced. The city tag is priced separately |
 | Special tile (Nuclear Zone, Mohole Area…) | 2.5 | the real value is usually the effect or VP printed with it |
 
 ## Tags
@@ -208,8 +208,23 @@ Most negatives are the same formulas with a minus sign, so costs stay consistent
 | Remove up to X plants from any player | +0.3 per plant | good for you, but barely |
 | Lower any player's production 1 step | +40% of that step's value | good for you; 1-3 steps of any resource (steel/titanium is **Rust**) |
 | Steal X resources from another player | +1 × stock value × X | **Theft** |
-| Every opponent discards a card | +1.5 | **Espionage** |
+| Each opponent chooses a card to discard | +1.5 | **Espionage** |
+| An opponent of your choice chooses a card to discard | +1 | **Espionage** |
 | Discard X cards from your hand | −2 × X | **Forgetting** |
+
+### Card resources, growth and more triggers
+
+| Part | Value | Category |
+|---|---:|---|
+| Add 1 animal / microbe / floater to another card | 2 / 1 / 1.3 | Fauna / Microbes / Floaters |
+| Action: add 1 resource to this card (1 VP per X) | 3.3 ÷ X × 5 uses | same |
+| When you play a tag, add 1 resource here | 3.3 ÷ X × 8 × tag share × 2 | same |
+| When you play a tag, draw a card | 3 × 8 × tag share × 2 | Knowledge |
+| When you play a tag, gain titanium / energy | as other tag triggers | Synergy |
+| Production 1 step per X tags you have | step ÷ X × 10 × tag share (+1 tag if on the card) | Growth |
+
+Animals score 1 VP per 1-2, microbes per 3-4, floaters per 2-3. A collector card scores VP only from
+its resources. Common tags (building, space) count per 2.
 
 ### Complexity score and bold cards
 

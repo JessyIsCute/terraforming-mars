@@ -16,6 +16,8 @@ export const EFFECT_CATEGORIES = [
   'efficiency', 'synergy',
   'rust', 'theft',
   'espionage', 'forgetting',
+  'fauna', 'microbes',
+  'floaters', 'growth',
 ] as const;
 
 export type EffectCategory = typeof EFFECT_CATEGORIES[number];
@@ -49,6 +51,10 @@ export const EFFECT_CATEGORY_INFO: Record<EffectCategory, EffectCategoryInfo> = 
   theft: {label: 'Theft', description: 'Steal resources from another player.', bane: false},
   espionage: {label: 'Espionage', description: 'Make your opponents discard cards.', bane: false},
   forgetting: {label: 'Forgetting', description: 'Discard cards from your hand.', bane: true},
+  fauna: {label: 'Fauna', description: 'Animals: collect them on the card for VP, or add them to another card.', bane: false},
+  microbes: {label: 'Microbes', description: 'Microbes: collect them on the card for VP, or add them to another card.', bane: false},
+  floaters: {label: 'Floaters', description: 'Floaters: collect them on the card for VP, or add them to another card.', bane: false},
+  growth: {label: 'Growth', description: 'Production that grows with how many of a tag you have.', bane: false},
 };
 
 export function isEffectCategory(s: string): s is EffectCategory {

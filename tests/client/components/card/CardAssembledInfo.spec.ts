@@ -5,7 +5,7 @@ import CardAssembledInfo from '@/client/components/card/CardAssembledInfo.vue';
 import {AssembledCardInfo} from '@/common/models/CardModel';
 
 const info: AssembledCardInfo = {
-  complexity: 'mid',
+  complexity: 3,
   value: 15,
   breakdown: [
     {text: 'Increase your plant production 1 step', value: 8},
@@ -29,7 +29,7 @@ describe('CardAssembledInfo', () => {
     const text = popup!.textContent ?? '';
     expect(text).contains('Increase your plant production 1 step');
     expect(text).contains('+8');
-    expect(text).contains('Mid complexity');
+    expect(text).contains('Complexity 3');
     expect(text).contains('12'); // cost = value - 3
     expect(text).contains('−10');
     const lastRow = popup!.querySelector('tr:last-child')!.textContent ?? '';
