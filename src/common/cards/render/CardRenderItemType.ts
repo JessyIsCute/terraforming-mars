@@ -80,6 +80,9 @@ export const CardRenderItemType = {
 
   // Conglomerates
   COORDINATION: 'coordination',
+
+  // Assembler
+  ASSEMBLE: 'assemble',
 } as const;
 
 export type CardRenderItemType = typeof CardRenderItemType[keyof typeof CardRenderItemType];

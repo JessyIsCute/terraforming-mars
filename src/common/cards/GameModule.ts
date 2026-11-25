@@ -26,6 +26,7 @@ export const EXPANSIONS = [
   'industries',
   'highOrbit',
   'solaris',
+  'assembler',
 ] as const;
 
 export const GAME_MODULES = [
@@ -65,6 +66,7 @@ export const MODULE_NAMES = {
   industries: 'Industries',
   highOrbit: 'High Orbit',
   solaris: 'Solaris',
+  assembler: 'Assembler',
 } satisfies Record<GameModule, string>;
 
 export const DEFAULT_EXPANSIONS = {
@@ -95,4 +97,5 @@ export const DEFAULT_EXPANSIONS = {
   industries: false,
   highOrbit: false,
   solaris: false,
+  assembler: false,
 } satisfies Record<Expansion, boolean>;

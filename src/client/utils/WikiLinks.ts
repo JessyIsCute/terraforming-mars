@@ -35,6 +35,7 @@ export const RULEBOOK_URLS: Record<GameModule, string> = {
   industries: `${FORK_WIKI}/Industries`,
   highOrbit: `${FORK_WIKI}/High-Orbit`,
   solaris: `${FORK_WIKI}/Solaris`,
+  assembler: `${FORK_WIKI}/Assembler`,
 };
 
 export const WIKI_URLS = {

@@ -1571,4 +1571,20 @@ export enum CardName {
   WISH_MACHINE = 'Wish Machine',
   MANAGEMENT_CRISIS = 'Management Crisis',
   ENERGY_ACQUISITION = 'Energy Acquisition',
+
+  // Assembler (fan). Cards it generates during a game are not listed here; see src/server/assembler/.
+  ASSEMBLY_LINE = 'Assembly Line',
+  PROTOTYPE_WORKSHOP = 'Prototype Workshop',
+  SALVAGE_YARD = 'Salvage Yard',
+  MODULAR_FACTORY = 'Modular Factory',
+  RESEARCH_PROTOTYPE = 'Research Prototype',
+  OPEN_SOURCE_BLUEPRINTS = 'Open Source Blueprints',
+  QUAD_CORE_CHASSIS = 'Quad-Core Chassis',
+  ASSEMBLY_ROBOTS = 'Assembly Robots',
+  REVERSE_ENGINEERING = 'Reverse Engineering',
+  SPECIALIZED_FABRICATOR = 'Specialized Fabricator',
+  VENTURE_PROTOTYPE = 'Venture Prototype',
+  PRODUCTION_RUN = 'Production Run',
+  HALL_OF_PROTOTYPES = 'Hall of Prototypes',
+  BARGAIN_BIN = 'Bargain Bin',
 }

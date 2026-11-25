@@ -1,5 +1,6 @@
 import {AssembledCardDefinition} from './assembler/AssembledCardDefinition';
 import {registerAssembledCard} from './assembler/AssembledCardRegistry';
+import {AssemblerExpansion} from './assembler/AssemblerExpansion';
 import * as constants from '../common/constants';
 import {BeginnerCorporation} from './cards/corporation/BeginnerCorporation';
 import {Board} from './boards/Board';
@@ -333,6 +334,7 @@ export class Game implements IGame, Logger {
         industries: partialOptions.industriesExpansion ?? false,
         highOrbit: partialOptions.highOrbitExpansion ?? false,
         solaris: partialOptions.solarisExpansion ?? false,
+        assembler: partialOptions.assemblerExpansion ?? false,
       };
     }
     const gameOptions = {...DEFAULT_GAME_OPTIONS, ...partialOptions};
@@ -388,6 +390,10 @@ export class Game implements IGame, Logger {
     const game = new Game(id, name, players, firstPlayer, activePlayer, spectatorId, gameOptions, rng, board, projectDeck, corporationDeck, preludeDeck, ceoDeck, Array.from(tags));
     // This evaluation of created time doesn't match what's stored in the database, but that's fine.
     game.createdTime = new Date();
+    // Assembler (fan): seed the deck with generated cards before anyone is dealt a hand.
+    if (gameOptions.assemblerExpansion) {
+      AssemblerExpansion.setup(game);
+    }
     // Initialize Ares data
     if (gameOptions.aresExtension) {
       game.aresData = AresSetup.initialData(gameOptions.aresHazards, players);

@@ -87,6 +87,7 @@ describe('ApiGame', () => {
             'robAntilles': false,
             'sillyfication': false,
             'solaris': false,
+            'assembler': false,
             'starwars': false,
             'turmoil': false,
             'underworld': false,

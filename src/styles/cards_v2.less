@@ -1905,6 +1905,33 @@
     }
   }
 
+  // Assembler: CSS-only, same bevelled-square token as Coordination above, in copper with a gear.
+  .card-resource-assemble {
+    background: linear-gradient(to bottom, #c8742c 50%, #7a3e10 50%);
+    border: 1px solid black;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      background: linear-gradient(to bottom, #e8954a 50%, #9a5220 50%);
+      z-index: 0;
+    }
+
+    &::before {
+      content: "⚙️";
+      position: relative;
+      z-index: 1;
+      top: -2px;
+      font-size: 18px;
+      line-height: 28px;
+    }
+  }
+
   .card-neutral-delegate {
     .card-delegate();
     background-image: url(./assets/underworld/neutral-delegate.png) !important;

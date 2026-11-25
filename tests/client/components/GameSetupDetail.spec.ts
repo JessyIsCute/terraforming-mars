@@ -36,6 +36,7 @@ const EXPANSION_ICON_CLASSES: Record<Expansion, string> = {
   industries: 'industries',
   highOrbit: 'highOrbit',
   solaris: 'solaris',
+  assembler: 'assembler',
 };
 
 describe('GameSetupDetail', () => {

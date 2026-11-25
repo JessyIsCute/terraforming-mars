@@ -58,16 +58,50 @@ reload, which happens after every move. So:
 - Assemble → serialize → deserialize: assembled cards in hand and deck survive.
 - Playing an assembled card runs its behavior; its action is usable; its discount applies.
 
-### Phase 2 — the expansion
-- `GameModule` / `Expansion` entry `assembler`, a game option, and a checkbox on the create-game
-  screen (`src/client/components/create/`).
-- `AssemblerCardManifest` with a handful of printed cards that use the keyword, e.g.
-  - **Assembly Line** — Action: spend 4 M€ to Assemble 1.
-  - **Prototype Workshop** — Assemble 2. Gain 1 steel.
-  - **Salvage Yard** — Effect: when you play an assembled card, gain 2 M€.
-- Optional setup seeding.
-- The card name enum: assembled cards are not in `CardName` (cast like `DataDrivenCard` does). The
-  printed Assembler cards do get normal enum entries.
+### Phase 2 — the expansion (done)
+- Module `assembler`, game option `assemblerExpansion`, a checkbox on the create-game screen, a
+  badge in the game-setup details, a gear (⚙️) expansion icon, and the card list filter letter `A`.
+- **Assemble into your hand.** Assembling only into the deck helps every player, so a card that
+  pays for it would be a bad buy. The keyword has two forms:
+  - `assemble: 3` shuffles 3 new cards into the project deck (any player can draw them);
+  - `assemble: {count: 1, into: 'hand'}` puts the new card straight into your hand.
+- **The Assemble icon**: a copper token with a gear (`CardRenderer` `.assemble(n)`, CSS only, no art).
+- **Setup seeding**: with the expansion on, 12 assembled cards are shuffled into the deck at game
+  start, before hands are dealt (`AssemblerExpansion.SETUP_CARDS`).
+- **Printed cards** (`src/server/cards/assembler/`), priced with the value table (an assembled card
+  in hand ≈ drawing a card, 3):
+
+  | # | Card | Cost | Tags | Text |
+  |---|---|---:|---|---|
+  | AS01 | Assembly Line | 8 | building | Action: spend 1 M€ to Assemble a card into your hand. |
+  | AS02 | Prototype Workshop | 9 | science, building | Assemble 2 cards into your hand. Gain 1 steel. |
+  | AS03 | Salvage Yard | 7 | building | Effect: when you play an assembled card, gain 2 M€. Assemble 3 cards into the deck. |
+  | AS04 | Modular Factory | 13 | building | +1 steel production. Assemble a card into your hand. 1 VP. |
+
+- **Presets** (`AssembleSpec`): any Assemble can constrain the card it makes: `complexity`,
+  required `tags`, an exact `tagCount`, a `minCost`/`maxCost` range (a card worth too little gets
+  extra good parts, so even a low-complexity card can reach ~30 M€), and `costAdjust` (e.g. -10)
+  applied after pricing and recorded on the card. Presets that ask for tags never make events (so
+  the tags stay in play), and no card with 4+ tags is an event (the client would collapse 5 tag
+  icons into one).
+- **Card pack** (AS05–AS14), built on presets. See `card-pack.jpg` and, for one card each preset
+  made, `card-pack-presets.jpg`:
+
+  | # | Card | Cost | Tags | Text |
+  |---|---|---:|---|---|
+  | AS05 | Research Prototype | 3 | science (event) | Assemble a card with at least 1 science tag into your hand, then discard a card. |
+  | AS06 | Open Source Blueprints | 8 | earth (event) | Every player Assembles a simple card costing ~30 M€ into their hand. Yours costs 10 M€ less. |
+  | AS07 | Quad-Core Chassis | 5 | building | Assemble a card with exactly 4 tags into your hand. |
+  | AS08 | Assembly Robots | 10 | science, building | Effect: assembled cards cost you 2 M€ less. Assemble a card into your hand. |
+  | AS09 | Reverse Engineering | 7 | science | Action: discard a card from your hand to Assemble a card into your hand. |
+  | AS10 | Specialized Fabricator | 5 | building | Assemble a card with your most common tag into your hand. |
+  | AS11 | Venture Prototype | 6 | space | Assemble a high-complexity card into your hand. Gain 1 titanium. |
+  | AS12 | Production Run | 10 | building, power | +1 energy production. Assemble a card into your hand and 2 into the deck. |
+  | AS13 | Hall of Prototypes | 7 | building | 1 VP per 2 assembled cards you've played (events included). |
+  | AS14 | Bargain Bin | 2 | (event) | Assemble a simple card costing at most 8 M€ into your hand. Gain 2 M€. |
+
+- Memory: when the server unloads a game, its assembled cards are unregistered and their cached
+  card properties dropped (`Cache.evict`). They're re-registered when the game is loaded again.
 
 ### Phase 3 — client polish
 - An "assembled" marker on the card face, and the value breakdown in the card's tooltip.

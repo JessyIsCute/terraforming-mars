@@ -482,6 +482,7 @@ export class Server {
         industries: options.industriesExpansion,
         highOrbit: options.highOrbitExpansion,
         solaris: options.solarisExpansion,
+        assembler: options.assemblerExpansion,
       },
       fastModeOption: options.fastModeOption,
       includedCards: options.includedCards,

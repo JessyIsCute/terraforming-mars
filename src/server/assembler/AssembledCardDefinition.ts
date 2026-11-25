@@ -4,8 +4,9 @@ import {CardRequirementDescriptor} from '../../common/cards/CardRequirementDescr
 import {CardDiscount} from '../../common/cards/Types';
 import {Units} from '../../common/Units';
 import {Behavior} from '../behavior/Behavior';
+import {AssemblerComplexity} from './AssembleSpec';
 
-export type AssemblerComplexity = 'low' | 'mid' | 'high';
+export type {AssemblerComplexity} from './AssembleSpec';
 
 /** "When you play a card with `tag`, gain `gain`." */
 export type AssembledTrigger = {
@@ -45,4 +46,9 @@ export interface AssembledCardDefinition {
   effectTexts: Array<string>;
   value: number;
   breakdown: Array<AssembledValueLine>;
+  /**
+   * Set when a preset changed the printed cost after pricing (e.g. -10, "yours costs 10 M€ less").
+   * `cost` already includes it; without it, cost = round(value - 3).
+   */
+  costAdjust?: number;
 }

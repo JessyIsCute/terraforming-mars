@@ -8,6 +8,7 @@ import {Behavior} from '../behavior/Behavior';
 import {AssembledCardDefinition, AssembledTrigger, AssembledValueLine, AssemblerComplexity} from './AssembledCardDefinition';
 import * as V from './AssemblerValues';
 import {fitsOnCard} from './AssemblerRender';
+import {AssembleSpec} from './AssembleSpec';
 
 /** A card under construction. Parts write into it. */
 type Draft = {
@@ -304,11 +305,12 @@ export class AssemblerGenerator {
 
   /**
    * @param name the card's unique name (see AssembledCardDefinition.name).
-   * Tries random cards until one is sensibly priced and fits on a card. Throws only if 500 tries all fail (never seen).
+   * Tries random cards until one is sensibly priced and fits on a card. Throws only if 2000 tries all fail.
+   * @param spec optional constraints (a preset): required tags, tag count, cost range, cost adjustment.
    */
-  public generate(name: string, complexity: AssemblerComplexity, options: {forceRequirement?: boolean} = {}): AssembledCardDefinition {
-    for (let attempt = 0; attempt < 500; attempt++) {
-      const card = this.tryGenerate(name, complexity, options.forceRequirement === true);
+  public generate(name: string, complexity: AssemblerComplexity, spec: AssembleSpec = {}): AssembledCardDefinition {
+    for (let attempt = 0; attempt < 2000; attempt++) {
+      const card = this.tryGenerate(name, complexity, spec);
       // Reroll cards too busy to print legibly, rather than letting text run off the card.
       if (card !== undefined && fitsOnCard(card)) {
         return card;
@@ -317,7 +319,8 @@ export class AssemblerGenerator {
     throw new Error(`Assembler could not build a ${complexity} card`);
   }
 
-  private tryGenerate(name: string, complexity: AssemblerComplexity, forceRequirement: boolean): AssembledCardDefinition | undefined {
+  private tryGenerate(name: string, complexity: AssemblerComplexity, spec: AssembleSpec): AssembledCardDefinition | undefined {
+    const forceRequirement = spec.forceRequirement === true;
     const profile = PROFILE[complexity];
     const parts: Array<Part> = [];
     const nGood = this.int(...profile.good);
@@ -331,6 +334,16 @@ export class AssemblerGenerator {
     for (let i = 0; i < nBad; i++) {
       parts.push(this.badPart());
     }
+    // A minimum cost: add good parts until the card is worth about enough. Pricing below decides.
+    if (spec.minCost !== undefined) {
+      const target = spec.minCost + V.BUY_COST - 3; // tags add roughly 3
+      for (let tries = 0; tries < 20 && parts.length < 7 && parts.reduce((s, p) => s + p.value, 0) < target; tries++) {
+        const p = this.goodPart();
+        if (!parts.some((q) => q.key === p.key)) {
+          parts.push(p);
+        }
+      }
+    }
 
     const keys = parts.map((p) => p.key);
     if (new Set(keys).size !== keys.length) {
@@ -343,19 +356,23 @@ export class AssemblerGenerator {
 
     const blue = parts.some((p) => p.blue === true);
     const lasting = parts.some((p) => p.lasting === true);
-    const type = blue ? CardType.ACTIVE : (!lasting && this.chance(0.6) ? CardType.EVENT : CardType.AUTOMATED);
+    // A preset that asks for tags wants them to stay in play, so it never makes an event. Neither
+    // does a 4+ tag card: with the event tag on top the client would collapse the tags to one icon.
+    const eventAllowed = (spec.tags ?? []).length === 0 && (spec.tagCount ?? 0) < 4;
+    const type = blue ? CardType.ACTIVE : (!lasting && eventAllowed && this.chance(0.6) ? CardType.EVENT : CardType.AUTOMATED);
     // Negative VP on an event reads oddly; keep VP on cards that stay in play.
     if (type === CardType.EVENT && parts.some((p) => p.key === 'vp')) {
       return undefined;
     }
 
     // Tags: lean toward one that fits the parts.
-    const tags: Array<Tag> = [];
+    const required = [...new Set(spec.tags ?? [])];
+    const tags: Array<Tag> = [...required];
+    const nTags = Math.max(spec.tagCount ?? this.int(...profile.tags), required.length);
     const hint = parts.find((p) => p.hintTag !== undefined)?.hintTag;
-    if (hint !== undefined && this.chance(0.7)) {
+    if (hint !== undefined && tags.length < nTags && !tags.includes(hint) && this.chance(0.7)) {
       tags.push(hint);
     }
-    const nTags = this.int(...profile.tags);
     while (tags.length < nTags) {
       const t = this.weighted(TAG_WEIGHTS);
       if (!tags.includes(t)) {
@@ -364,8 +381,9 @@ export class AssemblerGenerator {
     }
 
     const requirement = (forceRequirement || this.chance(profile.requirementChance)) ? this.requirement() : undefined;
-    if (requirement?.tag !== undefined && !tags.includes(requirement.tag) && this.chance(0.5)) {
-      tags[tags.length - 1] = requirement.tag; // science-requirement cards tend to be science cards
+    // Science-requirement cards tend to be science cards -- unless that would drop a required tag.
+    if (requirement?.tag !== undefined && !tags.includes(requirement.tag) && tags.length > required.length && this.chance(0.5)) {
+      tags[tags.length - 1] = requirement.tag;
     }
 
     // ---- price ----
@@ -401,10 +419,12 @@ export class AssemblerGenerator {
     }
     // Round the value first and derive the cost from it, so cost = round(value - 3) holds exactly for the shown value.
     const value = Math.round((exactCost + V.BUY_COST) * 10) / 10;
-    const cost = Math.round(value - V.BUY_COST);
-    if (cost < V.MIN_COST || cost > V.MAX_COST) {
+    const pricedCost = Math.round(value - V.BUY_COST);
+    if (pricedCost < Math.max(V.MIN_COST, spec.minCost ?? 0) || pricedCost > Math.min(V.MAX_COST, spec.maxCost ?? Infinity)) {
       return undefined;
     }
+    const costAdjust = spec.costAdjust ?? 0;
+    const cost = Math.max(0, pricedCost + costAdjust);
 
     // ---- build ----
     const draft: Draft = {behavior: {}, cardDiscount: [], victoryPoints: 0};
@@ -436,6 +456,7 @@ export class AssemblerGenerator {
       effectTexts,
       value,
       breakdown: breakdown.map((l) => ({text: l.text, value: Math.round(l.value * 10) / 10})),
+      costAdjust: costAdjust !== 0 ? costAdjust : undefined,
     };
   }
 }

@@ -203,6 +203,7 @@ const CARD_RESOURCES: ReadonlyArray<IconEntry> = [
   {iconClass: 'card-resource-agenda', label: 'Agenda', official: false, expansions: ['pathfinders']},
   {iconClass: 'card-resource-orbital', label: 'Orbital', official: false, expansions: ['pathfinders']},
   {iconClass: 'card-resource-clone-trooper', label: 'Clone Trooper', official: false, expansions: ['starwars']},
+  {iconClass: 'card-resource-assemble', label: 'Assemble', official: false, expansions: ['assembler']},
   {iconClass: 'card-resource-tool', label: 'Tool', official: false, expansions: ['underworld']},
   {iconClass: 'card-resource-ware', label: 'Ware', official: false, expansions: ['underworld']},
   {iconClass: 'card-resource-journalism', label: 'Journalism', official: false, expansions: ['underworld']},

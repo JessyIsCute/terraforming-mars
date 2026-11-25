@@ -4,6 +4,8 @@ import {CardType} from '../../src/common/cards/CardType';
 import {Tag} from '../../src/common/cards/Tag';
 import {AssemblerGenerator, compactTexts} from '../../src/server/assembler/AssemblerGenerator';
 import {AssembledCardDefinition, AssemblerComplexity} from '../../src/server/assembler/AssembledCardDefinition';
+import {AssembleSpec} from '../../src/server/assembler/AssembleSpec';
+import {fitsOnCard} from '../../src/server/assembler/AssemblerRender';
 import {newAssembledCard} from '../../src/server/assembler/AssembledCard';
 import {validateBehavior} from '../../src/server/cards/Card';
 import {CardName} from '../../src/common/cards/CardName';
@@ -93,4 +95,64 @@ describe('AssemblerGenerator', () => {
     ]);
     expect(compactTexts(['Gain 2 steel.'])).deep.eq(['Gain 2 steel.']);
   });
+
+  describe('presets', () => {
+    function many(spec: AssembleSpec, complexity: AssemblerComplexity = 'mid', count = 200) {
+      const generator = new AssemblerGenerator(new SeededRandom(0.77));
+      return Array.from({length: count}, (_, i) => generator.generate(`Assembled preset-${i}`, complexity, spec));
+    }
+
+    it('required tags are always on the card', () => {
+      for (const def of many({tags: [Tag.SCIENCE]})) {
+        expect(def.tags, def.name).includes(Tag.SCIENCE);
+        expect(new Set(def.tags).size).eq(def.tags.length);
+      }
+    });
+
+    it('tagCount gives exactly that many tags', () => {
+      for (const def of many({tagCount: 4})) {
+        expect(def.tags, def.name).has.length(4);
+        expect(new Set(def.tags).size).eq(4);
+        // an event's extra event tag would make 5, which the client collapses to one icon
+        expect(def.type, def.name).not.eq(CardType.EVENT);
+      }
+    });
+
+    it('presets that ask for tags never make events, so the tags stay in play', () => {
+      for (const def of many({tags: [Tag.JOVIAN]}, 'low')) {
+        expect(def.type, def.name).not.eq(CardType.EVENT);
+      }
+    });
+
+    it('a cost range holds, even for low complexity with a high minimum', () => {
+      for (const def of many({minCost: 28, maxCost: 32}, 'low')) {
+        expect(def.cost, def.name).is.within(28, 32);
+        expect(def.complexity).eq('low');
+        // low complexity: no effects, actions or drawbacks
+        expect(def.effectTexts, def.name).is.empty;
+        expect(def.cost).eq(Math.round(def.value - BUY_COST));
+      }
+      for (const def of many({maxCost: 8}, 'low')) {
+        expect(def.cost, def.name).is.at.most(8);
+      }
+    });
+
+    it('costAdjust changes the printed cost and is recorded', () => {
+      for (const def of many({minCost: 28, maxCost: 32, costAdjust: -10}, 'low', 50)) {
+        expect(def.costAdjust).eq(-10);
+        expect(def.cost, def.name).eq(Math.round(def.value - BUY_COST) - 10);
+        expect(def.cost).is.within(18, 22);
+      }
+    });
+
+    it('preset cards still fit on a card and validate', () => {
+      for (const spec of [{tagCount: 4}, {tags: [Tag.SCIENCE]}, {minCost: 28, maxCost: 32}] as Array<AssembleSpec>) {
+        for (const def of many(spec, 'high', 60)) {
+          expect(fitsOnCard(def), def.name).is.true;
+          expect(() => validateBehavior(def.behavior, def.name as CardName)).not.to.throw();
+        }
+      }
+    });
+  });
 });
+

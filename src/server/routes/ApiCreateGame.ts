@@ -152,6 +152,7 @@ export class ApiCreateGame extends Handler {
         industriesExpansion: gameReq.expansions.industries,
         highOrbitExpansion: gameReq.expansions.highOrbit,
         solarisExpansion: gameReq.expansions.solaris,
+        assemblerExpansion: gameReq.expansions.assembler,
         robAntillesExpansion: gameReq.expansions.robAntilles,
         morePartiesExpansion: gameReq.expansions.moreParties,
         venusPhase2Expansion: gameReq.expansions.venusPhase2,

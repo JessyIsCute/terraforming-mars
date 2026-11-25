@@ -92,6 +92,8 @@ export class GlobalEventDealer {
       highOrbit: gameOptions.highOrbitExpansion,
       // No ModuleManifest/global events of its own -- included only to satisfy Record<GameModule, boolean>.
       solaris: gameOptions.solarisExpansion,
+      // No global events of its own -- included only to satisfy Record<GameModule, boolean>.
+      assembler: gameOptions.assemblerExpansion,
     };
 
     for (const manifest of ALL_MODULE_MANIFESTS) {

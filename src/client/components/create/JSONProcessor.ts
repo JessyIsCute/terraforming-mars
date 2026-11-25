@@ -100,6 +100,7 @@ export class JSONProcessor {
       industries: json_constants.INDUSTRIES_EXPANSION,
       highOrbit: json_constants.HIGH_ORBIT_EXPANSION,
       solaris: json_constants.SOLARIS_EXPANSION,
+      assembler: json_constants.ASSEMBLER_EXPANSION,
     } as const;
     for (const expansion of Object.keys(oldExpansionFields)) {
       const x = oldExpansionFields[expansion as Expansion];

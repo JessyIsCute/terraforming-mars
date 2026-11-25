@@ -33,3 +33,4 @@ export const VENUS_PHASE_2_EXPANSION = 'venusPhase2Expansion';
 export const INDUSTRIES_EXPANSION = 'industriesExpansion';
 export const HIGH_ORBIT_EXPANSION = 'highOrbitExpansion';
 export const SOLARIS_EXPANSION = 'solarisExpansion';
+export const ASSEMBLER_EXPANSION = 'assemblerExpansion';

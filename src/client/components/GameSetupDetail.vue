@@ -29,6 +29,7 @@
               <a v-if="gameOptions.expansions.industries" :href="rulebookUrls.industries" class="tooltip" data-tooltip="Industries rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-industries"></div></a>
               <a v-if="gameOptions.expansions.highOrbit" :href="rulebookUrls.highOrbit" class="tooltip" data-tooltip="High Orbit rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-highOrbit"></div></a>
               <a v-if="gameOptions.expansions.solaris" :href="rulebookUrls.solaris" class="tooltip" data-tooltip="Solaris rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-solaris"></div></a>
+              <a v-if="gameOptions.expansions.assembler" :href="rulebookUrls.assembler" class="tooltip" data-tooltip="Assembler rules" target="_blank"><div class="create-game-expansion-icon expansion-icon-assembler"></div></a>
               <a v-if="gameOptions.expansions.corpera" :href="rulebookUrls.corpera" class="tooltip" data-tooltip="Corporate Era rulebook" target="_blank"><div class="create-game-expansion-icon expansion-icon-CE"></div></a>
             </li>
 

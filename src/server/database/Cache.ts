@@ -5,6 +5,7 @@ import {EventEmitter} from 'events';
 import {Database} from './Database';
 import {CacheConfig} from './CacheConfig';
 import {Clock} from '../../common/Timer';
+import {unregisterAssembledCards} from '../assembler/AssembledCardRegistry';
 import {partition} from '@/common/utils/utils';
 
 export class Cache extends EventEmitter {
@@ -139,6 +140,8 @@ export class Cache extends EventEmitter {
       return;
     }
     game.players.forEach((p) => p.tearDown());
+    // Assembler (fan): this game's generated cards are registered by name; they're re-registered on reload.
+    unregisterAssembledCards(game.assembledCards.map((d) => d.name));
     this.games.set(gameId, undefined); // Setting to undefied is the same as "not yet loaded."
     this.lastAccess.delete(gameId);
   }

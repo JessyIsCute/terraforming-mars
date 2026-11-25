@@ -91,6 +91,14 @@ export type StaticCardProperties = SharedProperties & {
 const cardProperties = new Map<CardName, InternalProperties>();
 
 /**
+ * Drop a card's cached properties. Only for cards that exist for one game, e.g. Assembler's
+ * generated cards, so they don't stay in memory after their game is unloaded.
+ */
+export function forgetCardProperties(name: CardName): void {
+  cardProperties.delete(name);
+}
+
+/**
  * Card is an implementation for most cards in the game, which provides one key features:
  *
  * 1. It stores key card properties into a static cache, which means that each instance of a card

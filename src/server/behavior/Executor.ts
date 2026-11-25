@@ -559,7 +559,12 @@ export class Executor implements BehaviorExecutor {
       player.game.defer(new DecreaseAnyProduction(player, behavior.decreaseAnyProduction.type, {count: behavior.decreaseAnyProduction.count}));
     }
     if (behavior.assemble !== undefined) {
-      AssemblerExpansion.assemble(player.game, behavior.assemble, player);
+      const {count, into, preset} = typeof behavior.assemble === 'number' ? {count: behavior.assemble, into: 'deck', preset: undefined} : behavior.assemble;
+      if (into === 'hand') {
+        AssemblerExpansion.assembleIntoHand(player, count, preset);
+      } else {
+        AssemblerExpansion.assemble(player.game, count, player, preset);
+      }
     }
     if (behavior.removeAnyPlants !== undefined) {
       player.game.defer(new RemoveAnyPlants(player, behavior.removeAnyPlants));

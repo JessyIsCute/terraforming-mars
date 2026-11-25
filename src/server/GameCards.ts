@@ -35,6 +35,7 @@ import {VENUS_PHASE_2_CARD_MANIFEST} from './cards/venusPhase2/VenusPhase2CardMa
 import {INDUSTRIES_CARD_MANIFEST} from './cards/industries/IndustriesCardManifest';
 import {HIGH_ORBIT_CARD_MANIFEST} from './cards/highOrbit/HighOrbitCardManifest';
 import {SOLARIS_CARD_MANIFEST} from './cards/solaris/SolarisCardManifest';
+import {ASSEMBLER_CARD_MANIFEST} from './cards/assembler/AssemblerCardManifest';
 import {DataDrivenCard} from './cards/DataDrivenCard';
 import {getAllCustomCardDefinitions} from './cards/CustomCardRegistry';
 
@@ -88,6 +89,7 @@ export class GameCards {
       [gameOptions.industriesExpansion, INDUSTRIES_CARD_MANIFEST],
       [gameOptions.highOrbitExpansion, HIGH_ORBIT_CARD_MANIFEST],
       [gameOptions.solarisExpansion, SOLARIS_CARD_MANIFEST],
+      [gameOptions.assemblerExpansion, ASSEMBLER_CARD_MANIFEST],
     ];
 
     this.moduleManifests = manifests

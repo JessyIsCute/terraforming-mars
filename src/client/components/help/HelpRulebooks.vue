@@ -63,6 +63,7 @@ const fanExpansions: ReadonlyArray<RulebookEntry> = [
   {module: 'industries', name: 'Industries', iconClass: 'industries', url: RULEBOOK_URLS.industries},
   {module: 'highOrbit', name: 'High Orbit', iconClass: 'highOrbit', url: RULEBOOK_URLS.highOrbit},
   {module: 'solaris', name: 'Solaris', iconClass: 'solaris', url: RULEBOOK_URLS.solaris},
+  {module: 'assembler', name: 'Assembler', iconClass: 'assembler', url: RULEBOOK_URLS.assembler},
 ];
 
 export default defineComponent({

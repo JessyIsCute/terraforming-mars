@@ -1,5 +1,6 @@
 import {CardName} from '../../common/cards/CardName';
 import {AssembledCardDefinition} from './AssembledCardDefinition';
+import {forgetCardProperties} from '../cards/Card';
 
 /**
  * Every assembled card currently known to this server process, by name.
@@ -13,12 +14,15 @@ const registry = new Map<string, AssembledCardDefinition>();
 
 export function registerAssembledCard(def: AssembledCardDefinition): void {
   registry.set(def.name, def);
+  // Card caches properties by name; a re-registered name must not keep an older card's face.
+  forgetCardProperties(def.name as CardName);
 }
 
 /** Forget cards, e.g. when their game leaves memory. Also used by tests to simulate a fresh server process. */
 export function unregisterAssembledCards(names: ReadonlyArray<string>): void {
   for (const name of names) {
     registry.delete(name);
+    forgetCardProperties(name as CardName);
   }
 }
 

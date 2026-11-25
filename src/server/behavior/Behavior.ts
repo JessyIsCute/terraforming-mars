@@ -10,6 +10,7 @@ import {PlacementType} from '../boards/PlacementType';
 import {AdjacencyBonus} from '../ares/AdjacencyBonus';
 import {Units} from '../../common/Units';
 import {NoAttributes} from './NoAttributes';
+import {AssembleSpec} from '../assembler/AssembleSpec';
 import {Message} from '@/common/logs/Message';
 
 type ValueOf<Obj> = Obj[keyof Obj];
@@ -138,8 +139,12 @@ export type Behavior = {
   /** Draw this many cards from the deck. */
   drawCard?: number | DrawCard,
 
-  /** Assembler (fan): generate this many new cards and shuffle them into the project deck. */
-  assemble?: number,
+  /**
+   * Assembler (fan): generate new random cards. A number shuffles that many into the project
+   * deck; `{count, into: 'hand'}` puts them straight into the player's hand instead. `preset`
+   * constrains the cards, e.g. `{tags: [Tag.SCIENCE]}` or `{tagCount: 4}`.
+   */
+  assemble?: number | {count: number, into: 'deck' | 'hand', preset?: AssembleSpec},
 
   /** Greeneries cost one plant less. */
   greeneryDiscount?: 1,
