@@ -110,11 +110,17 @@ export function cardsToModel(
         requirements: card.requirements,
         metadata: card.metadata,
         resourceType: card.resourceType,
-        module: 'customCards',
+        module: 'assembler',
         compatibility: [],
         hasAction: assembled.action !== undefined,
       };
       model.combinedDisplayName = assembled.title;
+      model.assembled = {
+        complexity: assembled.complexity,
+        value: assembled.value,
+        breakdown: assembled.breakdown,
+        costAdjust: assembled.costAdjust,
+      };
     }
     // Same reasoning as Custom Card Maker cards above: DeimosDoubleDownCopy's face varies
     // per instance (whichever Space event it copies), so it's not in the static manifest

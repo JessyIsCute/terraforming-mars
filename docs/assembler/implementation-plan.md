@@ -103,9 +103,15 @@ reload, which happens after every move. So:
 - Memory: when the server unloads a game, its assembled cards are unregistered and their cached
   card properties dropped (`Cache.evict`). They're re-registered when the game is loaded again.
 
-### Phase 3 — client polish
-- An "assembled" marker on the card face, and the value breakdown in the card's tooltip.
-- A client test for an assembled card (Vitest, `tests/client/`).
+### Phase 3 — client polish (done)
+- Assembled cards carry the Assembler ⚙ badge in the bottom corner (`module: 'assembler'`), like
+  the printed Assembler cards.
+- Hovering an assembled card shows a copper ⚙ button; clicking it opens a popup with the card's
+  complexity, each priced part, the total value, cost = value − 3, and any preset adjustment
+  (e.g. Open Source Blueprints' −10) with the final cost.
+- The server sends this as `CardModel.assembled` (`AssembledCardInfo`, `src/common/models/CardModel.ts`).
+- Component: `src/client/components/card/CardAssembledInfo.vue`; test:
+  `tests/client/components/card/CardAssembledInfo.spec.ts`.
 
 ### Phase 4 — v2 effects and tuning
 - Trigger effects ("when you play a X tag, gain Y") as a generic trigger card class.

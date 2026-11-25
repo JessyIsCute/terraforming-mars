@@ -5,6 +5,7 @@
               <div><CardCost :amount="cost" :newCost="reducedCost" :titanium="isInfrastructure" /></div>
               <div v-if="showPlayerCube" :class="playerCubeClass"></div>
               <CardHelp v-if="hasHelpText" :name="card.name" :hovering="hovering" />
+              <CardAssembledInfo v-if="card.assembled !== undefined" :info="card.assembled" :title="card.combinedDisplayName ?? card.name" :hovering="hovering" />
               <CardTags :tags="tags" />
           </div>
           <CardTitle :title="card.name" :type="cardType" :displayTitle="card.combinedDisplayName" :tags="tags"/>
@@ -39,6 +40,7 @@ import CardTags from './CardTags.vue';
 import CardVictoryPoints from './CardVictoryPoints.vue';
 import CardContent from './CardContent.vue';
 import CardHelp from './CardHelp.vue';
+import CardAssembledInfo from './CardAssembledInfo.vue';
 import {CardType} from '@/common/cards/CardType';
 import {CardName} from '@/common/cards/CardName';
 import {CardMetadata} from '@/common/cards/CardMetadata';
@@ -57,6 +59,7 @@ export default defineComponent({
   components: {
     CardTitle,
     CardHelp,
+    CardAssembledInfo,
     CardResourceCounter,
     CardCost,
     CardExtraContent,

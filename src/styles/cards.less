@@ -395,6 +395,16 @@ input[type="radio"]:checked+.filterDiv::after {
   content: "";
 }
 
+// Assembler (fan): the badge on a card generated during the game.
+.assembler-icon:after {
+  .expansion-icon-base();
+  background: white;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  content: "⚙️";
+}
+
 .underworld-icon:after {
   .expansion-icon-base();
   background-image: url(./assets/expansion_icons/expansion_icon_underworld.png);

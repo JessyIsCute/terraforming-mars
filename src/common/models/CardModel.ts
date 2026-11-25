@@ -35,6 +35,16 @@ export interface CustomCardModel {
     hasAction?: boolean;
 }
 
+/** Assembler (fan): how a card generated during the game was priced. Shown in its info popup. */
+export interface AssembledCardInfo {
+    complexity: 'low' | 'mid' | 'high';
+    /** What the card is worth, in M€. Its cost is round(value - 3), plus costAdjust. */
+    value: number;
+    breakdown: ReadonlyArray<{text: string, value: number}>;
+    /** Set when a preset changed the cost after pricing, e.g. -10. */
+    costAdjust?: number;
+}
+
 export interface CardModel {
     name: CardName;
     resources?: number;
@@ -51,4 +61,5 @@ export interface CardModel {
     customCard?: CustomCardModel; // Set only for a Custom Card Maker card -- see CustomCardModel's doc comment.
     combinedDisplayName?: string; // DeimosDoubleDownCopy (sillyfication): the copy's display name, e.g. "<real card name> Copy"
     inSpireResources?: ReadonlyArray<ICardRenderItem>; // InSpire (Pathfinders): the resources currently stored on this card
+    assembled?: AssembledCardInfo; // Assembler (fan): set only for a card generated during the game
 }
