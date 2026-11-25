@@ -92,10 +92,26 @@ export const CARDS_PLAYED_AFTER = 8;
 /** You build around a tag you get a bonus for. */
 export const FOCUS_FACTOR = 2;
 /**
- * A discount on a tag pulls harder: you buy and play more of those cards. Set so 2 M€ off
- * science tags is worth about 7 (2 × 8 cards × 15% × 3).
+ * 1 M€ off every card. More than the ~8 cards you play after it: it also lets you play expensive
+ * cards sooner (printed: Earth Catapult and Anti-Gravity Technology, 2 M€ off, 14.5-18.5).
  */
-export const DISCOUNT_FOCUS_FACTOR = 3;
+export const ALL_DISCOUNT_VALUE = 10;
+
+/**
+ * A tag discount makes you build around that tag, and the rarer the tag the harder it pulls: you
+ * go looking for those cards. The factor is 0.45 ÷ share, kept between 1.5 and 4, so 2 M€ off
+ * science (15%) is worth about 7, the same off space (26%) about 7.5 (Space Station and Shuttles
+ * print at 7), and very rare tags don't run away.
+ */
+export function tagDiscountFocus(tag: Tag): number {
+  const share = TAG_SHARE[tag] ?? 0;
+  return share === 0 ? 0 : Math.min(4, Math.max(1.5, 0.45 / share));
+}
+
+/** What `amount` M€ off every card with `tag` is worth. */
+export function tagDiscountValue(tag: Tag, amount: number): number {
+  return amount * CARDS_PLAYED_AFTER * (TAG_SHARE[tag] ?? 0) * tagDiscountFocus(tag);
+}
 export const STANDARD_PROJECTS_AFTER = 2.3;
 
 /** Requirements. */

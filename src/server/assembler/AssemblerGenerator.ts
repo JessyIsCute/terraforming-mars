@@ -414,7 +414,7 @@ export class AssemblerGenerator {
       [() => {
         const x = this.int(1, 2);
         const text = `Effect: When you play a card, you pay ${x} M€ less for it.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: x * V.CARDS_PLAYED_AFTER, category: 'efficiency',
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: x * V.ALL_DISCOUNT_VALUE, category: 'efficiency',
           apply: (d) => d.cardDiscount.push({amount: x})};
       }, 1],
       [() => {
@@ -422,7 +422,7 @@ export class AssemblerGenerator {
         const x = this.int(2, 3);
         const text = `Effect: When you play ${an(tag)} tag, you pay ${x} M€ less for it.`;
         return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'efficiency',
-          value: x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.DISCOUNT_FOCUS_FACTOR,
+          value: V.tagDiscountValue(tag, x),
           apply: (d) => d.cardDiscount.push({tag, amount: x})};
       }, 3],
       [() => {
@@ -477,7 +477,7 @@ export class AssemblerGenerator {
           value: -x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0), category: 'debt', apply: (d) => d.cardDiscount.push({tag, amount: -x})};
       }, 1.5],
       [() => ({kind: 'bad', key: 'blue', blue: true, text: '', effectText: 'Effect: When you play a card, you pay 1 M€ more for it.',
-        value: -V.CARDS_PLAYED_AFTER, category: 'debt', apply: (d) => d.cardDiscount.push({amount: -1})}), 0.7],
+        value: -V.ALL_DISCOUNT_VALUE, category: 'debt', apply: (d) => d.cardDiscount.push({amount: -1})}), 0.7],
     ])();
   }
 

@@ -158,12 +158,15 @@ Example: "Action: spend 1 energy to gain 2 steel" = (2×2 − 1.2) × 4 = 11.2.
 ### Discounts
 
 ```
-−X M€ on every card     = X × 8           (you play ~8 more cards after it)
-−X M€ on cards with tag T = X × 8 × share(T) × 3   (×3 because you build around it)
+−X M€ on every card       = X × 10                      (~8 cards played after, plus big cards sooner)
+−X M€ on cards with tag T = X × 8 × share(T) × focus(T)
+focus(T)                  = 0.45 ÷ share(T), kept between 1.5 and 4 (rarer tags pull harder)
 ```
 
-The factor was 2 (it matches the space cards below); raised to 3 by hand so 2 M€ off science is
-worth about 7. Space and building discounts now come out above the printed cards.
+So 2 M€ off a tag is worth about 7 for most tags (building 7.4, space 7.2, science 7.2, earth 7.2,
+venus/plant/power 7.0), less for the rarest (microbe 5.8, jovian/city 4.5, animal 2.6): you can only
+build around a tag that comes up often enough. The all-card discount was 8 per M€ and felt
+underpriced.
 
 | Card | Discount | Predicted | Measured |
 |---|---|---:|---:|

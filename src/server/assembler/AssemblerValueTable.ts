@@ -142,9 +142,9 @@ export function buildValueTable(): AssemblerValueTableModel {
       `2 energy → 2 steel: (${num(2 * V.STOCK_VALUE.steel)} − ${num(2 * V.STOCK_VALUE.energy)}) × ${V.ACTION_USES} = ${num((2 * V.STOCK_VALUE.steel - 2 * V.STOCK_VALUE.energy) * V.ACTION_USES)}`],
     ['Action: spend 4 energy to raise a parameter', `(Step − 4 energy) × ${V.CONVERSION_ACTION_USES} uses`,
       `Temperature: (${num(V.GLOBAL_STEP_VALUE.temperature)} − ${num(4 * V.STOCK_VALUE.energy)}) × ${V.CONVERSION_ACTION_USES} = ${num((V.GLOBAL_STEP_VALUE.temperature - 4 * V.STOCK_VALUE.energy) * V.CONVERSION_ACTION_USES)}`],
-    ['Discount on every card', `Discount × ${V.CARDS_PLAYED_AFTER} cards played after`, `1 M€: ${num(V.CARDS_PLAYED_AFTER)}`],
-    ['Discount on a tag', `Discount × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.DISCOUNT_FOCUS_FACTOR} (focus)`,
-      `2 M€ on science: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SCIENCE] ?? 0)} × ${V.DISCOUNT_FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.DISCOUNT_FOCUS_FACTOR)}`],
+    ['Discount on every card', `${num(V.ALL_DISCOUNT_VALUE)} per M€ (the ~${V.CARDS_PLAYED_AFTER} cards played after, plus playing big cards sooner)`, `1 M€: ${num(V.ALL_DISCOUNT_VALUE)}`],
+    ['Discount on a tag', `Discount × ${V.CARDS_PLAYED_AFTER} × tag share × focus (0.45 ÷ share, 1.5 to 4: rarer tags pull harder)`,
+      `2 M€ on science: ${num(V.tagDiscountValue(Tag.SCIENCE, 2))}, space: ${num(V.tagDiscountValue(Tag.SPACE, 2))}, jovian: ${num(V.tagDiscountValue(Tag.JOVIAN, 2))}`],
     ['When you play a tag, gain', `Gain × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
       `2 M€ per space tag: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SPACE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SPACE] ?? 0) * V.FOCUS_FACTOR)}`],
     ['When you play a tag, draw a card', `${num(V.DRAW_CARD_VALUE)} × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
@@ -155,14 +155,15 @@ export function buildValueTable(): AssemblerValueTableModel {
       `Microbe per plant tag, 1 VP per 3: ${num(V.VP_VALUE / 3 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.PLANT] ?? 0) * V.FOCUS_FACTOR)}`],
     ['Production per X tags (Growth)', `Step value ÷ X × ${V.TAGS_IN_PLAY} cards in play × tag share (+1 tag if the card has it)`,
       `1 M€ per 2 building tags: ${num(V.PRODUCTION_VALUE.megacredits / 2 * V.TAGS_IN_PLAY * (V.TAG_SHARE[Tag.BUILDING] ?? 0))}`],
-    ['Cards cost 1 M€ more (drawback)', `−${V.CARDS_PLAYED_AFTER} (× tag share for one tag)`, `Science tags: ${num(-V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0))}`],
+    ['Cards cost 1 M€ more (drawback)', `−${num(V.ALL_DISCOUNT_VALUE)} for every card; −${V.CARDS_PLAYED_AFTER} × tag share for one tag`, `Science tags: ${num(-V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0))}`],
   ]));
 
-  sections.push(section('Tags', ['Tag', 'Value', 'Share of cards'], [false, true, true],
+  sections.push(section('Tags', ['Tag', 'Value', 'Share of cards', '2 M€ off it'], [false, true, true, true],
     TAG_ORDER.map((t) => [
       t.charAt(0).toUpperCase() + t.slice(1),
       num(V.TAG_VALUE[t] ?? 0),
       V.TAG_SHARE[t] !== undefined ? pct(V.TAG_SHARE[t]) : '–',
+      V.TAG_SHARE[t] !== undefined ? num(V.tagDiscountValue(t, 2)) : '–',
     ]),
     `The most valuable tag counts fully, every other tag ${pct(V.EXTRA_TAG_FACTOR)}. An event's tags count ${pct(V.EVENT_TAG_FACTOR)}, plus ${num(V.EVENT_TAG_VALUE)} for the event tag. ` +
     'Paying with steel or titanium is not priced on top: that is already why steel and titanium are worth 2 and 3 M€. ' +
@@ -248,7 +249,9 @@ export function rateableValues(): Array<RateableValue> {
   add('greenery', 'Place a greenery tile (and raise oxygen)', V.GREENERY_VALUE, 'One-off effects');
   add('city', 'Place a city tile', V.CITY_VALUE, 'One-off effects');
   add('action.steel', 'Action: gain 1 steel (on a blue card)', V.STOCK_VALUE.steel * V.ACTION_USES, 'Effects and actions');
-  add('discount.all', 'Effect: you pay 1 M€ less for every card', V.CARDS_PLAYED_AFTER, 'Effects and actions');
+  add('discount.all', 'Effect: you pay 1 M€ less for every card', V.ALL_DISCOUNT_VALUE, 'Effects and actions');
+  add('discount.science', 'Effect: you pay 1 M€ less for science cards', V.tagDiscountValue(Tag.SCIENCE, 1), 'Effects and actions');
+  add('discount.space', 'Effect: you pay 1 M€ less for space cards', V.tagDiscountValue(Tag.SPACE, 1), 'Effects and actions');
   for (const t of [Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, Tag.VENUS, Tag.PLANT, Tag.POWER, Tag.MICROBE, Tag.JOVIAN, Tag.CITY, Tag.ANIMAL]) {
     add(`tag.${t}`, `A ${t} tag on a card`, V.TAG_VALUE[t] ?? 0, 'Tags');
   }
