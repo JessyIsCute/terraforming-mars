@@ -9,7 +9,7 @@
         <p><span v-i18n>Assembled during this game</span> · {{ $t(complexityLabel) }}</p>
         <table><tbody>
           <tr v-for="(line, i) in info.breakdown" :key="i">
-            <td>{{ line.text }}</td>
+            <td>{{ line.text }} <span v-if="line.category !== undefined" class="card-assembled-category">{{ $t(categoryLabel(line.category)) }}</span></td>
             <td class="card-assembled-value">{{ signed(line.value) }}</td>
           </tr>
           <tr class="card-assembled-total">
@@ -38,6 +38,7 @@
 
 import {defineComponent} from 'vue';
 import {AssembledCardInfo} from '@/common/models/CardModel';
+import {EFFECT_CATEGORY_INFO, EffectCategory} from '@/common/assembler/EffectCategory';
 import PopupPanel from '@/client/components/common/PopupPanel.vue';
 
 /** Assembler (fan): a hover button on a generated card that shows how the card was priced. */
@@ -75,6 +76,9 @@ export default defineComponent({
     },
   },
   methods: {
+    categoryLabel(category: EffectCategory): string {
+      return EFFECT_CATEGORY_INFO[category].label;
+    },
     signed(n: number): string {
       return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0';
     },

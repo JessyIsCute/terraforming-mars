@@ -41,6 +41,7 @@
       />
       <CardList v-else-if="screen === 'cards'"/>
       <CardMaker v-else-if="screen === 'card-maker'"/>
+      <AssemblerWorkshop v-else-if="screen === 'assembler'"/>
       <CardLibrary v-else-if="screen === 'card-library'"/>
       <MapEditor v-else-if="screen === 'map-editor'"/>
       <MapLibrary v-else-if="screen === 'map-library'"/>
@@ -72,6 +73,7 @@ const SpectatorHome = defineAsyncComponent(() => import(/* webpackChunkName: "sp
 const StartScreen = defineAsyncComponent(() => import(/* webpackChunkName: "start-screen" */ '@/client/components/StartScreen.vue'));
 const MapEditor = defineAsyncComponent(() => import(/* webpackChunkName: "map-editor" */ '@/client/components/MapEditor.vue'));
 const CardMaker = defineAsyncComponent(() => import(/* webpackChunkName: "card-maker" */ '@/client/components/cardmaker/CardMaker.vue'));
+const AssemblerWorkshop = defineAsyncComponent(() => import(/* webpackChunkName: "assembler" */ '@/client/components/assembler/AssemblerWorkshop.vue'));
 const CardLibrary = defineAsyncComponent(() => import(/* webpackChunkName: "card-library" */ '@/client/components/cardlibrary/CardLibrary.vue'));
 const MapLibrary = defineAsyncComponent(() => import(/* webpackChunkName: "map-library" */ '@/client/components/maplibrary/MapLibrary.vue'));
 import {$t, setTranslationContext} from '@/client/directives/i18n';
@@ -95,6 +97,7 @@ type Screen = 'admin' |
             'load' |
             'login-home' |
             'card-maker' |
+            'assembler' |
             'card-library' |
             'map-editor' |
             'map-library' |
@@ -158,6 +161,7 @@ export default defineComponent({
     MapEditor,
     MapLibrary,
     CardMaker,
+    AssemblerWorkshop,
     CardLibrary,
     CreateGameForm,
     LoadGameForm,
@@ -311,6 +315,8 @@ export default defineComponent({
       app.screen = 'cards';
     } else if (currentPathname === paths.CUSTOM_CARD_MAKER) {
       app.screen = 'card-maker';
+    } else if (currentPathname === paths.ASSEMBLER) {
+      app.screen = 'assembler';
     } else if (currentPathname === paths.CARD_LIBRARY) {
       app.screen = 'card-library';
     } else if (currentPathname === paths.MAP_EDITOR) {

@@ -18,11 +18,20 @@ type ItemBuilder = {
 
 /** From this many of one resource, draw one icon with a number, like printed cards do. */
 const DIGIT_FROM = 4;
-/** How many icons fit side by side on a card row. */
+/**
+ * How many icon widths fit side by side on a card row. One width is a resource icon with its
+ * margin, about 36px; widths below were measured in the browser (e.g. the Venus gauge is 60px).
+ */
 const ROW_WIDTH = 6;
+/** The space between two effects on a row. */
+const GAP = 0.2;
 
+/** How many icon widths an amount takes. A number next to an icon ("4 heat") is about one and a half. */
 function iconCount(r: Resource, n: number): number {
-  return r === 'megacredits' || Math.abs(n) >= DIGIT_FROM ? 1 : Math.abs(n);
+  if (r === 'megacredits') {
+    return 1;
+  }
+  return Math.abs(n) >= DIGIT_FROM ? 1.5 : Math.abs(n);
 }
 
 function units(b: ItemBuilder, u: Partial<Units> | undefined) {
@@ -137,7 +146,7 @@ export function renderAssembled(def: AssembledCardDefinition) {
         units(p, gains);
       });
       // Like printed cards, small one-off effects share the production box's row.
-      if (instant.length > 0 && productionWidth(behavior) + instantWidth(instant) <= ROW_WIDTH) {
+      if (instant.length > 0 && productionWidth(behavior) + GAP + instantWidth(instant) <= ROW_WIDTH) {
         b.nbsp;
       } else {
         b.br;
@@ -146,11 +155,12 @@ export function renderAssembled(def: AssembledCardDefinition) {
     // One-off effects, wrapping onto a new row when it gets too wide.
     let width = 0;
     for (const group of instant) {
-      if (width > 0 && width + group.width > ROW_WIDTH) {
+      if (width > 0 && width + GAP + group.width > ROW_WIDTH) {
         b.br;
         width = 0;
       } else if (width > 0) {
         b.nbsp;
+        width += GAP;
       }
       group.draw(b as unknown as RowBuilder);
       width += group.width;
@@ -188,29 +198,29 @@ function instantGroups(behavior: Behavior): Array<Group> {
   const g = behavior.global;
   if (g?.temperature) {
     const n = g.temperature;
-    groups.push({width: 1, draw: (b) => b.temperature(n)});
+    groups.push({width: 0.6, draw: (b) => b.temperature(n)});
   }
   if (g?.oxygen) {
     const n = g.oxygen;
-    groups.push({width: 1, draw: (b) => b.oxygen(n)});
+    groups.push({width: 1.4, draw: (b) => b.oxygen(n)});
   }
   if (g?.venus) {
     const n = g.venus;
-    groups.push({width: 1, draw: (b) => b.venus(n)});
+    groups.push({width: 1.8, draw: (b) => b.venus(n)});
   }
   if (typeof behavior.tr === 'number') {
     const n = behavior.tr;
-    groups.push({width: 1, draw: (b) => b.tr(n)});
+    groups.push({width: 1.6, draw: (b) => b.tr(n)});
   }
   if (behavior.ocean !== undefined) {
     const n = behavior.ocean.count ?? 1;
-    groups.push({width: 1.5, draw: (b) => b.oceans(n)});
+    groups.push({width: 1.3, draw: (b) => b.oceans(n)});
   }
   if (behavior.greenery !== undefined) {
-    groups.push({width: 1.5, draw: (b) => b.greenery()});
+    groups.push({width: 1.4, draw: (b) => b.greenery()});
   }
   if (behavior.city !== undefined) {
-    groups.push({width: 1.5, draw: (b) => b.city()});
+    groups.push({width: 1.3, draw: (b) => b.city()});
   }
   if (typeof behavior.drawCard === 'number') {
     const n = behavior.drawCard;
@@ -220,14 +230,15 @@ function instantGroups(behavior: Behavior): Array<Group> {
     const n = Math.abs(behavior.removeAnyPlants);
     groups.push({width: iconCount('plants', n) + 0.5, draw: (b) => {
       b.minus();
-      b.plants(n, {all});
+      b.plants(n, n >= DIGIT_FROM ? {all, digit} : {all});
     }});
   }
   return groups;
 }
 
+/** Width of the groups on one row, gaps included. */
 function instantWidth(groups: Array<Group>): number {
-  return groups.reduce((w, g) => w + g.width, 0);
+  return groups.reduce((w, g) => w + g.width, 0) + GAP * Math.max(0, groups.length - 1);
 }
 
 /** Width of the widest production-box row, plus the box's border. */
@@ -277,7 +288,7 @@ export function estimateContentHeight(def: AssembledCardDefinition): number {
     let width = instantWidth(instant);
     if (hasLoss || hasGain) {
       h += ROW_HEIGHT + (hasLoss && hasGain ? PRODUCTION_ROW_HEIGHT : 0);
-      if (instant.length > 0 && productionWidth(behavior) + width <= ROW_WIDTH) {
+      if (instant.length > 0 && productionWidth(behavior) + GAP + width <= ROW_WIDTH) {
         width = 0;
       }
     }

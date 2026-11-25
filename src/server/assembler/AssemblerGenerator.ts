@@ -9,6 +9,8 @@ import {AssembledCardDefinition, AssembledTrigger, AssembledValueLine, Assembler
 import * as V from './AssemblerValues';
 import {fitsOnCard} from './AssemblerRender';
 import {AssembleSpec} from './AssembleSpec';
+import {EffectCategory} from '../../common/assembler/EffectCategory';
+import {nameCard} from './AssemblerNames';
 
 /** A card under construction. Parts write into it. */
 type Draft = {
@@ -35,8 +37,30 @@ type Part = {
   hintTag?: Tag;
   /** Shown on the card face as an effect or action, not in the description. */
   effectText?: string;
+  /** What kind of effect this is; names the card and lets presets guarantee it. */
+  category: EffectCategory;
   apply: (d: Draft) => void;
 };
+
+/** The category of gaining a resource or its production. */
+const GAIN_CATEGORY: Record<V.StandardResource, EffectCategory> = {
+  megacredits: 'money',
+  steel: 'metal',
+  titanium: 'metal',
+  plants: 'plants',
+  heat: 'heat',
+  energy: 'energy',
+};
+
+/** The category of losing a resource or its production. */
+const LOSS_CATEGORY = {
+  megacredits: 'debt',
+  energy: 'drain',
+  heat: 'cooling',
+  plants: 'blight',
+} as const satisfies Partial<Record<V.StandardResource, EffectCategory>>;
+
+const GLOBAL_CATEGORY = {temperature: 'heat', oxygen: 'air', venus: 'air'} as const satisfies Record<string, EffectCategory>;
 
 const NAME: Record<V.StandardResource, string> = {
   megacredits: 'M€',
@@ -82,7 +106,7 @@ export function compactTexts(texts: Array<string>): Array<string> {
   return [sentence.charAt(0).toUpperCase() + sentence.slice(1), ...rest];
 }
 
-const PROFILE: Record<AssemblerComplexity, {good: [number, number], effectChance: number, bad: [number, number], tags: [number, number], requirementChance: number}> = {
+export const PROFILE: Record<AssemblerComplexity, {good: [number, number], effectChance: number, bad: [number, number], tags: [number, number], requirementChance: number}> = {
   low: {good: [1, 1], effectChance: 0, bad: [0, 0], tags: [1, 1], requirementChance: 0.15},
   mid: {good: [2, 3], effectChance: 0.3, bad: [0, 1], tags: [1, 2], requirementChance: 0.35},
   high: {good: [2, 3], effectChance: 1, bad: [1, 2], tags: [2, 3], requirementChance: 0.5},
@@ -99,19 +123,6 @@ const GLOBALS = {
   oceans: {start: 0, max: 9, step: 1, text: (n: number) => `${n} ocean tiles`},
   venus: {start: 0, max: 30, step: 2, text: (n: number) => `Venus ${n}%`},
 } as const;
-
-const TITLE_PREFIX = ['Assembled', 'Modular', 'Patchwork', 'Salvaged', 'Prototype', 'Scrapbuilt', 'Jury-rigged', 'Composite', 'Kitbashed', 'Retrofit'];
-const TITLE_THEMES: Array<[RegExp, Array<string>]> = [
-  [/ocean/i, ['Aquifer', 'Ice Melter', 'Hydro Basin']],
-  [/greenery|plant production/i, ['Greenhouse', 'Bio-Dome', 'Lichen Farm']],
-  [/energy production|energy to/i, ['Reactor', 'Power Grid', 'Fusion Cell']],
-  [/temperature|heat/i, ['Thermal Vent', 'Heat Sink', 'Solar Lens']],
-  [/oxygen|venus/i, ['Atmo Shaper', 'Cloud Seeder', 'Air Forge']],
-  [/draw/i, ['Archive', 'Think Tank', 'Data Relay']],
-  [/titanium|steel/i, ['Foundry', 'Ore Smelter', 'Mass Driver']],
-  [/city/i, ['Habitat', 'Outpost', 'Settlement']],
-  [/M€/i, ['Exchange', 'Trade Office', 'Holding']],
-];
 
 function an(tag: Tag) {
   return /^[aeiou]/.test(tag) ? `an ${tag}` : `a ${tag}`;
@@ -160,26 +171,26 @@ export class AssemblerGenerator {
     return this.weighted<() => Part>([
       [() => this.gainStock(), 10],
       [() => this.gainProduction(), 10],
-      [() => ({kind: 'good', key: 'tr', text: 'Raise your TR 1 step.', value: V.TR_VALUE, apply: (d) => d.behavior.tr = 1}), 3],
+      [() => ({kind: 'good', key: 'tr', text: 'Raise your TR 1 step.', value: V.TR_VALUE, category: 'prestige', apply: (d) => d.behavior.tr = 1}), 3],
       [() => this.raiseGlobal(), 4],
-      [() => ({kind: 'good', key: 'ocean', text: 'Place an ocean tile.', value: V.OCEAN_VALUE, apply: (d) => d.behavior.ocean = {}}), 2],
-      [() => ({kind: 'good', key: 'greenery', text: 'Place a greenery tile and raise oxygen 1 step.', value: V.GREENERY_VALUE, hintTag: Tag.PLANT, apply: (d) => d.behavior.greenery = {}}), 1.5],
-      [() => ({kind: 'good', key: 'city', text: 'Place a city tile.', value: V.CITY_VALUE, lasting: true, hintTag: Tag.CITY, apply: (d) => d.behavior.city = {}}), 1.5],
+      [() => ({kind: 'good', key: 'ocean', text: 'Place an ocean tile.', value: V.OCEAN_VALUE, category: 'water', apply: (d) => d.behavior.ocean = {}}), 2],
+      [() => ({kind: 'good', key: 'greenery', text: 'Place a greenery tile and raise oxygen 1 step.', value: V.GREENERY_VALUE, hintTag: Tag.PLANT, category: 'plants', apply: (d) => d.behavior.greenery = {}}), 1.5],
+      [() => ({kind: 'good', key: 'city', text: 'Place a city tile.', value: V.CITY_VALUE, lasting: true, hintTag: Tag.CITY, category: 'city', apply: (d) => d.behavior.city = {}}), 1.5],
       [() => {
         const n = this.int(1, 2);
-        return {kind: 'good', key: 'draw', text: `Draw ${plural(n, 'card')}.`, value: V.DRAW_CARD_VALUE * n, apply: (d) => d.behavior.drawCard = n};
+        return {kind: 'good', key: 'draw', text: `Draw ${plural(n, 'card')}.`, value: V.DRAW_CARD_VALUE * n, category: 'knowledge', apply: (d) => d.behavior.drawCard = n};
       }, 4],
       [() => {
         const n = this.int(1, 2);
-        return {kind: 'good', key: 'vp', text: '', value: V.VP_VALUE * n, lasting: true, apply: (d) => d.victoryPoints = n};
+        return {kind: 'good', key: 'vp', text: '', value: V.VP_VALUE * n, lasting: true, category: 'prestige', apply: (d) => d.victoryPoints = n};
       }, 4],
       [() => {
         const n = this.int(2, 4);
-        return {kind: 'good', key: 'removePlants', text: `Remove up to ${n} plants from any player.`, value: V.REMOVE_PLANT_VALUE * n, apply: (d) => d.behavior.removeAnyPlants = n};
+        return {kind: 'good', key: 'removePlants', text: `Remove up to ${n} plants from any player.`, value: V.REMOVE_PLANT_VALUE * n, category: 'blight', apply: (d) => d.behavior.removeAnyPlants = n};
       }, 0.6],
       [() => {
         const r = this.pick([Resource.MEGACREDITS, Resource.HEAT, Resource.PLANTS] as const);
-        return {kind: 'good', key: 'decreaseAny', text: `Decrease any ${NAME[r]} production 1 step.`, value: V.DECREASE_ANY_PRODUCTION_VALUE,
+        return {kind: 'good', key: 'decreaseAny', text: `Decrease any ${NAME[r]} production 1 step.`, value: V.DECREASE_ANY_PRODUCTION_VALUE, category: LOSS_CATEGORY[r],
           apply: (d) => d.behavior.decreaseAnyProduction = {type: r, count: 1}};
       }, 0.6],
     ])();
@@ -188,7 +199,7 @@ export class AssemblerGenerator {
   private gainStock(): Part {
     const r = this.pick(Object.keys(V.STOCK_VALUE) as Array<V.StandardResource>);
     const n = r === 'megacredits' ? this.int(2, 8) : this.int(1, 5);
-    return {kind: 'good', key: `stock.${r}`, text: `Gain ${amount(n, r)}.`, value: V.STOCK_VALUE[r] * n,
+    return {kind: 'good', key: `stock.${r}`, text: `Gain ${amount(n, r)}.`, value: V.STOCK_VALUE[r] * n, category: GAIN_CATEGORY[r],
       apply: (d) => d.behavior.stock = {...d.behavior.stock, [r]: n}};
   }
 
@@ -197,13 +208,13 @@ export class AssemblerGenerator {
     const n = r === 'megacredits' ? this.int(1, 3) : this.int(1, 2);
     const hint = r === 'energy' ? Tag.POWER : r === 'plants' ? Tag.PLANT : r === 'steel' ? Tag.BUILDING : r === 'titanium' ? Tag.SPACE : undefined;
     return {kind: 'good', key: `production.${r}`, text: `Increase your ${NAME[r]} production ${n} ${n === 1 ? 'step' : 'steps'}.`,
-      value: V.PRODUCTION_VALUE[r] * n, lasting: true, hintTag: hint,
+      value: V.PRODUCTION_VALUE[r] * n, lasting: true, hintTag: hint, category: GAIN_CATEGORY[r],
       apply: (d) => d.behavior.production = {...d.behavior.production, [r]: n}};
   }
 
   private raiseGlobal(): Part {
     const g = this.pick(['temperature', 'oxygen', 'venus'] as const);
-    return {kind: 'good', key: `global.${g}`, text: `Raise ${g === 'venus' ? 'Venus' : g} 1 step.`, value: V.GLOBAL_STEP_VALUE[g],
+    return {kind: 'good', key: `global.${g}`, text: `Raise ${g === 'venus' ? 'Venus' : g} 1 step.`, value: V.GLOBAL_STEP_VALUE[g], category: GLOBAL_CATEGORY[g],
       hintTag: g === 'venus' ? Tag.VENUS : undefined,
       apply: (d) => d.behavior.global = {...d.behavior.global, [g]: 1}};
   }
@@ -215,34 +226,34 @@ export class AssemblerGenerator {
         const n = r === 'megacredits' ? 2 : 1;
         const one = V.STOCK_VALUE[r] * n;
         const text = `Action: Gain ${amount(n, r)}.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.ACTION_USES,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.ACTION_USES, category: GAIN_CATEGORY[r],
           apply: (d) => d.action = {stock: {[r]: n}}};
       }, 3],
       [() => {
         const [r, n] = this.pick([['steel', 2], ['titanium', 1], ['plants', 2], ['megacredits', 4]] as const);
         const one = V.STOCK_VALUE[r] * n - V.STOCK_VALUE.energy * 2;
         const text = `Action: Spend 2 energy to gain ${amount(n, r)}.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.ACTION_USES, hintTag: Tag.POWER,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.ACTION_USES, hintTag: Tag.POWER, category: GAIN_CATEGORY[r],
           apply: (d) => d.action = {spend: {energy: 2}, stock: {[r]: n}}};
       }, 3],
       [() => {
         const g = this.pick(['temperature', 'oxygen'] as const);
         const one = V.GLOBAL_STEP_VALUE[g] - 4 * V.STOCK_VALUE.energy;
         const text = `Action: Spend 4 energy to raise ${g} 1 step.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.CONVERSION_ACTION_USES, hintTag: Tag.POWER,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: one * V.CONVERSION_ACTION_USES, hintTag: Tag.POWER, category: GLOBAL_CATEGORY[g],
           apply: (d) => d.action = {spend: {energy: 4}, global: {[g]: 1}}};
       }, 2],
       [() => {
         const x = this.int(1, 2);
         const text = `Effect: When you play a card, you pay ${x} M€ less for it.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: x * V.CARDS_PLAYED_AFTER,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, value: x * V.CARDS_PLAYED_AFTER, category: 'efficiency',
           apply: (d) => d.cardDiscount.push({amount: x})};
       }, 1],
       [() => {
         const tag = this.pick([Tag.SPACE, Tag.BUILDING, Tag.EARTH, Tag.SCIENCE, Tag.JOVIAN, Tag.VENUS, Tag.PLANT]);
         const x = this.int(2, 3);
         const text = `Effect: When you play ${an(tag)} tag, you pay ${x} M€ less for it.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'efficiency',
           value: x * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR,
           apply: (d) => d.cardDiscount.push({tag, amount: x})};
       }, 3],
@@ -251,7 +262,7 @@ export class AssemblerGenerator {
         const [r, n] = this.pick([['megacredits', 2], ['plants', 1], ['steel', 1], ['heat', 2]] as const);
         const triggers = V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0) * V.FOCUS_FACTOR;
         const text = `Effect: When you play ${an(tag)} tag, gain ${amount(n, r)}.`;
-        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, value: V.STOCK_VALUE[r] * n * triggers,
+        return {kind: 'effect', key: 'blue', blue: true, text: '', effectText: text, hintTag: tag, category: 'synergy', value: V.STOCK_VALUE[r] * n * triggers,
           apply: (d) => d.trigger = {tag, gain: {[r]: n}}};
       }, 3],
     ])();
@@ -260,26 +271,26 @@ export class AssemblerGenerator {
   private badPart(): Part {
     return this.weighted<() => Part>([
       [() => {
-        const r = this.weighted<V.StandardResource>([['megacredits', 4], ['energy', 3], ['heat', 1], ['plants', 1]]);
+        const r = this.weighted<keyof typeof LOSS_CATEGORY>([['megacredits', 4], ['energy', 3], ['heat', 1], ['plants', 1]]);
         const n = r === 'megacredits' ? this.int(1, 2) : 1;
         return {kind: 'bad', key: `production.${r}`, text: `Decrease your ${NAME[r]} production ${n} ${n === 1 ? 'step' : 'steps'}.`,
-          value: -V.PRODUCTION_VALUE[r] * n, apply: (d) => d.behavior.production = {...d.behavior.production, [r]: -n}};
+          value: -V.PRODUCTION_VALUE[r] * n, category: LOSS_CATEGORY[r], apply: (d) => d.behavior.production = {...d.behavior.production, [r]: -n}};
       }, 5],
       [() => {
-        const r = this.pick(['plants', 'heat', 'steel', 'energy'] as const);
+        const r = this.pick(['plants', 'heat', 'energy'] as const);
         const n = this.int(2, 4);
-        return {kind: 'bad', key: 'lose', text: `Lose ${amount(n, r)}.`, value: -V.STOCK_VALUE[r] * n,
+        return {kind: 'bad', key: 'lose', text: `Lose ${amount(n, r)}.`, value: -V.STOCK_VALUE[r] * n, category: LOSS_CATEGORY[r],
           apply: (d) => d.behavior.lose = {stock: {[r]: n}}};
       }, 3],
-      [() => ({kind: 'bad', key: 'vp', text: '', value: -V.VP_VALUE, apply: (d) => d.victoryPoints = -1}), 2],
+      [() => ({kind: 'bad', key: 'vp', text: '', value: -V.VP_VALUE, category: 'infamy', apply: (d) => d.victoryPoints = -1}), 2],
       [() => {
         const tag = this.pick([Tag.SPACE, Tag.BUILDING, Tag.EARTH, Tag.SCIENCE]);
         const text = `Effect: When you play ${an(tag)} tag, you pay 1 M€ more for it.`;
         return {kind: 'bad', key: 'blue', blue: true, text: '', effectText: text,
-          value: -V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0), apply: (d) => d.cardDiscount.push({tag, amount: -1})};
+          value: -V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[tag] ?? 0), category: 'debt', apply: (d) => d.cardDiscount.push({tag, amount: -1})};
       }, 1.5],
       [() => ({kind: 'bad', key: 'blue', blue: true, text: '', effectText: 'Effect: When you play a card, you pay 1 M€ more for it.',
-        value: -V.CARDS_PLAYED_AFTER, apply: (d) => d.cardDiscount.push({amount: -1})}), 0.7],
+        value: -V.CARDS_PLAYED_AFTER, category: 'debt', apply: (d) => d.cardDiscount.push({amount: -1})}), 0.7],
     ])();
   }
 
@@ -299,6 +310,21 @@ export class AssemblerGenerator {
     const count = this.weighted<number>([[1, 3], [2, 4], [3, 3], [4, 1], [5, 0.5]]);
     return {descriptor: {tag, count}, value: -Math.pow(count, V.TAG_REQUIREMENT_EXPONENT), tag,
       text: `Requires ${count} ${tag} ${count === 1 ? 'tag' : 'tags'}.`};
+  }
+
+  /**
+   * A random part of this category, for presets that guarantee an effect. Bane categories
+   * (cooling, blight, ...) come as drawbacks or as sabotage against another player.
+   */
+  private partOf(category: EffectCategory): Part {
+    for (let i = 0; i < 1000; i++) {
+      const kind = this.pick(['good', 'effect', 'bad'] as const);
+      const part = kind === 'good' ? this.goodPart() : kind === 'effect' ? this.effectPart() : this.badPart();
+      if (part.category === category) {
+        return part;
+      }
+    }
+    throw new Error(`Assembler has no ${category} part`);
   }
 
   // ---- the card ----------------------------------------------------------------------------------
@@ -322,25 +348,38 @@ export class AssemblerGenerator {
   private tryGenerate(name: string, complexity: AssemblerComplexity, spec: AssembleSpec): AssembledCardDefinition | undefined {
     const forceRequirement = spec.forceRequirement === true;
     const profile = PROFILE[complexity];
-    const parts: Array<Part> = [];
-    const nGood = this.int(...profile.good);
+    // Chosen first, so a minimum cost (below) can make up for what the requirement takes off.
+    const requirement = (forceRequirement || this.chance(profile.requirementChance)) ? this.requirement() : undefined;
+    // Guaranteed effects first; they count toward the card's usual number of parts.
+    const parts: Array<Part> = [...new Set(spec.categories ?? [])].map((c) => this.partOf(c));
+    const has = (kind: PartKind) => parts.filter((p) => p.kind === kind).length;
+    const nGood = this.int(...profile.good) - has('good');
     for (let i = 0; i < nGood; i++) {
       parts.push(this.goodPart());
     }
-    if (this.chance(profile.effectChance)) {
+    if (has('effect') === 0 && this.chance(profile.effectChance)) {
       parts.push(this.effectPart());
     }
-    const nBad = this.int(...profile.bad);
+    // An active card needs an effect or action.
+    if (spec.type === CardType.ACTIVE && !parts.some((p) => p.blue === true)) {
+      parts.push(this.effectPart());
+    }
+    const nBad = this.int(...profile.bad) - has('bad');
     for (let i = 0; i < nBad; i++) {
       parts.push(this.badPart());
     }
     // A minimum cost: add good parts until the card is worth about enough. Pricing below decides.
+    // Each time, take the candidate that lands closest to the target: a big part while far below
+    // it (fewer parts still fit on the card), a small one near it (so the cost doesn't overshoot).
     if (spec.minCost !== undefined) {
-      const target = spec.minCost + V.BUY_COST - 3; // tags add roughly 3
-      for (let tries = 0; tries < 20 && parts.length < 7 && parts.reduce((s, p) => s + p.value, 0) < target; tries++) {
-        const p = this.goodPart();
-        if (!parts.some((q) => q.key === p.key)) {
-          parts.push(p);
+      const target = spec.minCost + V.BUY_COST - 3 - (requirement?.value ?? 0); // tags add roughly 3
+      const sum = () => parts.reduce((s, p) => s + p.value, 0);
+      for (let tries = 0; tries < 20 && parts.length < 7 && sum() < target; tries++) {
+        const remaining = target - sum();
+        const candidates = [this.goodPart(), this.goodPart(), this.goodPart(), this.goodPart()].filter((p) => !parts.some((q) => q.key === p.key));
+        const best = candidates.sort((a, b) => Math.abs(remaining - a.value) - Math.abs(remaining - b.value))[0];
+        if (best !== undefined) {
+          parts.push(best);
         }
       }
     }
@@ -359,7 +398,14 @@ export class AssemblerGenerator {
     // A preset that asks for tags wants them to stay in play, so it never makes an event. Neither
     // does a 4+ tag card: with the event tag on top the client would collapse the tags to one icon.
     const eventAllowed = (spec.tags ?? []).length === 0 && (spec.tagCount ?? 0) < 4;
-    const type = blue ? CardType.ACTIVE : (!lasting && eventAllowed && this.chance(0.6) ? CardType.EVENT : CardType.AUTOMATED);
+    let type = blue ? CardType.ACTIVE : (!lasting && eventAllowed && this.chance(0.6) ? CardType.EVENT : CardType.AUTOMATED);
+    if (spec.type !== undefined) {
+      // An event can't hold anything lasting; an automated card can't hold an effect.
+      if ((spec.type === CardType.EVENT && (blue || lasting)) || (spec.type === CardType.AUTOMATED && blue)) {
+        return undefined;
+      }
+      type = spec.type;
+    }
     // Negative VP on an event reads oddly; keep VP on cards that stay in play.
     if (type === CardType.EVENT && parts.some((p) => p.key === 'vp')) {
       return undefined;
@@ -380,7 +426,6 @@ export class AssemblerGenerator {
       }
     }
 
-    const requirement = (forceRequirement || this.chance(profile.requirementChance)) ? this.requirement() : undefined;
     // Science-requirement cards tend to be science cards -- unless that would drop a required tag.
     if (requirement?.tag !== undefined && !tags.includes(requirement.tag) && tags.length > required.length && this.chance(0.5)) {
       tags[tags.length - 1] = requirement.tag;
@@ -390,7 +435,7 @@ export class AssemblerGenerator {
     const breakdown: Array<AssembledValueLine> = [];
     for (const p of parts) {
       const text = p.key === 'vp' ? `${p.value > 0 ? '' : '−'}${Math.abs(p.value / V.VP_VALUE)} VP` : (p.effectText ?? p.text);
-      breakdown.push({text, value: p.value});
+      breakdown.push({text, value: p.value, category: p.category});
     }
     const tagValues = tags.map((t) => V.TAG_VALUE[t] ?? 0).sort((a, b) => b - a);
     let tagValue = tagValues.reduce((s, v, i) => s + v * (i === 0 ? 1 : V.EXTRA_TAG_FACTOR), 0);
@@ -431,13 +476,16 @@ export class AssemblerGenerator {
     for (const p of parts) {
       p.apply(draft);
     }
+    // "Lose 4 heat. Gain 5 heat." is nonsense: never lose and gain the same resource.
+    const lost = Object.keys(draft.behavior.lose?.stock ?? {});
+    if (lost.some((r) => Object.keys(draft.behavior.stock ?? {}).includes(r))) {
+      return undefined;
+    }
 
     const playTexts = parts.filter((p) => p.text !== '' && p.effectText === undefined).map((p) => p.text);
     const description = [requirement?.text, ...compactTexts(playTexts)].filter((t) => t !== undefined).join(' ');
     const effectTexts = parts.filter((p) => p.effectText !== undefined).map((p) => p.effectText as string);
-    const allText = [...playTexts, ...effectTexts].join(' ');
-    const theme = TITLE_THEMES.find(([re]) => re.test(allText));
-    const title = `${this.pick(TITLE_PREFIX)} ${this.pick(theme?.[1] ?? ['Contraption', 'Device', 'Rig'])}`;
+    const title = nameCard(parts.map((p) => ({category: p.category, value: p.value, bad: p.kind === 'bad'})), complexity, (items) => this.pick(items));
 
     return {
       name,
@@ -455,7 +503,7 @@ export class AssemblerGenerator {
       description,
       effectTexts,
       value,
-      breakdown: breakdown.map((l) => ({text: l.text, value: Math.round(l.value * 10) / 10})),
+      breakdown: breakdown.map((l) => ({...l, value: Math.round(l.value * 10) / 10})),
       costAdjust: costAdjust !== 0 ? costAdjust : undefined,
     };
   }

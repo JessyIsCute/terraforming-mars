@@ -113,6 +113,25 @@ reload, which happens after every move. So:
 - Component: `src/client/components/card/CardAssembledInfo.vue`; test:
   `tests/client/components/card/CardAssembledInfo.spec.ts`.
 
+### Effect categories, names and the card generator page (done)
+- Every generated part belongs to an effect category (`src/common/assembler/EffectCategory.ts`):
+  heat, cooling, plants, blight, energy, drain, metal, money, debt, water, air, knowledge, city,
+  prestige, infamy, efficiency, synergy. Cooling, blight, drain, debt and infamy are drawbacks (or
+  sabotage against another player).
+- Names come from the categories (`AssemblerNames.ts`): the strongest benefit gives the noun, the
+  next category (a drawback first) the adjective, and high-complexity cards an "of ..." ending.
+  Parts worth 10 M€ or more use the bigger words ("Frozen" instead of "Cooled").
+- Presets can guarantee categories (`categories`) and a card type (`type`).
+- `/assembler` is a public card generator page (linked from the start screen and the Card Maker):
+  pick complexity, type, guaranteed effects, tags, cost range, cost change and a requirement; a
+  seed makes results shareable. A second tab shows the value table, built from the generator's
+  own constants (`AssemblerValueTable.ts`, `api/assembler/values`).
+- `api/assembler` generates without saving anything; 60 requests a minute per client by default
+  (`ASSEMBLER_PREVIEW_QUOTA`). Combinations that rarely fit on a card (high complexity at
+  35+ M€) come back partly, with a count of the cards that couldn't be made.
+- Icon widths in `AssemblerRender.ts` were measured in the browser; 480 generated cards were
+  checked with no icons past the card edge.
+
 ### Phase 4 — v2 effects and tuning
 - Trigger effects ("when you play a X tag, gain Y") as a generic trigger card class.
 - Recount tag synergy from the game's actual card pool at setup (see value-table.md, "Make it

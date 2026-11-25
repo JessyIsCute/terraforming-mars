@@ -1,4 +1,6 @@
 import {Tag} from '../../common/cards/Tag';
+import {CardType} from '../../common/cards/CardType';
+import {EffectCategory} from '../../common/assembler/EffectCategory';
 
 export type AssemblerComplexity = 'low' | 'mid' | 'high';
 
@@ -23,4 +25,8 @@ export type AssembleSpec = {
   costAdjust?: number,
   /** The card always has a requirement. */
   forceRequirement?: boolean,
+  /** The card has at least one part of each of these effect categories (see EffectCategory). */
+  categories?: ReadonlyArray<EffectCategory>,
+  /** The card is this type. */
+  type?: CardType.AUTOMATED | CardType.ACTIVE | CardType.EVENT,
 };

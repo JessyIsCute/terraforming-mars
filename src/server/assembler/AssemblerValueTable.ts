@@ -1,0 +1,204 @@
+import {Tag} from '../../common/cards/Tag';
+import {AssemblerValueTableModel, ValueTableSection} from '../../common/assembler/AssemblerValueTable';
+import {EFFECT_CATEGORIES, EFFECT_CATEGORY_INFO} from '../../common/assembler/EffectCategory';
+import {ASSEMBLER_CARD_MANIFEST} from '../cards/assembler/AssemblerCardManifest';
+import {CardName} from '../../common/cards/CardName';
+import {IProjectCard} from '../cards/IProjectCard';
+import {OPEN_SOURCE_BLUEPRINTS_DISCOUNT, OPEN_SOURCE_BLUEPRINTS_PRESET} from '../cards/assembler/OpenSourceBlueprints';
+import * as V from './AssemblerValues';
+import {PROFILE} from './AssemblerGenerator';
+import {CATEGORY_WORDS, MAJOR_VALUE} from './AssemblerNames';
+import {AssembleSpec} from './AssembleSpec';
+
+/** "8.5", "11", "−2.5": one decimal at most, a real minus sign. */
+function num(n: number): string {
+  const rounded = Math.round(n * 10) / 10;
+  return rounded < 0 ? `−${Math.abs(rounded)}` : String(rounded);
+}
+
+function pct(n: number): string {
+  return `${Math.round(n * 100)}%`;
+}
+
+function range([lo, hi]: [number, number]): string {
+  return lo === hi ? String(lo) : `${lo}–${hi}`;
+}
+
+function section(title: string, columns: Array<string>, numeric: Array<boolean>, rows: Array<Array<string>>, intro?: string): ValueTableSection {
+  return intro === undefined ? {title, columns, numeric, rows} : {title, intro, columns, numeric, rows};
+}
+
+const RESOURCE_LABEL: Record<V.StandardResource, string> = {
+  megacredits: 'M€',
+  steel: 'Steel',
+  titanium: 'Titanium',
+  plants: 'Plants',
+  energy: 'Energy',
+  heat: 'Heat',
+};
+
+const TAG_ORDER: Array<Tag> = [Tag.BUILDING, Tag.SPACE, Tag.EARTH, Tag.SCIENCE, Tag.VENUS, Tag.PLANT, Tag.POWER, Tag.MICROBE, Tag.JOVIAN, Tag.CITY, Tag.ANIMAL, Tag.WILD];
+
+/** The preset each printed Assembler card uses, in words. */
+export function describeSpec(spec: AssembleSpec): string {
+  const parts: Array<string> = [];
+  if (spec.complexity !== undefined) {
+    parts.push(`${spec.complexity} complexity`);
+  }
+  if (spec.tags !== undefined && spec.tags.length > 0) {
+    parts.push(`at least 1 ${spec.tags.join(' and ')} tag`);
+  }
+  if (spec.tagCount !== undefined) {
+    parts.push(`exactly ${spec.tagCount} tags`);
+  }
+  if (spec.minCost !== undefined && spec.maxCost !== undefined) {
+    parts.push(`cost ${spec.minCost}–${spec.maxCost} M€`);
+  } else if (spec.maxCost !== undefined) {
+    parts.push(`cost at most ${spec.maxCost} M€`);
+  } else if (spec.minCost !== undefined) {
+    parts.push(`cost at least ${spec.minCost} M€`);
+  }
+  if (spec.costAdjust !== undefined) {
+    parts.push(`then ${num(spec.costAdjust)} M€`);
+  }
+  if (spec.forceRequirement === true) {
+    parts.push('with a requirement');
+  }
+  if (spec.categories !== undefined && spec.categories.length > 0) {
+    parts.push(`with ${spec.categories.map((c) => EFFECT_CATEGORY_INFO[c].label).join(', ')}`);
+  }
+  const text = parts.join(', ');
+  return text === '' ? 'Random' : text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+const PRESETS: Partial<Record<CardName, string>> = {
+  [CardName.RESEARCH_PROTOTYPE]: describeSpec({tags: [Tag.SCIENCE]}),
+  [CardName.OPEN_SOURCE_BLUEPRINTS]: `${describeSpec(OPEN_SOURCE_BLUEPRINTS_PRESET)}; yours ${num(-OPEN_SOURCE_BLUEPRINTS_DISCOUNT)} M€`,
+  [CardName.QUAD_CORE_CHASSIS]: describeSpec({tagCount: 4}),
+  [CardName.SPECIALIZED_FABRICATOR]: 'Has your most common tag',
+  [CardName.VENTURE_PROTOTYPE]: describeSpec({complexity: 'high'}),
+  [CardName.BARGAIN_BIN]: describeSpec({complexity: 'low', maxCost: 8}),
+};
+
+/** Effect and action texts live in the card's picture, not its description; spelled out here. */
+const EFFECTS: Partial<Record<CardName, string>> = {
+  [CardName.ASSEMBLY_LINE]: 'Action: spend 1 M€ to Assemble a new card into your hand.',
+  [CardName.SALVAGE_YARD]: 'Effect: when you play an assembled card, gain 2 M€.',
+  [CardName.ASSEMBLY_ROBOTS]: 'Effect: assembled cards cost you 2 M€ less.',
+  [CardName.REVERSE_ENGINEERING]: 'Action: discard a card to Assemble a new card into your hand.',
+  [CardName.HALL_OF_PROTOTYPES]: '1 VP for every 2 assembled cards you have played.',
+};
+
+/** Everything on the value table page. */
+export function buildValueTable(): AssemblerValueTableModel {
+  const sections: Array<ValueTableSection> = [];
+
+  sections.push(section('How a card is priced', ['Rule', 'Value'], [false, false], [
+    ['Card value', 'Sum of its parts, tags and requirement (in M€)'],
+    ['Printed cost', `Value − ${V.BUY_COST} (what it costs to buy the card), rounded`],
+    ['Cost range', `${V.MIN_COST}–${V.MAX_COST} M€; cards outside it are rerolled`],
+    ['Big effect', `Worth ${MAJOR_VALUE} M€ or more: uses the stronger naming words`],
+  ], 'Every assembled card is worth what its parts are worth. A drawback has a negative value and makes the card cheaper.'));
+
+  sections.push(section('Resources', ['Resource', '1 in stock', '1 production step', 'Category'], [false, true, true, false],
+    (Object.keys(V.STOCK_VALUE) as Array<V.StandardResource>).map((r) => [
+      RESOURCE_LABEL[r],
+      num(V.STOCK_VALUE[r]),
+      num(V.PRODUCTION_VALUE[r]),
+      EFFECT_CATEGORY_INFO[r === 'megacredits' ? 'money' : r === 'steel' || r === 'titanium' ? 'metal' : r].label,
+    ]),
+    'Losing a resource or production is worth the same, negative.'));
+
+  sections.push(section('One-off effects', ['Effect', 'Value', 'Category'], [false, true, false], [
+    ['Raise your TR 1 step', num(V.TR_VALUE), 'Prestige'],
+    ['1 victory point', num(V.VP_VALUE), 'Prestige'],
+    ['Draw a card', num(V.DRAW_CARD_VALUE), 'Knowledge'],
+    ['Raise temperature 1 step', num(V.GLOBAL_STEP_VALUE.temperature), 'Heat'],
+    ['Raise oxygen 1 step', num(V.GLOBAL_STEP_VALUE.oxygen), 'Air'],
+    ['Raise Venus 1 step', num(V.GLOBAL_STEP_VALUE.venus), 'Air'],
+    ['Place an ocean tile', num(V.OCEAN_VALUE), 'Water'],
+    ['Place a greenery tile (and raise oxygen)', num(V.GREENERY_VALUE), 'Plants'],
+    ['Place a city tile', num(V.CITY_VALUE), 'City'],
+    ['Remove 1 plant from any player', num(V.REMOVE_PLANT_VALUE), 'Blight'],
+    ['Decrease any production 1 step', num(V.DECREASE_ANY_PRODUCTION_VALUE), 'Cooling / Blight / Debt'],
+  ]));
+
+  sections.push(section('Effects and actions', ['What', 'How it\'s valued', 'Example'], [false, false, false], [
+    ['Action: gain resources', `What you gain × ${V.ACTION_USES} uses`, `Gain 1 steel: ${num(V.STOCK_VALUE.steel)} × ${V.ACTION_USES} = ${num(V.STOCK_VALUE.steel * V.ACTION_USES)}`],
+    ['Action: spend energy to gain', `(Gain − energy spent) × ${V.ACTION_USES} uses`,
+      `2 energy → 2 steel: (${num(2 * V.STOCK_VALUE.steel)} − ${num(2 * V.STOCK_VALUE.energy)}) × ${V.ACTION_USES} = ${num((2 * V.STOCK_VALUE.steel - 2 * V.STOCK_VALUE.energy) * V.ACTION_USES)}`],
+    ['Action: spend 4 energy to raise a parameter', `(Step − 4 energy) × ${V.CONVERSION_ACTION_USES} uses`,
+      `Temperature: (${num(V.GLOBAL_STEP_VALUE.temperature)} − ${num(4 * V.STOCK_VALUE.energy)}) × ${V.CONVERSION_ACTION_USES} = ${num((V.GLOBAL_STEP_VALUE.temperature - 4 * V.STOCK_VALUE.energy) * V.CONVERSION_ACTION_USES)}`],
+    ['Discount on every card', `Discount × ${V.CARDS_PLAYED_AFTER} cards played after`, `1 M€: ${num(V.CARDS_PLAYED_AFTER)}`],
+    ['Discount on a tag', `Discount × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR} (focus)`,
+      `2 M€ on science: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SCIENCE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['When you play a tag, gain', `Gain × ${V.CARDS_PLAYED_AFTER} × tag share × ${V.FOCUS_FACTOR}`,
+      `2 M€ per space tag: 2 × ${V.CARDS_PLAYED_AFTER} × ${pct(V.TAG_SHARE[Tag.SPACE] ?? 0)} × ${V.FOCUS_FACTOR} = ${num(2 * V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SPACE] ?? 0) * V.FOCUS_FACTOR)}`],
+    ['Cards cost 1 M€ more (drawback)', `−${V.CARDS_PLAYED_AFTER} (× tag share for one tag)`, `Science tags: ${num(-V.CARDS_PLAYED_AFTER * (V.TAG_SHARE[Tag.SCIENCE] ?? 0))}`],
+  ]));
+
+  sections.push(section('Tags', ['Tag', 'Value', 'Share of cards', 'Pay with'], [false, true, true, false],
+    TAG_ORDER.map((t) => {
+      const pay = V.PAYMENT_VALUE[t];
+      return [
+        t.charAt(0).toUpperCase() + t.slice(1),
+        num(V.TAG_VALUE[t] ?? 0),
+        V.TAG_SHARE[t] !== undefined ? pct(V.TAG_SHARE[t]) : '–',
+        pay !== undefined ? `${t === Tag.SPACE ? 'Titanium' : 'Steel'}: +${num(pay.flat)} and ${pct(pay.ofCost)} of the cost` : '',
+      ];
+    }),
+    `The most valuable tag counts fully, every other tag ${pct(V.EXTRA_TAG_FACTOR)}. An event's tags count ${pct(V.EVENT_TAG_FACTOR)}, plus ${num(V.EVENT_TAG_VALUE)} for the event tag.`));
+
+  const tagRequirementRows = [1, 2, 3, 4, 5].map((n) => [`${n} tag${n === 1 ? '' : 's'}`, num(-Math.pow(n, V.TAG_REQUIREMENT_EXPONENT))]);
+  sections.push(section('Requirements', ['Requirement', 'Value'], [false, true], [
+    ['Parameter at least X', `${num(V.GLOBAL_MIN_REQUIREMENT)} × how late (0 = start, 1 = max)`],
+    ['Example: 5% oxygen or more', num(V.GLOBAL_MIN_REQUIREMENT * 5 / 14)],
+    ['Parameter at most X', `${num(V.GLOBAL_MAX_REQUIREMENT)} × how early it closes`],
+    ...tagRequirementRows,
+  ], 'A requirement makes a card harder to play, so it lowers the value. Tag requirements grow faster than the count.'));
+
+  sections.push(section('Complexity', ['Complexity', 'Benefits', 'Effect chance', 'Drawbacks', 'Tags', 'Requirement chance'], [false, true, true, true, true, true],
+    (['low', 'mid', 'high'] as const).map((c) => {
+      const p = PROFILE[c];
+      return [c.charAt(0).toUpperCase() + c.slice(1), range(p.good), pct(p.effectChance), range(p.bad), range(p.tags), pct(p.requirementChance)];
+    }),
+    'Low cards do one thing. High cards do several, always have an effect or action, and carry a drawback that pays for the rest.'));
+
+  sections.push(section('Effect categories and names', ['Category', 'Kind', 'What counts', 'Nouns', 'Adjectives (small / big)', 'Endings'], [false, false, false, false, false, false],
+    EFFECT_CATEGORIES.map((c) => {
+      const info = EFFECT_CATEGORY_INFO[c];
+      const w = CATEGORY_WORDS[c];
+      return [
+        info.label,
+        info.bane ? 'Drawback' : 'Benefit',
+        info.description,
+        [...w.nouns[0], ...w.nouns[1]].join(', '),
+        `${w.adjectives[0].join(', ')} / ${w.adjectives[1].join(', ')}`,
+        w.endings.join(', '),
+      ];
+    }),
+    'The strongest benefit names the thing, the next effect (a drawback first) describes it, and high-complexity cards add an ending: "Cooled Reactor of Insight".'));
+
+  const printed: Array<IProjectCard> = Object.values(ASSEMBLER_CARD_MANIFEST.projectCards).map((spec) => new spec.Factory());
+  sections.push(section('Printed Assembler cards and their presets', ['Card', 'Cost', 'What it does', 'Preset'], [false, true, false, false],
+    printed.map((card) => {
+      const description = card.metadata.description;
+      const text = typeof description === 'string' ? description : description?.text ?? '';
+      return [
+        card.name,
+        String(card.cost),
+        [EFFECTS[card.name], text].filter((t) => t !== undefined && t !== '').join(' '),
+        PRESETS[card.name] ?? 'Random',
+      ];
+    })));
+
+  const example = V.PRODUCTION_VALUE.plants + (V.TAG_VALUE[Tag.PLANT] ?? 0);
+  sections.push(section('Worked example', ['Part', 'Value'], [false, true], [
+    ['Increase your plant production 1 step', num(V.PRODUCTION_VALUE.plants)],
+    ['Plant tag', num(V.TAG_VALUE[Tag.PLANT] ?? 0)],
+    ['Card value', num(example)],
+    [`Printed cost (value − ${V.BUY_COST})`, String(Math.round(example - V.BUY_COST))],
+  ]));
+
+  return {sections};
+}

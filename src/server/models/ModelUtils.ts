@@ -14,7 +14,33 @@ import {asArray} from '../../common/utils/utils';
 import {isIStandardProjectCard} from '../cards/IStandardProjectCard';
 import {isCustomCardName, getCustomCardDefinition} from '../cards/CustomCardRegistry';
 import {getAssembledCardDefinition} from '../assembler/AssembledCardRegistry';
+import {AssembledCardDefinition} from '../assembler/AssembledCardDefinition';
 import {NEUTRAL_COLONY_OWNER} from '../../common/Types';
+
+/**
+ * Assembler: a generated card isn't in the client's static manifest, so its face travels with
+ * the model, along with how it was priced.
+ */
+export function addAssembledCardModel(model: CardModel, card: ICard, assembled: AssembledCardDefinition): void {
+  model.customCard = {
+    type: card.type,
+    cost: card.cost,
+    tags: card.tags,
+    requirements: card.requirements,
+    metadata: card.metadata,
+    resourceType: card.resourceType,
+    module: 'assembler',
+    compatibility: [],
+    hasAction: assembled.action !== undefined,
+  };
+  model.combinedDisplayName = assembled.title;
+  model.assembled = {
+    complexity: assembled.complexity,
+    value: assembled.value,
+    breakdown: assembled.breakdown,
+    costAdjust: assembled.costAdjust,
+  };
+}
 
 export function cardsToModel(
   player: IPlayer,
@@ -103,24 +129,7 @@ export function cardsToModel(
     // Assembler: generated during the game, so not in the static manifest either.
     const assembled = getAssembledCardDefinition(card.name);
     if (assembled !== undefined) {
-      model.customCard = {
-        type: card.type,
-        cost: card.cost,
-        tags: card.tags,
-        requirements: card.requirements,
-        metadata: card.metadata,
-        resourceType: card.resourceType,
-        module: 'assembler',
-        compatibility: [],
-        hasAction: assembled.action !== undefined,
-      };
-      model.combinedDisplayName = assembled.title;
-      model.assembled = {
-        complexity: assembled.complexity,
-        value: assembled.value,
-        breakdown: assembled.breakdown,
-        costAdjust: assembled.costAdjust,
-      };
+      addAssembledCardModel(model, card, assembled);
     }
     // Same reasoning as Custom Card Maker cards above: DeimosDoubleDownCopy's face varies
     // per instance (whichever Space event it copies), so it's not in the static manifest

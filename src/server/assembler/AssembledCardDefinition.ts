@@ -5,6 +5,7 @@ import {CardDiscount} from '../../common/cards/Types';
 import {Units} from '../../common/Units';
 import {Behavior} from '../behavior/Behavior';
 import {AssemblerComplexity} from './AssembleSpec';
+import {EffectCategory} from '../../common/assembler/EffectCategory';
 
 export type {AssemblerComplexity} from './AssembleSpec';
 
@@ -18,6 +19,8 @@ export type AssembledTrigger = {
 export type AssembledValueLine = {
   text: string,
   value: number,
+  /** The part's effect category. Not set on tag/requirement lines, or on cards saved before categories existed. */
+  category?: EffectCategory,
 };
 
 /**

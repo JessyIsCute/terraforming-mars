@@ -7,6 +7,7 @@
       it, it becomes available in any game with "Custom Cards" enabled.
     </p>
     <p class="card-maker-intro"><a :href="paths.CARD_LIBRARY" v-i18n>Browse submitted &amp; approved cards</a></p>
+    <p class="card-maker-intro"><a :href="paths.ASSEMBLER" v-i18n>Or generate random Assembler cards</a></p>
 
     <div class="card-maker-layout">
       <div class="card-maker-controls">

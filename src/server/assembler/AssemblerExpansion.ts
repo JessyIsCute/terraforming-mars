@@ -6,6 +6,7 @@ import {AssembleSpec, AssemblerComplexity} from './AssembleSpec';
 import {AssemblerGenerator} from './AssemblerGenerator';
 import {assembledCardName, registerAssembledCard} from './AssembledCardRegistry';
 import {newAssembledCard} from './AssembledCard';
+import {Random} from '../../common/utils/Random';
 
 const COMPLEXITY_WEIGHTS: Array<[AssemblerComplexity, number]> = [['low', 4], ['mid', 4], ['high', 2]];
 
@@ -19,7 +20,7 @@ export class AssemblerExpansion {
    */
   public static create(game: IGame, spec: AssembleSpec = {}): {definition: AssembledCardDefinition, card: IProjectCard} {
     const generator = new AssemblerGenerator(game.rng);
-    const chosen = spec.complexity ?? AssemblerExpansion.pickComplexity(game);
+    const chosen = spec.complexity ?? AssemblerExpansion.pickComplexity(game.rng);
     const name = assembledCardName(game.id, game.assembledCards.length + 1);
     const definition = generator.generate(name, chosen, spec);
     game.assembledCards.push(definition);
@@ -62,9 +63,10 @@ export class AssemblerExpansion {
     AssemblerExpansion.assemble(game, AssemblerExpansion.SETUP_CARDS);
   }
 
-  private static pickComplexity(game: IGame): AssemblerComplexity {
+  /** A random complexity: more low and mid than high. */
+  public static pickComplexity(rng: Random): AssemblerComplexity {
     const total = COMPLEXITY_WEIGHTS.reduce((s, [, w]) => s + w, 0);
-    let r = game.rng.next() * total;
+    let r = rng.next() * total;
     for (const [c, w] of COMPLEXITY_WEIGHTS) {
       r -= w;
       if (r < 0) {

@@ -4,7 +4,7 @@ import {AssemblyLine} from '../../../src/server/cards/assembler/AssemblyLine';
 import {PrototypeWorkshop} from '../../../src/server/cards/assembler/PrototypeWorkshop';
 import {SalvageYard} from '../../../src/server/cards/assembler/SalvageYard';
 import {ModularFactory} from '../../../src/server/cards/assembler/ModularFactory';
-import {isAssembledCardName} from '../../../src/server/assembler/AssembledCardRegistry';
+import {getAssembledCardDefinition, isAssembledCardName} from '../../../src/server/assembler/AssembledCardRegistry';
 import {AssemblerExpansion} from '../../../src/server/assembler/AssemblerExpansion';
 import {Mine} from '../../../src/server/cards/base/Mine';
 import {TestPlayer} from '../../TestPlayer';
@@ -59,7 +59,10 @@ describe('Assembler printed cards', () => {
 
     const [assembled] = AssemblerExpansion.assembleIntoHand(player, 1);
     player.playCard(assembled);
-    expect(player.megaCredits).eq(2);
+    runAllActions(game);
+    // The assembled card may give M€ itself; Salvage Yard adds 2 on top.
+    const ownGain = getAssembledCardDefinition(assembled.name)?.behavior?.stock?.megacredits ?? 0;
+    expect(player.megaCredits).eq(2 + (typeof ownGain === 'number' ? ownGain : 0));
   });
 
   it('Modular Factory: steel production, an assembled card, 1 VP', () => {

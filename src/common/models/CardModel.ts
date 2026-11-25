@@ -1,3 +1,4 @@
+import {EffectCategory} from '../assembler/EffectCategory';
 import {Units} from '../Units';
 import {CardName} from '../cards/CardName';
 import {CardResource} from '../CardResource';
@@ -40,7 +41,8 @@ export interface AssembledCardInfo {
     complexity: 'low' | 'mid' | 'high';
     /** What the card is worth, in M€. Its cost is round(value - 3), plus costAdjust. */
     value: number;
-    breakdown: ReadonlyArray<{text: string, value: number}>;
+    /** category: set when the line is one of the card's parts. */
+    breakdown: ReadonlyArray<{text: string, value: number, category?: EffectCategory}>;
     /** Set when a preset changed the cost after pricing, e.g. -10. */
     costAdjust?: number;
 }

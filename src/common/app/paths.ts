@@ -1,5 +1,7 @@
 export const paths = {
   ADMIN: 'admin',
+  API_ASSEMBLER: 'api/assembler',
+  API_ASSEMBLER_VALUES: 'api/assembler/values',
   API_CLONEABLEGAME: 'api/cloneablegame',
   API_CREATEGAME: 'api/creategame',
   API_GAME: 'api/game',
@@ -20,6 +22,7 @@ export const paths = {
   API_STATS: 'api/stats',
   API_WAITING_FOR: 'api/waitingfor',
   AUTH_DISCORD_CALLBACK: 'auth/discord/callback',
+  ASSEMBLER: 'assembler',
   AUTOPASS: 'autopass',
   CARD_LIBRARY: 'card-library',
   CARDS: 'cards',

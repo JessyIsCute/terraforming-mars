@@ -10,6 +10,7 @@
     <a class="start-screen-link start-screen-link--cards-list" href="cards" target="_blank" v-i18n>Cards list</a>
     <a class="start-screen-link start-screen-link--map-library" href="map-library" v-i18n>Map library</a>
     <a class="start-screen-link start-screen-link--card-maker" href="card-maker" v-i18n>Card maker</a>
+    <a class="start-screen-link start-screen-link--assembler" href="assembler" v-i18n>Card generator</a>
     <a class="start-screen-link start-screen-link--board-game" href="https://boardgamegeek.com/boardgame/167791/terraforming-mars" target="_blank" v-i18n>Board game</a>
     <a class="start-screen-link start-screen-link--about" href="https://github.com/terraforming-mars/terraforming-mars#README" target="_blank" v-i18n>About us</a>
     <div class="start-screen-header start-screen-link--languages">

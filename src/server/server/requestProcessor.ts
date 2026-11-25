@@ -35,6 +35,7 @@ import {Login} from '../routes/Login';
 import {PlayerInput} from '../routes/PlayerInput';
 import {Reset} from '../routes/Reset';
 import {ServeApp} from '../routes/ServeApp';
+import {ApiAssembler, ApiAssemblerValues} from '../routes/ApiAssembler';
 import {ServeAsset} from '../routes/ServeAsset';
 import {serverId, statsId} from '../utils/server-ids';
 import {newIpBlocklist} from './IPBlocklist';
@@ -94,6 +95,9 @@ const handlers: Map<string, IHandler> = new Map(
   [
     ['', ServeApp.INSTANCE],
     [paths.ADMIN, ServeApp.INSTANCE],
+    [paths.ASSEMBLER, ServeApp.INSTANCE],
+    [paths.API_ASSEMBLER, ApiAssembler.INSTANCE],
+    [paths.API_ASSEMBLER_VALUES, ApiAssemblerValues.INSTANCE],
     [paths.API_CLONEABLEGAME, ApiCloneableGame.INSTANCE],
     [paths.API_CREATEGAME, ApiCreateGame.INSTANCE],
     [paths.API_GAME, ApiGame.INSTANCE],
